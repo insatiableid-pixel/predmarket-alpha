@@ -143,7 +143,10 @@ class MacroSignalExtractor:
         }
         
         # We query the real FRED API, falling back to defaults on failure
-        api_key = os.getenv("FRED_API_KEY", "abcdefghijklmnopqrstuvwxyz123456")
+        api_key = os.getenv("FRED_API_KEY")
+        if not api_key:
+            logger.warning(f"FRED_API_KEY not set — returning hardcoded default for {series_id}")
+            return macro_defaults.get(series_id, 0.0)
         units_param = "&units=pc1" if series_id == "CPIAUCSNS" else ""
         url = f"https://api.stlouisfed.org/fred/series/observations?series_id={series_id}&api_key={api_key}&file_type=json{units_param}"
         

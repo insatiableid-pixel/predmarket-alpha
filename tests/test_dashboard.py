@@ -1,7 +1,7 @@
 import pytest
 import sqlite3
 from fastapi.testclient import TestClient
-from predmarket.dashboard import app, server, get_db_connection, fetch_performance_metrics, update_dashboard_data, approve_staged_order_db, get_staged_orders, approve_order_endpoint
+from predmarket.dashboard import app, server, get_db_connection, fetch_performance_metrics, update_dashboard_data, approve_staged_order_db, get_staged_orders, approve_order_endpoint, ApprovalRequest
 import predmarket.dashboard as db_module
 
 @pytest.fixture
@@ -120,7 +120,7 @@ async def test_fastapi_endpoints(setup_dashboard_db):
     # 2. Test approve_order_endpoint function
     # Since we are using mock execution (execution disabled by default on Kalshi),
     # approving should route to stage_order and return success or execute order.
-    res_json = await approve_order_endpoint({"id": staged_id}, api_key="predmarket_secret_key_123")
+    res_json = await approve_order_endpoint(ApprovalRequest(id=staged_id), api_key="predmarket_secret_key_123")
     assert "status" in res_json
 
 def test_api_key_authentication_routing(setup_dashboard_db):

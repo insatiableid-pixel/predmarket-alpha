@@ -38,3 +38,4 @@ dash-bootstrap-components>=1.0.0 # UI styling layout and elements
 pytest>=7.3.0               # Test runner
 pytest-asyncio>=0.21.0      # Async test fixtures and wrappers
 pytest-cov>=4.1.0           # Test suite coverage calculation
+alembic>=1.13.0             # Database migration framework

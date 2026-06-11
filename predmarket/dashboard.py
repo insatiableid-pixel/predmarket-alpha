@@ -7,6 +7,7 @@ from typing import Dict, Any, List, Optional
 from pathlib import Path
 from fastapi import FastAPI, Depends, Security, HTTPException, status
 from fastapi.security import APIKeyHeader
+from pydantic import BaseModel, Field
 from dash import Dash, dcc, html, Input, Output, callback, callback_context, ALL
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
@@ -30,6 +31,12 @@ def get_api_key(api_key: Optional[str] = Security(api_key_header)):
             detail="Could not validate credentials"
         )
     return api_key
+
+
+class ApprovalRequest(BaseModel):
+    """Pydantic model for /api/approve request body validation."""
+    id: int = Field(gt=0, description="Staged order ID to approve")
+
 
 # Dash App
 app = Dash(
@@ -136,14 +143,13 @@ def get_staged_orders(api_key: str = Depends(get_api_key)):
         conn.close()
         return df.to_dict("records")
     except Exception as e:
-        return {"status": "error", "message": str(e)}
+        logger.exception("Failed to fetch staged orders")
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR, detail="Internal server error")
 
 @server.post("/api/approve")
-async def approve_order_endpoint(payload: dict, api_key: str = Depends(get_api_key)):
-    staged_id = payload.get("id")
-    if not staged_id:
-        logger.warning("Approve endpoint called without 'id' in payload")
-        return {"status": "error", "message": "Missing 'id' in payload"}
+async def approve_order_endpoint(body: ApprovalRequest, api_key: str = Depends(get_api_key)):
+    staged_id = body.id
+    logger.info(f"Approve endpoint called for staged order {staged_id}")
     return await approve_staged_order_db(staged_id)
 
 def fetch_performance_metrics() -> Dict[str, Any]:
