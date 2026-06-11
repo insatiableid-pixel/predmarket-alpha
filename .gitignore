@@ -1,0 +1,46 @@
+# Environment secrets — NEVER commit real credentials
+.env
+
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+*.egg-info/
+dist/
+build/
+
+# Test artifacts
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+
+# Data files (databases, logs, audit trails contain runtime state)
+data/*.sqlite
+data/*.log
+data/*.jsonl
+data/raw/*
+data/processed/*
+!data/raw/.gitkeep
+!data/processed/.gitkeep
+
+# Test temp data
+tests/tmp_data/
+
+# IDE / editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Agent / tool temp files
+.hermes-tmp.*
+
+# Misc
+*.Zone.Identifier

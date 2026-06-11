@@ -1,0 +1,56 @@
+# Prediction Market Alpha Platform Configuration
+# Schema Version: 1.0.0
+
+global:
+  environment: "wsl2"
+  data_dir: "/home/mrwatson/projects/predmarket-alpha/data"
+  log_level: "INFO"
+  dashboard_host: "0.0.0.0"
+  dashboard_port: 8050
+
+venues:
+  polymarket:
+    enabled: true
+    execution_enabled: false
+    clob_api_url: "https://clob.polymarket.com"
+    wallet_address: "" # Loaded via POLYMARKET_WALLET_ADDRESS env
+    min_liquidity_usd: 10000.0  # Open interest threshold
+    max_slippage_pct: 1.5
+    gas_reserve_matic: 10.0
+
+  kalshi:
+    enabled: true
+    execution_enabled: false
+    api_url: "https://api.kalshi.co/v2"
+    min_liquidity_usd: 10000.0
+    max_slippage_pct: 1.0
+
+  interactive_brokers:
+    enabled: true
+    execution_enabled: false
+    host: "127.0.0.1"
+    port: 4002 # Default paper trading port. Live: 4001
+    client_id: 10
+    live_trading_enabled: false # Enforce safety by default
+
+forecasting:
+  ensemble:
+    divergence_threshold: 0.15      # Trigger ENSEMBLE-DIVERGENCE if max(p_i) - min(p_i) > threshold
+    recency_anchor_threshold: 0.60  # NLP weight threshold for recency damping
+    nlp_damping_factor: 0.50        # Lambda for base rate damping
+    min_forecast_prob: 0.01         # Trigger OVERCONFIDENT-TAIL below this
+    max_forecast_prob: 0.99         # Trigger OVERCONFIDENT-TAIL above this
+
+portfolio:
+  kelly:
+    fraction: 0.25                  # Quarter-Kelly standard sizing
+    leverage_cap: 1.0               # Absolute leverage limit
+    min_edge: 0.03                  # 3% raw edge minimum over market implied + transaction costs
+    max_single_position_pct: 0.05   # 5% max bankroll in one contract
+    max_correlated_exposure_pct: 0.10 # 10% max bankroll on same underlying topic
+  
+  risk_controls:
+    max_drawdown_limit: 0.20        # 20% 30-day drawdown circuit breaker
+    line_movement_threshold_pct: 0.05 # 5 percentage points shift
+    line_movement_window_mins: 30   # 30-minute window for SHARP-MOVE
+    covariance_update_frequency_mins: 60

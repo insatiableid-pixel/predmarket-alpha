@@ -1,0 +1,40 @@
+# Python Dependencies for Prediction Market Alpha Platform (predmarket-alpha)
+# Pinned to stable major versions
+
+# Configuration & Env Management
+pydantic>=2.0.0             # Type-safe validation of config schemas
+pyyaml>=6.0.0               # Parsing and loading config.yaml
+python-dotenv>=1.0.0        # Secure credential loading from .env
+
+# Asynchronous Ingestion & Network
+aiohttp>=3.9.0              # Async HTTP client for REST APIs
+websockets>=12.0            # High-performance async WebSocket client
+asyncio>=3.4.3              # Native async execution orchestration
+
+# Venue Clients
+kalshi-python>=2.0.0        # Official CFTC-regulated Kalshi SDK
+cryptography>=41.0.0        # Cryptographic keys and signatures required by kalshi-python
+ib-insync>=0.9.86           # Asyncio-native Interactive Brokers TWS/Gateway wrapper
+
+# Data Science & Math
+numpy>=1.24.0               # Vectorized algebra and Kelly computations
+pandas>=2.0.0               # Dataframes for time-series and log ingestion
+scipy>=1.10.0               # Convex optimization solver for correlation Kelly
+scikit-learn>=1.2.0         # Model evaluation metrics and calibration curves
+
+# Deep Learning / NLP Signal Extraction
+torch>=2.0.0 --extra-index-url https://download.pytorch.org/whl/cpu # CPU-only PyTorch for resource efficiency
+transformers>=4.30.0        # Hugging Face transformers for DeBERTa NLP signal modeling
+
+# Dashboard & API Service
+fastapi>=0.100.0            # REST API wrapper for staging manual approvals
+uvicorn>=0.22.0             # High-performance ASGI web server
+dash>=2.11.0                # Live dashboard UI using Plotly React elements
+plotly>=5.15.0              # Statistical plotting and calibration curves
+dash-bootstrap-components>=1.0.0 # UI styling layout and elements
+
+
+# Testing Framework
+pytest>=7.3.0               # Test runner
+pytest-asyncio>=0.21.0      # Async test fixtures and wrappers
+pytest-cov>=4.1.0           # Test suite coverage calculation
