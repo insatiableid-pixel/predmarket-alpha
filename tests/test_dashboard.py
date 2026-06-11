@@ -2,14 +2,15 @@ import pytest
 import sqlite3
 from fastapi.testclient import TestClient
 from predmarket.dashboard import app, server, get_db_connection, fetch_performance_metrics, update_dashboard_data, approve_staged_order_db, get_staged_orders, approve_order_endpoint, ApprovalRequest
-import predmarket.dashboard as db_module
+from predmarket.dashboard import callbacks as _callbacks  # ensure callbacks are registered
+import predmarket.dashboard.data as db_module
 
 @pytest.fixture
 def setup_dashboard_db(test_data_dir, monkeypatch):
     # Setup database file
     db_path = test_data_dir / "database.sqlite"
     
-    # Patch get_db_connection in dashboard module to use our test DB
+    # Patch get_db_connection in dashboard.data module to use our test DB
     def mock_get_db_connection():
         return sqlite3.connect(str(db_path))
     monkeypatch.setattr(db_module, "get_db_connection", mock_get_db_connection)
