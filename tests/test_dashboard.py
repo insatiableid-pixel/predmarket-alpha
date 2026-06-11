@@ -87,8 +87,9 @@ def test_performance_metrics_with_data(setup_dashboard_db):
     assert metrics["pnl"] > 0
     assert metrics["win_rate"] == 1.0
 
-def test_dashboard_callback_update(setup_dashboard_db):
-    res = update_dashboard_data(0)
+@pytest.mark.asyncio
+async def test_dashboard_callback_update(setup_dashboard_db):
+    res = await update_dashboard_data(0)
     assert len(res) == 9 # 9 outputs returned
     brier, logloss, pnl, drawdown, cal_fig, eq_fig, opp_table, slate, err = res
     assert brier is not None

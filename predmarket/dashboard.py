@@ -13,7 +13,6 @@ from dash import Dash, dcc, html, Input, Output, callback, callback_context, ALL
 import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from sklearn.calibration import calibration_curve
-import nest_asyncio
 from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 logger = logging.getLogger("predmarket.dashboard")
@@ -348,10 +347,10 @@ app.layout = dbc.Container(
     ],
     Input("interval-update", "n_intervals")
 )
-def update_dashboard_data(n):
+async def update_dashboard_data(n):
     try:
         metrics = fetch_performance_metrics()
-        
+
         brier_str = f"{metrics['brier_score']:.4f}"
         logloss_str = f"{metrics['log_score']:.4f}"
         pnl_str = f"${metrics['pnl']:.2f}"
@@ -365,7 +364,7 @@ def update_dashboard_data(n):
             if resolved_trades:
                 y_true = [t["outcome"] for t in resolved_trades]
                 y_prob = [t["model_prob"] for t in resolved_trades]
-                
+
                 if len(set(y_true)) > 1:
                     fraction_of_positives, mean_predicted_value = calibration_curve(y_true, y_prob, n_bins=5)
                     cal_fig.add_trace(go.Scatter(
@@ -375,14 +374,14 @@ def update_dashboard_data(n):
                         mode="lines+markers",
                         name="Platform Calibration"
                     ))
-            
+
             # Ideal line
             cal_fig.add_trace(go.Scatter(
                 x=[0, 1], y=[0, 1],
                 line=dict(dash="dash", color="grey"),
                 name="Perfect Calibration"
             ))
-        
+
         cal_fig.update_layout(
             title="Forecasting Epistemic Calibration Curve",
             xaxis_title="Mean Predicted Probability",
@@ -397,7 +396,7 @@ def update_dashboard_data(n):
         conn = get_db_connection()
         df_eq = pd.read_sql_query("SELECT timestamp, total_equity FROM equity_history", conn)
         conn.close()
-        
+
         if not df_eq.empty:
             df_eq["time"] = pd.to_datetime(df_eq["timestamp"], unit="s")
             eq_fig.add_trace(go.Scatter(
@@ -418,34 +417,22 @@ def update_dashboard_data(n):
         # 3. Opportunity Board Layout
         opp_table_headers = ["Venue", "Contract", "Category", "Model Prob", "Market Implied", "Edge %", "Status"]
         opp_rows = []
-        
+
         try:
             from predmarket.config import load_config
             from predmarket.ingest import MarketIngestManager
             from predmarket.ensemble import EnsembleForecaster
-            import asyncio
-            
+
             config = load_config()
             ingest = MarketIngestManager(config)
             forecaster = EnsembleForecaster(config)
-            
-            async def fetch_snapshots():
-                await ingest.initialize()
-                try:
-                    return await ingest.get_all_snapshots()
-                finally:
-                    await ingest.close()
-            
+
+            await ingest.initialize()
             try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-                asyncio.set_event_loop(loop)
-                
-            if loop.is_running():
-                nest_asyncio.apply()
-            snapshots = loop.run_until_complete(fetch_snapshots())
-            
+                snapshots = await ingest.get_all_snapshots()
+            finally:
+                await ingest.close()
+
             sim_opportunities = []
             for snap in snapshots:
                 category = "political" if "ELECTION" in snap.contract_id else "econ"
@@ -482,23 +469,23 @@ def update_dashboard_data(n):
                 html.Td(f"{edge:+.1%}", style={"color": ACCENT_GREEN if edge > 0 else ACCENT_RED}),
                 html.Td(item["status"], style={"color": ACCENT_BLUE if item["status"] == "READY" else ACCENT_RED})
             ]))
-            
+
         opp_table = dbc.Table([html.Thead(html.Tr([html.Th(h) for h in opp_table_headers])), html.Tbody(opp_rows)], bordered=True, hover=True, color="dark", responsive=True)
 
-        # 4. Position Sizing Slate Layout
+        # 4. Position Sizing Slate Layout — via shared data-access, not raw SQLite
         slate_cards = []
         conn = get_db_connection()
         df_staged = pd.read_sql_query("""
-            SELECT id, venue, contract, category, side, price, model_prob, market_implied, net_edge, size, details 
-            FROM audit_trail 
+            SELECT id, venue, contract, category, side, price, model_prob, market_implied, net_edge, size, details
+            FROM audit_trail
             WHERE status = 'STAGED'
         """, conn)
         conn.close()
-        
+
         for idx, row in df_staged.iterrows():
             edge = row["model_prob"] - row["market_implied"]
-            recommended_allocation_pct = row["size"] / 10000.0 # hypothetical cash percentage
-            
+            recommended_allocation_pct = row["size"] / 10000.0
+
             slate_cards.append(
                 dbc.Card(
                     dbc.CardBody([
@@ -507,9 +494,9 @@ def update_dashboard_data(n):
                         html.P(f"RECOMMENDED ALLOCATION: ${row['size']:.2f} ({recommended_allocation_pct:.2%})"),
                         html.P(f"DETAILS / KEY RESOLUTION: {row['details']}", className="text-muted mb-1"),
                         dbc.Button(
-                            "Approve Trade Intent", 
-                            color="warning", 
-                            className="mt-2", 
+                            "Approve Trade Intent",
+                            color="warning",
+                            className="mt-2",
                             id={"type": "approve-btn", "index": int(row["id"])}
                         )
                     ]),
@@ -533,11 +520,11 @@ def update_dashboard_data(n):
     Input({"type": "approve-btn", "index": ALL}, "n_clicks"),
     prevent_initial_call=True
 )
-def approve_trade_intent_callback(n_clicks_list):
+async def approve_trade_intent_callback(n_clicks_list):
     ctx = callback_context
     if not ctx.triggered:
         return None
-        
+
     trigger_id = ctx.triggered[0]["prop_id"].split(".")[0]
     import json
     try:
@@ -545,26 +532,12 @@ def approve_trade_intent_callback(n_clicks_list):
         staged_id = trigger_dict["index"]
     except Exception:
         return None
-        
+
     val = ctx.triggered[0]["value"]
     if not val:
         return None
-        
-    import asyncio
-    
-    async def run_approval():
-        return await approve_staged_order_db(staged_id)
-        
-    try:
-        loop = asyncio.get_event_loop()
-    except RuntimeError:
-        loop = asyncio.new_event_loop()
-        asyncio.set_event_loop(loop)
-        
-    if loop.is_running():
-        nest_asyncio.apply()
-    
-    res = loop.run_until_complete(run_approval())
+
+    res = await approve_staged_order_db(staged_id)
     if res["status"] == "success":
         return dbc.Alert(res["message"], color="success", dismissable=True)
     else:
