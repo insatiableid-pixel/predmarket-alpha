@@ -1,0 +1,80 @@
+/* predmarket-alpha — CSS Custom Properties & Base Styles */
+
+:root {
+  --dark-bg: #0B0E14;
+  --card-bg: #161B22;
+  --accent-blue: #58A6FF;
+  --accent-green: #3FB950;
+  --accent-red: #F85149;
+  --accent-orange: #F0883E;
+  --text-muted: #8B949E;
+  --font-family: 'Outfit', sans-serif;
+}
+
+/* Base page */
+body {
+  background-color: var(--dark-bg);
+  font-family: var(--font-family);
+  min-height: 100vh;
+}
+
+/* KPI cards */
+.kpi-card {
+  background-color: var(--card-bg);
+}
+
+.kpi-positive {
+  color: var(--accent-green);
+}
+
+.kpi-negative {
+  color: var(--accent-red);
+}
+
+.kpi-neutral {
+  color: var(--accent-blue);
+}
+
+/* Section cards */
+.section-card {
+  background-color: var(--card-bg);
+}
+
+.section-header-blue {
+  background-color: var(--card-bg);
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+.section-header-orange {
+  background-color: var(--card-bg);
+  color: var(--accent-orange);
+  font-weight: bold;
+}
+
+/* Trade approval cards */
+.approval-card {
+  background-color: var(--dark-bg);
+  border: 1px solid var(--accent-orange);
+  margin-bottom: 15px;
+}
+
+/* Opportunity board */
+.edge-positive {
+  color: var(--accent-green);
+}
+
+.edge-negative {
+  color: var(--accent-red);
+}
+
+.status-ready {
+  color: var(--accent-blue);
+}
+
+.status-warning {
+  color: var(--accent-red);
+}
+
+/* Plotly overrides (applied via Dash config, referenced here for clarity) */
+/* Template: plotly_dark, plot_bgcolor: var(--card-bg), paper_bgcolor: var(--dark-bg) */

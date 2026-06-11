@@ -4,7 +4,7 @@ import asyncio
 import logging
 import sqlite3
 import time
-import threading
+import multiprocessing
 import json
 import hashlib
 import uuid
@@ -241,15 +241,20 @@ async def main():
     risk = RiskManager(config, audit_logger)
     execution = ExecutionManager(config, audit_logger)
 
-    # 5. Start Dashboard thread
-    t = threading.Thread(target=start_dashboard_server, daemon=True)
-    t.start()
+    # 5. Start Dashboard as a separate process (survives main loop crash)
+    dashboard_proc = multiprocessing.Process(
+        target=start_dashboard_server,
+        name="predmarket-dashboard"
+    )
+    dashboard_proc.start()
 
     # 6. Start platform background loop
     try:
         await platform_loop(config, ingest, forecaster, risk, execution, audit_logger)
     finally:
         await ingest.close()
+        dashboard_proc.terminate()
+        dashboard_proc.join(timeout=5)
 
 if __name__ == "__main__":
     asyncio.run(main())
