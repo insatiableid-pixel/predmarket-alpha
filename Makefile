@@ -1,0 +1,83 @@
+.PHONY: setup test lint run clean coverage openapi
+
+# Default target
+help:
+	@echo "predmarket-alpha — Makefile targets"
+	@echo ""
+	@echo "  make setup     — Create venv and install dependencies"
+	@echo "  make test      — Run pytest with coverage"
+	@echo "  make lint      — Run ruff linting"
+	@echo "  make run       — Start the platform (alembic upgrade + main)"
+	@echo "  make dashboard — Start dashboard server only"
+	@echo "  make coverage  — Run tests and generate HTML coverage report"
+	@echo "  make openapi   — Export OpenAPI spec to docs/openapi.json"
+	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
+	@echo "  make migrate   — Run Alembic migrations to head"
+	@echo "  make docker    — Build Docker image"
+
+# ---- Environment ----
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+PIP := $(VENV)/bin/pip
+PYTEST := $(VENV)/bin/pytest
+
+$(VENV):
+	python3 -m venv $(VENV)
+	$(PIP) install --upgrade pip setuptools wheel
+
+setup: $(VENV)
+	$(PIP) install -r requirements.txt
+	@echo "Setup complete. Activate with: source $(VENV)/bin/activate"
+
+# ---- Testing ----
+test:
+	PYTHONPATH=. $(PYTEST) tests/ -v --tb=short
+
+coverage:
+	PYTHONPATH=. $(PYTEST) tests/ --cov=predmarket --cov-report=html --cov-report=term-missing
+	@echo "Coverage report: htmlcov/index.html"
+
+lint:
+	$(PIP) install -q ruff 2>/dev/null || true
+	$(VENV)/bin/ruff check predmarket/ tests/ main.py || echo "ruff not installed — run 'make setup' first"
+
+# ---- Running ----
+run:
+	alembic upgrade head
+	PYTHONPATH=. $(PYTHON) main.py
+
+dashboard:
+	PYTHONPATH=. $(PYTHON) -m uvicorn predmarket.dashboard:server --host 0.0.0.0 --port 8050
+
+# ---- Database ----
+migrate:
+	alembic upgrade head
+
+# ---- Docs ----
+openapi:
+	@echo "Starting server to export OpenAPI spec..."
+	PYTHONPATH=. $(PYTHON) -c "\
+		import json, time, threading; \
+		from predmarket.dashboard import server; \
+		import uvicorn; \
+		t = threading.Thread(target=uvicorn.run, args=(server,), kwargs={'host':'127.0.0.1','port':8051}, daemon=True); \
+		t.start(); \
+		time.sleep(2); \
+		import urllib.request; \
+		resp = urllib.request.urlopen('http://127.0.0.1:8051/openapi.json'); \
+		spec = json.loads(resp.read()); \
+		Path('docs').mkdir(exist_ok=True); \
+		json.dump(spec, open('docs/openapi.json','w'), indent=2); \
+		print('docs/openapi.json written') \
+	"
+
+# ---- Docker ----
+docker:
+	docker build -t predmarket .
+
+# ---- Cleanup ----
+clean:
+	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
+	find . -type f -name '*.pyc' -delete 2>/dev/null || true
+	rm -rf .pytest_cache htmlcov dist build *.egg-info
+	@echo "Clean complete."

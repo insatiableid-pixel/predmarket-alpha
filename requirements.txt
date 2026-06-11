@@ -39,3 +39,5 @@ pytest>=7.3.0               # Test runner
 pytest-asyncio>=0.21.0      # Async test fixtures and wrappers
 pytest-cov>=4.1.0           # Test suite coverage calculation
 alembic>=1.13.0             # Database migration framework
+prometheus-client>=0.19.0   # Prometheus /metrics endpoint
+python-json-logger>=2.0.0   # Structured JSON logging

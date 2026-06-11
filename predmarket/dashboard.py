@@ -6,6 +6,7 @@ import numpy as np
 from typing import Dict, Any, List, Optional
 from pathlib import Path
 from fastapi import FastAPI, Depends, Security, HTTPException, status
+from fastapi.responses import Response
 from fastapi.security import APIKeyHeader
 from pydantic import BaseModel, Field
 from dash import Dash, dcc, html, Input, Output, callback, callback_context, ALL
@@ -13,8 +14,23 @@ import dash_bootstrap_components as dbc
 import plotly.graph_objs as go
 from sklearn.calibration import calibration_curve
 import nest_asyncio
+from prometheus_client import Counter, generate_latest, CONTENT_TYPE_LATEST
 
 logger = logging.getLogger("predmarket.dashboard")
+
+# Prometheus metrics
+METRIC_TRADES_STAGED = Counter(
+    "predmarket_trades_staged_total",
+    "Total trades staged for review"
+)
+METRIC_TRADES_EXECUTED = Counter(
+    "predmarket_trades_executed_total",
+    "Total trades successfully executed"
+)
+METRIC_TRADES_FAILED = Counter(
+    "predmarket_trades_failed_total",
+    "Total trades that failed execution"
+)
 
 # FastAPI Server
 server = FastAPI()
@@ -113,6 +129,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
         logger.info(f"Order execution result: {res.get('status')} (order_id={res.get('order_id', 'N/A')})")
         
         if res.get("status") == "FILLED":
+            METRIC_TRADES_EXECUTED.inc()
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE audit_trail SET status = 'FILLED', details = ? WHERE id = ?", (f"Filled: {res.get('order_id')}", staged_id))
@@ -120,6 +137,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
             conn.close()
             return {"status": "success", "message": f"Successfully executed order {res.get('order_id')} on {venue}."}
         else:
+            METRIC_TRADES_FAILED.inc()
             conn = get_db_connection()
             cursor = conn.cursor()
             cursor.execute("UPDATE audit_trail SET status = 'FAILED' WHERE id = ?", (staged_id,))
@@ -127,6 +145,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
             conn.close()
             return {"status": "error", "message": f"Execution failed on {venue}."}
     except Exception as e:
+        METRIC_TRADES_FAILED.inc()
         conn = get_db_connection()
         cursor = conn.cursor()
         cursor.execute("UPDATE audit_trail SET status = 'FAILED', details = ? WHERE id = ?", (str(e), staged_id))
@@ -151,6 +170,13 @@ async def approve_order_endpoint(body: ApprovalRequest, api_key: str = Depends(g
     staged_id = body.id
     logger.info(f"Approve endpoint called for staged order {staged_id}")
     return await approve_staged_order_db(staged_id)
+
+
+@server.get("/metrics")
+def metrics_endpoint():
+    """Prometheus metrics endpoint."""
+    return Response(content=generate_latest(), media_type=CONTENT_TYPE_LATEST)
+
 
 def fetch_performance_metrics() -> Dict[str, Any]:
     conn = get_db_connection()

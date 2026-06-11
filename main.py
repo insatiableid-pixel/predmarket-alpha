@@ -7,8 +7,10 @@ import time
 import threading
 import json
 import hashlib
+import uuid
 from pathlib import Path
 from typing import List, Dict, Any
+from pythonjsonlogger.json import JsonFormatter
 
 from predmarket.config import load_config
 from predmarket.audit import AuditLogger
@@ -18,18 +20,33 @@ from predmarket.risk import RiskManager
 from predmarket.execution import ExecutionManager
 from predmarket.dashboard import server, app
 
-# Configure logging dynamically/portably
+# Configure structured JSON logging
 log_dir = Path(__file__).resolve().parents[0] / "data" / "processed"
 log_dir.mkdir(parents=True, exist_ok=True)
 log_file = log_dir / "platform.log"
 
+# JSON formatter for file output
+json_formatter = JsonFormatter(
+    "%(asctime)s %(levelname)s %(name)s %(message)s",
+    datefmt="%Y-%m-%dT%H:%M:%S"
+)
+
+# Plain-text formatter for console
+console_formatter = logging.Formatter(
+    "%(asctime)s [%(levelname)s] %(name)s: %(message)s"
+)
+
+# File handler (JSON structured)
+file_handler = logging.FileHandler(str(log_file))
+file_handler.setFormatter(json_formatter)
+
+# Console handler (human-readable)
+console_handler = logging.StreamHandler(sys.stdout)
+console_handler.setFormatter(console_formatter)
+
 logging.basicConfig(
     level=logging.INFO,
-    format="%(asctime)s [%(levelname)s] %(name)s: %(message)s",
-    handlers=[
-        logging.StreamHandler(sys.stdout),
-        logging.FileHandler(str(log_file))
-    ]
+    handlers=[console_handler, file_handler]
 )
 logger = logging.getLogger("predmarket.main")
 
