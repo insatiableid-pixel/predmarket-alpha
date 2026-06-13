@@ -2,13 +2,13 @@
 
 # Default target
 help:
-	@echo "predmarket-alpha — Makefile targets"
+	@echo "Big Two PredMarket Alpha — Makefile targets"
 	@echo ""
 	@echo "  make setup     — Create venv and install dependencies"
 	@echo "  make check-env — Verify runtime imports resolve from the venv"
 	@echo "  make test      — Run pytest with coverage"
 	@echo "  make lint      — Run ruff linting"
-	@echo "  make run       — Start the platform (alembic upgrade + main)"
+	@echo "  make run       — Start the Big Two platform (alembic upgrade + main)"
 	@echo "  make dashboard — Start dashboard server only"
 	@echo "  make coverage  — Run tests and generate HTML coverage report"
 	@echo "  make openapi   — Export OpenAPI spec to docs/openapi.json"

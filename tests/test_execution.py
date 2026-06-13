@@ -49,9 +49,8 @@ async def test_execution_fee_modeling(mock_config, test_data_dir):
     k_cost = exec_mgr.calculate_transaction_costs("Kalshi", 200.0, 0.40)
     assert abs(k_cost - (80.0 * 0.0035)) < 1e-6
 
-    # IB: commission ($0.01/qty) + regulatory fee (0.02% of size)
-    ib_cost = exec_mgr.calculate_transaction_costs("IB", 1000.0, 0.60)
-    assert ib_cost == (1000.0 * 0.01) + (600.0 * 0.0002)
+    with pytest.raises(ValueError, match="Unsupported venue"):
+        exec_mgr.calculate_transaction_costs("LegacyVenue", 1000.0, 0.60)
 
 
 @pytest.mark.asyncio

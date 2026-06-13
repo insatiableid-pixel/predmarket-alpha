@@ -1,5 +1,5 @@
 """
-Dashboard package for the PredMarket-Alpha platform.
+Dashboard package for the Big Two PredMarket Alpha platform.
 
 Modules
 -------

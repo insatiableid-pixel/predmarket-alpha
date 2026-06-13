@@ -10,12 +10,6 @@ except ImportError:  # pragma: no cover - exercised in minimal test envs
     aiohttp = None
 
 try:
-    from ib_insync import IB, Contract as IBContract
-except ImportError:  # pragma: no cover - exercised in minimal test envs
-    IB = None
-    IBContract = None
-
-try:
     import kalshi_python
 except ImportError:  # pragma: no cover - exercised in minimal test envs
     kalshi_python = None
@@ -56,11 +50,9 @@ class MarketIngestManager:
     ):
         self.config = config
         self.blocking_call_runner = blocking_call_runner or asyncio.to_thread
-        self.ib: Optional[IB] = None
         self.session: Optional[aiohttp.ClientSession] = None
         self.polymarket_connected = False
         self.kalshi_connected = False
-        self.ib_connected = False
         self.mock_db: Dict[str, MarketSnapshot] = {}
         self._init_mock_data()
 
@@ -88,17 +80,6 @@ class MarketIngestManager:
                 open_interest=150000.0,
                 volume_24h=35000.0,
                 line_history=[0.48, 0.46, 0.45, 0.44, 0.43, 0.425]
-            ),
-            "IB-CPI-JUNE-2026": MarketSnapshot(
-                venue="IB",
-                contract_id="IB-CPI-JUNE-2026",
-                title="US CPI YoY growth for June 2026 exceeds 2.8%",
-                bid=0.61,
-                ask=0.63,
-                last_price=0.62,
-                open_interest=25000.0,
-                volume_24h=8000.0,
-                line_history=[0.58, 0.59, 0.60, 0.61, 0.62]
             )
         }
 
@@ -117,15 +98,9 @@ class MarketIngestManager:
         if self.config.venues.kalshi.enabled:
             await self._connect_kalshi()
 
-        # 3. Interactive Brokers Init
-        if self.config.venues.interactive_brokers.enabled:
-            await self._connect_ib()
-
     async def close(self):
         if self.session:
             await self.session.close()
-        if self.ib and self.ib.isConnected():
-            self.ib.disconnect()
 
     async def _connect_polymarket(self):
         p_cfg = self.config.venues.polymarket
@@ -180,33 +155,6 @@ class MarketIngestManager:
         except Exception as e:
             logger.warning(f"Kalshi API connection failed: {e}. Falling back.")
             self.kalshi_connected = False
-
-    async def _connect_ib(self):
-        ib_cfg = self.config.venues.interactive_brokers
-        if IB is None:
-            logger.warning("ib_insync is not installed. Running IB in mock/fallback mode.")
-            self.ib_connected = False
-            return
-        self.ib = IB()
-        try:
-            # We use a short timeout for connection checks to prevent freezing the application
-            await asyncio.wait_for(
-                self.ib.connectAsync(ib_cfg.host, ib_cfg.port, clientId=ib_cfg.client_id),
-                timeout=2.0
-            )
-            if self.ib.isConnected():
-                logger.info(f"Connected to IB Gateway at {ib_cfg.host}:{ib_cfg.port}")
-                self.ib_connected = True
-                if ib_cfg.live_trading_enabled and ib_cfg.live_confirmed:
-                    logger.warning("=== LIVE IB TRADING ACTIVE ===")
-                else:
-                    logger.info("=== PAPER-MODE-ACTIVE (IB Gateway on Paper Port) ===")
-        except Exception as e:
-            # Under WSL2, IB Gateway must be running on the host or in WSL.
-            # We log a warning with instructions and fallback to mock data
-            logger.warning(f"IB-CONNECT-WARNING: Could not connect to IB Gateway at {ib_cfg.host}:{ib_cfg.port} ({e})")
-            logger.warning("To connect IB Gateway, ensure TWS/Gateway is running and 'Enable ActiveX and Socket Clients' is enabled on port 4002.")
-            self.ib_connected = False
 
     async def get_market_snapshot(self, contract_id: str) -> MarketSnapshot:
         # If real venue connection is available, query real endpoints; otherwise return mock
@@ -267,33 +215,6 @@ class MarketIngestManager:
                     snapshot.open_interest = float(getattr(market, "open_interest", snapshot.open_interest))
             except Exception as e:
                 logger.warning(f"Failed to fetch live Kalshi book for {contract_id}: {e}")
-                
-        elif snapshot.venue == "IB" and self.ib_connected:
-            try:
-                ib_contract = IBContract()
-                if contract_id.isdigit():
-                    ib_contract.conId = int(contract_id)
-                else:
-                    ib_contract.symbol = contract_id
-                    ib_contract.secType = "WAR"
-                    ib_contract.exchange = "FORECASTEX"
-                
-                await self.ib.qualifyContractsAsync(ib_contract)
-                ticker = self.ib.reqMktData(ib_contract, '', False, False)
-                await asyncio.sleep(0.5)
-                
-                if ticker.bid is not None and ticker.bid > 0:
-                    snapshot.bid = ticker.bid
-                if ticker.ask is not None and ticker.ask > 0:
-                    snapshot.ask = ticker.ask
-                if ticker.last is not None and ticker.last > 0:
-                    snapshot.last_price = ticker.last
-                if snapshot.bid > 0 and snapshot.ask > 0:
-                    snapshot.mid = (snapshot.bid + snapshot.ask) / 2.0
-                
-                self.ib.cancelMktData(ib_contract)
-            except Exception as e:
-                logger.warning(f"Failed to fetch live IB data for {contract_id}: {e}")
 
         return snapshot
 

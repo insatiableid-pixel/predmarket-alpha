@@ -40,8 +40,6 @@ def mock_config(test_data_dir):
     venues.kalshi.execution_enabled = False
     venues.kalshi.api_key = ""
     venues.kalshi.api_secret = ""
-    venues.interactive_brokers.enabled = False
-    venues.interactive_brokers.execution_enabled = False
 
     return Config(
         global_cfg=GlobalConfig(

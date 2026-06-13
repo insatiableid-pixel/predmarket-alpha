@@ -9,7 +9,7 @@ async def test_ingest_mock_fallback(mock_config):
     await manager.initialize()
 
     snapshots = await manager.get_all_snapshots()
-    assert len(snapshots) == 3
+    assert len(snapshots) == 2
 
     pm_snap = await manager.get_market_snapshot("PM-US-ELECTION-2026")
     assert isinstance(pm_snap, MarketSnapshot)

@@ -1,4 +1,4 @@
-# Python Dependencies for Prediction Market Alpha Platform (predmarket-alpha)
+# Python Dependencies for Big Two Prediction Market Alpha (predmarket-alpha)
 # Pinned to stable major versions
 
 # Configuration & Env Management
@@ -11,10 +11,9 @@ aiohttp>=3.9.0              # Async HTTP client for REST APIs
 websockets>=12.0            # High-performance async WebSocket client
 asyncio>=3.4.3              # Native async execution orchestration
 
-# Venue Clients
+# Big Two Venue Clients
 kalshi-python>=2.0.0        # Official CFTC-regulated Kalshi SDK
 cryptography>=41.0.0        # Cryptographic keys and signatures required by kalshi-python
-ib-insync>=0.9.86           # Asyncio-native Interactive Brokers TWS/Gateway wrapper
 
 # Data Science & Math
 numpy>=1.24.0               # Vectorized algebra and Kelly computations

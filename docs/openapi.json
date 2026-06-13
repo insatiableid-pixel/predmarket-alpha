@@ -1,9 +1,9 @@
 {
   "openapi": "3.1.0",
   "info": {
-    "title": "predmarket-alpha API",
+    "title": "Big Two PredMarket Alpha API",
     "version": "1.0.0",
-    "description": "Prediction market alpha platform \u2014 REST API for staging, approval, and monitoring"
+    "description": "Kalshi and Polymarket prediction market alpha platform API for staging, approval, and monitoring"
   },
   "paths": {
     "/api/staged": {

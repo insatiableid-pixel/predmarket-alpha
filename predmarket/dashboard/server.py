@@ -35,7 +35,10 @@ limiter = Limiter(key_func=get_remote_address, default_limits=["30/minute"])
 # FastAPI application
 # ---------------------------------------------------------------------------
 
-server = FastAPI()
+server = FastAPI(
+    title="Big Two PredMarket Alpha API",
+    description="Kalshi and Polymarket prediction market alpha platform API for staging, approval, and monitoring",
+)
 server.state.limiter = limiter
 server.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
@@ -173,7 +176,7 @@ async def dashboard_auth_middleware(request: Request, call_next):
     # Request basic auth credentials if missing or invalid
     return Response(
         status_code=401,
-        headers={"WWW-Authenticate": 'Basic realm="Predmarket Dashboard"'},
+        headers={"WWW-Authenticate": 'Basic realm="Big Two PredMarket Dashboard"'},
         content="Unauthorized"
     )
 

@@ -1,8 +1,8 @@
 import asyncio
 import sys
 
-# Ensure an active event loop is available in the current thread to prevent 
-# eventkit/ib_insync from throwing RuntimeError on import in Python 3.12+
+# Ensure an active event loop is available in the current thread for async
+# venue clients imported during application startup.
 try:
     asyncio.get_event_loop()
 except RuntimeError:

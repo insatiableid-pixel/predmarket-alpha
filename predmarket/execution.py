@@ -3,7 +3,6 @@ import asyncio
 import time
 from typing import Dict, Any, Optional, Callable, Awaitable
 import aiohttp
-from ib_insync import IB, Contract as IBContract
 import kalshi_python
 from predmarket.config import Config
 from predmarket.audit import AuditLogger
@@ -40,10 +39,6 @@ class ExecutionManager:
                 config_kalshi.api_key = k_cfg.api_key
                 config_kalshi.api_secret = k_cfg.api_secret
                 self.kalshi_api = kalshi_python.PortfolioApi(kalshi_python.ApiClient(config_kalshi))
-        
-        self.ib = None
-        self.ib_connected = False
-
 
     def calculate_transaction_costs(self, venue: str, quantity: float, price: float) -> float:
         """
@@ -62,14 +57,8 @@ class ExecutionManager:
             volume_fee = size_usd * 0.0015
             spread_slippage = size_usd * 0.002
             return volume_fee + spread_slippage
-            
-        elif venue.lower() == "ib":
-            # Standard ForecastEx commission ($0.01 per contract) + regulatory fees
-            commission = quantity * 0.01
-            reg_fee = size_usd * 0.0002
-            return commission + reg_fee
-            
-        return size_usd * 0.01
+
+        raise ValueError(f"Unsupported venue for transaction costs: {venue}")
 
     async def stage_order(
         self,
@@ -136,8 +125,6 @@ class ExecutionManager:
             execution_enabled = self.config.venues.polymarket.execution_enabled
         elif venue_lower == "kalshi":
             execution_enabled = self.config.venues.kalshi.execution_enabled
-        elif venue_lower == "ib":
-            execution_enabled = self.config.venues.interactive_brokers.execution_enabled
         else:
             entry_hash = self.audit_logger.log_trade_intent(
                 venue=venue,
@@ -245,43 +232,6 @@ class ExecutionManager:
                     
                     resp = await self.blocking_call_runner(self.kalshi_api.create_order, create_order_request=order_req)
                     order_id = getattr(resp, "order_id", f"KL-{int(time.time())}")
-                    
-                elif venue_lower == "ib":
-                    if not self.ib or not self.ib.isConnected():
-                        self.ib = IB()
-                        ib_cfg = self.config.venues.interactive_brokers
-                        await asyncio.wait_for(
-                            self.ib.connectAsync(ib_cfg.host, ib_cfg.port, clientId=ib_cfg.client_id + 1),
-                            timeout=3.0
-                        )
-                        self.ib_connected = self.ib.isConnected()
-                        
-                    ib_contract = IBContract()
-                    if contract.isdigit():
-                        ib_contract.conId = int(contract)
-                    else:
-                        ib_contract.symbol = contract
-                        ib_contract.secType = "WAR"
-                        ib_contract.exchange = "FORECASTEX"
-                        
-                    await self.ib.qualifyContractsAsync(ib_contract)
-                    
-                    qty = int(max(quantity, 1))
-                    from ib_insync import LimitOrder
-                    order = LimitOrder(action='BUY', totalQuantity=qty, lmtPrice=price)
-                    
-                    trade = self.ib.placeOrder(ib_contract, order)
-                    
-                    # Wait for order completion
-                    wait_retries = 0
-                    while not trade.isDone() and wait_retries < 10:
-                        await asyncio.sleep(0.5)
-                        wait_retries += 1
-                        
-                    if trade.orderStatus.status == 'Filled':
-                        order_id = str(trade.order.orderId)
-                    else:
-                        raise Exception(f"IB Order status: {trade.orderStatus.status}")
                 else:
                     raise ValueError(f"Unsupported venue: {venue}")
                 

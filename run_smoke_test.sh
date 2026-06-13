@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Smoke Test Orchestrator for predmarket-alpha
+# Smoke Test Orchestrator for Big Two PredMarket Alpha
 # Confirms environment is active, modules are importable, and pytest suite passes.
 # ==============================================================================
 
@@ -39,7 +39,6 @@ import aiohttp
 import websockets
 from pythonjsonlogger.json import JsonFormatter
 import kalshi_python
-import ib_insync
 print('Core dependencies verified.')
 "
 

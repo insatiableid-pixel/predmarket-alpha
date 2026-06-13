@@ -79,7 +79,7 @@ def seed_historical_data(db_path: str):
             )
             
         # 2. Seed 20 resolved trade intents to pass the health check and generate calibration curves
-        venues = ["Polymarket", "Kalshi", "IB"]
+        venues = ["Polymarket", "Kalshi"]
         categories = ["political", "econ", "sports"]
         sides = ["YES", "NO"]
         
@@ -98,7 +98,7 @@ def seed_historical_data(db_path: str):
 
         for idx, (p, o) in enumerate(historical_cases):
             t = now - (20 - idx) * 3600 * 12
-            v = venues[idx % 3]
+            v = venues[idx % len(venues)]
             cat = categories[idx % 3]
             side = sides[idx % 2]
             price = p + 0.02 if side == "YES" else (1.0 - p) + 0.02
@@ -315,7 +315,7 @@ def run_migrations():
 
 async def main():
     # 0. Parse CLI arguments (B7 remediation)
-    parser = argparse.ArgumentParser(description="PredMarket-Alpha Platform")
+    parser = argparse.ArgumentParser(description="Big Two PredMarket Alpha Platform")
     parser.add_argument("--seed", action="store_true", help="Seed historical performance data into the database on startup")
     args = parser.parse_args()
 

@@ -1,8 +1,8 @@
 import os
 from pathlib import Path
-from typing import Dict, Any, Optional
+from typing import Optional
 import yaml
-from pydantic import BaseModel, Field, field_validator, model_validator, ConfigDict
+from pydantic import BaseModel, Field, model_validator, ConfigDict
 from dotenv import load_dotenv
 
 # Load env variables from .env if present
@@ -50,25 +50,9 @@ class KalshiConfig(BaseModel):
             self.api_secret = os.getenv("KALSHI_API_SECRET") or ""
         return self
 
-class IBConfig(BaseModel):
-    enabled: bool = True
-    execution_enabled: bool = False
-    host: str = "127.0.0.1"
-    port: int = 4002
-    client_id: int = 10
-    live_trading_enabled: bool = False
-    live_confirmed: bool = Field(default=False)
-
-    @model_validator(mode="after")
-    def load_from_env(self) -> 'IBConfig':
-        env_val = os.getenv("IB_LIVE_CONFIRMED", "false").lower()
-        self.live_confirmed = env_val in ("true", "1", "yes")
-        return self
-
 class VenuesConfig(BaseModel):
     polymarket: PolymarketConfig = Field(default_factory=PolymarketConfig)
     kalshi: KalshiConfig = Field(default_factory=KalshiConfig)
-    interactive_brokers: IBConfig = Field(default_factory=IBConfig)
 
 class EnsembleConfig(BaseModel):
     divergence_threshold: float = 0.15
@@ -122,4 +106,3 @@ def load_config(config_path: Optional[str] = None) -> Config:
         raw_yaml = yaml.safe_load(f) or {}
 
     return Config.model_validate(raw_yaml)
-

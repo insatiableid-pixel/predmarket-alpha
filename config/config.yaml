@@ -1,4 +1,5 @@
-# Prediction Market Alpha Platform Configuration
+# Big Two Prediction Market Alpha Configuration
+# Runtime venues are intentionally limited to Polymarket and Kalshi.
 # Schema Version: 1.0.0
 
 global:
@@ -24,15 +25,6 @@ venues:
     api_url: "https://api.kalshi.co/v2"
     min_liquidity_usd: 10000.0
     max_slippage_pct: 1.0
-
-  interactive_brokers:
-    enabled: true
-    execution_enabled: false
-    host: "127.0.0.1"
-    port: 4002 # Default paper trading port. Live: 4001
-    client_id: 10
-    live_trading_enabled: false # Enforce safety by default
-
 forecasting:
   ensemble:
     divergence_threshold: 0.15      # Trigger ENSEMBLE-DIVERGENCE if max(p_i) - min(p_i) > threshold

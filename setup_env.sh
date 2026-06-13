@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # ==============================================================================
-# Setup Environment Script for predmarket-alpha
+# Setup Environment Script for Big Two PredMarket Alpha
 # Creates directories, initializes python venv, and installs dependencies.
 # ==============================================================================
 

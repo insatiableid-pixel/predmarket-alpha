@@ -1,4 +1,4 @@
-# Multi-stage Dockerfile for predmarket-alpha
+# Multi-stage Dockerfile for Big Two PredMarket Alpha
 # Build: docker build -t predmarket .
 # Run:   docker run -p 8050:8050 --env-file .env predmarket
 
@@ -33,5 +33,5 @@ USER appuser
 
 EXPOSE 8050
 
-# Run Alembic migrations, then start the platform
+# Run Alembic migrations, then start the Big Two platform
 CMD ["sh", "-c", "alembic upgrade head && python main.py"]

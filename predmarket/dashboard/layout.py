@@ -36,6 +36,7 @@ app = Dash(
     server=server,
     routes_pathname_prefix="/",
     assets_folder=str(assets_dir),
+    title="Big Two PredMarket Alpha",
     external_stylesheets=[
         dbc.themes.CYBORG,
         # F6: Outfit font is now served locally via assets/custom.css @font-face.
@@ -67,7 +68,7 @@ app.layout = dbc.Container(
             dbc.Row(
                 dbc.Col(
                     html.H1(
-                        "PREDMARKET-ALPHA | Real-time Forecasting Platform",
+                        "BIG TWO PREDMARKET ALPHA | Kalshi + Polymarket",
                         className="text-center my-4",
                         style={"color": ACCENT_BLUE, "font-family": "Outfit, sans-serif"},
                     ),
