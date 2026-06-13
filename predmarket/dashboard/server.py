@@ -80,6 +80,22 @@ def validate_csrf_token(token: str, max_age: int = 3600) -> bool:
         return False
 
 
+def generate_dashboard_auth_token() -> str:
+    """Generate a signed browser-session token after successful Basic auth."""
+    s = URLSafeTimedSerializer(_get_csrf_secret(), salt="predmarket-dashboard-auth")
+    return s.dumps({"t": "dashboard-auth"})
+
+
+def validate_dashboard_auth_token(token: str, max_age: int = 12 * 3600) -> bool:
+    """Validate the signed dashboard-session token."""
+    try:
+        s = URLSafeTimedSerializer(_get_csrf_secret(), salt="predmarket-dashboard-auth")
+        s.loads(token, max_age=max_age)
+        return True
+    except (BadSignature, Exception):
+        return False
+
+
 @server.middleware("http")
 async def csrf_middleware(request: Request, call_next):
     """Enforce CSRF validation on state-changing requests (POST/PUT/DELETE).
@@ -143,7 +159,9 @@ def get_api_key(api_key: Optional[str] = Security(api_key_header)):
 
 @server.middleware("http")
 async def dashboard_auth_middleware(request: Request, call_next):
-    # Exclude API endpoints, Swagger docs, and Prometheus metrics from basic auth
+    # Exclude API endpoints, Swagger docs, and Prometheus metrics from basic auth.
+    # API endpoints use X-API-Key; the browser UI uses Basic auth plus a signed
+    # cookie so Dash's assets, layout fetches, and websocket callbacks can load.
     path = request.url.path
     if (
         path.startswith("/api/")
@@ -162,6 +180,10 @@ async def dashboard_auth_middleware(request: Request, call_next):
             content="API_KEY environment variable is not set on the server."
         )
 
+    auth_cookie = request.cookies.get("dashboard_auth")
+    if auth_cookie and validate_dashboard_auth_token(auth_cookie):
+        return await call_next(request)
+
     auth_header = request.headers.get("Authorization")
     if auth_header and auth_header.startswith("Basic "):
         try:
@@ -169,7 +191,16 @@ async def dashboard_auth_middleware(request: Request, call_next):
             decoded = base64.b64decode(encoded).decode("utf-8")
             username, password = decoded.split(":", 1)
             if username == "admin" and password == expected_key:
-                return await call_next(request)
+                response = await call_next(request)
+                response.set_cookie(
+                    key="dashboard_auth",
+                    value=generate_dashboard_auth_token(),
+                    httponly=True,
+                    samesite="lax",
+                    secure=False,  # Set to True in production with HTTPS.
+                    max_age=12 * 3600,
+                )
+                return response
         except Exception:
             pass
 

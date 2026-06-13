@@ -200,3 +200,25 @@ async def test_basic_auth_middleware(setup_dashboard_db):
         call_next,
     )
     assert response.status_code == 200
+    assert "dashboard_auth=" in response.headers["set-cookie"]
+
+
+@pytest.mark.asyncio
+async def test_dashboard_auth_cookie_allows_dash_runtime_requests(setup_dashboard_db):
+    from predmarket.dashboard.server import (
+        dashboard_auth_middleware,
+        generate_dashboard_auth_token,
+    )
+
+    async def call_next(_request):
+        return Response(status_code=200)
+
+    response = await dashboard_auth_middleware(
+        make_request(
+            path="/_dash-layout",
+            headers={"Cookie": f"dashboard_auth={generate_dashboard_auth_token()}"},
+        ),
+        call_next,
+    )
+
+    assert response.status_code == 200
