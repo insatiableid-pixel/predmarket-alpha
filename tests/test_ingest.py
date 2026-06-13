@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import AsyncMock, patch, MagicMock
+from unittest.mock import AsyncMock, MagicMock
 from predmarket.ingest import MarketIngestManager, MarketSnapshot
 
 
@@ -22,7 +22,6 @@ async def test_ingest_mock_fallback(mock_config):
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="aiohttp async context manager mocking requires deeper integration")
 async def test_ingest_polymarket_live_fetch(mock_config):
     """Test live Polymarket book fetch with mocked HTTP."""
     manager = MarketIngestManager(mock_config)
@@ -45,6 +44,7 @@ async def test_ingest_polymarket_live_fetch(mock_config):
 
     mock_session = MagicMock()
     mock_session.get.return_value = MockResponse()
+    mock_session.close = AsyncMock()
     manager.session = mock_session
 
     snap = await manager.get_market_snapshot("PM-US-ELECTION-2026")
@@ -89,7 +89,6 @@ async def test_ingest_unknown_contract(mock_config):
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="aiohttp async context manager mocking requires deeper integration")
 async def test_ingest_polymarket_api_error_graceful(mock_config):
     """Test that Polymarket API errors fall back to mock data."""
     manager = MarketIngestManager(mock_config)
@@ -107,6 +106,7 @@ async def test_ingest_polymarket_api_error_graceful(mock_config):
 
     mock_session = MagicMock()
     mock_session.get.return_value = MockErrorResponse()
+    mock_session.close = AsyncMock()
     manager.session = mock_session
 
     snap = await manager.get_market_snapshot("PM-US-ELECTION-2026")

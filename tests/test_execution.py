@@ -8,6 +8,22 @@ async def run_blocking_inline(func, *args, **kwargs):
     return func(*args, **kwargs)
 
 
+class MockClientSession:
+    def __init__(self, post_response):
+        self.post_response = post_response
+        self.post_calls = []
+
+    async def __aenter__(self):
+        return self
+
+    async def __aexit__(self, *args):
+        pass
+
+    def post(self, *args, **kwargs):
+        self.post_calls.append((args, kwargs))
+        return self.post_response
+
+
 def make_execution_manager(config, audit_logger, **overrides):
     params = {
         "api_retry_limit": 1,
@@ -61,7 +77,6 @@ async def test_execution_staging_default(mock_config, test_data_dir):
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="aiohttp async context manager mocking requires deeper integration — covered by staging test")
 async def test_execution_polymarket_order_mocked(mock_config, test_data_dir):
     """Test Polymarket CLOB order submission with mocked HTTP."""
     audit = AuditLogger(str(test_data_dir))
@@ -83,10 +98,9 @@ async def test_execution_polymarket_order_mocked(mock_config, test_data_dir):
         async def __aexit__(self, *args):
             pass
 
-    mock_session = MagicMock()
-    mock_session.post.return_value = MockAsyncCtxResponse()
+    mock_session = MockClientSession(MockAsyncCtxResponse())
 
-    with patch("aiohttp.ClientSession", return_value=mock_session):
+    with patch("predmarket.execution.aiohttp.ClientSession", return_value=mock_session):
         res = await exec_mgr.execute_order(
             venue="Polymarket",
             contract="TOKEN-1",
@@ -100,10 +114,14 @@ async def test_execution_polymarket_order_mocked(mock_config, test_data_dir):
 
     assert res["status"] == "FILLED"
     assert res["order_id"] == "PM-12345"
+    assert len(mock_session.post_calls) == 1
+    args, kwargs = mock_session.post_calls[0]
+    assert args == ("https://clob.polymarket.com/order",)
+    assert kwargs["json"]["token_id"] == "TOKEN-1"
+    assert kwargs["json"]["side"] == "BUY"
 
 
 @pytest.mark.asyncio
-@pytest.mark.skip(reason="aiohttp async context manager mocking requires deeper integration")
 async def test_execution_polymarket_api_error(mock_config, test_data_dir):
     """Test Polymarket order with API error and retry exhaustion."""
     audit = AuditLogger(str(test_data_dir))
@@ -124,10 +142,9 @@ async def test_execution_polymarket_api_error(mock_config, test_data_dir):
         async def __aexit__(self, *args):
             pass
 
-    mock_session = MagicMock()
-    mock_session.post.return_value = MockErrorResponse()
+    mock_session = MockClientSession(MockErrorResponse())
 
-    with patch("aiohttp.ClientSession", return_value=mock_session):
+    with patch("predmarket.execution.aiohttp.ClientSession", return_value=mock_session):
         res = await exec_mgr.execute_order(
             venue="Polymarket",
             contract="TOKEN-1",
@@ -140,6 +157,7 @@ async def test_execution_polymarket_api_error(mock_config, test_data_dir):
         )
 
     assert res["status"] == "FAILED"
+    assert len(mock_session.post_calls) == 1
 
 
 @pytest.mark.asyncio
