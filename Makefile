@@ -1,4 +1,4 @@
-.PHONY: setup check-env test lint run clean coverage openapi
+.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery
 
 # Default target
 help:
@@ -12,6 +12,7 @@ help:
 	@echo "  make dashboard — Start dashboard server only"
 	@echo "  make coverage  — Run tests and generate HTML coverage report"
 	@echo "  make openapi   — Export OpenAPI spec to docs/openapi.json"
+	@echo "  make kalshi-discovery — Run Kalshi resolved-row discovery from stored rows"
 	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
 	@echo "  make migrate   — Run Alembic migrations to head"
 	@echo "  make docker    — Build Docker image"
@@ -80,6 +81,9 @@ openapi:
 		json.dump(spec, open('docs/openapi.json','w'), indent=2); \
 		print('docs/openapi.json written') \
 	"
+
+kalshi-discovery:
+	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_discovery
 
 # ---- Docker ----
 docker:
