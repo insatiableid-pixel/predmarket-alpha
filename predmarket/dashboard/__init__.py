@@ -34,6 +34,7 @@ from .data import (  # noqa: F401
     get_db_connection,
     fetch_performance_metrics,
     approve_staged_order_db,
+    fetch_opportunities,
 )
 
 # Layout layer (creates the Dash app bound to the FastAPI server)

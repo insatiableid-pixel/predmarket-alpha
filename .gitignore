@@ -41,6 +41,19 @@ Thumbs.db
 
 # Agent / tool temp files
 .hermes-tmp.*
+.agents/
+.subagent-*.md
+skills-lock.json
+pi-session-*.html
 
 # Misc
 *.Zone.Identifier
+*:Zone.Identifier
+=*
+
+# Local research/reference drops; keep curated docs explicit when needed
+*.pdf
+*_2026-*.md
+!REMEDIATION_2026-06-10_COMPLETE.md
+!REMEDIATION_2026-06-10_step1_git_init.md
+!AUDIT_hermes_deepseek_v4_2026-06-10.md

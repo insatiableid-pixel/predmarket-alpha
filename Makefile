@@ -1,10 +1,11 @@
-.PHONY: setup test lint run clean coverage openapi
+.PHONY: setup check-env test lint run clean coverage openapi
 
 # Default target
 help:
 	@echo "predmarket-alpha — Makefile targets"
 	@echo ""
 	@echo "  make setup     — Create venv and install dependencies"
+	@echo "  make check-env — Verify runtime imports resolve from the venv"
 	@echo "  make test      — Run pytest with coverage"
 	@echo "  make lint      — Run ruff linting"
 	@echo "  make run       — Start the platform (alembic upgrade + main)"
@@ -20,6 +21,8 @@ VENV := .venv
 PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 PYTEST := $(VENV)/bin/pytest
+ALEMBIC := $(VENV)/bin/alembic
+export PATH := $(abspath $(VENV))/bin:$(PATH)
 
 $(VENV):
 	python3 -m venv $(VENV)
@@ -28,6 +31,9 @@ $(VENV):
 setup: $(VENV)
 	$(PIP) install -r requirements.txt
 	@echo "Setup complete. Activate with: source $(VENV)/bin/activate"
+
+check-env: $(VENV)
+	PYTHONPATH=. $(PYTHON) -c "import prometheus_client, aiohttp; from pythonjsonlogger.json import JsonFormatter; import predmarket.execution; print('runtime imports ok')"
 
 # ---- Testing ----
 test:
@@ -43,7 +49,7 @@ lint:
 
 # ---- Running ----
 run:
-	alembic upgrade head
+	$(ALEMBIC) upgrade head
 	PYTHONPATH=. $(PYTHON) main.py
 
 dashboard:
@@ -51,7 +57,7 @@ dashboard:
 
 # ---- Database ----
 migrate:
-	alembic upgrade head
+	$(ALEMBIC) upgrade head
 
 # ---- Docs ----
 openapi:

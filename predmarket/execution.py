@@ -1,7 +1,8 @@
 import logging
 import asyncio
 import time
-from typing import Dict, Any, Optional
+from typing import Dict, Any, Optional, Callable, Awaitable
+import aiohttp
 from ib_insync import IB, Contract as IBContract
 import kalshi_python
 from predmarket.config import Config
@@ -11,10 +12,23 @@ from predmarket.audit import AuditLogger
 logger = logging.getLogger("predmarket.execution")
 
 class ExecutionManager:
-    def __init__(self, config: Config, audit_logger: AuditLogger):
+    def __init__(
+        self,
+        config: Config,
+        audit_logger: AuditLogger,
+        api_retry_limit: int = 3,
+        base_throttle_seconds: float = 0.1,
+        retry_backoff_seconds: float = 1.0,
+        retry_jitter_seconds: float = 0.5,
+        blocking_call_runner: Optional[Callable[..., Awaitable[Any]]] = None,
+    ):
         self.config = config
         self.audit_logger = audit_logger
-        self.api_retry_limit = 3
+        self.api_retry_limit = api_retry_limit
+        self.base_throttle_seconds = base_throttle_seconds
+        self.retry_backoff_seconds = retry_backoff_seconds
+        self.retry_jitter_seconds = retry_jitter_seconds
+        self.blocking_call_runner = blocking_call_runner or asyncio.to_thread
         
         # Instantiate Kalshi PortfolioApi if kalshi is enabled
         self.kalshi_api = None
@@ -115,6 +129,7 @@ class ExecutionManager:
         Enforces execution_enabled flags and rate limits.
         """
         venue_lower = venue.lower()
+        net_edge = model_prob - market_implied - 0.01
         execution_enabled = False
         
         if venue_lower == "polymarket":
@@ -123,8 +138,30 @@ class ExecutionManager:
             execution_enabled = self.config.venues.kalshi.execution_enabled
         elif venue_lower == "ib":
             execution_enabled = self.config.venues.interactive_brokers.execution_enabled
-
-        net_edge = model_prob - market_implied - 0.01
+        else:
+            entry_hash = self.audit_logger.log_trade_intent(
+                venue=venue,
+                contract=contract,
+                category=category,
+                side=side,
+                size=quantity * price,
+                price=price,
+                model_prob=model_prob,
+                market_implied=market_implied,
+                net_edge=net_edge,
+                status="FAILED",
+                details=f"Unsupported venue: {venue}"
+            )
+            logger.warning(f"Unsupported execution venue: {venue}")
+            return {
+                "status": "FAILED",
+                "audit_hash": entry_hash,
+                "venue": venue,
+                "contract": contract,
+                "side": side,
+                "quantity": quantity,
+                "price": price
+            }
 
         if not execution_enabled:
             # Fall back to staging if execution is disabled (Research Mode)
@@ -159,11 +196,12 @@ class ExecutionManager:
 
         # Execute order on the APIs
         retries = 0
-        backoff = 1.0
+        backoff = self.retry_backoff_seconds
         while retries < self.api_retry_limit:
             try:
                 # Enforce API rate limits with exponential backoff + jitter
-                await asyncio.sleep(0.1) # base rate throttle
+                if self.base_throttle_seconds > 0:
+                    await asyncio.sleep(self.base_throttle_seconds)
                 
                 if venue_lower == "polymarket":
                     p_cfg = self.config.venues.polymarket
@@ -179,7 +217,6 @@ class ExecutionManager:
                         "owner": p_cfg.wallet_address
                     }
                     
-                    import aiohttp
                     headers = {"Content-Type": "application/json"}
                     async with aiohttp.ClientSession() as session:
                         async with session.post(url, json=order_payload, headers=headers) as resp:
@@ -206,7 +243,7 @@ class ExecutionManager:
                         no_price=int(price * 100) if side.lower() == "no" else None
                     )
                     
-                    resp = await asyncio.to_thread(self.kalshi_api.create_order, create_order_request=order_req)
+                    resp = await self.blocking_call_runner(self.kalshi_api.create_order, create_order_request=order_req)
                     order_id = getattr(resp, "order_id", f"KL-{int(time.time())}")
                     
                 elif venue_lower == "ib":
@@ -268,10 +305,11 @@ class ExecutionManager:
             except Exception as e:
                 # Handle exceptions with backoff + jitter
                 retries += 1
-                jitter = time.time() % 0.5
+                jitter = time.time() % self.retry_jitter_seconds if self.retry_jitter_seconds > 0 else 0.0
                 sleep_time = backoff + jitter
                 logger.warning(f"API-ERROR: Order submission to {venue} failed: {e}. Retrying in {sleep_time:.2f}s (Attempt {retries}/{self.api_retry_limit}).")
-                await asyncio.sleep(sleep_time)
+                if sleep_time > 0:
+                    await asyncio.sleep(sleep_time)
                 backoff *= 2.0
 
         # Halt order and mark as failed
@@ -288,4 +326,3 @@ class ExecutionManager:
             "quantity": quantity,
             "price": price
         }
-

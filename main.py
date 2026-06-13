@@ -1,3 +1,4 @@
+import argparse
 import os
 import sys
 import asyncio
@@ -7,7 +8,6 @@ import time
 import multiprocessing
 import json
 import hashlib
-import uuid
 from pathlib import Path
 from typing import List, Dict, Any
 from pythonjsonlogger.json import JsonFormatter
@@ -16,6 +16,9 @@ from predmarket.config import load_config
 from predmarket.audit import AuditLogger
 from predmarket.ingest import MarketIngestManager
 from predmarket.ensemble import EnsembleForecaster
+from predmarket.forecasting_pipeline import ForecastingPipeline
+from predmarket.contracts import ForecastDistribution, ForecastRecord
+from predmarket.store import PointInTimeStore
 from predmarket.risk import RiskManager
 from predmarket.execution import ExecutionManager
 from predmarket.dashboard import server, app
@@ -146,7 +149,35 @@ def start_dashboard_server():
     logger.info("Starting Dash/Uvicorn server on http://0.0.0.0:8050...")
     uvicorn.run(server, host="0.0.0.0", port=8050, log_level="warning")
 
-async def platform_loop(config, ingest, forecaster, risk, execution, audit):
+def _has_real_method(obj: Any, method_name: str) -> bool:
+    """Return True for methods defined on real classes, not auto-created mocks."""
+    return callable(getattr(type(obj), method_name, None))
+
+
+def _forecast_distribution_from_pipeline_output(forecast: Dict[str, Any]) -> ForecastDistribution:
+    density = forecast.get("density_forecast")
+    samples = getattr(density, "samples", None)
+    if samples is not None and len(samples) > 0:
+        return ForecastDistribution.from_samples(
+            list(samples),
+            method="forecasting_pipeline",
+            model_version="sota-research-1.0",
+            status_flags=forecast.get("status_flags", []),
+        )
+    return ForecastDistribution(
+        p_mean=float(forecast.get("model_prob", forecast.get("point_forecast", 0.5))),
+        quantiles={
+            0.1: max(0.0, float(forecast.get("model_prob", 0.5)) - 0.2),
+            0.5: float(forecast.get("model_prob", 0.5)),
+            0.9: min(1.0, float(forecast.get("model_prob", 0.5)) + 0.2),
+        },
+        method="forecasting_pipeline",
+        model_version="point-fallback-1.0",
+        status_flags=forecast.get("status_flags", ["POINT_FALLBACK"]),
+    )
+
+
+async def platform_loop(config, ingest, forecaster, risk, execution, audit, pit_store=None):
     """
     Main background processing pipeline loop.
     """
@@ -166,6 +197,17 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit):
             
             forecasts = []
             for snap in snapshots:
+                as_of_ts = time.time()
+                if pit_store is not None:
+                    try:
+                        pit_store.write_market_snapshot(
+                            snap,
+                            event_id=getattr(snap, "event_id", snap.contract_id),
+                            as_of_ts=as_of_ts,
+                        )
+                    except Exception as e:
+                        logger.warning("Point-in-time snapshot persistence failed: %s", e)
+
                 # 3. Apply market filters (spread, liquidity, line movement)
                 status = risk.check_market_filters(
                     snap.mid, snap.volume_24h, snap.open_interest, snap.line_history
@@ -174,13 +216,44 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit):
                 # Fetch categories dynamically
                 category = "political" if "ELECTION" in snap.contract_id else "econ"
                 
-                # 4. Generate Ensemble Forecast
-                f_out = forecaster.generate_ensemble_forecast(
-                    snapshot=snap,
-                    category=category,
-                    headline="Congressional leaders reach compromise bill on tax reforms.",
-                    question=snap.title
-                )
+                # 4. Generate forecast through the research pipeline when available
+                if _has_real_method(forecaster, "generate_forecast"):
+                    f_out = forecaster.generate_forecast(
+                        snapshot=snap,
+                        category=category,
+                        headline="Congressional leaders reach compromise bill on tax reforms.",
+                        question=snap.title,
+                        timestamp=as_of_ts,
+                    )
+                else:
+                    f_out = forecaster.generate_ensemble_forecast(
+                        snapshot=snap,
+                        category=category,
+                        headline="Congressional leaders reach compromise bill on tax reforms.",
+                        question=snap.title
+                    )
+
+                if pit_store is not None:
+                    try:
+                        distribution = _forecast_distribution_from_pipeline_output(f_out)
+                        record = ForecastRecord.from_distribution(
+                            event_id=getattr(snap, "event_id", snap.contract_id),
+                            market_id=snap.contract_id,
+                            as_of_ts=float(f_out.get("timestamp", as_of_ts)),
+                            horizon="live_loop",
+                            distribution=distribution,
+                            features=f_out.get("engineered_features", {}),
+                            base_rate_ref=f_out.get("base_rate_reference", ""),
+                            calibration_bucket=f"{category}:live",
+                        )
+                        if distribution.samples:
+                            pit_store.write_density_samples(
+                                record.density_samples_ref, distribution.samples
+                            )
+                        pit_store.write_forecast(record)
+                        f_out["forecast_id"] = record.forecast_id
+                    except Exception as e:
+                        logger.warning("Point-in-time forecast persistence failed: %s", e)
                 
                 # If market filters failed (e.g. illiquid), override status
                 if status != "READY":
@@ -196,7 +269,13 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit):
             # 5. Optimize Sizing using Correlation-Adjusted Kelly Sizer
             # Assume cash balance is $10,000 for simulation
             cash_balance = 10000.0
-            sizing_slate = risk.optimize_portfolio_kelly(forecasts, cash_balance)
+            if _has_real_method(risk, "optimize_execution_aware"):
+                sizing_slate = risk.optimize_execution_aware(forecasts, cash_balance)
+            else:
+                sizing_slate = risk.optimize_portfolio_kelly(forecasts, cash_balance)
+
+            # Persist opportunity slate to the SQLite database
+            audit.save_opportunities(sizing_slate)
 
             # 6. Route execution or staging
             for slate in sizing_slate:
@@ -224,20 +303,46 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit):
             
         await asyncio.sleep(10) # 10 seconds refresh rate
 
+def run_migrations():
+    from alembic.config import Config as AlembicConfig
+    from alembic import command
+    
+    project_root = Path(__file__).resolve().parent
+    ini_path = project_root / "alembic.ini"
+    alembic_cfg = AlembicConfig(str(ini_path))
+    logger.info("Executing database migrations via Alembic...")
+    command.upgrade(alembic_cfg, "head")
+
 async def main():
+    # 0. Parse CLI arguments (B7 remediation)
+    parser = argparse.ArgumentParser(description="PredMarket-Alpha Platform")
+    parser.add_argument("--seed", action="store_true", help="Seed historical performance data into the database on startup")
+    args = parser.parse_args()
+
     # 1. Load Configurations
     config = load_config()
     
-    # 2. Initialize Audit Logger
+    # 2. Run database migrations
+    run_migrations()
+    
+    # 3. Initialize Audit Logger
     audit_logger = AuditLogger(data_dir=str(config.global_cfg.data_dir))
-    seed_historical_data(str(config.global_cfg.data_dir / "database.sqlite"))
+
+    # 3b. Seed historical data only when --seed flag is provided
+    if args.seed:
+        seed_historical_data(str(config.global_cfg.data_dir / "database.sqlite"))
+        logger.info("Historical seed data loaded (--seed flag provided).")
+    else:
+        logger.info("Skipping historical seed data (run with --seed to enable).")
 
     # 3. Initialize Ingest Manager
     ingest = MarketIngestManager(config)
     await ingest.initialize()
 
     # 4. Initialize Core Engines
-    forecaster = EnsembleForecaster(config)
+    base_ensemble = EnsembleForecaster(config)
+    forecaster = ForecastingPipeline(config, ensemble=base_ensemble)
+    pit_store = PointInTimeStore(config.global_cfg.data_dir)
     risk = RiskManager(config, audit_logger)
     execution = ExecutionManager(config, audit_logger)
 
@@ -250,9 +355,12 @@ async def main():
 
     # 6. Start platform background loop
     try:
-        await platform_loop(config, ingest, forecaster, risk, execution, audit_logger)
+        await platform_loop(
+            config, ingest, forecaster, risk, execution, audit_logger, pit_store
+        )
     finally:
         await ingest.close()
+        pit_store.close()
         dashboard_proc.terminate()
         dashboard_proc.join(timeout=5)
 

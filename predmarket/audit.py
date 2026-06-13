@@ -3,10 +3,25 @@ import time
 import json
 import sqlite3
 import hashlib
+import fcntl
+import threading
 from pathlib import Path
 from typing import Dict, Any, List, Optional
 
 class AuditLogger:
+    """
+    Immutable hash-chained audit logger with persistent SQLite connection pooling
+    and thread-safe file locking for JSONL writes.
+
+    Connection pooling (B4): a single sqlite3.Connection is held open for the
+    lifetime of the instance. All writes are serialized through a threading.Lock
+    to prevent 'database is locked' errors under concurrent dashboard + platform
+    loop access.
+
+    File locking (B6): JSONL appends use fcntl.flock for atomic multi-process
+    safety.
+    """
+
     def __init__(self, data_dir: Optional[str] = None):
         if data_dir is None:
             data_dir = str(Path(__file__).resolve().parents[1] / "data")
@@ -14,56 +29,26 @@ class AuditLogger:
         self.data_dir.mkdir(parents=True, exist_ok=True)
         self.db_path = self.data_dir / "database.sqlite"
         self.jsonl_path = self.data_dir / "audit_log.jsonl"
+        self._lock = threading.Lock()
+        self._conn = sqlite3.connect(str(self.db_path), check_same_thread=False)
         self._init_db()
 
     def _init_db(self):
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        # Table for cryptographic audit logs
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS audit_trail (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp REAL NOT NULL,
-                event_type TEXT NOT NULL,
-                venue TEXT,
-                contract TEXT,
-                category TEXT,
-                side TEXT,
-                size REAL,
-                price REAL,
-                model_prob REAL,
-                market_implied REAL,
-                net_edge REAL,
-                status TEXT,
-                details TEXT,
-                prev_hash TEXT NOT NULL,
-                entry_hash TEXT NOT NULL,
-                outcome INTEGER
-            )
-        """)
-        # Support schema migration/upgrade for existing databases
-        try:
-            cursor.execute("ALTER TABLE audit_trail ADD COLUMN outcome INTEGER")
-        except sqlite3.OperationalError:
-            pass
+        # Database table schemas are managed exclusively via Alembic migrations.
+        # Ensure the SQLite database file exists.
+        pass  # Connection is already established; tables created by migrations.
 
-        # Table for portfolio equity history (used for drawdown calculations)
-        cursor.execute("""
-            CREATE TABLE IF NOT EXISTS equity_history (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                timestamp REAL NOT NULL,
-                total_equity REAL NOT NULL
-            )
-        """)
-        conn.commit()
-        conn.close()
+    def close(self):
+        """Close the persistent database connection. Call on shutdown."""
+        if self._conn:
+            self._conn.close()
+            self._conn = None
 
     def _get_last_hash(self) -> str:
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute("SELECT entry_hash FROM audit_trail ORDER BY id DESC LIMIT 1")
-        row = cursor.fetchone()
-        conn.close()
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute("SELECT entry_hash FROM audit_trail ORDER BY id DESC LIMIT 1")
+            row = cursor.fetchone()
         # Seed hash if chain is empty
         return row[0] if row else "0000000000000000000000000000000000000000000000000000000000000000"
 
@@ -73,6 +58,15 @@ class AuditLogger:
         hasher.update(prev_hash.encode("utf-8"))
         hasher.update(serialized.encode("utf-8"))
         return hasher.hexdigest()
+
+    def _append_jsonl(self, log_entry: Dict[str, Any]):
+        """Thread-safe and process-safe JSONL append using fcntl file locking."""
+        with open(self.jsonl_path, "a") as f:
+            fcntl.flock(f, fcntl.LOCK_EX)
+            try:
+                f.write(json.dumps(log_entry) + "\n")
+            finally:
+                fcntl.flock(f, fcntl.LOCK_UN)
 
     def log_trade_intent(
         self,
@@ -110,28 +104,25 @@ class AuditLogger:
         prev_hash = self._get_last_hash()
         entry_hash = self._compute_hash(payload, prev_hash)
         
-        # Write to SQLite
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO audit_trail (
-                timestamp, event_type, venue, contract, category, side, size, price,
-                model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            timestamp, "TRADE_INTENT", venue, contract, category, side, size, price,
-            model_prob, market_implied, net_edge, status, details or "", prev_hash, entry_hash, outcome
-        ))
+        # Write to SQLite (pooled connection, thread-safe)
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute("""
+                INSERT INTO audit_trail (
+                    timestamp, event_type, venue, contract, category, side, size, price,
+                    model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                timestamp, "TRADE_INTENT", venue, contract, category, side, size, price,
+                model_prob, market_implied, net_edge, status, details or "", prev_hash, entry_hash, outcome
+            ))
+            self._conn.commit()
 
-        conn.commit()
-        conn.close()
-
-        # Write to JSONL
+        # Write to JSONL (file-locked)
         log_entry = payload.copy()
         log_entry["prev_hash"] = prev_hash
         log_entry["entry_hash"] = entry_hash
-        with open(self.jsonl_path, "a") as f:
-            f.write(json.dumps(log_entry) + "\n")
+        self._append_jsonl(log_entry)
 
         return entry_hash
 
@@ -157,64 +148,58 @@ class AuditLogger:
         prev_hash = self._get_last_hash()
         entry_hash = self._compute_hash(payload, prev_hash)
         
-        # Write to SQLite
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute("""
-            INSERT INTO audit_trail (
-                timestamp, event_type, venue, contract, category, side, size, price,
-                model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
-            ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        """, (
-            timestamp, event_type, "", "", "", "", 0.0, 0.0,
-            0.0, 0.0, 0.0, "INFO", details, prev_hash, entry_hash, None
-        ))
+        # Write to SQLite (pooled connection, thread-safe)
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute("""
+                INSERT INTO audit_trail (
+                    timestamp, event_type, venue, contract, category, side, size, price,
+                    model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
+                ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            """, (
+                timestamp, event_type, "", "", "", "", 0.0, 0.0,
+                0.0, 0.0, 0.0, "INFO", details, prev_hash, entry_hash, None
+            ))
+            self._conn.commit()
 
-        conn.commit()
-        conn.close()
-
-        # Write to JSONL
+        # Write to JSONL (file-locked)
         log_entry = payload.copy()
         log_entry["prev_hash"] = prev_hash
         log_entry["entry_hash"] = entry_hash
-        with open(self.jsonl_path, "a") as f:
-            f.write(json.dumps(log_entry) + "\n")
+        self._append_jsonl(log_entry)
 
         return entry_hash
 
     def log_equity(self, total_equity: float):
         timestamp = time.time()
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute(
-            "INSERT INTO equity_history (timestamp, total_equity) VALUES (?, ?)",
-            (timestamp, total_equity)
-        )
-        conn.commit()
-        conn.close()
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute(
+                "INSERT INTO equity_history (timestamp, total_equity) VALUES (?, ?)",
+                (timestamp, total_equity)
+            )
+            self._conn.commit()
 
     def get_equity_history(self, since_seconds: float) -> List[Dict[str, Any]]:
         limit_time = time.time() - since_seconds
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute(
-            "SELECT timestamp, total_equity FROM equity_history WHERE timestamp >= ? ORDER BY timestamp ASC",
-            (limit_time,)
-        )
-        rows = cursor.fetchall()
-        conn.close()
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute(
+                "SELECT timestamp, total_equity FROM equity_history WHERE timestamp >= ? ORDER BY timestamp ASC",
+                (limit_time,)
+            )
+            rows = cursor.fetchall()
         return [{"timestamp": r[0], "total_equity": r[1]} for r in rows]
 
     def verify_audit_chain(self) -> bool:
-        conn = sqlite3.connect(str(self.db_path))
-        cursor = conn.cursor()
-        cursor.execute("""
-            SELECT id, timestamp, event_type, venue, contract, category, side, size, price,
-                   model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
-            FROM audit_trail ORDER BY id ASC
-        """)
-        rows = cursor.fetchall()
-        conn.close()
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute("""
+                SELECT id, timestamp, event_type, venue, contract, category, side, size, price,
+                       model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
+                FROM audit_trail ORDER BY id ASC
+            """)
+            rows = cursor.fetchall()
 
         expected_prev_hash = "0000000000000000000000000000000000000000000000000000000000000000"
         for row in rows:
@@ -250,3 +235,48 @@ class AuditLogger:
         
         return True
 
+    def save_opportunities(self, slate: List[Dict[str, Any]]):
+        timestamp = time.time()
+        with self._lock:
+            cursor = self._conn.cursor()
+            for item in slate:
+                # Estimate edge
+                raw_edge = item["model_prob"] - item["market_implied"]
+                tx_cost = 0.01
+                net_edge = raw_edge - tx_cost
+                cursor.execute("""
+                    INSERT OR REPLACE INTO opportunities (
+                        contract_id, timestamp, venue, title, category, model_prob, market_implied, edge, status
+                    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+                """, (
+                    item["contract_id"],
+                    timestamp,
+                    item.get("venue", "Polymarket"),
+                    item["title"],
+                    item["category"],
+                    item["model_prob"],
+                    item["market_implied"],
+                    net_edge,
+                    item["status"]
+                ))
+            self._conn.commit()
+
+    def get_opportunities(self) -> List[Dict[str, Any]]:
+        with self._lock:
+            cursor = self._conn.cursor()
+            cursor.execute("""
+                SELECT contract_id, timestamp, venue, title, category, model_prob, market_implied, edge, status
+                FROM opportunities ORDER BY timestamp DESC
+            """)
+            rows = cursor.fetchall()
+        return [{
+            "contract_id": r[0],
+            "timestamp": r[1],
+            "venue": r[2],
+            "title": r[3],
+            "category": r[4],
+            "model_prob": r[5],
+            "market_implied": r[6],
+            "edge": r[7],
+            "status": r[8]
+        } for r in rows]

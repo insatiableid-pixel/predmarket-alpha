@@ -21,10 +21,15 @@ numpy>=1.24.0               # Vectorized algebra and Kelly computations
 pandas>=2.0.0               # Dataframes for time-series and log ingestion
 scipy>=1.10.0               # Convex optimization solver for correlation Kelly
 scikit-learn>=1.2.0         # Model evaluation metrics and calibration curves
+duckdb>=1.0.0               # Point-in-time analytical research store
+pyarrow>=15.0.0             # Parquet persistence for research snapshots
+lightgbm>=4.0.0             # Tabular challenger models for event truth forecasting
+mapie>=0.9.0                # Conformal calibration utilities
 
 # Deep Learning / NLP Signal Extraction
 torch>=2.0.0 --extra-index-url https://download.pytorch.org/whl/cpu # CPU-only PyTorch for resource efficiency
 transformers>=4.30.0        # Hugging Face transformers for DeBERTa NLP signal modeling
+openai>=1.99.0              # Responses API structured-output LLM forecaster
 
 # Dashboard & API Service
 fastapi>=0.100.0            # REST API wrapper for staging manual approvals
@@ -41,3 +46,8 @@ pytest-cov>=4.1.0           # Test suite coverage calculation
 alembic>=1.13.0             # Database migration framework
 prometheus-client>=0.19.0   # Prometheus /metrics endpoint
 python-json-logger>=2.0.0   # Structured JSON logging
+slowapi>=0.1.9              # Rate limiting for FastAPI endpoints
+itsdangerous>=2.1.0         # CSRF token signing
+arch>=6.0.0                 # GARCH volatility modeling
+xgboost>=2.0.0              # Gradient boosting for signal classification
+statsmodels>=0.14.0         # ARIMA, state-space models, statistical tests

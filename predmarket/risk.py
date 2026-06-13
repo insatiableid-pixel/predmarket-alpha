@@ -198,3 +198,151 @@ class RiskManager:
                 })
 
         return results
+
+    def optimize_execution_aware(
+        self,
+        forecasts: List[Dict[str, Any]],
+        cash_balance: float,
+    ) -> List[Dict[str, Any]]:
+        """Create staged trade intents from posterior edge and executable costs.
+
+        This is the research-engine sizing path. It uses forecast density
+        samples when available, applies fee/slippage/fill haircuts, constrains
+        correlated exposure by canonical event/category, and refuses to size
+        unpromoted models.
+        """
+        if not forecasts:
+            return []
+
+        prepared: List[Dict[str, Any]] = []
+        for forecast in forecasts:
+            density = forecast.get("density_forecast")
+            samples = None
+            if density is not None and getattr(density, "samples", None) is not None:
+                arr = np.asarray(getattr(density, "samples"), dtype=float)
+                if arr.size:
+                    samples = np.clip(arr, 0.0, 1.0)
+            if samples is None:
+                samples = np.asarray([float(forecast.get("model_prob", 0.5))])
+
+            executable_price = float(
+                forecast.get(
+                    "executable_price",
+                    forecast.get("ask", forecast.get("market_implied", 0.5)),
+                )
+            )
+            fees = float(forecast.get("fees", forecast.get("execution_cost_pct", 0.01)))
+            slippage = float(forecast.get("slippage", forecast.get("slippage_pct", 0.0)))
+            fill_probability = float(forecast.get("fill_probability", 1.0))
+            lockup_days = float(forecast.get("capital_lockup_days", 1.0))
+
+            edge_samples = samples - executable_price - fees - slippage
+            posterior_edge = float(np.mean(edge_samples))
+            edge_std = float(np.std(edge_samples)) if edge_samples.size > 1 else 0.0
+            haircut_edge = posterior_edge - 0.5 * edge_std
+            cvar_5 = float(np.mean(edge_samples[edge_samples <= np.quantile(edge_samples, 0.05)]))
+            net_edge = haircut_edge * fill_probability / max(np.sqrt(lockup_days), 1.0)
+
+            status = forecast.get("status", "READY")
+            promotion_status = forecast.get("promotion_status", "RESEARCH_ONLY")
+            if promotion_status != "PROMOTED":
+                status = "RESEARCH-ONLY"
+            elif net_edge < self.config.portfolio.kelly.min_edge:
+                status = "RESEARCH-ONLY"
+            elif cvar_5 < -0.05:
+                status = "RESEARCH-ONLY"
+
+            prepared.append(
+                {
+                    **forecast,
+                    "market_implied": executable_price,
+                    "raw_edge": float(forecast.get("model_prob", np.mean(samples)) - executable_price),
+                    "net_edge": net_edge,
+                    "posterior_edge": posterior_edge,
+                    "edge_uncertainty": edge_std,
+                    "cvar_5": cvar_5,
+                    "fees": fees,
+                    "slippage": slippage,
+                    "fill_probability": fill_probability,
+                    "capital_lockup_days": lockup_days,
+                    "status": status,
+                    "promotion_status": promotion_status,
+                }
+            )
+
+        n_contracts = len(prepared)
+        g = np.asarray([item["net_edge"] if item["status"] == "READY" else -1.0 for item in prepared])
+        Sigma = np.eye(n_contracts) * 0.25
+        for i in range(n_contracts):
+            for j in range(i + 1, n_contracts):
+                same_event = prepared[i].get("event_id") and prepared[i].get("event_id") == prepared[j].get("event_id")
+                same_category = prepared[i].get("category") == prepared[j].get("category")
+                if same_event:
+                    cov = 0.225
+                elif same_category:
+                    cov = 0.125
+                else:
+                    cov = 0.025
+                Sigma[i, j] = cov
+                Sigma[j, i] = cov
+
+        def objective(f):
+            return -(np.dot(f, g) - 0.5 * np.dot(f, np.dot(Sigma, f)))
+
+        max_single = self.config.portfolio.kelly.max_single_position_pct
+        bounds = [(0, max_single) for _ in range(n_contracts)]
+        constraints = [
+            {
+                "type": "ineq",
+                "fun": lambda f: self.config.portfolio.kelly.leverage_cap - np.sum(np.abs(f)),
+            }
+        ]
+
+        max_corr = self.config.portfolio.kelly.max_correlated_exposure_pct
+        groups = {}
+        for idx, item in enumerate(prepared):
+            group = item.get("event_id") or item.get("category") or "default"
+            groups.setdefault(group, []).append(idx)
+        for indices in groups.values():
+            constraints.append(
+                {
+                    "type": "ineq",
+                    "fun": lambda f, idxs=indices: max_corr - np.sum(np.abs(f[idxs])),
+                }
+            )
+
+        res = minimize(
+            objective,
+            np.zeros(n_contracts),
+            method="SLSQP",
+            bounds=bounds,
+            constraints=constraints,
+        )
+        fractions = res.x * self.config.portfolio.kelly.fraction if res.success else np.zeros(n_contracts)
+        if not res.success:
+            logger.error(f"Execution-aware sizing optimization failed: {res.message}")
+
+        results: List[Dict[str, Any]] = []
+        for idx, item in enumerate(prepared):
+            fraction = float(fractions[idx]) if item["status"] == "READY" else 0.0
+            if fraction <= 0.0001:
+                item["status"] = "RESEARCH-ONLY" if item["promotion_status"] != "PROMOTED" else item["status"]
+            results.append(
+                {
+                    **item,
+                    "kelly_full": float(res.x[idx]) if res.success else 0.0,
+                    "kelly_quarter": float((res.x[idx] if res.success else 0.0) * 0.25),
+                    "recommended_fraction": fraction,
+                    "recommended_usd": float(fraction * cash_balance),
+                    "trade_intent_stage": "STAGED",
+                    "execution_assumptions": {
+                        "executable_price": item["market_implied"],
+                        "fees": item["fees"],
+                        "slippage": item["slippage"],
+                        "fill_probability": item["fill_probability"],
+                        "capital_lockup_days": item["capital_lockup_days"],
+                    },
+                }
+            )
+
+        return results

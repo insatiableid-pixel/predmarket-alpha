@@ -19,14 +19,16 @@ config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
 
-# Resolve sqlalchemy.url from the project's data_dir config
-try:
-    from predmarket.config import load_config
-    app_config = load_config()
-    db_path = app_config.global_cfg.data_dir / "database.sqlite"
-    config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
-except Exception:
-    pass  # Fall back to alembic.ini value
+# Resolve sqlalchemy.url from the project's data_dir config if not running tests
+if "PYTEST_CURRENT_TEST" not in os.environ:
+    try:
+        from predmarket.config import load_config
+        app_config = load_config()
+        db_path = app_config.global_cfg.data_dir / "database.sqlite"
+        config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
+    except Exception:
+        # Fallback to a sensible default if config loading fails
+        config.set_main_option("sqlalchemy.url", "sqlite:///./data/database.sqlite")
 
 # target_metadata not used — this project uses raw SQLite, not SQLAlchemy ORM.
 # Migrations are written manually.

@@ -219,3 +219,19 @@ async def approve_staged_order_db(staged_id: int) -> dict:
         conn.commit()
         conn.close()
         return {"status": "error", "message": f"Execution error: {e}"}
+
+
+def fetch_opportunities() -> list:
+    conn = get_db_connection()
+    try:
+        df = pd.read_sql_query(
+            "SELECT venue, contract_id as contract, category, model_prob as prob, "
+            "market_implied as implied, status FROM opportunities",
+            conn,
+        )
+        conn.close()
+        return df.to_dict("records")
+    except Exception:
+        conn.close()
+        logger.exception("Failed to fetch opportunities from database")
+        return []

@@ -1,5 +1,36 @@
-/* predmarket-alpha — CSS Custom Properties & Base Styles */
+/* predmarket-alpha — CSS Custom Properties, Base Styles & Utility Classes */
 
+/* ---- F6: Local Outfit font (self-hosted, no CDN dependency) ---- */
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 300;
+  font-display: swap;
+  src: url('fonts/Outfit-300.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('fonts/Outfit-400.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 600;
+  font-display: swap;
+  src: url('fonts/Outfit-600.ttf') format('truetype');
+}
+@font-face {
+  font-family: 'Outfit';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('fonts/Outfit-800.ttf') format('truetype');
+}
+
+/* ---- CSS Custom Properties ---- */
 :root {
   --dark-bg: #0B0E14;
   --card-bg: #161B22;
@@ -11,14 +42,37 @@
   --font-family: 'Outfit', sans-serif;
 }
 
-/* Base page */
+/* ---- Base page ---- */
 body {
   background-color: var(--dark-bg);
   font-family: var(--font-family);
   min-height: 100vh;
 }
 
-/* KPI cards */
+/* ---- F8: CSS utility classes (replacing repeated inline styles) ---- */
+
+.dark-bg {
+  background-color: var(--dark-bg);
+  min-height: 100vh;
+}
+
+.card-bg {
+  background-color: var(--card-bg);
+}
+
+.section-header-blue {
+  background-color: var(--card-bg);
+  color: var(--accent-blue);
+  font-weight: bold;
+}
+
+.section-header-orange {
+  background-color: var(--card-bg);
+  color: var(--accent-orange);
+  font-weight: bold;
+}
+
+/* ---- KPI cards ---- */
 .kpi-card {
   background-color: var(--card-bg);
 }
@@ -35,31 +89,19 @@ body {
   color: var(--accent-blue);
 }
 
-/* Section cards */
+/* ---- Section cards ---- */
 .section-card {
   background-color: var(--card-bg);
 }
 
-.section-header-blue {
-  background-color: var(--card-bg);
-  color: var(--accent-blue);
-  font-weight: bold;
-}
-
-.section-header-orange {
-  background-color: var(--card-bg);
-  color: var(--accent-orange);
-  font-weight: bold;
-}
-
-/* Trade approval cards */
+/* ---- Trade approval cards ---- */
 .approval-card {
   background-color: var(--dark-bg);
   border: 1px solid var(--accent-orange);
   margin-bottom: 15px;
 }
 
-/* Opportunity board */
+/* ---- Opportunity board ---- */
 .edge-positive {
   color: var(--accent-green);
 }
@@ -76,5 +118,23 @@ body {
   color: var(--accent-red);
 }
 
-/* Plotly overrides (applied via Dash config, referenced here for clarity) */
+/* ---- F1: Skip-nav accessibility link ---- */
+.skip-nav:focus {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1000;
+  background: var(--accent-blue);
+  color: #000;
+  padding: 8px;
+  font-weight: bold;
+}
+
+/* ---- F4: Per-component error state ---- */
+.kpi-error {
+  color: var(--accent-red);
+  font-style: italic;
+}
+
+/* ---- Plotly overrides (applied via Dash config, referenced here for clarity) ---- */
 /* Template: plotly_dark, plot_bgcolor: var(--card-bg), paper_bgcolor: var(--dark-bg) */

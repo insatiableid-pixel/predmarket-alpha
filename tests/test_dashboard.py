@@ -1,9 +1,32 @@
 import pytest
 import sqlite3
-from fastapi.testclient import TestClient
 from predmarket.dashboard import app, server, get_db_connection, fetch_performance_metrics, update_dashboard_data, approve_staged_order_db, get_staged_orders, approve_order_endpoint, ApprovalRequest
 from predmarket.dashboard import callbacks as _callbacks  # ensure callbacks are registered
 import predmarket.dashboard.data as db_module
+from starlette.requests import Request as StarletteRequest
+from starlette.responses import Response
+
+
+def make_request(path="/api/staged", method="GET", headers=None):
+    raw_headers = [
+        (name.lower().encode("latin-1"), value.encode("latin-1"))
+        for name, value in (headers or {}).items()
+    ]
+    scope = {
+        "type": "http",
+        "method": method,
+        "path": path,
+        "headers": raw_headers,
+        "query_string": b"",
+        "scheme": "http",
+        "server": ("testserver", 80),
+        "client": ("testclient", 50000),
+    }
+
+    async def receive():
+        return {"type": "http.request", "body": b"", "more_body": False}
+
+    return StarletteRequest(scope, receive)
 
 @pytest.fixture
 def setup_dashboard_db(test_data_dir, monkeypatch):
@@ -100,7 +123,11 @@ async def test_dashboard_callback_update(setup_dashboard_db):
     assert err is None # no errors
 
 @pytest.mark.asyncio
-async def test_fastapi_endpoints(setup_dashboard_db):
+async def test_fastapi_endpoints(setup_dashboard_db, mock_config, monkeypatch):
+    import predmarket.config as config_module
+
+    monkeypatch.setattr(config_module, "load_config", lambda: mock_config)
+
     # Seed a staged trade
     conn = db_module.get_db_connection()
     cursor = conn.cursor()
@@ -113,30 +140,63 @@ async def test_fastapi_endpoints(setup_dashboard_db):
     conn.commit()
     conn.close()
     
-    # 1. Test get_staged_orders function
-    staged_list = get_staged_orders(api_key="predmarket_secret_key_123")
+    # 1. Test get_staged_orders function (slowapi requires a Request object)
+    mock_req = make_request()
+    staged_list = get_staged_orders(request=mock_req, api_key="predmarket_secret_key_123")
     assert len(staged_list) == 1
     assert staged_list[0]["contract"] == "CON-2"
     staged_id = staged_list[0]["id"]
     
     # 2. Test approve_order_endpoint function
-    # Since we are using mock execution (execution disabled by default on Kalshi),
-    # approving should route to stage_order and return success or execute order.
-    res_json = await approve_order_endpoint(ApprovalRequest(id=staged_id), api_key="predmarket_secret_key_123")
+    res_json = await approve_order_endpoint(request=mock_req, body=ApprovalRequest(id=staged_id), api_key="predmarket_secret_key_123")
     assert "status" in res_json
 
 def test_api_key_authentication_routing(setup_dashboard_db):
-    client = TestClient(server)
-    
-    # 1. Request without X-API-Key header should return 401 Unauthorized
-    response = client.get("/api/staged")
+    from fastapi import HTTPException
+    from predmarket.dashboard.server import get_api_key
+
+    with pytest.raises(HTTPException) as missing:
+        get_api_key(None)
+    assert missing.value.status_code == 401
+    assert missing.value.detail == "Could not validate credentials"
+
+    with pytest.raises(HTTPException) as invalid:
+        get_api_key("wrong_key")
+    assert invalid.value.status_code == 401
+
+    assert get_api_key("predmarket_secret_key_123") == "predmarket_secret_key_123"
+    staged = get_staged_orders(
+        request=make_request(headers={"X-API-Key": "predmarket_secret_key_123"}),
+        api_key="predmarket_secret_key_123",
+    )
+    assert staged == []
+
+
+@pytest.mark.asyncio
+async def test_basic_auth_middleware(setup_dashboard_db):
+    from predmarket.dashboard.server import dashboard_auth_middleware
+
+    async def call_next(_request):
+        return Response(status_code=200)
+
+    # 1. Request without Authorization header should return 401
+    response = await dashboard_auth_middleware(make_request(path="/"), call_next)
     assert response.status_code == 401
-    assert response.json()["detail"] == "Could not validate credentials"
-    
-    # 2. Request with invalid key should return 401 Unauthorized
-    response = client.get("/api/staged", headers={"X-API-Key": "wrong_key"})
+    assert "WWW-Authenticate" in response.headers
+
+    # 2. Request with invalid Basic credentials should return 401
+    import base64
+    invalid_token = base64.b64encode(b"admin:wrong_password").decode("utf-8")
+    response = await dashboard_auth_middleware(
+        make_request(path="/", headers={"Authorization": f"Basic {invalid_token}"}),
+        call_next,
+    )
     assert response.status_code == 401
-    
-    # 3. Request with valid key should succeed and return 200 OK
-    response = client.get("/api/staged", headers={"X-API-Key": "predmarket_secret_key_123"})
+
+    # 3. Request with valid Basic credentials should bypass middleware
+    valid_token = base64.b64encode(b"admin:predmarket_secret_key_123").decode("utf-8")
+    response = await dashboard_auth_middleware(
+        make_request(path="/", headers={"Authorization": f"Basic {valid_token}"}),
+        call_next,
+    )
     assert response.status_code == 200
