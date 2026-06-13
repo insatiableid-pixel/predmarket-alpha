@@ -22,6 +22,7 @@ PYTHON := $(VENV)/bin/python
 PIP := $(VENV)/bin/pip
 PYTEST := $(VENV)/bin/pytest
 ALEMBIC := $(VENV)/bin/alembic
+TMPDIR := $(CURDIR)/.tmp
 export PATH := $(abspath $(VENV))/bin:$(PATH)
 
 $(VENV):
@@ -32,15 +33,18 @@ setup: $(VENV)
 	$(PIP) install -r requirements.txt
 	@echo "Setup complete. Activate with: source $(VENV)/bin/activate"
 
+$(TMPDIR):
+	mkdir -p $(TMPDIR)
+
 check-env: $(VENV)
 	PYTHONPATH=. $(PYTHON) -c "import prometheus_client, aiohttp; from pythonjsonlogger.json import JsonFormatter; import predmarket.execution; print('runtime imports ok')"
 
 # ---- Testing ----
-test:
-	PYTHONPATH=. $(PYTEST) tests/ -v --tb=short
+test: | $(TMPDIR)
+	TMPDIR=$(TMPDIR) PYTHONPATH=. $(PYTEST) tests/ -v --tb=short
 
-coverage:
-	PYTHONPATH=. $(PYTEST) tests/ --cov=predmarket --cov-report=html --cov-report=term-missing
+coverage: | $(TMPDIR)
+	TMPDIR=$(TMPDIR) PYTHONPATH=. $(PYTEST) tests/ --cov=predmarket --cov-report=html --cov-report=term-missing
 	@echo "Coverage report: htmlcov/index.html"
 
 lint:
@@ -85,5 +89,5 @@ docker:
 clean:
 	find . -type d -name __pycache__ -exec rm -rf {} + 2>/dev/null || true
 	find . -type f -name '*.pyc' -delete 2>/dev/null || true
-	rm -rf .pytest_cache htmlcov dist build *.egg-info
+	rm -rf .pytest_cache .tmp htmlcov dist build *.egg-info
 	@echo "Clean complete."

@@ -10,6 +10,8 @@ PROJECT_ROOT="/home/mrwatson/projects/predmarket-alpha"
 VENV_DIR="${PROJECT_ROOT}/.venv"
 PYTHON="${VENV_DIR}/bin/python"
 PYTEST="${VENV_DIR}/bin/pytest"
+export TMPDIR="${PROJECT_ROOT}/.tmp"
+mkdir -p "$TMPDIR"
 
 # Ensure venv is activated
 if [ -d "$VENV_DIR" ]; then
@@ -50,7 +52,7 @@ fi
 
 echo "=== [2/2] Running Pytest Smoke Suite ==="
 if [ -x "$PYTEST" ]; then
-    PYTHONPATH="${PROJECT_ROOT}" "$PYTEST" -v "${PROJECT_ROOT}/tests/" || echo "Warning: pytest failed (some files may not be generated yet)"
+    TMPDIR="$TMPDIR" PYTHONPATH="${PROJECT_ROOT}" "$PYTEST" -v "${PROJECT_ROOT}/tests/" || echo "Warning: pytest failed (some files may not be generated yet)"
 else
     echo "pytest not installed in virtualenv."
     exit 1

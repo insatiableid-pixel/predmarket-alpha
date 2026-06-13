@@ -15,6 +15,7 @@ build/
 .coverage
 htmlcov/
 .tox/
+.tmp/
 
 # Data files (databases, logs, audit trails contain runtime state)
 data/*.sqlite
