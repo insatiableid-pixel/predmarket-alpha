@@ -1,5 +1,5 @@
 """
-Dashboard package for the Big Two PredMarket Alpha platform.
+Dashboard package for the Kalshi Action Alpha platform.
 
 Modules
 -------

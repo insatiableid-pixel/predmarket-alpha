@@ -16,27 +16,19 @@ class GlobalConfig(BaseModel):
     dashboard_port: int = 8050
 
 class PolymarketConfig(BaseModel):
+    """Polymarket is available for read-only market intelligence only."""
+
     enabled: bool = True
-    execution_enabled: bool = False
     clob_api_url: str = "https://clob.polymarket.com"
-    wallet_address: str = Field(default="")
-    private_key: str = Field(default="")
     min_liquidity_usd: float = 10000.0
     max_slippage_pct: float = 1.5
-    gas_reserve_matic: float = 10.0
-
-    @model_validator(mode="after")
-    def load_from_env(self) -> 'PolymarketConfig':
-        if not self.private_key:
-            self.private_key = os.getenv("POLYMARKET_PRIVATE_KEY") or ""
-        if not self.wallet_address:
-            self.wallet_address = os.getenv("POLYMARKET_WALLET_ADDRESS") or ""
-        return self
 
 class KalshiConfig(BaseModel):
     enabled: bool = True
     execution_enabled: bool = False
-    api_url: str = "https://api.kalshi.co/v2"
+    api_url: str = "https://external-api.kalshi.com/trade-api/v2"
+    demo_api_url: str = "https://external-api.demo.kalshi.co/trade-api/v2"
+    use_demo: bool = False
     api_key: str = Field(default="")
     api_secret: str = Field(default="")
     min_liquidity_usd: float = 10000.0
@@ -44,11 +36,21 @@ class KalshiConfig(BaseModel):
 
     @model_validator(mode="after")
     def load_from_env(self) -> 'KalshiConfig':
+        if os.getenv("KALSHI_API_URL"):
+            self.api_url = os.getenv("KALSHI_API_URL") or self.api_url
+        if os.getenv("KALSHI_DEMO_API_URL"):
+            self.demo_api_url = os.getenv("KALSHI_DEMO_API_URL") or self.demo_api_url
+        if os.getenv("KALSHI_USE_DEMO") is not None:
+            self.use_demo = (os.getenv("KALSHI_USE_DEMO") or "").lower() in {"1", "true", "yes", "on"}
         if not self.api_key:
             self.api_key = os.getenv("KALSHI_API_KEY") or ""
         if not self.api_secret:
             self.api_secret = os.getenv("KALSHI_API_SECRET") or ""
         return self
+
+    @property
+    def effective_api_url(self) -> str:
+        return self.demo_api_url if self.use_demo else self.api_url
 
 class VenuesConfig(BaseModel):
     polymarket: PolymarketConfig = Field(default_factory=PolymarketConfig)

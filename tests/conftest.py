@@ -33,9 +33,6 @@ def test_data_dir(tmp_path):
 def mock_config(test_data_dir):
     venues = VenuesConfig()
     venues.polymarket.enabled = False
-    venues.polymarket.execution_enabled = False
-    venues.polymarket.private_key = ""
-    venues.polymarket.wallet_address = ""
     venues.kalshi.enabled = False
     venues.kalshi.execution_enabled = False
     venues.kalshi.api_key = ""

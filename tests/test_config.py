@@ -1,5 +1,3 @@
-import pytest
-import os
 from predmarket.config import load_config, Config
 
 def test_config_load_defaults():
@@ -12,9 +10,10 @@ def test_config_load_defaults():
 
 def test_config_env_overrides(monkeypatch):
     # Test loading secrets from environment variables
-    monkeypatch.setenv("POLYMARKET_PRIVATE_KEY", "0xabc123")
+    monkeypatch.setenv("KALSHI_USE_DEMO", "true")
     monkeypatch.setenv("KALSHI_API_KEY", "key-uuid-123")
     
     config = load_config()
-    assert config.venues.polymarket.private_key == "0xabc123"
+    assert config.venues.kalshi.use_demo is True
     assert config.venues.kalshi.api_key == "key-uuid-123"
+    assert config.venues.kalshi.effective_api_url == "https://external-api.demo.kalshi.co/trade-api/v2"

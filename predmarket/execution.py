@@ -2,13 +2,13 @@ import logging
 import asyncio
 import time
 from typing import Dict, Any, Optional, Callable, Awaitable
-import aiohttp
 import kalshi_python
 from predmarket.config import Config
 from predmarket.audit import AuditLogger
 
 
 logger = logging.getLogger("predmarket.execution")
+ACTION_VENUE = "kalshi"
 
 class ExecutionManager:
     def __init__(
@@ -35,30 +35,63 @@ class ExecutionManager:
             k_cfg = self.config.venues.kalshi
             if k_cfg.api_key and k_cfg.api_secret:
                 config_kalshi = kalshi_python.Configuration()
-                config_kalshi.host = k_cfg.api_url
+                config_kalshi.host = k_cfg.effective_api_url
                 config_kalshi.api_key = k_cfg.api_key
                 config_kalshi.api_secret = k_cfg.api_secret
                 self.kalshi_api = kalshi_python.PortfolioApi(kalshi_python.ApiClient(config_kalshi))
 
+    def _record_failed_order(
+        self,
+        *,
+        venue: str,
+        contract: str,
+        category: str,
+        side: str,
+        quantity: float,
+        price: float,
+        model_prob: float,
+        market_implied: float,
+        details: str,
+    ) -> Dict[str, Any]:
+        net_edge = model_prob - market_implied - 0.01
+        entry_hash = self.audit_logger.log_trade_intent(
+            venue=venue,
+            contract=contract,
+            category=category,
+            side=side,
+            size=quantity * price,
+            price=price,
+            model_prob=model_prob,
+            market_implied=market_implied,
+            net_edge=net_edge,
+            status="FAILED",
+            details=details,
+        )
+        logger.warning("ORDER-REJECTED: %s | %s | %s", venue, contract, details)
+        return {
+            "status": "FAILED",
+            "audit_hash": entry_hash,
+            "venue": venue,
+            "contract": contract,
+            "side": side,
+            "quantity": quantity,
+            "price": price,
+            "details": details,
+        }
+
     def calculate_transaction_costs(self, venue: str, quantity: float, price: float) -> float:
         """
-        Explicit transaction cost models for each venue.
+        Explicit transaction cost model for executable venues.
         """
         size_usd = quantity * price
-        
-        if venue.lower() == "polymarket":
-            # MATIC gas fee (approx $0.01) + spread fee
-            gas_fee = 0.01
-            spread_slippage = size_usd * 0.005 # 0.5% slippage
-            return gas_fee + spread_slippage
-            
-        elif venue.lower() == "kalshi":
+
+        if venue.lower() == ACTION_VENUE:
             # Volume-based exchange fee (approx 0.1%) + spread
             volume_fee = size_usd * 0.0015
             spread_slippage = size_usd * 0.002
             return volume_fee + spread_slippage
 
-        raise ValueError(f"Unsupported venue for transaction costs: {venue}")
+        raise ValueError(f"Unsupported action venue for transaction costs: {venue}. Kalshi is the only executable venue.")
 
     async def stage_order(
         self,
@@ -74,6 +107,19 @@ class ExecutionManager:
         """
         Stages a trade intent for review or paper trading logs.
         """
+        if venue.lower() != ACTION_VENUE:
+            return self._record_failed_order(
+                venue=venue,
+                contract=contract,
+                category=category,
+                side=side,
+                quantity=quantity,
+                price=price,
+                model_prob=model_prob,
+                market_implied=market_implied,
+                details=f"Non-action venue: {venue}. Kalshi is the only executable venue.",
+            )
+
         net_edge = model_prob - market_implied - 0.01
         
         # Log to immutable audit database
@@ -119,37 +165,20 @@ class ExecutionManager:
         """
         venue_lower = venue.lower()
         net_edge = model_prob - market_implied - 0.01
-        execution_enabled = False
-        
-        if venue_lower == "polymarket":
-            execution_enabled = self.config.venues.polymarket.execution_enabled
-        elif venue_lower == "kalshi":
-            execution_enabled = self.config.venues.kalshi.execution_enabled
-        else:
-            entry_hash = self.audit_logger.log_trade_intent(
+        if venue_lower != ACTION_VENUE:
+            return self._record_failed_order(
                 venue=venue,
                 contract=contract,
                 category=category,
                 side=side,
-                size=quantity * price,
+                quantity=quantity,
                 price=price,
                 model_prob=model_prob,
                 market_implied=market_implied,
-                net_edge=net_edge,
-                status="FAILED",
-                details=f"Unsupported venue: {venue}"
+                details=f"Non-action venue: {venue}. Kalshi is the only executable venue.",
             )
-            logger.warning(f"Unsupported execution venue: {venue}")
-            return {
-                "status": "FAILED",
-                "audit_hash": entry_hash,
-                "venue": venue,
-                "contract": contract,
-                "side": side,
-                "quantity": quantity,
-                "price": price
-            }
 
+        execution_enabled = self.config.venues.kalshi.execution_enabled
         if not execution_enabled:
             # Fall back to staging if execution is disabled (Research Mode)
             logger.info(f"Execution disabled for {venue}. Routing to stage_order instead.")
@@ -190,50 +219,22 @@ class ExecutionManager:
                 if self.base_throttle_seconds > 0:
                     await asyncio.sleep(self.base_throttle_seconds)
                 
-                if venue_lower == "polymarket":
-                    p_cfg = self.config.venues.polymarket
-                    if not p_cfg.wallet_address or not p_cfg.private_key:
-                        raise ValueError("Polymarket credentials (wallet_address/private_key) not configured.")
-                    
-                    url = f"{p_cfg.clob_api_url}/order"
-                    order_payload = {
-                        "token_id": contract,
-                        "price": price,
-                        "side": "BUY" if side.upper() == "YES" else "SELL",
-                        "size": quantity,
-                        "owner": p_cfg.wallet_address
-                    }
-                    
-                    headers = {"Content-Type": "application/json"}
-                    async with aiohttp.ClientSession() as session:
-                        async with session.post(url, json=order_payload, headers=headers) as resp:
-                            if resp.status in (200, 201):
-                                res_data = await resp.json()
-                                order_id = res_data.get("orderID", f"PM-{int(time.time())}")
-                            else:
-                                error_text = await resp.text()
-                                raise Exception(f"Polymarket CLOB API returned status {resp.status}: {error_text}")
-                                
-                elif venue_lower == "kalshi":
-                    if not self.kalshi_api:
-                        raise ValueError("Kalshi API not initialized.")
-                    
-                    # Map YES/NO side and action
-                    # For Kalshi: we specify side as 'yes' or 'no', and action as 'buy' or 'sell'
-                    order_req = kalshi_python.CreateOrderRequest(
-                        ticker=contract,
-                        side=side.lower(),
-                        action="buy",
-                        count=int(max(quantity, 1)),
-                        type="limit",
-                        yes_price=int(price * 100) if side.lower() == "yes" else None,
-                        no_price=int(price * 100) if side.lower() == "no" else None
-                    )
-                    
-                    resp = await self.blocking_call_runner(self.kalshi_api.create_order, create_order_request=order_req)
-                    order_id = getattr(resp, "order_id", f"KL-{int(time.time())}")
-                else:
-                    raise ValueError(f"Unsupported venue: {venue}")
+                if not self.kalshi_api:
+                    raise ValueError("Kalshi API not initialized.")
+
+                # For Kalshi: specify side as yes/no and action as buy/sell.
+                order_req = kalshi_python.CreateOrderRequest(
+                    ticker=contract,
+                    side=side.lower(),
+                    action="buy",
+                    count=int(max(quantity, 1)),
+                    type="limit",
+                    yes_price=int(price * 100) if side.lower() == "yes" else None,
+                    no_price=int(price * 100) if side.lower() == "no" else None
+                )
+
+                resp = await self.blocking_call_runner(self.kalshi_api.create_order, create_order_request=order_req)
+                order_id = getattr(resp, "order_id", f"KL-{int(time.time())}")
                 
                 # Log success completion
                 self.audit_logger.log_system_event(

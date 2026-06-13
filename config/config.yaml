@@ -1,5 +1,5 @@
-# Big Two Prediction Market Alpha Configuration
-# Runtime venues are intentionally limited to Polymarket and Kalshi.
+# Kalshi Action Alpha Configuration
+# Kalshi is the only executable venue. Polymarket remains read-only market context.
 # Schema Version: 1.0.0
 
 global:
@@ -12,17 +12,16 @@ global:
 venues:
   polymarket:
     enabled: true
-    execution_enabled: false
     clob_api_url: "https://clob.polymarket.com"
-    wallet_address: "" # Loaded via POLYMARKET_WALLET_ADDRESS env
-    min_liquidity_usd: 10000.0  # Open interest threshold
+    min_liquidity_usd: 10000.0  # Read-only market context threshold
     max_slippage_pct: 1.5
-    gas_reserve_matic: 10.0
 
   kalshi:
     enabled: true
     execution_enabled: false
-    api_url: "https://api.kalshi.co/v2"
+    use_demo: false
+    api_url: "https://external-api.kalshi.com/trade-api/v2"
+    demo_api_url: "https://external-api.demo.kalshi.co/trade-api/v2"
     min_liquidity_usd: 10000.0
     max_slippage_pct: 1.0
 forecasting:

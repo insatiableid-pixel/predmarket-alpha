@@ -78,8 +78,8 @@ def seed_historical_data(db_path: str):
                 (t, start_equity + daily_gain)
             )
             
-        # 2. Seed 20 resolved trade intents to pass the health check and generate calibration curves
-        venues = ["Polymarket", "Kalshi"]
+        # 2. Seed 20 resolved Kalshi trade intents to pass the health check and generate calibration curves
+        venues = ["Kalshi"]
         categories = ["political", "econ", "sports"]
         sides = ["YES", "NO"]
         
@@ -210,7 +210,7 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit, pit_
 
                 # 3. Apply market filters (spread, liquidity, line movement)
                 status = risk.check_market_filters(
-                    snap.mid, snap.volume_24h, snap.open_interest, snap.line_history
+                    snap.mid, snap.volume_24h, snap.open_interest, snap.line_history, venue=snap.venue
                 )
                 
                 # Fetch categories dynamically
@@ -258,6 +258,11 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit, pit_
                 # If market filters failed (e.g. illiquid), override status
                 if status != "READY":
                     f_out["status"] = status
+
+                f_out.setdefault("venue", snap.venue)
+                if snap.venue.lower() != "kalshi":
+                    f_out["status"] = "RESEARCH-ONLY"
+                    f_out["action_constraint"] = "NON_ACTION_VENUE"
                     
                 forecasts.append(f_out)
 
@@ -280,11 +285,15 @@ async def platform_loop(config, ingest, forecaster, risk, execution, audit, pit_
             # 6. Route execution or staging
             for slate in sizing_slate:
                 if slate["status"] == "READY" and slate["recommended_fraction"] > 0:
+                    venue = slate.get("venue", "Kalshi")
+                    if venue.lower() != "kalshi":
+                        logger.info(f"Skipping non-action venue recommendation for {venue}: {slate['contract_id']}")
+                        continue
                     logger.info(f"Sizing recommendation: buy {slate['contract_id']} YES with {slate['recommended_fraction']:.2%} of cash.")
                     # Submit to execution manager
                     # For safety, it handles execution_enabled checks natively
                     await execution.execute_order(
-                        venue=slate["venue"] if "venue" in slate else "Polymarket",
+                        venue=venue,
                         contract=slate["contract_id"],
                         category=slate["category"],
                         side="YES",
@@ -315,7 +324,7 @@ def run_migrations():
 
 async def main():
     # 0. Parse CLI arguments (B7 remediation)
-    parser = argparse.ArgumentParser(description="Big Two PredMarket Alpha Platform")
+    parser = argparse.ArgumentParser(description="Kalshi Action Alpha Platform")
     parser.add_argument("--seed", action="store_true", help="Seed historical performance data into the database on startup")
     args = parser.parse_args()
 

@@ -108,17 +108,12 @@ class MarketIngestManager:
             logger.warning("Polymarket: HTTP session unavailable. Running in mock/fallback mode.")
             self.polymarket_connected = False
             return
-        if not p_cfg.private_key:
-            logger.warning("Polymarket: POLYMARKET_PRIVATE_KEY not configured. Running Polymarket in mock/fallback mode.")
-            self.polymarket_connected = False
-            return
-        
-        # In a real environment, we would initialize the py-clob-client
-        # For this implementation, we check the REST endpoint to confirm network connectivity
+
+        # Read-only connectivity check for public Polymarket market context.
         try:
             async with self.session.get(f"{p_cfg.clob_api_url}/markets/health") as resp:
                 if resp.status == 200:
-                    logger.info("Polymarket CLOB API connection operational.")
+                    logger.info("Polymarket public market-data connection operational.")
                     self.polymarket_connected = True
                 else:
                     logger.warning(f"Polymarket API healthcheck returned status {resp.status}. Falling back.")
@@ -141,7 +136,7 @@ class MarketIngestManager:
         # Attempt to run authentication check against Kalshi API
         try:
             config_kalshi = kalshi_python.Configuration()
-            config_kalshi.host = k_cfg.api_url
+            config_kalshi.host = k_cfg.effective_api_url
             config_kalshi.api_key = k_cfg.api_key
             config_kalshi.api_secret = k_cfg.api_secret
             self.kalshi_api = kalshi_python.MarketsApi(kalshi_python.ApiClient(config_kalshi))

@@ -56,14 +56,17 @@ class RiskManager:
         snapshot_mid: float,
         volume_24h: float,
         open_interest: float,
-        line_history: List[float]
+        line_history: List[float],
+        venue: str = "Kalshi",
     ) -> str:
         """
         Validates liquidity, line movement, and bid-ask spread limits.
         Returns status: READY / ILLIQUID / SHARP-MOVE
         """
         # 1. Liquidity check
-        if open_interest < self.config.venues.polymarket.min_liquidity_usd:
+        venue_lower = venue.lower()
+        venue_config = self.config.venues.kalshi if venue_lower == "kalshi" else self.config.venues.polymarket
+        if open_interest < venue_config.min_liquidity_usd:
             return "ILLIQUID"
 
         # 2. Sharp line movement check (> 5pp in last 30 mins)
@@ -161,15 +164,21 @@ class RiskManager:
                 
                 # Sizing status check
                 status = forecasts[idx]["status"]
+                venue = forecasts[idx].get("venue", "Kalshi")
+                if venue.lower() != "kalshi":
+                    status = "RESEARCH-ONLY"
                 if status == "READY":
                     if net_edge < self.config.portfolio.kelly.min_edge:
                         status = "RESEARCH-ONLY" # Edge below threshold
                     elif f_val <= 0.0001:
                         status = "RESEARCH-ONLY" # Sized to zero
+                if status != "READY":
+                    f_val = 0.0
                 
                 results.append({
                     "contract_id": forecasts[idx]["contract_id"],
                     "title": forecasts[idx]["title"],
+                    "venue": venue,
                     "category": forecasts[idx]["category"],
                     "model_prob": forecasts[idx]["model_prob"],
                     "market_implied": forecasts[idx]["market_implied"],
@@ -186,8 +195,10 @@ class RiskManager:
         else:
             logger.error(f"Sizing optimization failed: {res.message}")
             for item in forecasts:
+                venue = item.get("venue", "Kalshi")
                 results.append({
                     **item,
+                    "venue": venue,
                     "raw_edge": item["model_prob"] - item["market_implied"],
                     "net_edge": item["model_prob"] - item["market_implied"] - 0.01,
                     "kelly_full": 0.0,
@@ -245,7 +256,9 @@ class RiskManager:
 
             status = forecast.get("status", "READY")
             promotion_status = forecast.get("promotion_status", "RESEARCH_ONLY")
-            if promotion_status != "PROMOTED":
+            if forecast.get("venue", "Kalshi").lower() != "kalshi":
+                status = "RESEARCH-ONLY"
+            elif promotion_status != "PROMOTED":
                 status = "RESEARCH-ONLY"
             elif net_edge < self.config.portfolio.kelly.min_edge:
                 status = "RESEARCH-ONLY"
@@ -255,6 +268,7 @@ class RiskManager:
             prepared.append(
                 {
                     **forecast,
+                    "venue": forecast.get("venue", "Kalshi"),
                     "market_implied": executable_price,
                     "raw_edge": float(forecast.get("model_prob", np.mean(samples)) - executable_price),
                     "net_edge": net_edge,

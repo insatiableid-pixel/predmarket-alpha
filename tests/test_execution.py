@@ -1,27 +1,11 @@
 import pytest
-from unittest.mock import MagicMock, patch
+from unittest.mock import MagicMock
 from predmarket.execution import ExecutionManager
 from predmarket.audit import AuditLogger
 
 
 async def run_blocking_inline(func, *args, **kwargs):
     return func(*args, **kwargs)
-
-
-class MockClientSession:
-    def __init__(self, post_response):
-        self.post_response = post_response
-        self.post_calls = []
-
-    async def __aenter__(self):
-        return self
-
-    async def __aexit__(self, *args):
-        pass
-
-    def post(self, *args, **kwargs):
-        self.post_calls.append((args, kwargs))
-        return self.post_response
 
 
 def make_execution_manager(config, audit_logger, **overrides):
@@ -41,15 +25,14 @@ async def test_execution_fee_modeling(mock_config, test_data_dir):
     audit = AuditLogger(str(test_data_dir))
     exec_mgr = make_execution_manager(mock_config, audit)
 
-    # Polymarket: Gas ($0.01) + Spread (0.5% of size)
-    p_cost = exec_mgr.calculate_transaction_costs("Polymarket", 100.0, 0.50)
-    assert p_cost == 0.01 + (100.0 * 0.50 * 0.005)
-
     # Kalshi: Volume (0.15% of size) + Spread (0.2% of size)
     k_cost = exec_mgr.calculate_transaction_costs("Kalshi", 200.0, 0.40)
     assert abs(k_cost - (80.0 * 0.0035)) < 1e-6
 
-    with pytest.raises(ValueError, match="Unsupported venue"):
+    with pytest.raises(ValueError, match="Kalshi is the only executable venue"):
+        exec_mgr.calculate_transaction_costs("Polymarket", 100.0, 0.50)
+
+    with pytest.raises(ValueError, match="Unsupported action venue"):
         exec_mgr.calculate_transaction_costs("LegacyVenue", 1000.0, 0.60)
 
 
@@ -60,7 +43,7 @@ async def test_execution_staging_default(mock_config, test_data_dir):
 
     # In research/default config, execution is disabled. Should auto-route to staging.
     res = await exec_mgr.execute_order(
-        venue="Polymarket",
+        venue="Kalshi",
         contract="CON-1",
         category="political",
         side="YES",
@@ -76,87 +59,47 @@ async def test_execution_staging_default(mock_config, test_data_dir):
 
 
 @pytest.mark.asyncio
-async def test_execution_polymarket_order_mocked(mock_config, test_data_dir):
-    """Test Polymarket CLOB order submission with mocked HTTP."""
+async def test_execution_rejects_polymarket_action(mock_config, test_data_dir):
+    """Polymarket can be market context, but never an order target."""
     audit = AuditLogger(str(test_data_dir))
-
-    # Enable execution and set credentials
-    mock_config.venues.polymarket.execution_enabled = True
-    mock_config.venues.polymarket.private_key = "0xtest"
-    mock_config.venues.polymarket.wallet_address = "0xwallet"
     exec_mgr = make_execution_manager(mock_config, audit)
 
-    class MockAsyncCtxResponse:
-        status = 200
-        async def json(self):
-            return {"orderID": "PM-12345"}
-        async def text(self):
-            return ""
-        async def __aenter__(self):
-            return self
-        async def __aexit__(self, *args):
-            pass
+    res = await exec_mgr.execute_order(
+        venue="Polymarket",
+        contract="TOKEN-1",
+        category="political",
+        side="YES",
+        quantity=10.0,
+        price=0.55,
+        model_prob=0.60,
+        market_implied=0.55
+    )
 
-    mock_session = MockClientSession(MockAsyncCtxResponse())
-
-    with patch("predmarket.execution.aiohttp.ClientSession", return_value=mock_session):
-        res = await exec_mgr.execute_order(
-            venue="Polymarket",
-            contract="TOKEN-1",
-            category="political",
-            side="YES",
-            quantity=10.0,
-            price=0.55,
-            model_prob=0.60,
-            market_implied=0.55
-        )
-
-    assert res["status"] == "FILLED"
-    assert res["order_id"] == "PM-12345"
-    assert len(mock_session.post_calls) == 1
-    args, kwargs = mock_session.post_calls[0]
-    assert args == ("https://clob.polymarket.com/order",)
-    assert kwargs["json"]["token_id"] == "TOKEN-1"
-    assert kwargs["json"]["side"] == "BUY"
+    assert res["status"] == "FAILED"
+    assert "Kalshi is the only executable venue" in res["details"]
+    assert audit.verify_audit_chain() is True
 
 
 @pytest.mark.asyncio
-async def test_execution_polymarket_api_error(mock_config, test_data_dir):
-    """Test Polymarket order with API error and retry exhaustion."""
+async def test_stage_order_rejects_polymarket(mock_config, test_data_dir):
+    """Non-Kalshi venues cannot enter the staged approval queue."""
     audit = AuditLogger(str(test_data_dir))
-
-    mock_config.venues.polymarket.execution_enabled = True
-    mock_config.venues.polymarket.private_key = "0xtest"
-    mock_config.venues.polymarket.wallet_address = "0xwallet"
     exec_mgr = make_execution_manager(mock_config, audit)
 
-    class MockErrorResponse:
-        status = 500
-        async def json(self):
-            return {}
-        async def text(self):
-            return "Internal Server Error"
-        async def __aenter__(self):
-            return self
-        async def __aexit__(self, *args):
-            pass
-
-    mock_session = MockClientSession(MockErrorResponse())
-
-    with patch("predmarket.execution.aiohttp.ClientSession", return_value=mock_session):
-        res = await exec_mgr.execute_order(
-            venue="Polymarket",
-            contract="TOKEN-1",
-            category="political",
-            side="YES",
-            quantity=10.0,
-            price=0.55,
-            model_prob=0.60,
-            market_implied=0.55
-        )
+    res = await exec_mgr.stage_order(
+        venue="Polymarket",
+        contract="TOKEN-1",
+        category="political",
+        side="YES",
+        quantity=10.0,
+        price=0.55,
+        model_prob=0.60,
+        market_implied=0.55
+    )
 
     assert res["status"] == "FAILED"
-    assert len(mock_session.post_calls) == 1
+    assert "Kalshi is the only executable venue" in res["details"]
+    assert audit.verify_audit_chain() is True
 
 
 @pytest.mark.asyncio
@@ -267,12 +210,12 @@ async def test_execution_retry_exhaustion(mock_config, test_data_dir):
 
 @pytest.mark.asyncio
 async def test_execution_stage_order_audit_trail(mock_config, test_data_dir):
-    """Verify staging logs a valid audit entry."""
+    """Verify Kalshi staging logs a valid audit entry."""
     audit = AuditLogger(str(test_data_dir))
     exec_mgr = make_execution_manager(mock_config, audit)
 
     res = await exec_mgr.stage_order(
-        venue="Polymarket",
+        venue="Kalshi",
         contract="CON-STAGE",
         category="political",
         side="NO",
@@ -288,17 +231,13 @@ async def test_execution_stage_order_audit_trail(mock_config, test_data_dir):
 
 
 @pytest.mark.asyncio
-async def test_execution_missing_credentials(mock_config, test_data_dir):
-    """Test that execution fails gracefully when credentials are missing."""
+async def test_execution_unknown_venue_rejected_before_staging(mock_config, test_data_dir):
+    """Test that unsupported venues fail before staging."""
     audit = AuditLogger(str(test_data_dir))
-
-    mock_config.venues.polymarket.execution_enabled = True
-    mock_config.venues.polymarket.private_key = ""  # missing
-    mock_config.venues.polymarket.wallet_address = ""
     exec_mgr = make_execution_manager(mock_config, audit)
 
     res = await exec_mgr.execute_order(
-        venue="Polymarket",
+        venue="UnknownVenue",
         contract="CON-1",
         category="political",
         side="YES",
@@ -309,3 +248,4 @@ async def test_execution_missing_credentials(mock_config, test_data_dir):
     )
 
     assert res["status"] == "FAILED"
+    assert "Kalshi is the only executable venue" in res["details"]

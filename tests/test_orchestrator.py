@@ -13,7 +13,7 @@ def mock_platform_components():
     # Mocking get_all_snapshots to return one snapshot
     ingest.get_all_snapshots.return_value = [
         MarketSnapshot(
-            venue="Polymarket",
+            venue="Kalshi",
             contract_id="CON-1",
             title="Will event X happen?",
             bid=0.55,
@@ -38,7 +38,7 @@ def mock_platform_components():
     risk.check_market_filters.return_value = "READY"
     risk.optimize_portfolio_kelly.return_value = [
         {
-            "venue": "Polymarket",
+            "venue": "Kalshi",
             "contract_id": "CON-1",
             "category": "political",
             "status": "READY",

@@ -65,3 +65,27 @@ def test_risk_kelly_constrained_optimization(mock_config, test_data_dir):
     # Correlated exposure cap sum (both in 'political') should be <= max_correlated_exposure_pct (10% of bankroll = $1000)
     total_political_allocation = sum([r["recommended_usd"] for r in results])
     assert total_political_allocation <= 1000.0
+
+
+def test_risk_marks_non_kalshi_forecasts_research_only(mock_config, test_data_dir):
+    audit = AuditLogger(str(test_data_dir))
+    risk = RiskManager(mock_config, audit)
+
+    forecasts = [
+        {
+            "contract_id": "PM-1",
+            "title": "Read-only context market",
+            "venue": "Polymarket",
+            "category": "political",
+            "model_prob": 0.80,
+            "market_implied": 0.40,
+            "status": "READY",
+            "base_rate_reference": "Ref",
+            "base_rate_prob": 0.28,
+        }
+    ]
+
+    results = risk.optimize_portfolio_kelly(forecasts, 10000.0)
+
+    assert results[0]["status"] == "RESEARCH-ONLY"
+    assert results[0]["recommended_fraction"] == 0.0
