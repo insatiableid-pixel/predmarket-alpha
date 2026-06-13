@@ -137,6 +137,20 @@ class PointInTimeStore:
         )
         self._execute(
             """
+            CREATE TABLE IF NOT EXISTS kalshi_resolved_rows (
+                row_id TEXT PRIMARY KEY,
+                market_id TEXT,
+                event_id TEXT,
+                as_of_ts DOUBLE,
+                resolved_ts DOUBLE,
+                outcome INTEGER,
+                feature_hash TEXT,
+                row_json TEXT
+            )
+            """
+        )
+        self._execute(
+            """
             CREATE TABLE IF NOT EXISTS experiment_runs (
                 run_id TEXT PRIMARY KEY,
                 created_ts DOUBLE,
@@ -350,6 +364,58 @@ class PointInTimeStore:
                 json.dumps(raw_payload or {}, sort_keys=True, default=str),
             ),
         )
+
+    def write_kalshi_resolved_rows(self, rows: List[Dict[str, Any]]) -> None:
+        """Persist discovery-ready Kalshi resolved rows."""
+        for row in rows:
+            row_id = str(row.get("row_id") or self._stable_row_id(row))
+            payload = dict(row)
+            payload["row_id"] = row_id
+            feature_hash = hashlib.sha256(
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+            ).hexdigest()
+            self._execute(
+                """
+                INSERT OR REPLACE INTO kalshi_resolved_rows
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    row_id,
+                    str(payload.get("market_id", "")),
+                    str(payload.get("event_id", "")),
+                    float(payload.get("as_of_ts", 0.0)),
+                    float(payload.get("resolved_ts", 0.0)),
+                    int(payload.get("outcome", 0)),
+                    feature_hash,
+                    json.dumps(payload, sort_keys=True, default=str),
+                ),
+            )
+
+    def load_kalshi_resolved_rows(
+        self,
+        *,
+        market_id: Optional[str] = None,
+        min_as_of_ts: Optional[float] = None,
+        max_as_of_ts: Optional[float] = None,
+    ) -> List[Dict[str, Any]]:
+        """Load persisted Kalshi rows for discovery/backtesting."""
+        sql = """
+            SELECT row_json
+            FROM kalshi_resolved_rows
+            WHERE 1 = 1
+        """
+        params: list[Any] = []
+        if market_id is not None:
+            sql += " AND market_id = ?"
+            params.append(market_id)
+        if min_as_of_ts is not None:
+            sql += " AND as_of_ts >= ?"
+            params.append(float(min_as_of_ts))
+        if max_as_of_ts is not None:
+            sql += " AND as_of_ts <= ?"
+            params.append(float(max_as_of_ts))
+        sql += " ORDER BY as_of_ts, market_id, row_json"
+        return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
 
     def write_experiment_run(
         self,
@@ -617,6 +683,18 @@ class PointInTimeStore:
         if isinstance(value, dict):
             return value
         raise TypeError("discovery payload must be a dict or expose to_dict()")
+
+    @staticmethod
+    def _stable_row_id(row: Dict[str, Any]) -> str:
+        payload = {
+            "market_id": row.get("market_id"),
+            "as_of_ts": row.get("as_of_ts"),
+            "outcome": row.get("outcome"),
+            "schema": row.get("row_schema_version", 1),
+        }
+        return "kalshi-row-" + hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+        ).hexdigest()[:20]
 
     def load_context(
         self, event_id: str, market_id: str, as_of_ts: float
