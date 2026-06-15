@@ -88,16 +88,16 @@ openapi:
 	"
 
 kalshi-discovery:
-	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_discovery
+	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_discovery
 
 kalshi-rank:
-	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_live_rank
+	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_live_rank
 
 kalshi-cycle:
-	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_research_cycle
+	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_research_cycle
 
 kalshi-ledger:
-	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_paper_ledger
+	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_paper_ledger
 
 kalshi-desk:
 	@sed -n '1,220p' docs/kalshi_research_desk.md
