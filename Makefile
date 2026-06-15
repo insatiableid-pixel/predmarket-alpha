@@ -1,4 +1,4 @@
-.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk
+.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke
 
 # Default target
 help:
@@ -17,6 +17,7 @@ help:
 	@echo "  make kalshi-cycle — Run rank + paper-intent research cycle"
 	@echo "  make kalshi-ledger — Audit Kalshi paper ledger"
 	@echo "  make kalshi-desk — Show the Kalshi research desk runbook"
+	@echo "  make kalshi-smoke — Generate offline Kalshi desk smoke artifacts"
 	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
 	@echo "  make migrate   — Run Alembic migrations to head"
 	@echo "  make docker    — Build Docker image"
@@ -100,6 +101,9 @@ kalshi-ledger:
 
 kalshi-desk:
 	@sed -n '1,220p' docs/kalshi_research_desk.md
+
+kalshi-smoke:
+	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_research_smoke
 
 # ---- Docker ----
 docker:

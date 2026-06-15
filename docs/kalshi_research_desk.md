@@ -19,7 +19,15 @@ Run from the repository root.
    make check-env
    ```
 
-2. Refresh resolved Kalshi rows and run discovery:
+2. Generate offline smoke artifacts:
+
+   ```bash
+   make kalshi-smoke
+   ```
+
+   The smoke runner uses synthetic Kalshi data, local outcomes, and a temporary data directory. It must report `research_only: true` and `execution_enabled: false`.
+
+3. Refresh resolved Kalshi rows and run discovery:
 
    ```bash
    PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_discovery \
@@ -33,7 +41,7 @@ Run from the repository root.
 
    Use the emitted discovery JSON path as the hypothesis source for the live rank step.
 
-3. Rank current Kalshi markets:
+4. Rank current Kalshi markets:
 
    ```bash
    PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_live_rank \
@@ -44,7 +52,7 @@ Run from the repository root.
      --discovery-report path/to/kalshi-discovery.json
    ```
 
-4. Create research-only paper intents and settle any open intents with known outcomes:
+5. Create research-only paper intents and settle any open intents with known outcomes:
 
    ```bash
    PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_research_cycle \
@@ -54,7 +62,7 @@ Run from the repository root.
      --stale-open-grace-hours 24
    ```
 
-5. Audit the paper ledger:
+6. Audit the paper ledger:
 
    ```bash
    PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_paper_ledger \
