@@ -582,6 +582,28 @@ def test_paper_promotion_readiness_can_be_review_ready():
     assert readiness["reasons"] == []
 
 
+def test_paper_promotion_readiness_blocks_stale_open_intents():
+    readiness = paper_promotion_readiness(
+        {
+            "settled_count": 30,
+            "brier_score": 0.12,
+            "win_rate": 0.60,
+            "settled_pnl_usd": 25.0,
+        },
+        KalshiPaperConfig(
+            min_settled_for_promotion_review=30,
+            max_brier_for_promotion_review=0.20,
+            min_win_rate_for_promotion_review=0.55,
+            min_pnl_for_promotion_review=0.0,
+        ),
+        stale_open_count=1,
+    )
+
+    assert readiness["status"] == "INSUFFICIENT_EVIDENCE"
+    assert readiness["reasons"] == ["stale_open_intents_present"]
+    assert readiness["observed"]["stale_open_count"] == 1
+
+
 def test_cycle_integrity_hashes_are_stable():
     rank_report = _rank_report()
     intents, blocked = build_paper_intents(

@@ -44,7 +44,11 @@ def build_paper_ledger_report(
         now_ts=ts,
         grace_hours=paper_config.stale_open_grace_hours,
     )
-    readiness = paper_promotion_readiness(summary, paper_config)
+    readiness = paper_promotion_readiness(
+        summary,
+        paper_config,
+        stale_open_count=len(stale_open),
+    )
     return {
         "run_id": stable_ledger_report_id(ledger, paper_config),
         "created_ts": ts,

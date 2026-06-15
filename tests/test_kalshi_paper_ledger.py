@@ -109,6 +109,7 @@ def test_build_paper_ledger_report_flags_stale_open_intents():
     assert report["ledger"]["stale_open_count"] == 1
     assert report["stale_open_intents"][0]["market_id"] == "KXFED-26JUN-TARGET"
     assert report["stale_open_intents"][0]["hours_past_stale"] == 1.0
+    assert "stale_open_intents_present" in report["promotion_readiness"]["reasons"]
 
 
 def test_write_paper_ledger_report_outputs_json_and_markdown(tmp_path):

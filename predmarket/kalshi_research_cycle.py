@@ -415,7 +415,11 @@ def build_cycle_report(
             "count": len(paper_events),
             "status_counts": status_counts(paper_events),
         },
-        "promotion_readiness": paper_promotion_readiness(ledger_summary, config.paper),
+        "promotion_readiness": paper_promotion_readiness(
+            ledger_summary,
+            config.paper,
+            stale_open_count=len(stale_open),
+        ),
         "integrity": cycle_integrity(
             rank_report=rank_report,
             paper_intents=paper_intents,
@@ -485,6 +489,8 @@ def summarize_paper_ledger(ledger: Sequence[Mapping[str, Any]]) -> Dict[str, Any
 def paper_promotion_readiness(
     ledger_summary: Mapping[str, Any],
     config: KalshiPaperConfig,
+    *,
+    stale_open_count: int = 0,
 ) -> Dict[str, Any]:
     reasons = []
     settled_count = int(ledger_summary.get("settled_count", 0) or 0)
@@ -504,6 +510,8 @@ def paper_promotion_readiness(
         reasons.append("win_rate_below_threshold")
     if pnl < config.min_pnl_for_promotion_review:
         reasons.append("settled_pnl_below_threshold")
+    if stale_open_count > 0:
+        reasons.append("stale_open_intents_present")
 
     return {
         "status": "REVIEW_READY" if not reasons else "INSUFFICIENT_EVIDENCE",
@@ -519,6 +527,7 @@ def paper_promotion_readiness(
             "brier_score": brier,
             "win_rate": win_rate,
             "settled_pnl_usd": pnl,
+            "stale_open_count": int(stale_open_count),
         },
     }
 
