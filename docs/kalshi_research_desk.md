@@ -93,8 +93,8 @@ The desk produces JSON and Markdown reports under the research reports directory
 
 - Discovery report: candidate hypotheses, support, reward, and row summary.
 - Live rank report: current opportunities, blocking reasons, watchlist status, and scoring mode.
-- Cycle report: paper intents, blocked opportunities, settlement, ledger audit, promotion readiness, event history, and integrity hashes.
-- Ledger report: current ledger state, open exposure, settled performance, event history, and promotion readiness.
+- Cycle report: paper intents, blocked opportunities, settlement, ledger audit, promotion readiness, recent event history, and integrity hashes.
+- Ledger report: current ledger state, open exposure, settled performance, recent event history, stale/unknown close audits, and promotion readiness.
 - Stale open intents: paper intents still open after the original close estimate plus the configured grace window.
 - Stale rank reports: replayed rank artifacts older than the configured max age block new paper intents.
 
@@ -142,3 +142,23 @@ The best Kalshi targets for this engine are not the loudest markets by volume. T
 - High-attention events where order flow may chase headlines faster than contract text.
 
 The research cycle should prefer repeatable semantic and calibration edges over single-market speculation.
+
+## Verification
+
+Before relying on a desk run, verify the offline path and tests:
+
+```bash
+make kalshi-smoke
+TMPDIR=/tmp TMP=/tmp TEMP=/tmp PYTHONPATH=. .venv/bin/pytest \
+  tests/test_kalshi_only_runtime.py \
+  tests/test_kalshi_research_cycle.py \
+  tests/test_kalshi_paper_ledger.py \
+  tests/test_kalshi_research_smoke.py \
+  tests/test_kalshi_live_rank.py \
+  tests/test_kalshi_discovery.py \
+  tests/test_kalshi_dataset.py \
+  -q --tb=short
+TMPDIR=/tmp TMP=/tmp TEMP=/tmp PYTHONPATH=. .venv/bin/pytest tests/ -q --tb=short
+```
+
+The smoke output should be valid JSON and point to generated cycle and ledger Markdown reports.
