@@ -1,4 +1,4 @@
-.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery
+.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  make coverage  — Run tests and generate HTML coverage report"
 	@echo "  make openapi   — Export OpenAPI spec to docs/openapi.json"
 	@echo "  make kalshi-discovery — Run Kalshi resolved-row discovery from stored rows"
+	@echo "  make kalshi-rank — Rank live Kalshi markets in research-only mode"
 	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
 	@echo "  make migrate   — Run Alembic migrations to head"
 	@echo "  make docker    — Build Docker image"
@@ -84,6 +85,9 @@ openapi:
 
 kalshi-discovery:
 	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_discovery
+
+kalshi-rank:
+	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_live_rank
 
 # ---- Docker ----
 docker:

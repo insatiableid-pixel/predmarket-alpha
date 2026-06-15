@@ -181,6 +181,20 @@ class KalshiMarketDataClient:
         )
         return payload.get("candlesticks", [])
 
+    async def fetch_orderbook(
+        self,
+        market: Mapping[str, Any],
+        *,
+        depth: int = 10,
+    ) -> Dict[str, Any]:
+        ticker = str(market.get("ticker") or "")
+        if not ticker:
+            return {}
+        return await self.get_json(
+            f"/markets/{ticker}/orderbook",
+            {"depth": int(depth)},
+        )
+
 
 class KalshiResolvedDatasetBuilder:
     """Build discovery-ready resolved rows from Kalshi markets."""
