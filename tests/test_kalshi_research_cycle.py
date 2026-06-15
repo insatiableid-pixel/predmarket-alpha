@@ -10,6 +10,7 @@ from predmarket.kalshi_research_cycle import (
     load_rank_report,
     run_kalshi_research_cycle,
     settle_paper_intents,
+    summarize_paper_ledger,
 )
 from predmarket.kalshi_dataset import persist_rows
 from predmarket.store import PointInTimeStore
@@ -292,3 +293,52 @@ def test_research_cycle_replays_rank_report_and_supplied_outcomes(tmp_path, mock
     assert artifacts.report["paper"]["intended_count"] == 1
     assert artifacts.report["settlement"]["settled_count"] == 1
     assert settled[0]["pnl_usd"] > 0
+
+
+def test_summarize_paper_ledger_reports_exposure_and_quality():
+    intents, _ = build_paper_intents(
+        _rank_report(),
+        config=KalshiPaperConfig(min_liquidity_adjusted_edge=0.005, min_directional_edge=0.02),
+        created_ts=AS_OF_TS,
+    )
+    settled = settle_paper_intents(
+        intents,
+        outcomes={"KXFED-26JUN-TARGET": 1},
+        settled_ts=AS_OF_TS + 3600,
+    )
+    summary = summarize_paper_ledger([*intents, *settled])
+
+    assert summary["status_counts"]["PAPER_INTENDED"] == 1
+    assert summary["status_counts"]["SETTLED"] == 1
+    assert summary["open_stake_usd"] > 0
+    assert summary["settled_pnl_usd"] > 0
+    assert summary["win_rate"] == 1.0
+    assert summary["brier_score"] is not None
+    assert summary["open_event_exposure_usd"]["KXFED-26JUN"] > 0
+
+
+def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
+    rank_report = _rank_report()
+    store = PointInTimeStore(tmp_path / "data")
+    try:
+        artifacts = run_kalshi_research_cycle(
+            store,
+            app_config=mock_config,
+            rank_report=rank_report,
+            outcomes={"KXFED-26JUN-TARGET": 1},
+            config=KalshiResearchCycleConfig(
+                paper=KalshiPaperConfig(
+                    min_liquidity_adjusted_edge=0.005,
+                    min_directional_edge=0.02,
+                    settle_existing=True,
+                )
+            ),
+            reports_dir=tmp_path / "reports",
+        )
+    finally:
+        store.close()
+
+    ledger = artifacts.report["ledger"]
+    assert ledger["settled_pnl_usd"] > 0
+    assert ledger["brier_score"] is not None
+    assert "## Ledger Audit" in artifacts.markdown_path.read_text()

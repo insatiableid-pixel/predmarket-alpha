@@ -290,10 +290,7 @@ def build_cycle_report(
     config: KalshiResearchCycleConfig,
     live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None,
 ) -> Dict[str, Any]:
-    status_counts: Dict[str, int] = {}
-    for item in ledger:
-        status = str(item.get("status", "UNKNOWN"))
-        status_counts[status] = status_counts.get(status, 0) + 1
+    ledger_summary = summarize_paper_ledger(ledger)
     return {
         "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
         "created_ts": time.time(),
@@ -341,8 +338,62 @@ def build_cycle_report(
         },
         "ledger": {
             "count": len(ledger),
-            "status_counts": status_counts,
+            **ledger_summary,
         },
+    }
+
+
+def summarize_paper_ledger(ledger: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+    status_counts: Dict[str, int] = {}
+    event_exposure: Dict[str, float] = {}
+    settled = []
+    open_stake = 0.0
+    total_stake = 0.0
+    total_expected_value = 0.0
+
+    for item in ledger:
+        status = str(item.get("status", "UNKNOWN"))
+        status_counts[status] = status_counts.get(status, 0) + 1
+        stake = float(item.get("stake_usd", 0.0))
+        total_stake += stake
+        total_expected_value += float(item.get("expected_value_usd", 0.0))
+        event_id = str(item.get("event_id") or item.get("market_id") or "unknown")
+        if status == "PAPER_INTENDED":
+            open_stake += stake
+            event_exposure[event_id] = event_exposure.get(event_id, 0.0) + stake
+        if status == "SETTLED":
+            settled.append(item)
+
+    pnl = sum(float(item.get("pnl_usd", 0.0)) for item in settled)
+    wins = sum(1 for item in settled if float(item.get("pnl_usd", 0.0)) > 0)
+    brier_values = []
+    for item in settled:
+        if "side_outcome" not in item:
+            continue
+        p = float(item.get("side_probability", item.get("model_probability", 0.5)))
+        outcome = float(item.get("side_outcome", 0.0))
+        brier_values.append((p - outcome) ** 2)
+
+    return {
+        "status_counts": dict(sorted(status_counts.items())),
+        "total_stake_usd": round(total_stake, 2),
+        "open_stake_usd": round(open_stake, 2),
+        "settled_stake_usd": round(sum(float(item.get("stake_usd", 0.0)) for item in settled), 2),
+        "settled_pnl_usd": round(pnl, 4),
+        "settled_expected_value_usd": round(
+            sum(float(item.get("expected_value_usd", 0.0)) for item in settled),
+            4,
+        ),
+        "total_expected_value_usd": round(total_expected_value, 4),
+        "settled_count": len(settled),
+        "win_rate": round(wins / len(settled), 6) if settled else None,
+        "brier_score": round(sum(brier_values) / len(brier_values), 6) if brier_values else None,
+        "open_event_exposure_usd": dict(
+            sorted(
+                ((event_id, round(value, 2)) for event_id, value in event_exposure.items()),
+                key=lambda item: (-item[1], item[0]),
+            )
+        ),
     }
 
 
@@ -411,6 +462,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     ranked = report.get("ranked", {})
     paper = report.get("paper", {})
     settlement = report.get("settlement", {})
+    ledger = report.get("ledger", {})
     lines = [
         f"# Kalshi Research Cycle: {report.get('run_id', '')}",
         "",
@@ -453,6 +505,15 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- Settled: {settlement.get('settled_count', 0)}",
             f"- PnL: ${float(settlement.get('pnl_usd', 0.0)):.2f}",
+            "",
+            "## Ledger Audit",
+            "",
+            f"- Ledger count: {ledger.get('count', 0)}",
+            f"- Open stake: ${float(ledger.get('open_stake_usd', 0.0)):.2f}",
+            f"- Settled PnL: ${float(ledger.get('settled_pnl_usd', 0.0)):.2f}",
+            f"- Win rate: {ledger.get('win_rate')}",
+            f"- Brier score: {ledger.get('brier_score')}",
+            f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
             "",
         ]
     )
