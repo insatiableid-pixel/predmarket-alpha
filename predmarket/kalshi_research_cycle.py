@@ -39,6 +39,7 @@ class KalshiPaperConfig:
     min_fill_probability: float = 0.20
     max_spread: float = 0.12
     allow_blocked_opportunities: bool = False
+    suppress_duplicate_open_intents: bool = True
     settle_existing: bool = True
 
 
@@ -60,6 +61,7 @@ def build_paper_intents(
     rank_report: Mapping[str, Any],
     *,
     config: Optional[KalshiPaperConfig] = None,
+    existing_intents: Sequence[Mapping[str, Any]] = (),
     created_ts: Optional[float] = None,
 ) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
     paper_config = config or KalshiPaperConfig()
@@ -69,10 +71,19 @@ def build_paper_intents(
     event_stakes: Dict[str, float] = {}
     total_stake = 0.0
     rank_run_id = str(rank_report.get("run_id") or "")
+    open_pairs = {
+        (str(intent.get("market_id") or ""), str(intent.get("side") or "").upper())
+        for intent in existing_intents
+        if str(intent.get("status", "PAPER_INTENDED")) == "PAPER_INTENDED"
+    }
 
     for opportunity in rank_report.get("top_opportunities", []):
         opp = dict(opportunity)
+        side = str(opp.get("side") or "YES").upper()
+        market_id = str(opp.get("market_id") or "")
         reasons = paper_blocking_reasons(opp, config=paper_config)
+        if paper_config.suppress_duplicate_open_intents and (market_id, side) in open_pairs:
+            reasons.append("paper_duplicate_open_intent")
         event_id = str(opp.get("event_id") or opp.get("market_id") or "")
         if reasons and not paper_config.allow_blocked_opportunities:
             blocked.append({**opp, "paper_blocking_reasons": reasons})
@@ -91,7 +102,6 @@ def build_paper_intents(
             blocked.append({**opp, "paper_blocking_reasons": [*reasons, "stake_below_minimum"]})
             continue
 
-        side = str(opp.get("side") or "YES").upper()
         yes_ask = float(opp.get("yes_ask", opp.get("market_probability", 0.5)))
         yes_bid = float(opp.get("yes_bid", opp.get("market_probability", 0.5)))
         entry_price = yes_ask if side == "YES" else max(1.0 - yes_bid, 0.01)
@@ -127,6 +137,7 @@ def build_paper_intents(
             "source_opportunity": opp,
         }
         intents.append(intent)
+        open_pairs.add((market_id, side))
         total_stake += stake
         event_stakes[event_id] = event_stakes.get(event_id, 0.0) + stake
 
@@ -246,9 +257,11 @@ def run_kalshi_research_cycle(
     else:
         rank_payload = dict(rank_report)
 
+    existing_open_intents = store.load_kalshi_paper_intents(status="PAPER_INTENDED")
     paper_intents, paper_blocked = build_paper_intents(
         rank_payload,
         config=cycle_config.paper,
+        existing_intents=existing_open_intents,
     )
     if paper_intents:
         store.write_kalshi_paper_intents(paper_intents)

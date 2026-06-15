@@ -128,6 +128,24 @@ def test_build_paper_intents_blocks_watchlist_or_rank_blocked():
     assert "paper_requires_discovery_hypothesis" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_suppresses_existing_open_intent():
+    rank_report = _rank_report()
+    first_intents, _ = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(min_liquidity_adjusted_edge=0.005, min_directional_edge=0.02),
+        created_ts=AS_OF_TS,
+    )
+    second_intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(min_liquidity_adjusted_edge=0.005, min_directional_edge=0.02),
+        existing_intents=first_intents,
+        created_ts=AS_OF_TS + 60,
+    )
+
+    assert second_intents == []
+    assert "paper_duplicate_open_intent" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,
@@ -293,6 +311,46 @@ def test_research_cycle_replays_rank_report_and_supplied_outcomes(tmp_path, mock
     assert artifacts.report["paper"]["intended_count"] == 1
     assert artifacts.report["settlement"]["settled_count"] == 1
     assert settled[0]["pnl_usd"] > 0
+
+
+def test_research_cycle_does_not_duplicate_open_intents(tmp_path, mock_config):
+    rank_report = _rank_report()
+    store = PointInTimeStore(tmp_path / "data")
+    try:
+        first = run_kalshi_research_cycle(
+            store,
+            app_config=mock_config,
+            rank_report=rank_report,
+            config=KalshiResearchCycleConfig(
+                paper=KalshiPaperConfig(
+                    min_liquidity_adjusted_edge=0.005,
+                    min_directional_edge=0.02,
+                    settle_existing=False,
+                )
+            ),
+            reports_dir=tmp_path / "reports",
+        )
+        second = run_kalshi_research_cycle(
+            store,
+            app_config=mock_config,
+            rank_report=rank_report,
+            config=KalshiResearchCycleConfig(
+                paper=KalshiPaperConfig(
+                    min_liquidity_adjusted_edge=0.005,
+                    min_directional_edge=0.02,
+                    settle_existing=False,
+                )
+            ),
+            reports_dir=tmp_path / "reports",
+        )
+        open_intents = store.load_kalshi_paper_intents(status="PAPER_INTENDED")
+    finally:
+        store.close()
+
+    assert first.report["paper"]["intended_count"] == 1
+    assert second.report["paper"]["intended_count"] == 0
+    assert second.report["paper"]["blocked"][0]["paper_blocking_reasons"] == ["paper_duplicate_open_intent"]
+    assert len(open_intents) == 1
 
 
 def test_summarize_paper_ledger_reports_exposure_and_quality():
