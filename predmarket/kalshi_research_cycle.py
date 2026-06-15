@@ -41,6 +41,10 @@ class KalshiPaperConfig:
     allow_blocked_opportunities: bool = False
     suppress_duplicate_open_intents: bool = True
     settle_existing: bool = True
+    min_settled_for_promotion_review: int = 30
+    max_brier_for_promotion_review: float = 0.20
+    min_win_rate_for_promotion_review: float = 0.55
+    min_pnl_for_promotion_review: float = 0.0
 
 
 @dataclass
@@ -353,6 +357,7 @@ def build_cycle_report(
             "count": len(ledger),
             **ledger_summary,
         },
+        "promotion_readiness": paper_promotion_readiness(ledger_summary, config.paper),
     }
 
 
@@ -407,6 +412,47 @@ def summarize_paper_ledger(ledger: Sequence[Mapping[str, Any]]) -> Dict[str, Any
                 key=lambda item: (-item[1], item[0]),
             )
         ),
+    }
+
+
+def paper_promotion_readiness(
+    ledger_summary: Mapping[str, Any],
+    config: KalshiPaperConfig,
+) -> Dict[str, Any]:
+    reasons = []
+    settled_count = int(ledger_summary.get("settled_count", 0) or 0)
+    brier = ledger_summary.get("brier_score")
+    win_rate = ledger_summary.get("win_rate")
+    pnl = float(ledger_summary.get("settled_pnl_usd", 0.0) or 0.0)
+
+    if settled_count < config.min_settled_for_promotion_review:
+        reasons.append("insufficient_settled_sample")
+    if brier is None:
+        reasons.append("missing_brier_score")
+    elif float(brier) > config.max_brier_for_promotion_review:
+        reasons.append("brier_score_above_threshold")
+    if win_rate is None:
+        reasons.append("missing_win_rate")
+    elif float(win_rate) < config.min_win_rate_for_promotion_review:
+        reasons.append("win_rate_below_threshold")
+    if pnl < config.min_pnl_for_promotion_review:
+        reasons.append("settled_pnl_below_threshold")
+
+    return {
+        "status": "REVIEW_READY" if not reasons else "INSUFFICIENT_EVIDENCE",
+        "reasons": reasons,
+        "thresholds": {
+            "min_settled": config.min_settled_for_promotion_review,
+            "max_brier": config.max_brier_for_promotion_review,
+            "min_win_rate": config.min_win_rate_for_promotion_review,
+            "min_pnl_usd": config.min_pnl_for_promotion_review,
+        },
+        "observed": {
+            "settled_count": settled_count,
+            "brier_score": brier,
+            "win_rate": win_rate,
+            "settled_pnl_usd": pnl,
+        },
     }
 
 
@@ -476,6 +522,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     paper = report.get("paper", {})
     settlement = report.get("settlement", {})
     ledger = report.get("ledger", {})
+    readiness = report.get("promotion_readiness", {})
     lines = [
         f"# Kalshi Research Cycle: {report.get('run_id', '')}",
         "",
@@ -527,6 +574,12 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             f"- Win rate: {ledger.get('win_rate')}",
             f"- Brier score: {ledger.get('brier_score')}",
             f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
+            "",
+            "## Promotion Readiness",
+            "",
+            f"- Status: {readiness.get('status', '')}",
+            f"- Reasons: {readiness.get('reasons', [])}",
+            f"- Observed: {readiness.get('observed', {})}",
             "",
         ]
     )

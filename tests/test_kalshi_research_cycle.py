@@ -8,6 +8,7 @@ from predmarket.kalshi_research_cycle import (
     compute_paper_stake_usd,
     load_outcomes,
     load_rank_report,
+    paper_promotion_readiness,
     run_kalshi_research_cycle,
     settle_paper_intents,
     summarize_paper_ledger,
@@ -400,3 +401,39 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     assert ledger["settled_pnl_usd"] > 0
     assert ledger["brier_score"] is not None
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
+    assert artifacts.report["promotion_readiness"]["status"] == "INSUFFICIENT_EVIDENCE"
+
+
+def test_paper_promotion_readiness_requires_enough_settled_evidence():
+    readiness = paper_promotion_readiness(
+        {
+            "settled_count": 2,
+            "brier_score": 0.05,
+            "win_rate": 1.0,
+            "settled_pnl_usd": 10.0,
+        },
+        KalshiPaperConfig(min_settled_for_promotion_review=30),
+    )
+
+    assert readiness["status"] == "INSUFFICIENT_EVIDENCE"
+    assert "insufficient_settled_sample" in readiness["reasons"]
+
+
+def test_paper_promotion_readiness_can_be_review_ready():
+    readiness = paper_promotion_readiness(
+        {
+            "settled_count": 30,
+            "brier_score": 0.12,
+            "win_rate": 0.60,
+            "settled_pnl_usd": 25.0,
+        },
+        KalshiPaperConfig(
+            min_settled_for_promotion_review=30,
+            max_brier_for_promotion_review=0.20,
+            min_win_rate_for_promotion_review=0.55,
+            min_pnl_for_promotion_review=0.0,
+        ),
+    )
+
+    assert readiness["status"] == "REVIEW_READY"
+    assert readiness["reasons"] == []
