@@ -132,6 +132,8 @@ Do not promote or act on a candidate when:
 - The market rules cannot be mapped to a clear Kalshi resolution source.
 - The expected edge comes mainly from an untested transformation or a one-off news interpretation.
 
+`allow_blocked_opportunities` can only relax soft research gates. It must not bypass stale rank, missing rank timestamp, non-research-only rank, duplicate open intent, or non-Kalshi opportunity blockers.
+
 ## Square-Money Focus
 
 The best Kalshi targets for this engine are not the loudest markets by volume. They are liquid markets where retail wording mistakes are plausible and measurable:
