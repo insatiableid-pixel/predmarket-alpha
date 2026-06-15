@@ -50,7 +50,7 @@ def build_paper_ledger_report(
         stale_open_count=len(stale_open),
     )
     return {
-        "run_id": stable_ledger_report_id(ledger, paper_config),
+        "run_id": stable_ledger_report_id(ledger, paper_events, paper_config),
         "created_ts": ts,
         "research_only": True,
         "execution_enabled": False,
@@ -182,11 +182,13 @@ def run_paper_ledger_audit(
 
 def stable_ledger_report_id(
     ledger: Sequence[Mapping[str, Any]],
+    events: Sequence[Mapping[str, Any]],
     config: KalshiPaperConfig,
 ) -> str:
     return "kalshi-ledger-" + _stable_hash(
         {
             "ledger": list(ledger),
+            "events": list(events),
             "config": {"paper": config.__dict__},
         }
     )[:16]
