@@ -194,6 +194,7 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
         )
     lines.extend(
         [
+            "",
             "## Settled Intents",
             "",
         ]

@@ -822,6 +822,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         )
     lines.extend(
         [
+            "",
             "## Settlement",
             "",
             f"- Settled: {settlement.get('settled_count', 0)}",
