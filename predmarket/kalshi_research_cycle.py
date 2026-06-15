@@ -86,6 +86,10 @@ def build_paper_intents(
     rank_report_stale = (
         rank_age_hours is None or rank_age_hours > paper_config.max_rank_report_age_hours
     )
+    rank_report_research_only = (
+        rank_report.get("research_only") is True
+        and rank_report.get("execution_enabled") is False
+    )
     open_pairs = {
         (str(intent.get("market_id") or ""), str(intent.get("side") or "").upper())
         for intent in existing_intents
@@ -108,6 +112,8 @@ def build_paper_intents(
             reasons.append("paper_rank_report_missing_created_ts")
         elif rank_report_stale:
             reasons.append("paper_rank_report_stale")
+        if not rank_report_research_only:
+            reasons.append("paper_rank_report_not_research_only")
         if paper_config.suppress_duplicate_open_intents and (market_id, side) in open_pairs:
             reasons.append("paper_duplicate_open_intent")
         event_id = str(opp.get("event_id") or opp.get("market_id") or "")
@@ -380,6 +386,8 @@ def build_cycle_report(
                 if item.get("scoring_mode") == "watchlist_vulnerability"
             ),
             "rank_report_age_hours": rank_age_hours,
+            "rank_report_research_only": rank_report.get("research_only") is True,
+            "rank_report_execution_enabled": rank_report.get("execution_enabled") is True,
             "blocking_reason_counts": reason_counts(top_opportunities, "blocking_reasons"),
         },
         "paper": {
@@ -687,6 +695,8 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         f"- Top opportunities: {ranked.get('top_opportunities', 0)}",
         f"- Passed / blocked / watchlist: {ranked.get('research_only_pass', 0)} / {ranked.get('blocked', 0)} / {ranked.get('watchlist', 0)}",
         f"- Rank report age: {format_optional_hours(ranked.get('rank_report_age_hours'))}",
+        f"- Rank report research-only: {ranked.get('rank_report_research_only', False)}",
+        f"- Rank report execution enabled: {ranked.get('rank_report_execution_enabled', False)}",
         f"- Rank blocking reasons: {ranked.get('blocking_reason_counts', {})}",
         "",
         "## Paper Intents",

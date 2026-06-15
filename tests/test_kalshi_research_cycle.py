@@ -218,6 +218,23 @@ def test_build_paper_intents_blocks_rank_report_without_created_ts():
     assert "paper_rank_report_missing_created_ts" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_blocks_non_research_only_rank_report():
+    rank_report = dict(_rank_report())
+    rank_report["research_only"] = False
+    rank_report["execution_enabled"] = True
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(
+            min_liquidity_adjusted_edge=0.005,
+            min_directional_edge=0.02,
+        ),
+        created_ts=float(rank_report["created_ts"]),
+    )
+
+    assert intents == []
+    assert "paper_rank_report_not_research_only" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,
@@ -302,6 +319,8 @@ def test_research_cycle_writes_audit_report_and_ledger(tmp_path, mock_config):
     assert artifacts.report["paper"]["intended_count"] == 1
     assert artifacts.report["ranked"]["markets_ranked"] == 1
     assert artifacts.report["ranked"]["rank_report_age_hours"] >= 0
+    assert artifacts.report["ranked"]["rank_report_research_only"] is True
+    assert artifacts.report["ranked"]["rank_report_execution_enabled"] is False
     assert artifacts.report["events"]["count"] == 1
     assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1}
     assert ledger[0]["status"] == "PAPER_INTENDED"
