@@ -6,6 +6,8 @@ from predmarket.kalshi_research_cycle import (
     KalshiResearchCycleConfig,
     build_paper_intents,
     compute_paper_stake_usd,
+    load_outcomes,
+    load_rank_report,
     run_kalshi_research_cycle,
     settle_paper_intents,
 )
@@ -251,3 +253,42 @@ def test_research_cycle_settles_existing_from_resolved_rows(tmp_path, mock_confi
 
     assert artifacts.report["settlement"]["settled_count"] >= 1
     assert settled
+
+
+def test_load_rank_report_and_outcomes_json(tmp_path):
+    rank_path = tmp_path / "rank.json"
+    outcomes_path = tmp_path / "outcomes.json"
+    rank_payload = _rank_report()
+    rank_path.write_text(json.dumps(rank_payload))
+    outcomes_path.write_text(json.dumps({"outcomes": {"KXFED-26JUN-TARGET": 1}}))
+
+    assert load_rank_report(rank_path)["run_id"] == rank_payload["run_id"]
+    assert load_outcomes(outcomes_path) == {"KXFED-26JUN-TARGET": 1}
+
+
+def test_research_cycle_replays_rank_report_and_supplied_outcomes(tmp_path, mock_config):
+    rank_report = _rank_report()
+    store = PointInTimeStore(tmp_path / "data")
+    try:
+        artifacts = run_kalshi_research_cycle(
+            store,
+            app_config=mock_config,
+            rank_report=rank_report,
+            outcomes={"KXFED-26JUN-TARGET": 1},
+            config=KalshiResearchCycleConfig(
+                paper=KalshiPaperConfig(
+                    min_liquidity_adjusted_edge=0.005,
+                    min_directional_edge=0.02,
+                    settle_existing=True,
+                )
+            ),
+            reports_dir=tmp_path / "reports",
+        )
+        settled = store.load_kalshi_paper_intents(status="SETTLED")
+    finally:
+        store.close()
+
+    assert artifacts.report["live_rank_ref"]["run_id"] == rank_report["run_id"]
+    assert artifacts.report["paper"]["intended_count"] == 1
+    assert artifacts.report["settlement"]["settled_count"] == 1
+    assert settled[0]["pnl_usd"] > 0

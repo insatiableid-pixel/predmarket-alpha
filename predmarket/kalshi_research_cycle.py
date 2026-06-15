@@ -226,6 +226,7 @@ def run_kalshi_research_cycle(
     config: Optional[KalshiResearchCycleConfig] = None,
     rows: Optional[Sequence[Mapping[str, Any]]] = None,
     rank_report: Optional[Mapping[str, Any]] = None,
+    outcomes: Optional[Mapping[str, int]] = None,
     reports_dir: Optional[Path] = None,
 ) -> KalshiResearchCycleArtifacts:
     app_config = app_config or load_config()
@@ -256,7 +257,11 @@ def run_kalshi_research_cycle(
     if cycle_config.paper.settle_existing:
         open_intents = store.load_kalshi_paper_intents(status="PAPER_INTENDED")
         resolved_rows = store.load_kalshi_resolved_rows()
-        settled = settle_paper_intents(open_intents, resolved_rows=resolved_rows)
+        settled = settle_paper_intents(
+            open_intents,
+            resolved_rows=resolved_rows,
+            outcomes=outcomes,
+        )
         if settled:
             store.write_kalshi_paper_intents(settled)
 
@@ -357,6 +362,51 @@ def write_cycle_report(
     return KalshiResearchCycleArtifacts(dict(report), json_path, markdown_path)
 
 
+def load_rank_report(path: Path) -> Dict[str, Any]:
+    with path.open("r", encoding="utf-8") as f:
+        payload = json.load(f)
+    if not isinstance(payload, dict):
+        raise ValueError("rank report must be a JSON object")
+    if "top_opportunities" not in payload:
+        raise ValueError("rank report is missing top_opportunities")
+    return payload
+
+
+def load_outcomes(path: Path) -> Dict[str, int]:
+    with path.open("r", encoding="utf-8") as f:
+        payload = json.load(f)
+    outcomes: Dict[str, int] = {}
+    if isinstance(payload, dict):
+        source = payload.get("outcomes", payload)
+        if isinstance(source, dict):
+            for market_id, outcome in source.items():
+                outcomes[str(market_id)] = int(outcome)
+        elif isinstance(source, list):
+            outcomes.update(_outcomes_from_rows(source))
+        else:
+            raise ValueError("outcomes JSON object must contain a dict or list")
+    elif isinstance(payload, list):
+        outcomes.update(_outcomes_from_rows(payload))
+    else:
+        raise ValueError("outcomes JSON must be an object or list")
+    for market_id, outcome in outcomes.items():
+        if outcome not in {0, 1}:
+            raise ValueError(f"outcome for {market_id} must be 0 or 1")
+    return outcomes
+
+
+def _outcomes_from_rows(rows: Sequence[Any]) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for row in rows:
+        if not isinstance(row, Mapping):
+            continue
+        market_id = str(row.get("market_id") or row.get("ticker") or "")
+        if not market_id or "outcome" not in row:
+            continue
+        out[market_id] = int(row.get("outcome", 0))
+    return out
+
+
 def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     ranked = report.get("ranked", {})
     paper = report.get("paper", {})
@@ -452,6 +502,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--min-liquidity-adjusted-edge", type=float, default=0.02)
     parser.add_argument("--min-directional-edge", type=float, default=0.03)
     parser.add_argument("--no-settle-existing", action="store_true")
+    parser.add_argument("--rank-report", default=None, help="Replay from a saved live rank JSON report instead of fetching live")
+    parser.add_argument("--outcomes-json", default=None, help="Optional market_id -> outcome JSON for paper settlement")
     parser.add_argument("--discovery-report", default=None)
     parser.add_argument("--reports-dir", default=None)
     args = parser.parse_args(argv)
@@ -483,6 +535,8 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             store,
             app_config=app_config,
             config=KalshiResearchCycleConfig(live_rank=live_rank_config, paper=paper_config),
+            rank_report=load_rank_report(Path(args.rank_report)) if args.rank_report else None,
+            outcomes=load_outcomes(Path(args.outcomes_json)) if args.outcomes_json else None,
             reports_dir=Path(args.reports_dir) if args.reports_dir else None,
         )
     finally:
