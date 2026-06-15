@@ -318,6 +318,7 @@ def build_cycle_report(
     live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None,
 ) -> Dict[str, Any]:
     ledger_summary = summarize_paper_ledger(ledger)
+    top_opportunities = list(rank_report.get("top_opportunities", []))
     return {
         "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
         "created_ts": time.time(),
@@ -334,27 +335,29 @@ def build_cycle_report(
         },
         "ranked": {
             "markets_ranked": rank_report.get("input_summary", {}).get("n_rows", 0),
-            "top_opportunities": len(rank_report.get("top_opportunities", [])),
+            "top_opportunities": len(top_opportunities),
             "research_only_pass": sum(
                 1
-                for item in rank_report.get("top_opportunities", [])
+                for item in top_opportunities
                 if item.get("candidate_status") == "RESEARCH_ONLY_PASS"
             ),
             "blocked": sum(
                 1
-                for item in rank_report.get("top_opportunities", [])
+                for item in top_opportunities
                 if item.get("candidate_status") != "RESEARCH_ONLY_PASS"
             ),
             "watchlist": sum(
                 1
-                for item in rank_report.get("top_opportunities", [])
+                for item in top_opportunities
                 if item.get("scoring_mode") == "watchlist_vulnerability"
             ),
+            "blocking_reason_counts": reason_counts(top_opportunities, "blocking_reasons"),
         },
         "paper": {
             "intended_count": len(paper_intents),
             "blocked_count": len(paper_blocked),
             "total_stake_usd": round(sum(float(item.get("stake_usd", 0.0)) for item in paper_intents), 2),
+            "blocking_reason_counts": reason_counts(paper_blocked, "paper_blocking_reasons"),
             "intents": list(paper_intents),
             "blocked": list(paper_blocked),
         },
@@ -487,6 +490,15 @@ def status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
     return dict(sorted(counts.items()))
 
 
+def reason_counts(items: Sequence[Mapping[str, Any]], field: str) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for item in items:
+        for reason in item.get(field, []) or []:
+            reason_key = str(reason)
+            counts[reason_key] = counts.get(reason_key, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def cycle_integrity(
     *,
     rank_report: Mapping[str, Any],
@@ -597,11 +609,13 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         f"- Markets ranked: {ranked.get('markets_ranked', 0)}",
         f"- Top opportunities: {ranked.get('top_opportunities', 0)}",
         f"- Passed / blocked / watchlist: {ranked.get('research_only_pass', 0)} / {ranked.get('blocked', 0)} / {ranked.get('watchlist', 0)}",
+        f"- Rank blocking reasons: {ranked.get('blocking_reason_counts', {})}",
         "",
         "## Paper Intents",
         "",
         f"- Intended: {paper.get('intended_count', 0)}",
         f"- Blocked: {paper.get('blocked_count', 0)}",
+        f"- Paper blocking reasons: {paper.get('blocking_reason_counts', {})}",
         f"- Total stake: ${float(paper.get('total_stake_usd', 0.0)):.2f}",
         "",
     ]
