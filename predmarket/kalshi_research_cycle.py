@@ -290,12 +290,14 @@ def run_kalshi_research_cycle(
             store.write_kalshi_paper_intents(settled)
 
     ledger = store.load_kalshi_paper_intents()
+    paper_events = store.load_kalshi_paper_events()
     report = build_cycle_report(
         rank_payload,
         paper_intents=paper_intents,
         paper_blocked=paper_blocked,
         settled=settled,
         ledger=ledger,
+        paper_events=paper_events,
         config=cycle_config,
         live_rank_artifacts=live_rank_artifacts,
     )
@@ -312,6 +314,7 @@ def build_cycle_report(
     settled: Sequence[Mapping[str, Any]],
     ledger: Sequence[Mapping[str, Any]],
     config: KalshiResearchCycleConfig,
+    paper_events: Sequence[Mapping[str, Any]] = (),
     live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None,
 ) -> Dict[str, Any]:
     ledger_summary = summarize_paper_ledger(ledger)
@@ -364,6 +367,10 @@ def build_cycle_report(
             "count": len(ledger),
             **ledger_summary,
         },
+        "events": {
+            "count": len(paper_events),
+            "status_counts": status_counts(paper_events),
+        },
         "promotion_readiness": paper_promotion_readiness(ledger_summary, config.paper),
         "integrity": cycle_integrity(
             rank_report=rank_report,
@@ -371,6 +378,7 @@ def build_cycle_report(
             paper_blocked=paper_blocked,
             settled=settled,
             ledger=ledger,
+            paper_events=paper_events,
             config=config,
         ),
     }
@@ -471,6 +479,14 @@ def paper_promotion_readiness(
     }
 
 
+def status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
+    counts: Dict[str, int] = {}
+    for item in items:
+        status = str(item.get("status", "UNKNOWN"))
+        counts[status] = counts.get(status, 0) + 1
+    return dict(sorted(counts.items()))
+
+
 def cycle_integrity(
     *,
     rank_report: Mapping[str, Any],
@@ -479,14 +495,16 @@ def cycle_integrity(
     settled: Sequence[Mapping[str, Any]],
     ledger: Sequence[Mapping[str, Any]],
     config: KalshiResearchCycleConfig,
+    paper_events: Sequence[Mapping[str, Any]] = (),
 ) -> Dict[str, Any]:
     return {
-        "artifact_schema_version": 1,
+        "artifact_schema_version": 2,
         "rank_report_hash": _stable_hash(rank_report),
         "paper_intents_hash": _stable_hash(list(paper_intents)),
         "paper_blocked_hash": _stable_hash(list(paper_blocked)),
         "settled_hash": _stable_hash(list(settled)),
         "ledger_hash": _stable_hash(list(ledger)),
+        "paper_events_hash": _stable_hash(list(paper_events)),
         "config_hash": _stable_hash(
             {
                 "live_rank": asdict(config.live_rank),
@@ -562,6 +580,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     paper = report.get("paper", {})
     settlement = report.get("settlement", {})
     ledger = report.get("ledger", {})
+    events = report.get("events", {})
     readiness = report.get("promotion_readiness", {})
     integrity = report.get("integrity", {})
     lines = [
@@ -616,6 +635,11 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             f"- Brier score: {ledger.get('brier_score')}",
             f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
             "",
+            "## Event History",
+            "",
+            f"- Events: {events.get('count', 0)}",
+            f"- Event status counts: {events.get('status_counts', {})}",
+            "",
             "## Promotion Readiness",
             "",
             f"- Status: {readiness.get('status', '')}",
@@ -626,6 +650,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- Rank report hash: {integrity.get('rank_report_hash', '')}",
             f"- Ledger hash: {integrity.get('ledger_hash', '')}",
+            f"- Paper events hash: {integrity.get('paper_events_hash', '')}",
             f"- Config hash: {integrity.get('config_hash', '')}",
             "",
         ]

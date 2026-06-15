@@ -267,6 +267,8 @@ def test_research_cycle_writes_audit_report_and_ledger(tmp_path, mock_config):
     assert artifacts.markdown_path.exists()
     assert artifacts.report["paper"]["intended_count"] == 1
     assert artifacts.report["ranked"]["markets_ranked"] == 1
+    assert artifacts.report["events"]["count"] == 1
+    assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1}
     assert ledger[0]["status"] == "PAPER_INTENDED"
     assert "# Kalshi Research Cycle" in artifacts.markdown_path.read_text()
 
@@ -437,9 +439,13 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     ledger = artifacts.report["ledger"]
     assert ledger["settled_pnl_usd"] > 0
     assert ledger["brier_score"] is not None
+    assert artifacts.report["events"]["count"] == 2
+    assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1, "SETTLED": 1}
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
+    assert "## Event History" in artifacts.markdown_path.read_text()
     assert artifacts.report["promotion_readiness"]["status"] == "INSUFFICIENT_EVIDENCE"
     assert len(artifacts.report["integrity"]["ledger_hash"]) == 64
+    assert len(artifacts.report["integrity"]["paper_events_hash"]) == 64
     assert "## Integrity" in artifacts.markdown_path.read_text()
 
 
@@ -504,5 +510,6 @@ def test_cycle_integrity_hashes_are_stable():
     )
 
     assert left == right
-    assert left["artifact_schema_version"] == 1
+    assert left["artifact_schema_version"] == 2
     assert len(left["rank_report_hash"]) == 64
+    assert len(left["paper_events_hash"]) == 64
