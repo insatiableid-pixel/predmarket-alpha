@@ -353,6 +353,7 @@ def rank_live_rows(
             {
                 "market_id": row.get("market_id"),
                 "event_id": row.get("event_id"),
+                "venue": row.get("venue", "Kalshi"),
                 "title": row.get("title"),
                 "domain": row.get("domain"),
                 "horizon": row.get("horizon"),

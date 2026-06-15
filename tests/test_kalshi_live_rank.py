@@ -130,6 +130,7 @@ def test_rank_live_rows_applies_discovery_hypotheses():
 
     top = report["top_opportunities"][0]
     assert top["side"] == "YES"
+    assert top["venue"] == "Kalshi"
     assert top["model_probability"] > top["market_probability"]
     assert top["used_hypotheses"]
     assert "watchlist_only_no_usable_discovery_hypothesis" not in top["blocking_reasons"]

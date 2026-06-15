@@ -235,6 +235,23 @@ def test_build_paper_intents_blocks_non_research_only_rank_report():
     assert "paper_rank_report_not_research_only" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_blocks_non_kalshi_opportunity():
+    rank_report = dict(_rank_report())
+    rank_report["created_ts"] = AS_OF_TS
+    rank_report["top_opportunities"] = [dict(rank_report["top_opportunities"][0], venue="Polymarket")]
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(
+            min_liquidity_adjusted_edge=0.005,
+            min_directional_edge=0.02,
+        ),
+        created_ts=AS_OF_TS,
+    )
+
+    assert intents == []
+    assert "paper_non_kalshi_opportunity" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,

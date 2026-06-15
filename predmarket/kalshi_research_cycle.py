@@ -182,6 +182,8 @@ def paper_blocking_reasons(
     config: KalshiPaperConfig,
 ) -> List[str]:
     reasons = list(opportunity.get("blocking_reasons", []))
+    if str(opportunity.get("venue", "Kalshi")).lower() != "kalshi":
+        reasons.append("paper_non_kalshi_opportunity")
     if str(opportunity.get("candidate_status", "")) != "RESEARCH_ONLY_PASS":
         reasons.append("rank_status_not_pass")
     if float(opportunity.get("liquidity_adjusted_edge", 0.0)) < config.min_liquidity_adjusted_edge:
