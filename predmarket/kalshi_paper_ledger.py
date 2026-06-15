@@ -228,10 +228,13 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             {
                 "run_id": artifacts.report["run_id"],
                 "ledger_count": artifacts.report["ledger"]["count"],
+                "stale_open": artifacts.report["ledger"]["stale_open_count"],
+                "events": artifacts.report["events"]["count"],
                 "readiness": artifacts.report["promotion_readiness"]["status"],
                 "json_path": str(artifacts.json_path),
                 "markdown_path": str(artifacts.markdown_path),
                 "research_only": True,
+                "execution_enabled": False,
             },
             indent=2,
             sort_keys=True,
