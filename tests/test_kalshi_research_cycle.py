@@ -463,6 +463,8 @@ def test_research_cycle_does_not_duplicate_open_intents(tmp_path, mock_config):
     assert second.report["paper"]["intended_count"] == 0
     assert second.report["paper"]["blocked"][0]["paper_blocking_reasons"] == ["paper_duplicate_open_intent"]
     assert second.report["paper"]["blocking_reason_counts"] == {"paper_duplicate_open_intent": 1}
+    assert "## Blocked Opportunities" in second.markdown_path.read_text()
+    assert "paper_duplicate_open_intent" in second.markdown_path.read_text()
     assert len(open_intents) == 1
 
 
@@ -540,6 +542,7 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1, "SETTLED": 1}
     assert artifacts.report["events"]["recent"][0]["paper_event_type"] == "SETTLED"
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
+    assert "No blocked paper opportunities." in artifacts.markdown_path.read_text()
     assert "## Stale Open Intents" in artifacts.markdown_path.read_text()
     assert "## Event History" in artifacts.markdown_path.read_text()
     assert "Recent events:" in artifacts.markdown_path.read_text()

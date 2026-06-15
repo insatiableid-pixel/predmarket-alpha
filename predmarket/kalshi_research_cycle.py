@@ -767,6 +767,26 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         )
     lines.extend(
         [
+            "## Blocked Opportunities",
+            "",
+        ]
+    )
+    blocked = paper.get("blocked", [])
+    if not blocked:
+        lines.append("No blocked paper opportunities.")
+    for idx, item in enumerate(blocked[:10], start=1):
+        lines.extend(
+            [
+                f"### {idx}. {item.get('market_id', '')}",
+                "",
+                str(item.get("title", "")),
+                "",
+                f"- Reasons: {item.get('paper_blocking_reasons', [])}",
+                "",
+            ]
+        )
+    lines.extend(
+        [
             "## Settlement",
             "",
             f"- Settled: {settlement.get('settled_count', 0)}",
