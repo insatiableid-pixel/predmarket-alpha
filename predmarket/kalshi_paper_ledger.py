@@ -29,10 +29,12 @@ class KalshiPaperLedgerArtifacts:
 def build_paper_ledger_report(
     intents: Sequence[Mapping[str, Any]],
     *,
+    events: Sequence[Mapping[str, Any]] = (),
     config: Optional[KalshiPaperConfig] = None,
 ) -> Dict[str, Any]:
     paper_config = config or KalshiPaperConfig()
     ledger = [dict(intent) for intent in intents]
+    paper_events = [dict(event) for event in events]
     summary = summarize_paper_ledger(ledger)
     readiness = paper_promotion_readiness(summary, paper_config)
     return {
@@ -51,9 +53,14 @@ def build_paper_ledger_report(
         "settled_intents": [
             intent for intent in ledger if str(intent.get("status", "")) == "SETTLED"
         ],
+        "events": {
+            "count": len(paper_events),
+            "status_counts": _status_counts(paper_events),
+        },
         "integrity": {
             "artifact_schema_version": 1,
             "ledger_hash": _stable_hash(ledger),
+            "events_hash": _stable_hash(paper_events),
             "config_hash": _stable_hash({"paper": paper_config.__dict__}),
         },
     }
@@ -97,6 +104,11 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
         f"- Brier score: {ledger.get('brier_score')}",
         f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
         "",
+        "## Event History",
+        "",
+        f"- Events: {report.get('events', {}).get('count', 0)}",
+        f"- Event status counts: {report.get('events', {}).get('status_counts', {})}",
+        "",
         "## Promotion Readiness",
         "",
         f"- Status: {readiness.get('status', '')}",
@@ -132,7 +144,8 @@ def run_paper_ledger_audit(
     reports_dir: Optional[Path] = None,
 ) -> KalshiPaperLedgerArtifacts:
     ledger = store.load_kalshi_paper_intents()
-    report = build_paper_ledger_report(ledger, config=config)
+    events = store.load_kalshi_paper_events()
+    report = build_paper_ledger_report(ledger, events=events, config=config)
     out_dir = reports_dir or (store.research_dir / "reports")
     return write_paper_ledger_report(report, reports_dir=out_dir)
 
@@ -147,6 +160,14 @@ def stable_ledger_report_id(
             "config": {"paper": config.__dict__},
         }
     )[:16]
+
+
+def _status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
+    out: Dict[str, int] = {}
+    for item in items:
+        status = str(item.get("status", "UNKNOWN"))
+        out[status] = out.get(status, 0) + 1
+    return dict(sorted(out.items()))
 
 
 def main(argv: Optional[Sequence[str]] = None) -> int:

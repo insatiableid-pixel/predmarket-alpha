@@ -241,6 +241,17 @@ class PointInTimeStore:
             )
             """
         )
+        self._execute(
+            """
+            CREATE TABLE IF NOT EXISTS kalshi_paper_events (
+                paper_event_id TEXT PRIMARY KEY,
+                intent_id TEXT,
+                created_ts DOUBLE,
+                event_type TEXT,
+                payload_json TEXT
+            )
+            """
+        )
 
     def write_market_snapshot(
         self,
@@ -453,6 +464,7 @@ class PointInTimeStore:
                     json.dumps(payload, sort_keys=True, default=str),
                 ),
             )
+            self.write_kalshi_paper_event(payload)
 
     def load_kalshi_paper_intents(
         self,
@@ -478,6 +490,47 @@ class PointInTimeStore:
             sql += " AND source_run_id = ?"
             params.append(source_run_id)
         sql += " ORDER BY created_ts, intent_id"
+        return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
+
+    def write_kalshi_paper_event(self, payload: Dict[str, Any]) -> None:
+        """Append a research-only paper ledger event."""
+        event_payload = dict(payload)
+        event_type = str(event_payload.get("status", "UNKNOWN"))
+        event_id = self._stable_paper_event_id(event_payload)
+        self._execute(
+            """
+            INSERT OR REPLACE INTO kalshi_paper_events
+            VALUES (?, ?, ?, ?, ?)
+            """,
+            (
+                event_id,
+                str(event_payload.get("intent_id", "")),
+                float(event_payload.get("settled_ts", event_payload.get("created_ts", time.time()))),
+                event_type,
+                json.dumps(event_payload, sort_keys=True, default=str),
+            ),
+        )
+
+    def load_kalshi_paper_events(
+        self,
+        *,
+        intent_id: Optional[str] = None,
+        event_type: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Load append-only research-only paper ledger events."""
+        sql = """
+            SELECT payload_json
+            FROM kalshi_paper_events
+            WHERE 1 = 1
+        """
+        params: list[Any] = []
+        if intent_id is not None:
+            sql += " AND intent_id = ?"
+            params.append(intent_id)
+        if event_type is not None:
+            sql += " AND event_type = ?"
+            params.append(event_type)
+        sql += " ORDER BY created_ts, paper_event_id"
         return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
 
     def write_experiment_run(
@@ -769,6 +822,21 @@ class PointInTimeStore:
         }
         return "kalshi-paper-" + hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+        ).hexdigest()[:20]
+
+    @staticmethod
+    def _stable_paper_event_id(payload: Dict[str, Any]) -> str:
+        event_payload = {
+            "intent_id": payload.get("intent_id"),
+            "status": payload.get("status"),
+            "created_ts": payload.get("created_ts"),
+            "settled_ts": payload.get("settled_ts"),
+            "payload_hash": hashlib.sha256(
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+            ).hexdigest(),
+        }
+        return "kalshi-paper-event-" + hashlib.sha256(
+            json.dumps(event_payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
         ).hexdigest()[:20]
 
     def load_context(

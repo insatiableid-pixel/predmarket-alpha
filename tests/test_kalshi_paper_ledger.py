@@ -84,13 +84,15 @@ def _ledger_items():
 
 
 def test_build_paper_ledger_report_summarizes_store_rows():
-    report = build_paper_ledger_report(_ledger_items())
+    report = build_paper_ledger_report(_ledger_items(), events=_ledger_items())
 
     assert report["ledger"]["count"] == 2
     assert report["ledger"]["status_counts"]["PAPER_INTENDED"] == 1
     assert report["ledger"]["status_counts"]["SETTLED"] == 1
     assert report["ledger"]["settled_pnl_usd"] > 0
+    assert report["events"]["count"] == 2
     assert len(report["integrity"]["ledger_hash"]) == 64
+    assert len(report["integrity"]["events_hash"]) == 64
 
 
 def test_write_paper_ledger_report_outputs_json_and_markdown(tmp_path):
@@ -108,10 +110,13 @@ def test_run_paper_ledger_audit_loads_store(tmp_path):
     try:
         store.write_kalshi_paper_intents(_ledger_items())
         artifacts = run_paper_ledger_audit(store, reports_dir=tmp_path / "reports")
+        events = store.load_kalshi_paper_events()
     finally:
         store.close()
 
     assert artifacts.report["ledger"]["count"] == 1
     assert artifacts.report["ledger"]["status_counts"]["SETTLED"] == 1
+    assert artifacts.report["events"]["count"] == 2
+    assert {event["status"] for event in events} == {"PAPER_INTENDED", "SETTLED"}
     assert artifacts.report["research_only"] is True
     assert artifacts.report["execution_enabled"] is False
