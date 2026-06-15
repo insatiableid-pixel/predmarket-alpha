@@ -519,7 +519,7 @@ class PointInTimeStore:
     ) -> List[Dict[str, Any]]:
         """Load append-only research-only paper ledger events."""
         sql = """
-            SELECT payload_json
+            SELECT paper_event_id, created_ts, event_type, payload_json
             FROM kalshi_paper_events
             WHERE 1 = 1
         """
@@ -531,7 +531,14 @@ class PointInTimeStore:
             sql += " AND event_type = ?"
             params.append(event_type)
         sql += " ORDER BY created_ts, paper_event_id"
-        return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
+        events = []
+        for row in self._fetchall(sql, tuple(params)):
+            payload = json.loads(row[3] or "{}")
+            payload["paper_event_id"] = row[0]
+            payload["paper_event_ts"] = float(row[1])
+            payload["paper_event_type"] = row[2]
+            events.append(payload)
+        return events
 
     def write_experiment_run(
         self,

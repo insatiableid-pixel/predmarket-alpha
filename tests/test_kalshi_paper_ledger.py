@@ -147,5 +147,8 @@ def test_run_paper_ledger_audit_loads_store(tmp_path):
     assert artifacts.report["ledger"]["status_counts"]["SETTLED"] == 1
     assert artifacts.report["events"]["count"] == 2
     assert {event["status"] for event in events} == {"PAPER_INTENDED", "SETTLED"}
+    assert all(event["paper_event_id"].startswith("kalshi-paper-event-") for event in events)
+    assert {event["paper_event_type"] for event in events} == {"PAPER_INTENDED", "SETTLED"}
+    assert all(event["paper_event_ts"] > 0 for event in events)
     assert artifacts.report["research_only"] is True
     assert artifacts.report["execution_enabled"] is False
