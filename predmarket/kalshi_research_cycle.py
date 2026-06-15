@@ -77,8 +77,15 @@ def build_paper_intents(
     event_stakes: Dict[str, float] = {}
     total_stake = 0.0
     rank_run_id = str(rank_report.get("run_id") or "")
-    rank_age_hours = max((ts - float(rank_report.get("created_ts", ts) or ts)) / 3600.0, 0.0)
-    rank_report_stale = rank_age_hours > paper_config.max_rank_report_age_hours
+    rank_created_ts = rank_report.get("created_ts")
+    rank_age_hours = (
+        max((ts - float(rank_created_ts)) / 3600.0, 0.0)
+        if rank_created_ts is not None
+        else None
+    )
+    rank_report_stale = (
+        rank_age_hours is None or rank_age_hours > paper_config.max_rank_report_age_hours
+    )
     open_pairs = {
         (str(intent.get("market_id") or ""), str(intent.get("side") or "").upper())
         for intent in existing_intents
@@ -97,7 +104,9 @@ def build_paper_intents(
         side = str(opp.get("side") or "YES").upper()
         market_id = str(opp.get("market_id") or "")
         reasons = paper_blocking_reasons(opp, config=paper_config)
-        if rank_report_stale:
+        if rank_age_hours is None:
+            reasons.append("paper_rank_report_missing_created_ts")
+        elif rank_report_stale:
             reasons.append("paper_rank_report_stale")
         if paper_config.suppress_duplicate_open_intents and (market_id, side) in open_pairs:
             reasons.append("paper_duplicate_open_intent")
@@ -331,7 +340,12 @@ def build_cycle_report(
         now_ts=ts,
         grace_hours=config.paper.stale_open_grace_hours,
     )
-    rank_age_hours = max((ts - float(rank_report.get("created_ts", ts) or ts)) / 3600.0, 0.0)
+    rank_created_ts = rank_report.get("created_ts")
+    rank_age_hours = (
+        round(max((ts - float(rank_created_ts)) / 3600.0, 0.0), 4)
+        if rank_created_ts is not None
+        else None
+    )
     top_opportunities = list(rank_report.get("top_opportunities", []))
     return {
         "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
@@ -365,7 +379,7 @@ def build_cycle_report(
                 for item in top_opportunities
                 if item.get("scoring_mode") == "watchlist_vulnerability"
             ),
-            "rank_report_age_hours": round(rank_age_hours, 4),
+            "rank_report_age_hours": rank_age_hours,
             "blocking_reason_counts": reason_counts(top_opportunities, "blocking_reasons"),
         },
         "paper": {
@@ -555,6 +569,12 @@ def reason_counts(items: Sequence[Mapping[str, Any]], field: str) -> Dict[str, i
     return dict(sorted(counts.items()))
 
 
+def format_optional_hours(value: Any) -> str:
+    if value is None:
+        return "unknown"
+    return f"{float(value):.2f} hours"
+
+
 def cycle_integrity(
     *,
     rank_report: Mapping[str, Any],
@@ -666,7 +686,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         f"- Markets ranked: {ranked.get('markets_ranked', 0)}",
         f"- Top opportunities: {ranked.get('top_opportunities', 0)}",
         f"- Passed / blocked / watchlist: {ranked.get('research_only_pass', 0)} / {ranked.get('blocked', 0)} / {ranked.get('watchlist', 0)}",
-        f"- Rank report age: {float(ranked.get('rank_report_age_hours', 0.0)):.2f} hours",
+        f"- Rank report age: {format_optional_hours(ranked.get('rank_report_age_hours'))}",
         f"- Rank blocking reasons: {ranked.get('blocking_reason_counts', {})}",
         "",
         "## Paper Intents",

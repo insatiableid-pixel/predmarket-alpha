@@ -202,6 +202,22 @@ def test_build_paper_intents_blocks_stale_rank_report():
     assert "paper_rank_report_stale" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_blocks_rank_report_without_created_ts():
+    rank_report = dict(_rank_report())
+    rank_report.pop("created_ts", None)
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(
+            min_liquidity_adjusted_edge=0.005,
+            min_directional_edge=0.02,
+        ),
+        created_ts=AS_OF_TS,
+    )
+
+    assert intents == []
+    assert "paper_rank_report_missing_created_ts" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,
