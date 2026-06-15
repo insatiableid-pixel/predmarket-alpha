@@ -356,7 +356,13 @@ def build_cycle_report(
     )
     top_opportunities = list(rank_report.get("top_opportunities", []))
     return {
-        "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
+        "run_id": stable_cycle_run_id(
+            rank_report,
+            paper_intents,
+            paper_blocked,
+            settled,
+            config,
+        ),
         "created_ts": ts,
         "research_only": True,
         "execution_enabled": False,
@@ -800,11 +806,31 @@ def stable_paper_intent_id(opportunity: Mapping[str, Any], rank_run_id: str, cre
 def stable_cycle_run_id(
     rank_report: Mapping[str, Any],
     paper_intents: Sequence[Mapping[str, Any]],
+    paper_blocked: Sequence[Mapping[str, Any]],
+    settled: Sequence[Mapping[str, Any]],
     config: KalshiResearchCycleConfig,
 ) -> str:
     payload = {
         "rank_run_id": rank_report.get("run_id"),
         "intents": [intent.get("intent_id") for intent in paper_intents],
+        "blocked": [
+            {
+                "market_id": item.get("market_id"),
+                "side": item.get("side"),
+                "reasons": item.get("paper_blocking_reasons", []),
+            }
+            for item in paper_blocked
+        ],
+        "settled": [
+            {
+                "intent_id": item.get("intent_id"),
+                "market_id": item.get("market_id"),
+                "status": item.get("status"),
+                "outcome_yes": item.get("outcome_yes"),
+                "pnl_usd": item.get("pnl_usd"),
+            }
+            for item in settled
+        ],
         "config": {
             "live_rank": asdict(config.live_rank),
             "paper": asdict(config.paper),

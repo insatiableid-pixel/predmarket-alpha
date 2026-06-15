@@ -12,6 +12,7 @@ from predmarket.kalshi_research_cycle import (
     paper_promotion_readiness,
     run_kalshi_research_cycle,
     settle_paper_intents,
+    stable_cycle_run_id,
     stale_open_paper_intents,
     summarize_paper_ledger,
 )
@@ -633,3 +634,23 @@ def test_cycle_integrity_hashes_are_stable():
     assert left["artifact_schema_version"] == 2
     assert len(left["rank_report_hash"]) == 64
     assert len(left["paper_events_hash"]) == 64
+
+
+def test_stable_cycle_run_id_changes_with_settlement_state():
+    rank_report = _rank_report()
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(min_liquidity_adjusted_edge=0.005, min_directional_edge=0.02),
+        created_ts=AS_OF_TS,
+    )
+    settled = settle_paper_intents(
+        intents,
+        outcomes={"KXFED-26JUN-TARGET": 1},
+        settled_ts=AS_OF_TS + 3600,
+    )
+    config = KalshiResearchCycleConfig()
+
+    before = stable_cycle_run_id(rank_report, intents, blocked, [], config)
+    after = stable_cycle_run_id(rank_report, intents, blocked, settled, config)
+
+    assert before != after
