@@ -1,4 +1,4 @@
-.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke
+.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify
 
 # Default target
 help:
@@ -18,6 +18,7 @@ help:
 	@echo "  make kalshi-ledger — Audit Kalshi paper ledger"
 	@echo "  make kalshi-desk — Show the Kalshi research desk runbook"
 	@echo "  make kalshi-smoke — Generate offline Kalshi desk smoke artifacts"
+	@echo "  make kalshi-verify — Run Kalshi smoke plus focused tests"
 	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
 	@echo "  make migrate   — Run Alembic migrations to head"
 	@echo "  make docker    — Build Docker image"
@@ -104,6 +105,19 @@ kalshi-desk:
 
 kalshi-smoke:
 	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_research_smoke
+
+kalshi-verify: | $(TMPDIR)
+	@$(MAKE) --no-print-directory kalshi-smoke > $(TMPDIR)/kalshi-smoke.json
+	@$(PYTHON) -m json.tool $(TMPDIR)/kalshi-smoke.json > $(TMPDIR)/kalshi-smoke.pretty.json
+	TMPDIR=$(TMPDIR) TMP=$(TMPDIR) TEMP=$(TMPDIR) PYTHONPATH=. $(PYTEST) \
+		tests/test_kalshi_only_runtime.py \
+		tests/test_kalshi_research_cycle.py \
+		tests/test_kalshi_paper_ledger.py \
+		tests/test_kalshi_research_smoke.py \
+		tests/test_kalshi_live_rank.py \
+		tests/test_kalshi_discovery.py \
+		tests/test_kalshi_dataset.py \
+		-q --tb=short
 
 # ---- Docker ----
 docker:

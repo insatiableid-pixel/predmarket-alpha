@@ -148,17 +148,8 @@ The research cycle should prefer repeatable semantic and calibration edges over 
 Before relying on a desk run, verify the offline path and tests:
 
 ```bash
-make kalshi-smoke
-TMPDIR=/tmp TMP=/tmp TEMP=/tmp PYTHONPATH=. .venv/bin/pytest \
-  tests/test_kalshi_only_runtime.py \
-  tests/test_kalshi_research_cycle.py \
-  tests/test_kalshi_paper_ledger.py \
-  tests/test_kalshi_research_smoke.py \
-  tests/test_kalshi_live_rank.py \
-  tests/test_kalshi_discovery.py \
-  tests/test_kalshi_dataset.py \
-  -q --tb=short
+make kalshi-verify
 TMPDIR=/tmp TMP=/tmp TEMP=/tmp PYTHONPATH=. .venv/bin/pytest tests/ -q --tb=short
 ```
 
-The smoke output should be valid JSON and point to generated cycle and ledger Markdown reports.
+`make kalshi-verify` writes validated smoke output under `.tmp/` and runs the focused Kalshi desk tests.
