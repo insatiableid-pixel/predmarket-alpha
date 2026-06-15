@@ -672,7 +672,7 @@ def cycle_integrity(
     paper_events: Sequence[Mapping[str, Any]] = (),
 ) -> Dict[str, Any]:
     return {
-        "artifact_schema_version": 3,
+        "artifact_schema_version": 4,
         "rank_report_hash": _stable_hash(rank_report),
         "paper_intents_hash": _stable_hash(list(paper_intents)),
         "paper_blocked_hash": _stable_hash(list(paper_blocked)),

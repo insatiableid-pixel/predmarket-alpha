@@ -95,7 +95,7 @@ def test_build_paper_ledger_report_summarizes_store_rows():
     assert report["ledger"]["settled_pnl_usd"] > 0
     assert report["events"]["count"] == 2
     assert report["events"]["recent"][0]["status"] in {"PAPER_INTENDED", "SETTLED"}
-    assert report["integrity"]["artifact_schema_version"] == 2
+    assert report["integrity"]["artifact_schema_version"] == 3
     assert len(report["integrity"]["ledger_hash"]) == 64
     assert len(report["integrity"]["events_hash"]) == 64
 
