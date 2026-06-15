@@ -80,6 +80,13 @@ def build_paper_intents(
         for intent in existing_intents
         if str(intent.get("status", "PAPER_INTENDED")) == "PAPER_INTENDED"
     }
+    for intent in existing_intents:
+        if str(intent.get("status", "PAPER_INTENDED")) != "PAPER_INTENDED":
+            continue
+        stake = float(intent.get("stake_usd", 0.0))
+        total_stake += stake
+        event_id = str(intent.get("event_id") or intent.get("market_id") or "")
+        event_stakes[event_id] = event_stakes.get(event_id, 0.0) + stake
 
     for opportunity in rank_report.get("top_opportunities", []):
         opp = dict(opportunity)

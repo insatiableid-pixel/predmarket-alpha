@@ -148,6 +148,42 @@ def test_build_paper_intents_suppresses_existing_open_intent():
     assert "paper_duplicate_open_intent" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_counts_existing_open_exposure_against_caps():
+    rank_report = rank_live_rows(
+        [_live_row(ticker="KXFED-26JUN-OTHER")],
+        config=KalshiLiveRankConfig(
+            min_liquidity_usd=1.0,
+            max_spread=0.10,
+            min_fill_probability=0.10,
+            min_liquidity_adjusted_edge=0.005,
+        ),
+        discovery_report=_discovery_report(),
+    )
+    existing = [
+        {
+            "intent_id": "existing",
+            "market_id": "KXFED-26JUN-TARGET",
+            "event_id": "KXFED-26JUN",
+            "side": "YES",
+            "status": "PAPER_INTENDED",
+            "stake_usd": 50.0,
+        }
+    ]
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(
+            min_liquidity_adjusted_edge=0.005,
+            min_directional_edge=0.02,
+            max_event_stake_usd=50.0,
+        ),
+        existing_intents=existing,
+        created_ts=AS_OF_TS,
+    )
+
+    assert intents == []
+    assert "stake_below_minimum" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,
