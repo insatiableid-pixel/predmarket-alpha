@@ -633,7 +633,7 @@ def test_cycle_integrity_hashes_are_stable():
     )
 
     assert left == right
-    assert left["artifact_schema_version"] == 2
+    assert left["artifact_schema_version"] == 3
     assert len(left["rank_report_hash"]) == 64
     assert len(left["paper_events_hash"]) == 64
 

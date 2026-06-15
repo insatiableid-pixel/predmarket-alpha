@@ -74,7 +74,7 @@ def build_paper_ledger_report(
             "recent": recent_paper_events(paper_events),
         },
         "integrity": {
-            "artifact_schema_version": 1,
+            "artifact_schema_version": 2,
             "ledger_hash": _stable_hash(ledger),
             "events_hash": _stable_hash(paper_events),
             "config_hash": _stable_hash({"paper": paper_config.__dict__}),
