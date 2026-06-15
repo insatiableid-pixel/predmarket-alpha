@@ -1,4 +1,4 @@
-.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle
+.PHONY: setup check-env test lint run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger
 
 # Default target
 help:
@@ -15,6 +15,7 @@ help:
 	@echo "  make kalshi-discovery — Run Kalshi resolved-row discovery from stored rows"
 	@echo "  make kalshi-rank — Rank live Kalshi markets in research-only mode"
 	@echo "  make kalshi-cycle — Run rank + paper-intent research cycle"
+	@echo "  make kalshi-ledger — Audit Kalshi paper ledger"
 	@echo "  make clean     — Remove __pycache__, .pytest_cache, build artifacts"
 	@echo "  make migrate   — Run Alembic migrations to head"
 	@echo "  make docker    — Build Docker image"
@@ -92,6 +93,9 @@ kalshi-rank:
 
 kalshi-cycle:
 	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_research_cycle
+
+kalshi-ledger:
+	PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_paper_ledger
 
 # ---- Docker ----
 docker:
