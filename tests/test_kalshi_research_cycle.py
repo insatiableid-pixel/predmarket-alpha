@@ -12,6 +12,7 @@ from predmarket.kalshi_research_cycle import (
     paper_promotion_readiness,
     run_kalshi_research_cycle,
     settle_paper_intents,
+    stale_open_paper_intents,
     summarize_paper_ledger,
 )
 from predmarket.kalshi_dataset import persist_rows
@@ -416,6 +417,29 @@ def test_summarize_paper_ledger_reports_exposure_and_quality():
     assert summary["open_event_exposure_usd"]["KXFED-26JUN"] > 0
 
 
+def test_stale_open_paper_intents_flags_intents_after_close_grace():
+    stale = stale_open_paper_intents(
+        [
+            {
+                "intent_id": "intent-1",
+                "market_id": "KXFED-26JUN-TARGET",
+                "event_id": "KXFED-26JUN",
+                "side": "YES",
+                "status": "PAPER_INTENDED",
+                "stake_usd": 5.0,
+                "as_of_ts": AS_OF_TS,
+                "source_opportunity": {"time_to_close_hours": 1.0},
+            }
+        ],
+        now_ts=AS_OF_TS + 26 * 3600,
+        grace_hours=24.0,
+    )
+
+    assert len(stale) == 1
+    assert stale[0]["market_id"] == "KXFED-26JUN-TARGET"
+    assert stale[0]["hours_past_stale"] == 1.0
+
+
 def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     rank_report = _rank_report()
     store = PointInTimeStore(tmp_path / "data")
@@ -440,9 +464,11 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     ledger = artifacts.report["ledger"]
     assert ledger["settled_pnl_usd"] > 0
     assert ledger["brier_score"] is not None
+    assert ledger["stale_open_count"] == 0
     assert artifacts.report["events"]["count"] == 2
     assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1, "SETTLED": 1}
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
+    assert "## Stale Open Intents" in artifacts.markdown_path.read_text()
     assert "## Event History" in artifacts.markdown_path.read_text()
     assert "Paper blocking reasons" in artifacts.markdown_path.read_text()
     assert artifacts.report["promotion_readiness"]["status"] == "INSUFFICIENT_EVIDENCE"

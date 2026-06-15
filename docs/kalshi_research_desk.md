@@ -50,13 +50,15 @@ Run from the repository root.
    PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_research_cycle \
      --rank-report path/to/kalshi-live-rank.json \
      --max-total-stake-usd 100 \
-     --max-event-stake-usd 50
+     --max-event-stake-usd 50 \
+     --stale-open-grace-hours 24
    ```
 
 5. Audit the paper ledger:
 
    ```bash
-   PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_paper_ledger
+   PYTHONPATH=. .venv/bin/python -m predmarket.kalshi_paper_ledger \
+     --stale-open-grace-hours 24
    ```
 
 ## Replay And Settlement
@@ -84,6 +86,7 @@ The desk produces JSON and Markdown reports under the research reports directory
 - Live rank report: current opportunities, blocking reasons, watchlist status, and scoring mode.
 - Cycle report: paper intents, blocked opportunities, settlement, ledger audit, promotion readiness, event history, and integrity hashes.
 - Ledger report: current ledger state, open exposure, settled performance, event history, and promotion readiness.
+- Stale open intents: paper intents still open after the original close estimate plus the configured grace window.
 
 Use the integrity hashes to compare runs:
 

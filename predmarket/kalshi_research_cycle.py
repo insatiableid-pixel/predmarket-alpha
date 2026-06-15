@@ -45,6 +45,7 @@ class KalshiPaperConfig:
     max_brier_for_promotion_review: float = 0.20
     min_win_rate_for_promotion_review: float = 0.55
     min_pnl_for_promotion_review: float = 0.0
+    stale_open_grace_hours: float = 24.0
 
 
 @dataclass
@@ -316,12 +317,19 @@ def build_cycle_report(
     config: KalshiResearchCycleConfig,
     paper_events: Sequence[Mapping[str, Any]] = (),
     live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None,
+    created_ts: Optional[float] = None,
 ) -> Dict[str, Any]:
+    ts = float(created_ts or time.time())
     ledger_summary = summarize_paper_ledger(ledger)
+    stale_open = stale_open_paper_intents(
+        ledger,
+        now_ts=ts,
+        grace_hours=config.paper.stale_open_grace_hours,
+    )
     top_opportunities = list(rank_report.get("top_opportunities", []))
     return {
         "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
-        "created_ts": time.time(),
+        "created_ts": ts,
         "research_only": True,
         "execution_enabled": False,
         "cycle_config": {
@@ -368,8 +376,10 @@ def build_cycle_report(
         },
         "ledger": {
             "count": len(ledger),
+            "stale_open_count": len(stale_open),
             **ledger_summary,
         },
+        "stale_open_intents": stale_open,
         "events": {
             "count": len(paper_events),
             "status_counts": status_counts(paper_events),
@@ -482,6 +492,45 @@ def paper_promotion_readiness(
     }
 
 
+def stale_open_paper_intents(
+    ledger: Sequence[Mapping[str, Any]],
+    *,
+    now_ts: float,
+    grace_hours: float,
+) -> List[Dict[str, Any]]:
+    stale: List[Dict[str, Any]] = []
+    for intent in ledger:
+        if str(intent.get("status", "")) != "PAPER_INTENDED":
+            continue
+        source = intent.get("source_opportunity", {})
+        if not isinstance(source, Mapping):
+            source = {}
+        raw_time_to_close = source.get("time_to_close_hours", intent.get("time_to_close_hours"))
+        if raw_time_to_close is None:
+            continue
+        as_of_ts = float(intent.get("as_of_ts", intent.get("created_ts", 0.0)) or 0.0)
+        due_ts = as_of_ts + (float(raw_time_to_close) + float(grace_hours)) * 3600.0
+        if now_ts <= due_ts:
+            continue
+        stale.append(
+            {
+                "intent_id": intent.get("intent_id"),
+                "market_id": intent.get("market_id"),
+                "event_id": intent.get("event_id"),
+                "side": intent.get("side"),
+                "stake_usd": float(intent.get("stake_usd", 0.0)),
+                "as_of_ts": as_of_ts,
+                "expected_close_ts": as_of_ts + float(raw_time_to_close) * 3600.0,
+                "stale_after_ts": due_ts,
+                "hours_past_stale": round((now_ts - due_ts) / 3600.0, 4),
+            }
+        )
+    return sorted(
+        stale,
+        key=lambda item: (-float(item.get("hours_past_stale", 0.0)), str(item.get("market_id", ""))),
+    )
+
+
 def status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
     counts: Dict[str, int] = {}
     for item in items:
@@ -592,6 +641,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     paper = report.get("paper", {})
     settlement = report.get("settlement", {})
     ledger = report.get("ledger", {})
+    stale_open = report.get("stale_open_intents", [])
     events = report.get("events", {})
     readiness = report.get("promotion_readiness", {})
     integrity = report.get("integrity", {})
@@ -647,7 +697,23 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             f"- Settled PnL: ${float(ledger.get('settled_pnl_usd', 0.0)):.2f}",
             f"- Win rate: {ledger.get('win_rate')}",
             f"- Brier score: {ledger.get('brier_score')}",
+            f"- Stale open intents: {ledger.get('stale_open_count', 0)}",
             f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
+            "",
+            "## Stale Open Intents",
+            "",
+        ]
+    )
+    if not stale_open:
+        lines.append("No stale open paper intents.")
+    for item in stale_open:
+        lines.extend(
+            [
+                f"- {item.get('market_id', '')} {item.get('side', '')}: {float(item.get('hours_past_stale', 0.0)):.2f} hours past stale threshold",
+            ]
+        )
+    lines.extend(
+        [
             "",
             "## Event History",
             "",
@@ -714,6 +780,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--max-event-stake-usd", type=float, default=50.0)
     parser.add_argument("--min-liquidity-adjusted-edge", type=float, default=0.02)
     parser.add_argument("--min-directional-edge", type=float, default=0.03)
+    parser.add_argument("--stale-open-grace-hours", type=float, default=24.0)
     parser.add_argument("--no-settle-existing", action="store_true")
     parser.add_argument("--rank-report", default=None, help="Replay from a saved live rank JSON report instead of fetching live")
     parser.add_argument("--outcomes-json", default=None, help="Optional market_id -> outcome JSON for paper settlement")
@@ -742,6 +809,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             max_event_stake_usd=args.max_event_stake_usd,
             min_liquidity_adjusted_edge=args.min_liquidity_adjusted_edge,
             min_directional_edge=args.min_directional_edge,
+            stale_open_grace_hours=args.stale_open_grace_hours,
             settle_existing=not args.no_settle_existing,
         )
         artifacts = run_kalshi_research_cycle(

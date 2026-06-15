@@ -13,6 +13,7 @@ from predmarket.config import load_config
 from predmarket.kalshi_research_cycle import (
     KalshiPaperConfig,
     paper_promotion_readiness,
+    stale_open_paper_intents,
     summarize_paper_ledger,
 )
 from predmarket.kalshi_dataset import _stable_hash
@@ -31,19 +32,27 @@ def build_paper_ledger_report(
     *,
     events: Sequence[Mapping[str, Any]] = (),
     config: Optional[KalshiPaperConfig] = None,
+    created_ts: Optional[float] = None,
 ) -> Dict[str, Any]:
     paper_config = config or KalshiPaperConfig()
+    ts = float(created_ts or time.time())
     ledger = [dict(intent) for intent in intents]
     paper_events = [dict(event) for event in events]
     summary = summarize_paper_ledger(ledger)
+    stale_open = stale_open_paper_intents(
+        ledger,
+        now_ts=ts,
+        grace_hours=paper_config.stale_open_grace_hours,
+    )
     readiness = paper_promotion_readiness(summary, paper_config)
     return {
         "run_id": stable_ledger_report_id(ledger, paper_config),
-        "created_ts": time.time(),
+        "created_ts": ts,
         "research_only": True,
         "execution_enabled": False,
         "ledger": {
             "count": len(ledger),
+            "stale_open_count": len(stale_open),
             **summary,
         },
         "promotion_readiness": readiness,
@@ -53,6 +62,7 @@ def build_paper_ledger_report(
         "settled_intents": [
             intent for intent in ledger if str(intent.get("status", "")) == "SETTLED"
         ],
+        "stale_open_intents": stale_open,
         "events": {
             "count": len(paper_events),
             "status_counts": _status_counts(paper_events),
@@ -85,6 +95,7 @@ def write_paper_ledger_report(
 def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
     ledger = report.get("ledger", {})
     readiness = report.get("promotion_readiness", {})
+    stale_open = report.get("stale_open_intents", [])
     lines = [
         f"# Kalshi Paper Ledger: {report.get('run_id', '')}",
         "",
@@ -102,22 +113,37 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
         f"- Settled PnL: ${float(ledger.get('settled_pnl_usd', 0.0)):.2f}",
         f"- Win rate: {ledger.get('win_rate')}",
         f"- Brier score: {ledger.get('brier_score')}",
+        f"- Stale open intents: {ledger.get('stale_open_count', 0)}",
         f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
         "",
-        "## Event History",
-        "",
-        f"- Events: {report.get('events', {}).get('count', 0)}",
-        f"- Event status counts: {report.get('events', {}).get('status_counts', {})}",
-        "",
-        "## Promotion Readiness",
-        "",
-        f"- Status: {readiness.get('status', '')}",
-        f"- Reasons: {readiness.get('reasons', [])}",
-        f"- Observed: {readiness.get('observed', {})}",
-        "",
-        "## Open Intents",
+        "## Stale Open Intents",
         "",
     ]
+    if not stale_open:
+        lines.append("No stale open paper intents.")
+    for item in stale_open:
+        lines.append(
+            f"- {item.get('market_id', '')} {item.get('side', '')}: "
+            f"{float(item.get('hours_past_stale', 0.0)):.2f} hours past stale threshold"
+        )
+    lines.extend(
+        [
+            "",
+            "## Event History",
+            "",
+            f"- Events: {report.get('events', {}).get('count', 0)}",
+            f"- Event status counts: {report.get('events', {}).get('status_counts', {})}",
+            "",
+            "## Promotion Readiness",
+            "",
+            f"- Status: {readiness.get('status', '')}",
+            f"- Reasons: {readiness.get('reasons', [])}",
+            f"- Observed: {readiness.get('observed', {})}",
+            "",
+            "## Open Intents",
+            "",
+        ]
+    )
     open_intents = report.get("open_intents", [])
     if not open_intents:
         lines.append("No open paper intents.")
@@ -177,6 +203,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--max-brier-for-review", type=float, default=0.20)
     parser.add_argument("--min-win-rate-for-review", type=float, default=0.55)
     parser.add_argument("--min-pnl-for-review", type=float, default=0.0)
+    parser.add_argument("--stale-open-grace-hours", type=float, default=24.0)
     args = parser.parse_args(argv)
 
     app_config = load_config()
@@ -189,6 +216,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
                 max_brier_for_promotion_review=args.max_brier_for_review,
                 min_win_rate_for_promotion_review=args.min_win_rate_for_review,
                 min_pnl_for_promotion_review=args.min_pnl_for_review,
+                stale_open_grace_hours=args.stale_open_grace_hours,
             ),
             reports_dir=Path(args.reports_dir) if args.reports_dir else None,
         )

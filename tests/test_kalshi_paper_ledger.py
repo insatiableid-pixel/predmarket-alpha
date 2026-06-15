@@ -87,12 +87,28 @@ def test_build_paper_ledger_report_summarizes_store_rows():
     report = build_paper_ledger_report(_ledger_items(), events=_ledger_items())
 
     assert report["ledger"]["count"] == 2
+    assert report["ledger"]["stale_open_count"] == 0
     assert report["ledger"]["status_counts"]["PAPER_INTENDED"] == 1
     assert report["ledger"]["status_counts"]["SETTLED"] == 1
     assert report["ledger"]["settled_pnl_usd"] > 0
     assert report["events"]["count"] == 2
     assert len(report["integrity"]["ledger_hash"]) == 64
     assert len(report["integrity"]["events_hash"]) == 64
+
+
+def test_build_paper_ledger_report_flags_stale_open_intents():
+    intent = _ledger_items()[0]
+    intent["as_of_ts"] = AS_OF_TS
+    intent["source_opportunity"]["time_to_close_hours"] = 1.0
+    report = build_paper_ledger_report(
+        [intent],
+        config=KalshiPaperConfig(stale_open_grace_hours=24.0),
+        created_ts=AS_OF_TS + 26 * 3600,
+    )
+
+    assert report["ledger"]["stale_open_count"] == 1
+    assert report["stale_open_intents"][0]["market_id"] == "KXFED-26JUN-TARGET"
+    assert report["stale_open_intents"][0]["hours_past_stale"] == 1.0
 
 
 def test_write_paper_ledger_report_outputs_json_and_markdown(tmp_path):
@@ -103,6 +119,7 @@ def test_write_paper_ledger_report_outputs_json_and_markdown(tmp_path):
     assert artifacts.markdown_path.exists()
     assert json.loads(artifacts.json_path.read_text())["run_id"] == report["run_id"]
     assert "# Kalshi Paper Ledger" in artifacts.markdown_path.read_text()
+    assert "## Stale Open Intents" in artifacts.markdown_path.read_text()
 
 
 def test_run_paper_ledger_audit_loads_store(tmp_path):
