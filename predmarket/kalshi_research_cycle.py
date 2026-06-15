@@ -46,6 +46,7 @@ class KalshiPaperConfig:
     min_win_rate_for_promotion_review: float = 0.55
     min_pnl_for_promotion_review: float = 0.0
     stale_open_grace_hours: float = 24.0
+    max_rank_report_age_hours: float = 6.0
 
 
 @dataclass
@@ -76,6 +77,8 @@ def build_paper_intents(
     event_stakes: Dict[str, float] = {}
     total_stake = 0.0
     rank_run_id = str(rank_report.get("run_id") or "")
+    rank_age_hours = max((ts - float(rank_report.get("created_ts", ts) or ts)) / 3600.0, 0.0)
+    rank_report_stale = rank_age_hours > paper_config.max_rank_report_age_hours
     open_pairs = {
         (str(intent.get("market_id") or ""), str(intent.get("side") or "").upper())
         for intent in existing_intents
@@ -94,6 +97,8 @@ def build_paper_intents(
         side = str(opp.get("side") or "YES").upper()
         market_id = str(opp.get("market_id") or "")
         reasons = paper_blocking_reasons(opp, config=paper_config)
+        if rank_report_stale:
+            reasons.append("paper_rank_report_stale")
         if paper_config.suppress_duplicate_open_intents and (market_id, side) in open_pairs:
             reasons.append("paper_duplicate_open_intent")
         event_id = str(opp.get("event_id") or opp.get("market_id") or "")
@@ -326,6 +331,7 @@ def build_cycle_report(
         now_ts=ts,
         grace_hours=config.paper.stale_open_grace_hours,
     )
+    rank_age_hours = max((ts - float(rank_report.get("created_ts", ts) or ts)) / 3600.0, 0.0)
     top_opportunities = list(rank_report.get("top_opportunities", []))
     return {
         "run_id": stable_cycle_run_id(rank_report, paper_intents, config),
@@ -359,6 +365,7 @@ def build_cycle_report(
                 for item in top_opportunities
                 if item.get("scoring_mode") == "watchlist_vulnerability"
             ),
+            "rank_report_age_hours": round(rank_age_hours, 4),
             "blocking_reason_counts": reason_counts(top_opportunities, "blocking_reasons"),
         },
         "paper": {
@@ -659,6 +666,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
         f"- Markets ranked: {ranked.get('markets_ranked', 0)}",
         f"- Top opportunities: {ranked.get('top_opportunities', 0)}",
         f"- Passed / blocked / watchlist: {ranked.get('research_only_pass', 0)} / {ranked.get('blocked', 0)} / {ranked.get('watchlist', 0)}",
+        f"- Rank report age: {float(ranked.get('rank_report_age_hours', 0.0)):.2f} hours",
         f"- Rank blocking reasons: {ranked.get('blocking_reason_counts', {})}",
         "",
         "## Paper Intents",
@@ -781,6 +789,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--min-liquidity-adjusted-edge", type=float, default=0.02)
     parser.add_argument("--min-directional-edge", type=float, default=0.03)
     parser.add_argument("--stale-open-grace-hours", type=float, default=24.0)
+    parser.add_argument("--max-rank-report-age-hours", type=float, default=6.0)
     parser.add_argument("--no-settle-existing", action="store_true")
     parser.add_argument("--rank-report", default=None, help="Replay from a saved live rank JSON report instead of fetching live")
     parser.add_argument("--outcomes-json", default=None, help="Optional market_id -> outcome JSON for paper settlement")
@@ -810,6 +819,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
             min_liquidity_adjusted_edge=args.min_liquidity_adjusted_edge,
             min_directional_edge=args.min_directional_edge,
             stale_open_grace_hours=args.stale_open_grace_hours,
+            max_rank_report_age_hours=args.max_rank_report_age_hours,
             settle_existing=not args.no_settle_existing,
         )
         artifacts = run_kalshi_research_cycle(

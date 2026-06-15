@@ -59,7 +59,8 @@ Run from the repository root.
      --rank-report path/to/kalshi-live-rank.json \
      --max-total-stake-usd 100 \
      --max-event-stake-usd 50 \
-     --stale-open-grace-hours 24
+     --stale-open-grace-hours 24 \
+     --max-rank-report-age-hours 6
    ```
 
 6. Audit the paper ledger:
@@ -95,6 +96,7 @@ The desk produces JSON and Markdown reports under the research reports directory
 - Cycle report: paper intents, blocked opportunities, settlement, ledger audit, promotion readiness, event history, and integrity hashes.
 - Ledger report: current ledger state, open exposure, settled performance, event history, and promotion readiness.
 - Stale open intents: paper intents still open after the original close estimate plus the configured grace window.
+- Stale rank reports: replayed rank artifacts older than the configured max age block new paper intents.
 
 Use the integrity hashes to compare runs:
 
