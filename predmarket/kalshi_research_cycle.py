@@ -348,6 +348,7 @@ def build_cycle_report(
         now_ts=ts,
         grace_hours=config.paper.stale_open_grace_hours,
     )
+    unknown_close_open = open_paper_intents_missing_close_time(ledger)
     rank_created_ts = rank_report.get("created_ts")
     rank_age_hours = (
         round(max((ts - float(rank_created_ts)) / 3600.0, 0.0), 4)
@@ -414,9 +415,11 @@ def build_cycle_report(
         "ledger": {
             "count": len(ledger),
             "stale_open_count": len(stale_open),
+            "unknown_close_open_count": len(unknown_close_open),
             **ledger_summary,
         },
         "stale_open_intents": stale_open,
+        "unknown_close_open_intents": unknown_close_open,
         "events": {
             "count": len(paper_events),
             "status_counts": status_counts(paper_events),
@@ -426,6 +429,7 @@ def build_cycle_report(
             ledger_summary,
             config.paper,
             stale_open_count=len(stale_open),
+            unknown_close_open_count=len(unknown_close_open),
         ),
         "integrity": cycle_integrity(
             rank_report=rank_report,
@@ -498,6 +502,7 @@ def paper_promotion_readiness(
     config: KalshiPaperConfig,
     *,
     stale_open_count: int = 0,
+    unknown_close_open_count: int = 0,
 ) -> Dict[str, Any]:
     reasons = []
     settled_count = int(ledger_summary.get("settled_count", 0) or 0)
@@ -519,6 +524,8 @@ def paper_promotion_readiness(
         reasons.append("settled_pnl_below_threshold")
     if stale_open_count > 0:
         reasons.append("stale_open_intents_present")
+    if unknown_close_open_count > 0:
+        reasons.append("unknown_close_open_intents_present")
 
     return {
         "status": "REVIEW_READY" if not reasons else "INSUFFICIENT_EVIDENCE",
@@ -535,6 +542,7 @@ def paper_promotion_readiness(
             "win_rate": win_rate,
             "settled_pnl_usd": pnl,
             "stale_open_count": int(stale_open_count),
+            "unknown_close_open_count": int(unknown_close_open_count),
         },
     }
 
@@ -576,6 +584,32 @@ def stale_open_paper_intents(
         stale,
         key=lambda item: (-float(item.get("hours_past_stale", 0.0)), str(item.get("market_id", ""))),
     )
+
+
+def open_paper_intents_missing_close_time(
+    ledger: Sequence[Mapping[str, Any]],
+) -> List[Dict[str, Any]]:
+    missing = []
+    for intent in ledger:
+        if str(intent.get("status", "")) != "PAPER_INTENDED":
+            continue
+        source = intent.get("source_opportunity", {})
+        if not isinstance(source, Mapping):
+            source = {}
+        raw_time_to_close = source.get("time_to_close_hours", intent.get("time_to_close_hours"))
+        if raw_time_to_close is not None:
+            continue
+        missing.append(
+            {
+                "intent_id": intent.get("intent_id"),
+                "market_id": intent.get("market_id"),
+                "event_id": intent.get("event_id"),
+                "side": intent.get("side"),
+                "stake_usd": float(intent.get("stake_usd", 0.0)),
+                "as_of_ts": float(intent.get("as_of_ts", intent.get("created_ts", 0.0)) or 0.0),
+            }
+        )
+    return sorted(missing, key=lambda item: str(item.get("market_id", "")))
 
 
 def recent_paper_events(
@@ -721,6 +755,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     settlement = report.get("settlement", {})
     ledger = report.get("ledger", {})
     stale_open = report.get("stale_open_intents", [])
+    unknown_close_open = report.get("unknown_close_open_intents", [])
     events = report.get("events", {})
     readiness = report.get("promotion_readiness", {})
     integrity = report.get("integrity", {})
@@ -800,6 +835,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             f"- Win rate: {ledger.get('win_rate')}",
             f"- Brier score: {ledger.get('brier_score')}",
             f"- Stale open intents: {ledger.get('stale_open_count', 0)}",
+            f"- Unknown-close open intents: {ledger.get('unknown_close_open_count', 0)}",
             f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
             "",
             "## Stale Open Intents",
@@ -814,6 +850,10 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
                 f"- {item.get('market_id', '')} {item.get('side', '')}: {float(item.get('hours_past_stale', 0.0)):.2f} hours past stale threshold",
             ]
         )
+    if unknown_close_open:
+        lines.extend(["", "Open intents missing close-time estimates:", ""])
+    for item in unknown_close_open:
+        lines.append(f"- {item.get('market_id', '')} {item.get('side', '')}")
     lines.extend(
         [
             "",

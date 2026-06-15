@@ -117,6 +117,7 @@ The default promotion gate requires:
 - Win rate at or above 0.55.
 - Settled PnL at or above 0.
 - Zero stale open paper intents.
+- Zero open paper intents with unknown close-time estimates.
 
 `REVIEW_READY` means the paper ledger has enough evidence for human review. It does not enable execution. Any live execution path must stay behind the existing Kalshi-only approval and risk controls.
 

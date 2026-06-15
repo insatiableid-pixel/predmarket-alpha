@@ -89,6 +89,7 @@ def test_build_paper_ledger_report_summarizes_store_rows():
 
     assert report["ledger"]["count"] == 2
     assert report["ledger"]["stale_open_count"] == 0
+    assert report["ledger"]["unknown_close_open_count"] == 0
     assert report["ledger"]["status_counts"]["PAPER_INTENDED"] == 1
     assert report["ledger"]["status_counts"]["SETTLED"] == 1
     assert report["ledger"]["settled_pnl_usd"] > 0

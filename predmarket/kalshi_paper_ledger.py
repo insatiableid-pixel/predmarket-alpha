@@ -12,6 +12,7 @@ from typing import Any, Dict, Mapping, Optional, Sequence
 from predmarket.config import load_config
 from predmarket.kalshi_research_cycle import (
     KalshiPaperConfig,
+    open_paper_intents_missing_close_time,
     paper_promotion_readiness,
     recent_paper_events,
     stale_open_paper_intents,
@@ -45,10 +46,12 @@ def build_paper_ledger_report(
         now_ts=ts,
         grace_hours=paper_config.stale_open_grace_hours,
     )
+    unknown_close_open = open_paper_intents_missing_close_time(ledger)
     readiness = paper_promotion_readiness(
         summary,
         paper_config,
         stale_open_count=len(stale_open),
+        unknown_close_open_count=len(unknown_close_open),
     )
     return {
         "run_id": stable_ledger_report_id(ledger, paper_events, paper_config),
@@ -58,6 +61,7 @@ def build_paper_ledger_report(
         "ledger": {
             "count": len(ledger),
             "stale_open_count": len(stale_open),
+            "unknown_close_open_count": len(unknown_close_open),
             **summary,
         },
         "promotion_readiness": readiness,
@@ -68,6 +72,7 @@ def build_paper_ledger_report(
             intent for intent in ledger if str(intent.get("status", "")) == "SETTLED"
         ],
         "stale_open_intents": stale_open,
+        "unknown_close_open_intents": unknown_close_open,
         "events": {
             "count": len(paper_events),
             "status_counts": _status_counts(paper_events),
@@ -102,6 +107,7 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
     ledger = report.get("ledger", {})
     readiness = report.get("promotion_readiness", {})
     stale_open = report.get("stale_open_intents", [])
+    unknown_close_open = report.get("unknown_close_open_intents", [])
     lines = [
         f"# Kalshi Paper Ledger: {report.get('run_id', '')}",
         "",
@@ -120,6 +126,7 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
         f"- Win rate: {ledger.get('win_rate')}",
         f"- Brier score: {ledger.get('brier_score')}",
         f"- Stale open intents: {ledger.get('stale_open_count', 0)}",
+        f"- Unknown-close open intents: {ledger.get('unknown_close_open_count', 0)}",
         f"- Open event exposure: {ledger.get('open_event_exposure_usd', {})}",
         "",
         "## Stale Open Intents",
@@ -132,6 +139,10 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
             f"- {item.get('market_id', '')} {item.get('side', '')}: "
             f"{float(item.get('hours_past_stale', 0.0)):.2f} hours past stale threshold"
         )
+    if unknown_close_open:
+        lines.extend(["", "Open intents missing close-time estimates:", ""])
+    for item in unknown_close_open:
+        lines.append(f"- {item.get('market_id', '')} {item.get('side', '')}")
     lines.extend(
         [
             "",

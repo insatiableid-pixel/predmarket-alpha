@@ -9,6 +9,7 @@ from predmarket.kalshi_research_cycle import (
     cycle_integrity,
     load_outcomes,
     load_rank_report,
+    open_paper_intents_missing_close_time,
     paper_promotion_readiness,
     run_kalshi_research_cycle,
     settle_paper_intents,
@@ -513,6 +514,26 @@ def test_stale_open_paper_intents_flags_intents_after_close_grace():
     assert stale[0]["hours_past_stale"] == 1.0
 
 
+def test_open_paper_intents_missing_close_time_flags_unknown_close():
+    missing = open_paper_intents_missing_close_time(
+        [
+            {
+                "intent_id": "intent-1",
+                "market_id": "KXFED-26JUN-TARGET",
+                "event_id": "KXFED-26JUN",
+                "side": "YES",
+                "status": "PAPER_INTENDED",
+                "stake_usd": 5.0,
+                "as_of_ts": AS_OF_TS,
+                "source_opportunity": {},
+            }
+        ]
+    )
+
+    assert len(missing) == 1
+    assert missing[0]["market_id"] == "KXFED-26JUN-TARGET"
+
+
 def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     rank_report = _rank_report()
     store = PointInTimeStore(tmp_path / "data")
@@ -538,6 +559,7 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     assert ledger["settled_pnl_usd"] > 0
     assert ledger["brier_score"] is not None
     assert ledger["stale_open_count"] == 0
+    assert ledger["unknown_close_open_count"] == 0
     assert artifacts.report["events"]["count"] == 2
     assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1, "SETTLED": 1}
     assert artifacts.report["events"]["recent"][0]["paper_event_type"] == "SETTLED"
@@ -608,6 +630,28 @@ def test_paper_promotion_readiness_blocks_stale_open_intents():
     assert readiness["status"] == "INSUFFICIENT_EVIDENCE"
     assert readiness["reasons"] == ["stale_open_intents_present"]
     assert readiness["observed"]["stale_open_count"] == 1
+
+
+def test_paper_promotion_readiness_blocks_unknown_close_open_intents():
+    readiness = paper_promotion_readiness(
+        {
+            "settled_count": 30,
+            "brier_score": 0.12,
+            "win_rate": 0.60,
+            "settled_pnl_usd": 25.0,
+        },
+        KalshiPaperConfig(
+            min_settled_for_promotion_review=30,
+            max_brier_for_promotion_review=0.20,
+            min_win_rate_for_promotion_review=0.55,
+            min_pnl_for_promotion_review=0.0,
+        ),
+        unknown_close_open_count=1,
+    )
+
+    assert readiness["status"] == "INSUFFICIENT_EVIDENCE"
+    assert readiness["reasons"] == ["unknown_close_open_intents_present"]
+    assert readiness["observed"]["unknown_close_open_count"] == 1
 
 
 def test_cycle_integrity_hashes_are_stable():
