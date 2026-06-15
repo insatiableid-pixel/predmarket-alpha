@@ -181,6 +181,28 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
                 "",
             ]
         )
+    lines.extend(
+        [
+            "## Settled Intents",
+            "",
+        ]
+    )
+    settled_intents = report.get("settled_intents", [])
+    if not settled_intents:
+        lines.append("No settled paper intents.")
+    for idx, intent in enumerate(settled_intents[:10], start=1):
+        lines.extend(
+            [
+                f"### {idx}. {intent.get('market_id', '')}",
+                "",
+                str(intent.get("title", "")),
+                "",
+                f"- Side: {intent.get('side', '')}",
+                f"- Outcome: {intent.get('side_outcome')}",
+                f"- PnL: ${float(intent.get('pnl_usd', 0.0)):.2f}",
+                "",
+            ]
+        )
     return "\n".join(lines).rstrip() + "\n"
 
 
