@@ -227,6 +227,20 @@ class PointInTimeStore:
             )
             """
         )
+        self._execute(
+            """
+            CREATE TABLE IF NOT EXISTS kalshi_paper_intents (
+                intent_id TEXT PRIMARY KEY,
+                created_ts DOUBLE,
+                market_id TEXT,
+                event_id TEXT,
+                side TEXT,
+                status TEXT,
+                source_run_id TEXT,
+                payload_json TEXT
+            )
+            """
+        )
 
     def write_market_snapshot(
         self,
@@ -415,6 +429,55 @@ class PointInTimeStore:
             sql += " AND as_of_ts <= ?"
             params.append(float(max_as_of_ts))
         sql += " ORDER BY as_of_ts, market_id, row_json"
+        return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
+
+    def write_kalshi_paper_intents(self, intents: List[Dict[str, Any]]) -> None:
+        """Persist research-only paper trade intents."""
+        for intent in intents:
+            payload = dict(intent)
+            intent_id = str(payload.get("intent_id") or self._stable_paper_intent_id(payload))
+            payload["intent_id"] = intent_id
+            self._execute(
+                """
+                INSERT OR REPLACE INTO kalshi_paper_intents
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+                """,
+                (
+                    intent_id,
+                    float(payload.get("created_ts", time.time())),
+                    str(payload.get("market_id", "")),
+                    str(payload.get("event_id", "")),
+                    str(payload.get("side", "")),
+                    str(payload.get("status", "PAPER_INTENDED")),
+                    str(payload.get("source_run_id", "")),
+                    json.dumps(payload, sort_keys=True, default=str),
+                ),
+            )
+
+    def load_kalshi_paper_intents(
+        self,
+        *,
+        status: Optional[str] = None,
+        market_id: Optional[str] = None,
+        source_run_id: Optional[str] = None,
+    ) -> List[Dict[str, Any]]:
+        """Load research-only paper trade intents."""
+        sql = """
+            SELECT payload_json
+            FROM kalshi_paper_intents
+            WHERE 1 = 1
+        """
+        params: list[Any] = []
+        if status is not None:
+            sql += " AND status = ?"
+            params.append(status)
+        if market_id is not None:
+            sql += " AND market_id = ?"
+            params.append(market_id)
+        if source_run_id is not None:
+            sql += " AND source_run_id = ?"
+            params.append(source_run_id)
+        sql += " ORDER BY created_ts, intent_id"
         return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
 
     def write_experiment_run(
@@ -693,6 +756,18 @@ class PointInTimeStore:
             "schema": row.get("row_schema_version", 1),
         }
         return "kalshi-row-" + hashlib.sha256(
+            json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+        ).hexdigest()[:20]
+
+    @staticmethod
+    def _stable_paper_intent_id(intent: Dict[str, Any]) -> str:
+        payload = {
+            "market_id": intent.get("market_id"),
+            "side": intent.get("side"),
+            "source_run_id": intent.get("source_run_id"),
+            "as_of_ts": intent.get("as_of_ts"),
+        }
+        return "kalshi-paper-" + hashlib.sha256(
             json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
         ).hexdigest()[:20]
 
