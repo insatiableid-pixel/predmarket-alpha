@@ -25,6 +25,15 @@ from predmarket.kalshi_dataset import _stable_hash
 from predmarket.store import PointInTimeStore
 
 
+HARD_PAPER_BLOCKING_REASONS = {
+    "paper_duplicate_open_intent",
+    "paper_non_kalshi_opportunity",
+    "paper_rank_report_missing_created_ts",
+    "paper_rank_report_not_research_only",
+    "paper_rank_report_stale",
+}
+
+
 @dataclass
 class KalshiPaperConfig:
     bankroll_usd: float = 10_000.0
@@ -116,8 +125,10 @@ def build_paper_intents(
             reasons.append("paper_rank_report_not_research_only")
         if paper_config.suppress_duplicate_open_intents and (market_id, side) in open_pairs:
             reasons.append("paper_duplicate_open_intent")
+        reasons = sorted(set(reasons))
+        hard_reasons = [reason for reason in reasons if reason in HARD_PAPER_BLOCKING_REASONS]
         event_id = str(opp.get("event_id") or opp.get("market_id") or "")
-        if reasons and not paper_config.allow_blocked_opportunities:
+        if reasons and (hard_reasons or not paper_config.allow_blocked_opportunities):
             blocked.append({**opp, "paper_blocking_reasons": reasons})
             continue
         if len(intents) >= paper_config.max_intents:

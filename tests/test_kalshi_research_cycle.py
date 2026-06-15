@@ -254,6 +254,26 @@ def test_build_paper_intents_blocks_non_kalshi_opportunity():
     assert "paper_non_kalshi_opportunity" in blocked[0]["paper_blocking_reasons"]
 
 
+def test_build_paper_intents_allow_blocked_cannot_override_hard_guards():
+    rank_report = dict(_rank_report())
+    rank_report["created_ts"] = AS_OF_TS - 7 * 3600
+    rank_report["research_only"] = False
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(
+            allow_blocked_opportunities=True,
+            min_liquidity_adjusted_edge=0.005,
+            min_directional_edge=0.02,
+            max_rank_report_age_hours=6.0,
+        ),
+        created_ts=AS_OF_TS,
+    )
+
+    assert intents == []
+    assert "paper_rank_report_stale" in blocked[0]["paper_blocking_reasons"]
+    assert "paper_rank_report_not_research_only" in blocked[0]["paper_blocking_reasons"]
+
+
 def test_compute_paper_stake_respects_caps():
     opportunity = {
         "liquidity_adjusted_edge": 0.10,
