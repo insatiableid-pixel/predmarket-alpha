@@ -538,9 +538,11 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     assert ledger["stale_open_count"] == 0
     assert artifacts.report["events"]["count"] == 2
     assert artifacts.report["events"]["status_counts"] == {"PAPER_INTENDED": 1, "SETTLED": 1}
+    assert artifacts.report["events"]["recent"][0]["paper_event_type"] == "SETTLED"
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
     assert "## Stale Open Intents" in artifacts.markdown_path.read_text()
     assert "## Event History" in artifacts.markdown_path.read_text()
+    assert "Recent events:" in artifacts.markdown_path.read_text()
     assert "Paper blocking reasons" in artifacts.markdown_path.read_text()
     assert artifacts.report["promotion_readiness"]["status"] == "INSUFFICIENT_EVIDENCE"
     assert len(artifacts.report["integrity"]["ledger_hash"]) == 64

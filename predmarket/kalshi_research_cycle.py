@@ -420,6 +420,7 @@ def build_cycle_report(
         "events": {
             "count": len(paper_events),
             "status_counts": status_counts(paper_events),
+            "recent": recent_paper_events(paper_events),
         },
         "promotion_readiness": paper_promotion_readiness(
             ledger_summary,
@@ -575,6 +576,32 @@ def stale_open_paper_intents(
         stale,
         key=lambda item: (-float(item.get("hours_past_stale", 0.0)), str(item.get("market_id", ""))),
     )
+
+
+def recent_paper_events(
+    events: Sequence[Mapping[str, Any]],
+    *,
+    limit: int = 10,
+) -> List[Dict[str, Any]]:
+    normalized = []
+    for event in events:
+        event_ts = float(event.get("paper_event_ts", event.get("settled_ts", event.get("created_ts", 0.0))) or 0.0)
+        normalized.append(
+            {
+                "paper_event_id": event.get("paper_event_id"),
+                "paper_event_ts": event_ts,
+                "paper_event_type": event.get("paper_event_type", event.get("status")),
+                "intent_id": event.get("intent_id"),
+                "market_id": event.get("market_id"),
+                "event_id": event.get("event_id"),
+                "side": event.get("side"),
+                "status": event.get("status"),
+            }
+        )
+    return sorted(
+        normalized,
+        key=lambda item: (-float(item.get("paper_event_ts", 0.0)), str(item.get("paper_event_id", ""))),
+    )[:limit]
 
 
 def status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
@@ -774,6 +801,20 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- Events: {events.get('count', 0)}",
             f"- Event status counts: {events.get('status_counts', {})}",
+            "",
+            "Recent events:",
+            "",
+        ]
+    )
+    if not events.get("recent", []):
+        lines.append("No paper events recorded.")
+    for item in events.get("recent", []):
+        lines.append(
+            f"- {item.get('paper_event_type', '')} {item.get('market_id', '')} "
+            f"{item.get('side', '')} at {float(item.get('paper_event_ts', 0.0)):.0f}"
+        )
+    lines.extend(
+        [
             "",
             "## Promotion Readiness",
             "",

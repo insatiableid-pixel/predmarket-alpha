@@ -93,6 +93,7 @@ def test_build_paper_ledger_report_summarizes_store_rows():
     assert report["ledger"]["status_counts"]["SETTLED"] == 1
     assert report["ledger"]["settled_pnl_usd"] > 0
     assert report["events"]["count"] == 2
+    assert report["events"]["recent"][0]["status"] in {"PAPER_INTENDED", "SETTLED"}
     assert len(report["integrity"]["ledger_hash"]) == 64
     assert len(report["integrity"]["events_hash"]) == 64
 
@@ -132,6 +133,7 @@ def test_write_paper_ledger_report_outputs_json_and_markdown(tmp_path):
     assert json.loads(artifacts.json_path.read_text())["run_id"] == report["run_id"]
     assert "# Kalshi Paper Ledger" in artifacts.markdown_path.read_text()
     assert "## Stale Open Intents" in artifacts.markdown_path.read_text()
+    assert "Recent events:" in artifacts.markdown_path.read_text()
 
 
 def test_run_paper_ledger_audit_loads_store(tmp_path):

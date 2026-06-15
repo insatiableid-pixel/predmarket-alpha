@@ -13,6 +13,7 @@ from predmarket.config import load_config
 from predmarket.kalshi_research_cycle import (
     KalshiPaperConfig,
     paper_promotion_readiness,
+    recent_paper_events,
     stale_open_paper_intents,
     summarize_paper_ledger,
 )
@@ -70,6 +71,7 @@ def build_paper_ledger_report(
         "events": {
             "count": len(paper_events),
             "status_counts": _status_counts(paper_events),
+            "recent": recent_paper_events(paper_events),
         },
         "integrity": {
             "artifact_schema_version": 1,
@@ -137,6 +139,21 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
             "",
             f"- Events: {report.get('events', {}).get('count', 0)}",
             f"- Event status counts: {report.get('events', {}).get('status_counts', {})}",
+            "",
+            "Recent events:",
+            "",
+        ]
+    )
+    recent = report.get("events", {}).get("recent", [])
+    if not recent:
+        lines.append("No paper events recorded.")
+    for item in recent:
+        lines.append(
+            f"- {item.get('paper_event_type', '')} {item.get('market_id', '')} "
+            f"{item.get('side', '')} at {float(item.get('paper_event_ts', 0.0)):.0f}"
+        )
+    lines.extend(
+        [
             "",
             "## Promotion Readiness",
             "",
