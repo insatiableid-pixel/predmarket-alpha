@@ -6,6 +6,7 @@ from predmarket.kalshi_research_cycle import (
     KalshiResearchCycleConfig,
     build_paper_intents,
     compute_paper_stake_usd,
+    cycle_integrity,
     load_outcomes,
     load_rank_report,
     paper_promotion_readiness,
@@ -402,6 +403,8 @@ def test_research_cycle_report_includes_ledger_audit(tmp_path, mock_config):
     assert ledger["brier_score"] is not None
     assert "## Ledger Audit" in artifacts.markdown_path.read_text()
     assert artifacts.report["promotion_readiness"]["status"] == "INSUFFICIENT_EVIDENCE"
+    assert len(artifacts.report["integrity"]["ledger_hash"]) == 64
+    assert "## Integrity" in artifacts.markdown_path.read_text()
 
 
 def test_paper_promotion_readiness_requires_enough_settled_evidence():
@@ -437,3 +440,33 @@ def test_paper_promotion_readiness_can_be_review_ready():
 
     assert readiness["status"] == "REVIEW_READY"
     assert readiness["reasons"] == []
+
+
+def test_cycle_integrity_hashes_are_stable():
+    rank_report = _rank_report()
+    intents, blocked = build_paper_intents(
+        rank_report,
+        config=KalshiPaperConfig(min_liquidity_adjusted_edge=0.005, min_directional_edge=0.02),
+        created_ts=AS_OF_TS,
+    )
+    config = KalshiResearchCycleConfig()
+    left = cycle_integrity(
+        rank_report=rank_report,
+        paper_intents=intents,
+        paper_blocked=blocked,
+        settled=[],
+        ledger=intents,
+        config=config,
+    )
+    right = cycle_integrity(
+        rank_report=rank_report,
+        paper_intents=intents,
+        paper_blocked=blocked,
+        settled=[],
+        ledger=intents,
+        config=config,
+    )
+
+    assert left == right
+    assert left["artifact_schema_version"] == 1
+    assert len(left["rank_report_hash"]) == 64

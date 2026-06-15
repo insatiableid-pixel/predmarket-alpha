@@ -358,6 +358,14 @@ def build_cycle_report(
             **ledger_summary,
         },
         "promotion_readiness": paper_promotion_readiness(ledger_summary, config.paper),
+        "integrity": cycle_integrity(
+            rank_report=rank_report,
+            paper_intents=paper_intents,
+            paper_blocked=paper_blocked,
+            settled=settled,
+            ledger=ledger,
+            config=config,
+        ),
     }
 
 
@@ -456,6 +464,31 @@ def paper_promotion_readiness(
     }
 
 
+def cycle_integrity(
+    *,
+    rank_report: Mapping[str, Any],
+    paper_intents: Sequence[Mapping[str, Any]],
+    paper_blocked: Sequence[Mapping[str, Any]],
+    settled: Sequence[Mapping[str, Any]],
+    ledger: Sequence[Mapping[str, Any]],
+    config: KalshiResearchCycleConfig,
+) -> Dict[str, Any]:
+    return {
+        "artifact_schema_version": 1,
+        "rank_report_hash": _stable_hash(rank_report),
+        "paper_intents_hash": _stable_hash(list(paper_intents)),
+        "paper_blocked_hash": _stable_hash(list(paper_blocked)),
+        "settled_hash": _stable_hash(list(settled)),
+        "ledger_hash": _stable_hash(list(ledger)),
+        "config_hash": _stable_hash(
+            {
+                "live_rank": asdict(config.live_rank),
+                "paper": asdict(config.paper),
+            }
+        ),
+    }
+
+
 def write_cycle_report(
     report: Mapping[str, Any],
     *,
@@ -523,6 +556,7 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     settlement = report.get("settlement", {})
     ledger = report.get("ledger", {})
     readiness = report.get("promotion_readiness", {})
+    integrity = report.get("integrity", {})
     lines = [
         f"# Kalshi Research Cycle: {report.get('run_id', '')}",
         "",
@@ -580,6 +614,12 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
             f"- Status: {readiness.get('status', '')}",
             f"- Reasons: {readiness.get('reasons', [])}",
             f"- Observed: {readiness.get('observed', {})}",
+            "",
+            "## Integrity",
+            "",
+            f"- Rank report hash: {integrity.get('rank_report_hash', '')}",
+            f"- Ledger hash: {integrity.get('ledger_hash', '')}",
+            f"- Config hash: {integrity.get('config_hash', '')}",
             "",
         ]
     )
