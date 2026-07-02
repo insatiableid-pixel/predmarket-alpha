@@ -1,0 +1,167 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "candidate_count": {
+      "minimum": 0,
+      "type": "integer"
+    },
+    "classification": {
+      "type": "string"
+    },
+    "cost_model": {
+      "type": "string"
+    },
+    "example_contracts": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "external_data_requirements": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "feature_family": {
+      "type": "string"
+    },
+    "gates": {
+      "items": {
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reason": {
+            "type": "string"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "warn",
+              "blocked",
+              "fail"
+            ]
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "reason"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "hypothesis_id": {
+      "pattern": "^hyp_[0-9a-f]{16}$",
+      "type": "string"
+    },
+    "market_universe_filter": {
+      "type": "object"
+    },
+    "model_route": {
+      "type": "string"
+    },
+    "multiple_testing_family": {
+      "type": "string"
+    },
+    "null_hypothesis": {
+      "type": "string"
+    },
+    "promotion_rule": {
+      "type": "string"
+    },
+    "retirement_rule": {
+      "type": "string"
+    },
+    "safety": {
+      "properties": {
+        "account_or_order_paths": {
+          "const": false
+        },
+        "database_writes": {
+          "const": false
+        },
+        "market_execution": {
+          "const": false
+        },
+        "research_only": {
+          "const": true
+        },
+        "staking_or_sizing_guidance": {
+          "const": false
+        }
+      },
+      "required": [
+        "research_only",
+        "market_execution",
+        "account_or_order_paths"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "HypothesisCandidateV1"
+    },
+    "signal_definition": {
+      "type": "string"
+    },
+    "source": {
+      "type": "string"
+    },
+    "source_artifact": {
+      "type": "string"
+    },
+    "source_artifact_sha256": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status": {
+      "enum": [
+        "candidate_unvalidated",
+        "rejected",
+        "promoted_research",
+        "retired_decayed"
+      ]
+    },
+    "target_contract_class": {
+      "type": "string"
+    },
+    "training_window_policy": {
+      "type": "string"
+    },
+    "usable": {
+      "const": false
+    },
+    "validation_window_policy": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "hypothesis_id",
+    "status",
+    "source",
+    "source_artifact",
+    "classification",
+    "model_route",
+    "feature_family",
+    "candidate_count",
+    "target_contract_class",
+    "market_universe_filter",
+    "signal_definition",
+    "null_hypothesis",
+    "cost_model",
+    "multiple_testing_family",
+    "promotion_rule",
+    "retirement_rule",
+    "gates",
+    "usable",
+    "safety"
+  ],
+  "title": "HypothesisCandidateV1",
+  "type": "object"
+}

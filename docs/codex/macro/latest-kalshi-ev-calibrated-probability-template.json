@@ -1,0 +1,287 @@
+{
+  "execution_enabled": false,
+  "research_only": true,
+  "rows": [
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301840TEXCLE-CLE",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "dd23211c5a4c6f0f201c3029"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301840PITPHI-PIT",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "3d06b687d99da130d6e462df"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN292140LAASEA-LAA",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "5fc5ec2a5363049a50aafde8"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN302005SDCHC-SD",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "19f34fa603092b3c8f2a0751"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301905DETNYY-NYY",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "1fbbf43893c5b984d61c1cb5"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301940TBKC-TB",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "ce6a7f3c0ec363171909b5e9"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN302140LAASEA-LAA",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "a0c17d5fcbceef69c6b6c847"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN292140LADATH-ATH",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "80cab60094bf325ab46c66d3"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291905DETNYY-DET",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "6dbff42535df48ad66087ed1"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN292010MINHOU-MIN",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "1aec62e92ffc982f5e049077"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301910WSHBOS-WSH",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "aaae963e3825182c3ae4c293"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN292040MIACOL-MIA",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "07fcdce52a0fd1554b545cc2"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291910WSHBOS-WSH",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "b401a3606447d4efdb6b5ef4"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291910TEXCLE-TEX",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "c0d28bc1e2655e04bf50cd65"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291910WSHBOS-BOS",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "d907c30b70ba5e50fc88c18b"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301940CINMIL-MIL",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "d5955f09454f633c406918e3"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301835CWSBAL-CWS",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "8f972f125f51de553e541727"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN292005SDCHC-CHC",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "c212bb1dbcbceffab679a49f"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291940CINMIL-CIN",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "9d6a286b4ce767e8fce514ec"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN302010MINHOU-HOU",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "6a9ccbc29c474f37d8ae2d58"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN302040MIACOL-COL",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "769a2099be6242b6f29551d9"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN291907NYMTOR-TOR",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "845deeef7e4045d2b6d6e03c"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301907NYMTOR-NYM",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "2b9cb944983d59a4827fa0c6"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN301907NYMTOR-TOR",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "01ff329f80cdaaed0d64f1b0"
+    },
+    {
+      "calibrated_probability": null,
+      "calibrated_probability_source": "TODO:model_or_validation_artifact",
+      "calibration_status": "validated_calibrated_probability",
+      "contract_ticker": "KXMLBGAME-26JUN302140LADATH-ATH",
+      "notes": "Fill only after a validated calibrated model produces a contract-level probability.",
+      "probability_uncertainty": null,
+      "side": "yes",
+      "source_repo_id": "predmarket-alpha",
+      "source_row_id": "7923ec3f40339beaedfcf1b6"
+    }
+  ],
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_execution": false,
+    "provider_api_calls": false
+  }
+}

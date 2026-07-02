@@ -1,0 +1,47 @@
+# Issue and PR label taxonomy for predmarket-alpha.
+# Sync with: gh label create/edit commands (see scripts/sync_labels.py)
+#
+# Priority labels:
+- name: "P0-critical"
+  color: "b60205"
+  description: "Critical: blocks all research work"
+- name: "P1-high"
+  color: "d93f0b"
+  description: "High priority: blocks current tranche"
+- name: "P2-medium"
+  color: "fbca04"
+  description: "Medium priority: important but not blocking"
+- name: "P3-low"
+  color: "0e8a16"
+  description: "Low priority: nice to have"
+
+# Type labels:
+- name: "bug"
+  color: "d73a4a"
+  description: "Something isn't working"
+- name: "enhancement"
+  color: "a2eeef"
+  description: "New feature or request"
+- name: "chore"
+  color: "c5def5"
+  description: "Maintenance, refactoring, or tooling"
+- name: "research"
+  color: "1d76db"
+  description: "Kalshi signal-factory research work"
+- name: "documentation"
+  color: "0075ca"
+  description: "Improvements to documentation"
+
+# Area labels:
+- name: "area-kalshi"
+  color: "5319e7"
+  description: "Kalshi-specific research (universe, EV, crypto proxy)"
+- name: "area-infra"
+  color: "bfd4f2"
+  description: "Infrastructure, CI/CD, tooling"
+- name: "area-testing"
+  color: "c2e0c6"
+  description: "Test coverage, test quality, flaky tests"
+- name: "area-security"
+  color: "d4c5f9"
+  description: "Security, secret scanning, dependency safety"

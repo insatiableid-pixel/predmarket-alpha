@@ -132,6 +132,11 @@ class KalshiMarketDataClient:
         series_ticker: Optional[str] = None,
         min_settled_ts: Optional[int] = None,
         max_settled_ts: Optional[int] = None,
+        min_close_ts: Optional[int] = None,
+        max_close_ts: Optional[int] = None,
+        min_created_ts: Optional[int] = None,
+        max_created_ts: Optional[int] = None,
+        mve_filter: Optional[str] = "exclude",
     ) -> List[Dict[str, Any]]:
         markets: List[Dict[str, Any]] = []
         cursor = ""
@@ -145,7 +150,11 @@ class KalshiMarketDataClient:
                     "series_ticker": series_ticker,
                     "min_settled_ts": min_settled_ts,
                     "max_settled_ts": max_settled_ts,
-                    "mve_filter": "exclude",
+                    "min_close_ts": min_close_ts,
+                    "max_close_ts": max_close_ts,
+                    "min_created_ts": min_created_ts,
+                    "max_created_ts": max_created_ts,
+                    "mve_filter": mve_filter,
                 },
             )
             markets.extend(payload.get("markets", []))
@@ -153,6 +162,27 @@ class KalshiMarketDataClient:
             if not cursor:
                 break
         return markets
+
+    async def fetch_series_list(
+        self,
+        *,
+        include_product_metadata: bool = False,
+        include_volume: bool = True,
+        category: Optional[str] = None,
+        tags: Optional[str] = None,
+        min_updated_ts: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        payload = await self.get_json(
+            "/series",
+            {
+                "include_product_metadata": str(bool(include_product_metadata)).lower(),
+                "include_volume": str(bool(include_volume)).lower(),
+                "category": category,
+                "tags": tags,
+                "min_updated_ts": min_updated_ts,
+            },
+        )
+        return [item for item in payload.get("series", []) if isinstance(item, dict)]
 
     async def fetch_candlesticks(
         self,

@@ -1,0 +1,560 @@
+{
+  "blockers": [],
+  "created_at_utc": "2026-06-29T22:49:44.157218Z",
+  "created_ts": 1782773384.1572185,
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "research_only_safety",
+      "reasons": [
+        "No provider, paid, database, account, order, or execution calls are used."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "reference_file_available",
+      "reasons": [
+        "Sportsbook reference JSON supplied."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "reference_rows_present",
+      "reasons": [
+        "Reference rows: 52."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "explicit_kalshi_mappings",
+      "reasons": [
+        "Every reference row has kalshi_ticker."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "kalshi_tickers_resolve",
+      "reasons": [
+        "All mapped tickers resolve to the local Kalshi artifact."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "two_sided_odds_valid",
+      "reasons": [
+        "Every mapped row has usable two-sided YES/NO odds."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "no_fuzzy_matching",
+      "reasons": [
+        "Only exact kalshi_ticker mappings are allowed."
+      ],
+      "status": "pass"
+    }
+  ],
+  "inputs": {
+    "kalshi_json": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260629T224907Z.json",
+    "kalshi_rows": 571,
+    "kalshi_sha256": "b203e41ba9c27b56c2b5d9045c0a2982c66c0d675445c0588cc7e868d3560e63",
+    "sportsbook_json": "/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json",
+    "sportsbook_references": 52,
+    "sportsbook_sha256": "e5e63fa5bd5ce7e5be67f0cca0abcd51dea40b08cc53f709f98fc3c5ab536bb0"
+  },
+  "policy": {
+    "matching_policy": "explicit_kalshi_ticker_only",
+    "odds_policy": "two_sided_yes_no_required",
+    "provider_calls_allowed": false
+  },
+  "ready": true,
+  "references": [
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291835CWSBAL-CWS",
+      "no_vig_no": 0.6623303167420814,
+      "no_vig_yes": 0.3376696832579186,
+      "reference_id": "kxmlbgame-26jun291835cwsbal-cws-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291835CWSBAL-BAL",
+      "no_vig_no": 0.3376696832579186,
+      "no_vig_yes": 0.6623303167420814,
+      "reference_id": "kxmlbgame-26jun291835cwsbal-bal-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291840PITPHI-PIT",
+      "no_vig_no": 0.6392151800697043,
+      "no_vig_yes": 0.3607848199302956,
+      "reference_id": "kxmlbgame-26jun291840pitphi-pit-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291840PITPHI-PHI",
+      "no_vig_no": 0.3607848199302956,
+      "no_vig_yes": 0.6392151800697043,
+      "reference_id": "kxmlbgame-26jun291840pitphi-phi-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291905DETNYY-DET",
+      "no_vig_no": 0.560558168221417,
+      "no_vig_yes": 0.439441831778583,
+      "reference_id": "kxmlbgame-26jun291905detnyy-det-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291905DETNYY-NYY",
+      "no_vig_no": 0.439441831778583,
+      "no_vig_yes": 0.560558168221417,
+      "reference_id": "kxmlbgame-26jun291905detnyy-nyy-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291907NYMTOR-NYM",
+      "no_vig_no": 0.5340672676837726,
+      "no_vig_yes": 0.46593273231622745,
+      "reference_id": "kxmlbgame-26jun291907nymtor-nym-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291907NYMTOR-TOR",
+      "no_vig_no": 0.46593273231622745,
+      "no_vig_yes": 0.5340672676837726,
+      "reference_id": "kxmlbgame-26jun291907nymtor-tor-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291910WSHBOS-WSH",
+      "no_vig_no": 0.6201438848920864,
+      "no_vig_yes": 0.3798561151079137,
+      "reference_id": "kxmlbgame-26jun291910wshbos-wsh-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291910WSHBOS-BOS",
+      "no_vig_no": 0.3798561151079137,
+      "no_vig_yes": 0.6201438848920864,
+      "reference_id": "kxmlbgame-26jun291910wshbos-bos-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291910TEXCLE-TEX",
+      "no_vig_no": 0.5891702586206897,
+      "no_vig_yes": 0.4108297413793104,
+      "reference_id": "kxmlbgame-26jun291910texcle-tex-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291910TEXCLE-CLE",
+      "no_vig_no": 0.4108297413793104,
+      "no_vig_yes": 0.5891702586206897,
+      "reference_id": "kxmlbgame-26jun291910texcle-cle-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291940CINMIL-CIN",
+      "no_vig_no": 0.5566541117388575,
+      "no_vig_yes": 0.44334588826114246,
+      "reference_id": "kxmlbgame-26jun291940cinmil-cin-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN291940CINMIL-MIL",
+      "no_vig_no": 0.44334588826114246,
+      "no_vig_yes": 0.5566541117388575,
+      "reference_id": "kxmlbgame-26jun291940cinmil-mil-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292005SDCHC-SD",
+      "no_vig_no": 0.5925263367123832,
+      "no_vig_yes": 0.40747366328761675,
+      "reference_id": "kxmlbgame-26jun292005sdchc-sd-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292005SDCHC-CHC",
+      "no_vig_no": 0.40747366328761675,
+      "no_vig_yes": 0.5925263367123832,
+      "reference_id": "kxmlbgame-26jun292005sdchc-chc-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292010MINHOU-MIN",
+      "no_vig_no": 0.560558168221417,
+      "no_vig_yes": 0.439441831778583,
+      "reference_id": "kxmlbgame-26jun292010minhou-min-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292010MINHOU-HOU",
+      "no_vig_no": 0.439441831778583,
+      "no_vig_yes": 0.560558168221417,
+      "reference_id": "kxmlbgame-26jun292010minhou-hou-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292040MIACOL-MIA",
+      "no_vig_no": 0.43014325801211045,
+      "no_vig_yes": 0.5698567419878895,
+      "reference_id": "kxmlbgame-26jun292040miacol-mia-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292040MIACOL-COL",
+      "no_vig_no": 0.5698567419878895,
+      "no_vig_yes": 0.43014325801211045,
+      "reference_id": "kxmlbgame-26jun292040miacol-col-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LADATH-LAD",
+      "no_vig_no": 0.47935779816513757,
+      "no_vig_yes": 0.5206422018348623,
+      "reference_id": "kxmlbgame-26jun292140ladath-lad-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LADATH-ATH",
+      "no_vig_no": 0.5206422018348623,
+      "no_vig_yes": 0.47935779816513757,
+      "reference_id": "kxmlbgame-26jun292140ladath-ath-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LAASEA-LAA",
+      "no_vig_no": 0.6575502571294998,
+      "no_vig_yes": 0.3424497428705003,
+      "reference_id": "kxmlbgame-26jun292140laasea-laa-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LAASEA-SEA",
+      "no_vig_no": 0.3424497428705003,
+      "no_vig_yes": 0.6575502571294998,
+      "reference_id": "kxmlbgame-26jun292140laasea-sea-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301835CWSBAL-CWS",
+      "no_vig_no": 0.5771481587210961,
+      "no_vig_yes": 0.42285184127890374,
+      "reference_id": "kxmlbgame-26jun301835cwsbal-cws-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301835CWSBAL-BAL",
+      "no_vig_no": 0.42285184127890374,
+      "no_vig_yes": 0.5771481587210961,
+      "reference_id": "kxmlbgame-26jun301835cwsbal-bal-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301840TEXCLE-TEX",
+      "no_vig_no": 0.4747974797479748,
+      "no_vig_yes": 0.5252025202520252,
+      "reference_id": "kxmlbgame-26jun301840texcle-tex-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301840TEXCLE-CLE",
+      "no_vig_no": 0.5252025202520252,
+      "no_vig_yes": 0.4747974797479748,
+      "reference_id": "kxmlbgame-26jun301840texcle-cle-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301840PITPHI-PIT",
+      "no_vig_no": 0.6760710553814002,
+      "no_vig_yes": 0.3239289446185998,
+      "reference_id": "kxmlbgame-26jun301840pitphi-pit-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301840PITPHI-PHI",
+      "no_vig_no": 0.3239289446185998,
+      "no_vig_yes": 0.6760710553814002,
+      "reference_id": "kxmlbgame-26jun301840pitphi-phi-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301905DETNYY-DET",
+      "no_vig_no": 0.5548433048433048,
+      "no_vig_yes": 0.44515669515669515,
+      "reference_id": "kxmlbgame-26jun301905detnyy-det-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301905DETNYY-NYY",
+      "no_vig_no": 0.44515669515669515,
+      "no_vig_yes": 0.5548433048433048,
+      "reference_id": "kxmlbgame-26jun301905detnyy-nyy-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301907NYMTOR-NYM",
+      "no_vig_no": 0.5252025202520252,
+      "no_vig_yes": 0.4747974797479748,
+      "reference_id": "kxmlbgame-26jun301907nymtor-nym-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301907NYMTOR-TOR",
+      "no_vig_no": 0.4747974797479748,
+      "no_vig_yes": 0.5252025202520252,
+      "reference_id": "kxmlbgame-26jun301907nymtor-tor-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301910WSHBOS-WSH",
+      "no_vig_no": 0.560558168221417,
+      "no_vig_yes": 0.439441831778583,
+      "reference_id": "kxmlbgame-26jun301910wshbos-wsh-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301910WSHBOS-BOS",
+      "no_vig_no": 0.439441831778583,
+      "no_vig_yes": 0.560558168221417,
+      "reference_id": "kxmlbgame-26jun301910wshbos-bos-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301915STLATL-STL",
+      "no_vig_no": 0.5891702586206897,
+      "no_vig_yes": 0.4108297413793104,
+      "reference_id": "kxmlbgame-26jun301915stlatl-stl-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301915STLATL-ATL",
+      "no_vig_no": 0.4108297413793104,
+      "no_vig_yes": 0.5891702586206897,
+      "reference_id": "kxmlbgame-26jun301915stlatl-atl-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301940CINMIL-CIN",
+      "no_vig_no": 0.61125843780135,
+      "no_vig_yes": 0.38874156219864997,
+      "reference_id": "kxmlbgame-26jun301940cinmil-cin-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301940CINMIL-MIL",
+      "no_vig_no": 0.38874156219864997,
+      "no_vig_yes": 0.61125843780135,
+      "reference_id": "kxmlbgame-26jun301940cinmil-mil-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301940TBKC-TB",
+      "no_vig_no": 0.4839567290062339,
+      "no_vig_yes": 0.516043270993766,
+      "reference_id": "kxmlbgame-26jun301940tbkc-tb-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN301940TBKC-KC",
+      "no_vig_no": 0.516043270993766,
+      "no_vig_yes": 0.4839567290062339,
+      "reference_id": "kxmlbgame-26jun301940tbkc-kc-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302005SDCHC-SD",
+      "no_vig_no": 0.5857583019513866,
+      "no_vig_yes": 0.4142416980486135,
+      "reference_id": "kxmlbgame-26jun302005sdchc-sd-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302005SDCHC-CHC",
+      "no_vig_no": 0.4142416980486135,
+      "no_vig_yes": 0.5857583019513866,
+      "reference_id": "kxmlbgame-26jun302005sdchc-chc-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302010MINHOU-MIN",
+      "no_vig_no": 0.4839567290062339,
+      "no_vig_yes": 0.516043270993766,
+      "reference_id": "kxmlbgame-26jun302010minhou-min-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302010MINHOU-HOU",
+      "no_vig_no": 0.516043270993766,
+      "no_vig_yes": 0.4839567290062339,
+      "reference_id": "kxmlbgame-26jun302010minhou-hou-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302040MIACOL-MIA",
+      "no_vig_no": 0.4338842975206611,
+      "no_vig_yes": 0.5661157024793388,
+      "reference_id": "kxmlbgame-26jun302040miacol-mia-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302040MIACOL-COL",
+      "no_vig_no": 0.5661157024793388,
+      "no_vig_yes": 0.4338842975206611,
+      "reference_id": "kxmlbgame-26jun302040miacol-col-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302140LADATH-LAD",
+      "no_vig_no": 0.4250184594881769,
+      "no_vig_yes": 0.574981540511823,
+      "reference_id": "kxmlbgame-26jun302140ladath-lad-draftkings",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302140LADATH-ATH",
+      "no_vig_no": 0.574981540511823,
+      "no_vig_yes": 0.4250184594881769,
+      "reference_id": "kxmlbgame-26jun302140ladath-ath-draftkings",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302140LAASEA-LAA",
+      "no_vig_no": 0.6142662156548573,
+      "no_vig_yes": 0.3857337843451427,
+      "reference_id": "kxmlbgame-26jun302140laasea-laa-fanduel",
+      "valid": true
+    },
+    {
+      "blocker_reasons": [],
+      "blockers": [],
+      "kalshi_ticker": "KXMLBGAME-26JUN302140LAASEA-SEA",
+      "no_vig_no": 0.3857337843451427,
+      "no_vig_yes": 0.6142662156548573,
+      "reference_id": "kxmlbgame-26jun302140laasea-sea-fanduel",
+      "valid": true
+    }
+  ],
+  "research_only": true,
+  "run_id": "type2-reference-preflight-latest",
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_provider_payload_copied": false
+  },
+  "schema_version": 1,
+  "status": "reference_ready",
+  "summary": {
+    "blocker_count": 0,
+    "invalid_odds_count": 0,
+    "missing_ticker_count": 0,
+    "reference_count": 52,
+    "unknown_ticker_count": 0,
+    "valid_reference_count": 52
+  }
+}

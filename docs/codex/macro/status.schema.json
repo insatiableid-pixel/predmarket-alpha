@@ -1,0 +1,248 @@
+{
+  "$id": "https://local.codex/macro/MacroRepoStatusV1.schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": false,
+  "properties": {
+    "as_of_utc": {
+      "format": "date-time",
+      "type": "string"
+    },
+    "evidence": {
+      "additionalProperties": true,
+      "properties": {
+        "blocker_count": {
+          "minimum": 0,
+          "type": "integer"
+        },
+        "gate_counts": {
+          "additionalProperties": {
+            "minimum": 0,
+            "type": "integer"
+          },
+          "type": "object"
+        },
+        "hashes": {
+          "additionalProperties": {
+            "type": "string"
+          },
+          "type": "object"
+        },
+        "latest_artifacts": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "metrics": {
+          "additionalProperties": true,
+          "type": "object"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "status",
+        "latest_artifacts",
+        "hashes",
+        "gate_counts",
+        "blocker_count"
+      ],
+      "type": "object"
+    },
+    "gates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "reasons": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "source_artifacts": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "status": {
+            "enum": [
+              "pass",
+              "warn",
+              "blocked",
+              "fail"
+            ],
+            "type": "string"
+          }
+        },
+        "required": [
+          "name",
+          "status",
+          "reasons",
+          "source_artifacts"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "git": {
+      "additionalProperties": true,
+      "properties": {
+        "branch": {
+          "type": "string"
+        },
+        "dirty_counts": {
+          "additionalProperties": false,
+          "properties": {
+            "added": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "deleted": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "modified": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "renamed": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "staged": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "total": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "unstaged": {
+              "minimum": 0,
+              "type": "integer"
+            },
+            "untracked": {
+              "minimum": 0,
+              "type": "integer"
+            }
+          },
+          "required": [
+            "total",
+            "modified",
+            "added",
+            "deleted",
+            "renamed",
+            "untracked",
+            "staged",
+            "unstaged"
+          ],
+          "type": "object"
+        },
+        "head": {
+          "type": "string"
+        },
+        "risk_flags": {
+          "additionalProperties": {
+            "type": "boolean"
+          },
+          "type": "object"
+        },
+        "sample_paths": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        }
+      },
+      "required": [
+        "branch",
+        "head",
+        "dirty_counts",
+        "risk_flags"
+      ],
+      "type": "object"
+    },
+    "mode": {
+      "additionalProperties": false,
+      "properties": {
+        "execution_enabled": {
+          "type": "boolean"
+        },
+        "live_calls_allowed": {
+          "type": "boolean"
+        },
+        "notes": {
+          "items": {
+            "type": "string"
+          },
+          "type": "array"
+        },
+        "research_only": {
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "research_only",
+        "execution_enabled",
+        "live_calls_allowed"
+      ],
+      "type": "object"
+    },
+    "repo_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "repo_path": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "scheduling": {
+      "additionalProperties": true,
+      "properties": {
+        "priority": {
+          "type": "number"
+        },
+        "recommended_next_tranche": {
+          "type": "string"
+        },
+        "score_components": {
+          "additionalProperties": {
+            "type": "number"
+          },
+          "type": "object"
+        },
+        "stop_condition": {
+          "type": "string"
+        }
+      },
+      "required": [
+        "score_components",
+        "priority",
+        "recommended_next_tranche",
+        "stop_condition"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "repo_id",
+    "repo_path",
+    "as_of_utc",
+    "git",
+    "mode",
+    "evidence",
+    "gates",
+    "scheduling"
+  ],
+  "title": "MacroRepoStatusV1",
+  "type": "object"
+}

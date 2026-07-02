@@ -1,0 +1,19 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": ["config:recommended"],
+  "minimumReleaseAge": "7 days",
+  "internalChecksFilter": "strict",
+  "packageRules": [
+    {
+      "description": "Wait 14 days before adopting major version bumps for ML libraries",
+      "matchPackagePatterns": ["torch", "transformers", "scikit-learn", "xgboost", "lightgbm"],
+      "minimumReleaseAge": "14 days"
+    },
+    {
+      "description": "Security patches can be adopted after 3 days",
+      "matchUpdateTypes": ["patch"],
+      "matchDepTypes": ["dependencies"],
+      "minimumReleaseAge": "3 days"
+    }
+  ]
+}

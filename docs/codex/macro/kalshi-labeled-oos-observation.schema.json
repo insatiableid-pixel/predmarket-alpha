@@ -1,0 +1,134 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "execution_enabled": {
+      "const": false
+    },
+    "research_only": {
+      "const": true
+    },
+    "rows": {
+      "items": {
+        "properties": {
+          "all_in_break_even_probability": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "close_time": {
+            "type": "string"
+          },
+          "contract_ticker": {
+            "type": "string"
+          },
+          "cost_source": {
+            "type": "string"
+          },
+          "decision_time": {
+            "type": "string"
+          },
+          "event_ticker": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "hypothesis_id": {
+            "pattern": "^hyp_[0-9a-f]{16}$",
+            "type": "string"
+          },
+          "label_source": {
+            "type": "string"
+          },
+          "model_probability": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "model_time": {
+            "type": "string"
+          },
+          "quote_time": {
+            "type": "string"
+          },
+          "settled_time": {
+            "type": "string"
+          },
+          "side": {
+            "enum": [
+              "yes",
+              "no"
+            ]
+          },
+          "side_outcome": {
+            "maximum": 1,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "source_artifact": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "required": [
+          "hypothesis_id",
+          "contract_ticker",
+          "side",
+          "decision_time",
+          "quote_time",
+          "model_time",
+          "close_time",
+          "settled_time",
+          "model_probability",
+          "all_in_break_even_probability",
+          "side_outcome",
+          "label_source",
+          "cost_source"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "safety": {
+      "properties": {
+        "account_or_order_paths": {
+          "const": false
+        },
+        "database_writes": {
+          "const": false
+        },
+        "market_execution": {
+          "const": false
+        },
+        "research_only": {
+          "const": true
+        },
+        "staking_or_sizing_guidance": {
+          "const": false
+        }
+      },
+      "required": [
+        "research_only",
+        "market_execution",
+        "account_or_order_paths",
+        "database_writes"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1
+    }
+  },
+  "required": [
+    "schema_version",
+    "research_only",
+    "execution_enabled",
+    "rows",
+    "safety"
+  ],
+  "title": "KalshiLabeledOosObservationPacketV1",
+  "type": "object"
+}

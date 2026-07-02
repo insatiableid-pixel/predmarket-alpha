@@ -1,0 +1,27 @@
+{
+  "created_at_utc": "2026-07-01T18:57:56Z",
+  "execution_enabled": false,
+  "outputs": {
+    "latest_path": "/home/mrwatson/manual_drops/kalshi/kalshi_nfl_game_series_latest.json",
+    "snapshot_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json"
+  },
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_data_calls": true,
+    "market_execution": false,
+    "paid_calls": false,
+    "raw_secrets_copied": false
+  },
+  "schema_version": 1,
+  "status": "kalshi_manual_drop_capture_written",
+  "summary": {
+    "market_count": 66,
+    "series_counts": {
+      "KXNFLGAME": 66
+    },
+    "series_error_count": 0,
+    "series_errors": {}
+  }
+}

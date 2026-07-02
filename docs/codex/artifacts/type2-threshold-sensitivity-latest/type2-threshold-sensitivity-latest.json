@@ -1,0 +1,293 @@
+{
+  "created_at_utc": "2026-06-29T22:50:46.699014Z",
+  "created_ts": 1782773446.699014,
+  "execution_enabled": false,
+  "inputs": {
+    "disposition_json": "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
+    "disposition_status": "candidate_disposition_watch_only",
+    "paper_matcher_json": "docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json",
+    "paper_matcher_status": "watch_only_no_review_candidates"
+  },
+  "policy": {
+    "current_threshold_preserved": true,
+    "does_not_promote_candidates": true,
+    "provider_calls_allowed": false,
+    "thresholds_are_hypothetical": true
+  },
+  "research_only": true,
+  "run_id": "type2-threshold-sensitivity-latest",
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_provider_payload_copied": false
+  },
+  "schema_version": 1,
+  "status": "threshold_sensitivity_no_current_threshold_candidates",
+  "summary": {
+    "candidate_count": 52,
+    "current_threshold": 0.1,
+    "current_threshold_would_pass_count": 0,
+    "gap_to_current_threshold": 0.08392894461859979,
+    "manual_timing_unknown_count": 0,
+    "max_positive_review_only_net_divergence": 0.016071055381400218,
+    "minimum_hypothetical_threshold_for_one_candidate": 0.016071055381400218,
+    "positive_net_candidate_count": 27,
+    "temporal_downgrade_count": 4,
+    "timing_clean_candidate_count": 48
+  },
+  "threshold_grid": [
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.1,
+      "tickers": [],
+      "would_pass_count": 0
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.075,
+      "tickers": [],
+      "would_pass_count": 0
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.05,
+      "tickers": [],
+      "would_pass_count": 0
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.025,
+      "tickers": [],
+      "would_pass_count": 0
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.02,
+      "tickers": [],
+      "would_pass_count": 0
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.015,
+      "tickers": [
+        "KXMLBGAME-26JUN301840TEXCLE-TEX",
+        "KXMLBGAME-26JUN301840TEXCLE-CLE",
+        "KXMLBGAME-26JUN301840PITPHI-PIT",
+        "KXMLBGAME-26JUN301840PITPHI-PHI",
+        "KXMLBGAME-26JUN302010MINHOU-MIN"
+      ],
+      "would_pass_count": 5
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.01,
+      "tickers": [
+        "KXMLBGAME-26JUN301840TEXCLE-TEX",
+        "KXMLBGAME-26JUN301840TEXCLE-CLE",
+        "KXMLBGAME-26JUN301840PITPHI-PIT",
+        "KXMLBGAME-26JUN301840PITPHI-PHI",
+        "KXMLBGAME-26JUN301910WSHBOS-BOS",
+        "KXMLBGAME-26JUN302010MINHOU-MIN"
+      ],
+      "would_pass_count": 6
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.005,
+      "tickers": [
+        "KXMLBGAME-26JUN292140LAASEA-LAA",
+        "KXMLBGAME-26JUN292140LAASEA-SEA",
+        "KXMLBGAME-26JUN301840TEXCLE-TEX",
+        "KXMLBGAME-26JUN301840TEXCLE-CLE",
+        "KXMLBGAME-26JUN301840PITPHI-PIT",
+        "KXMLBGAME-26JUN301840PITPHI-PHI",
+        "KXMLBGAME-26JUN301905DETNYY-DET",
+        "KXMLBGAME-26JUN301905DETNYY-NYY",
+        "KXMLBGAME-26JUN301910WSHBOS-BOS",
+        "KXMLBGAME-26JUN302005SDCHC-SD"
+      ],
+      "would_pass_count": 12
+    },
+    {
+      "max_net_divergence": 0.016071055381400218,
+      "threshold": 0.0,
+      "tickers": [
+        "KXMLBGAME-26JUN291905DETNYY-DET",
+        "KXMLBGAME-26JUN291905DETNYY-NYY",
+        "KXMLBGAME-26JUN291910WSHBOS-WSH",
+        "KXMLBGAME-26JUN292010MINHOU-MIN",
+        "KXMLBGAME-26JUN292010MINHOU-HOU",
+        "KXMLBGAME-26JUN292040MIACOL-MIA",
+        "KXMLBGAME-26JUN292040MIACOL-COL",
+        "KXMLBGAME-26JUN292140LADATH-LAD",
+        "KXMLBGAME-26JUN292140LADATH-ATH",
+        "KXMLBGAME-26JUN292140LAASEA-LAA"
+      ],
+      "would_pass_count": 27
+    }
+  ],
+  "top_candidates": [
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN301840PITPHI",
+      "kalshi_midpoint": 0.345,
+      "kalshi_ticker": "KXMLBGAME-26JUN301840PITPHI-PIT",
+      "rank": 29,
+      "raw_divergence": 0.021071055381400194,
+      "reference_id": "kxmlbgame-26jun301840pitphi-pit-fanduel",
+      "review_only_net_divergence": 0.016071055381400218,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.3239289446185998,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Pittsburgh vs Philadelphia Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN301840PITPHI",
+      "kalshi_midpoint": 0.655,
+      "kalshi_ticker": "KXMLBGAME-26JUN301840PITPHI-PHI",
+      "rank": 30,
+      "raw_divergence": 0.021071055381400194,
+      "reference_id": "kxmlbgame-26jun301840pitphi-phi-fanduel",
+      "review_only_net_divergence": 0.01607105538140019,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.6760710553814002,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Pittsburgh vs Philadelphia Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN302010MINHOU",
+      "kalshi_midpoint": 0.495,
+      "kalshi_ticker": "KXMLBGAME-26JUN302010MINHOU-MIN",
+      "rank": 45,
+      "raw_divergence": 0.021043270993766017,
+      "reference_id": "kxmlbgame-26jun302010minhou-min-fanduel",
+      "review_only_net_divergence": 0.016043270993766012,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.516043270993766,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Minnesota vs Houston Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN301840TEXCLE",
+      "kalshi_midpoint": 0.505,
+      "kalshi_ticker": "KXMLBGAME-26JUN301840TEXCLE-TEX",
+      "rank": 27,
+      "raw_divergence": 0.02020252025202518,
+      "reference_id": "kxmlbgame-26jun301840texcle-tex-fanduel",
+      "review_only_net_divergence": 0.015202520252025176,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.5252025202520252,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Texas vs Cleveland Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN301840TEXCLE",
+      "kalshi_midpoint": 0.495,
+      "kalshi_ticker": "KXMLBGAME-26JUN301840TEXCLE-CLE",
+      "rank": 28,
+      "raw_divergence": 0.02020252025202518,
+      "reference_id": "kxmlbgame-26jun301840texcle-cle-fanduel",
+      "review_only_net_divergence": 0.015202520252025176,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.4747974797479748,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Texas vs Cleveland Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN301910WSHBOS",
+      "kalshi_midpoint": 0.545,
+      "kalshi_ticker": "KXMLBGAME-26JUN301910WSHBOS-BOS",
+      "rank": 36,
+      "raw_divergence": 0.01555816822141698,
+      "reference_id": "kxmlbgame-26jun301910wshbos-bos-fanduel",
+      "review_only_net_divergence": 0.010558168221416975,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.560558168221417,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Washington vs Boston Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN292140LAASEA",
+      "kalshi_midpoint": 0.645,
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LAASEA-SEA",
+      "rank": 24,
+      "raw_divergence": 0.012550257129499753,
+      "reference_id": "kxmlbgame-26jun292140laasea-sea-fanduel",
+      "review_only_net_divergence": 0.007550257129499749,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.6575502571294998,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Los Angeles A vs Seattle Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN292140LAASEA",
+      "kalshi_midpoint": 0.355,
+      "kalshi_ticker": "KXMLBGAME-26JUN292140LAASEA-LAA",
+      "rank": 23,
+      "raw_divergence": 0.012550257129499698,
+      "reference_id": "kxmlbgame-26jun292140laasea-laa-fanduel",
+      "review_only_net_divergence": 0.007550257129499693,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.3424497428705003,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "Los Angeles A vs Seattle Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN302005SDCHC",
+      "kalshi_midpoint": 0.575,
+      "kalshi_ticker": "KXMLBGAME-26JUN302005SDCHC-CHC",
+      "rank": 44,
+      "raw_divergence": 0.010758301951386606,
+      "reference_id": "kxmlbgame-26jun302005sdchc-chc-fanduel",
+      "review_only_net_divergence": 0.005758301951386602,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.5857583019513866,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "San Diego vs Chicago C Winner?"
+    },
+    {
+      "blockers": [],
+      "disposition": "WATCH_ONLY",
+      "event_ticker": "KXMLBGAME-26JUN302005SDCHC",
+      "kalshi_midpoint": 0.425,
+      "kalshi_ticker": "KXMLBGAME-26JUN302005SDCHC-SD",
+      "rank": 43,
+      "raw_divergence": 0.010758301951386495,
+      "reference_id": "kxmlbgame-26jun302005sdchc-sd-fanduel",
+      "review_only_net_divergence": 0.005758301951386491,
+      "review_status": "REVIEW_ONLY_WATCH",
+      "sportsbook_no_vig_yes": 0.4142416980486135,
+      "threshold": 0.1,
+      "timing_status": "timing_clean_watch",
+      "title": "San Diego vs Chicago C Winner?"
+    }
+  ]
+}

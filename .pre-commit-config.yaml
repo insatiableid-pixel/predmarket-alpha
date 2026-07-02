@@ -1,0 +1,50 @@
+repos:
+  - repo: https://github.com/astral-sh/ruff-pre-commit
+    rev: v0.15.17
+    hooks:
+      - id: ruff
+        args: [--fix, --exit-non-zero-on-fix]
+      - id: ruff-format
+
+  - repo: https://github.com/gitleaks/gitleaks
+    rev: v8.27.2
+    hooks:
+      - id: gitleaks
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v5.0.0
+    hooks:
+      - id: trailing-whitespace
+      - id: end-of-file-fixer
+      - id: check-yaml
+        args: [--allow-multiple-documents]
+      - id: check-added-large-files
+        args: [--maxkb=500]
+      - id: check-merge-conflict
+      - id: debug-statements
+
+  # --- Local architectural & quality gates (configured in pyproject.toml) ---
+  # mypy (strict) is intentionally NOT a blocking commit hook: the library is
+  # mid-migration and currently reports ~226 strict errors. mypy runs as an
+  # advisory step in CI (`make typecheck`) so the count can be ratcheted down.
+  - repo: local
+    hooks:
+      - id: import-linter
+        name: import-linter (architectural boundaries)
+        entry: lint-imports
+        language: python
+        additional_dependencies: [import-linter>=2.1]
+        pass_filenames: false
+        files: \.py$
+      - id: tech-debt-ratchet
+        name: tech-debt marker ratchet
+        entry: python3 scripts/scan_tech_debt.py --check
+        language: system
+        pass_filenames: false
+        files: \.py$
+      - id: file-size-ratchet
+        name: large-file ratchet
+        entry: python3 scripts/check_file_sizes.py --check
+        language: system
+        pass_filenames: false
+        files: \.py$

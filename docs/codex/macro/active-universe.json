@@ -1,0 +1,38 @@
+{
+  "as_of": "2026-06-16",
+  "control_plane_repo_id": "predmarket-alpha",
+  "phase": "research_paper_only",
+  "repos": [
+    {
+      "default_tranche": "kalshi_paper_evidence_and_macro_router",
+      "path": "/home/mrwatson/projects/predmarket-alpha",
+      "repo_id": "predmarket-alpha",
+      "role": "command_center_kalshi_paper_loop"
+    },
+    {
+      "default_tranche": "type2_market_adapter_and_no_spend_evidence",
+      "path": "/home/mrwatson/projects/mlb-platform",
+      "repo_id": "mlb-platform",
+      "role": "primary_type2_sports_prop_edge_engine"
+    },
+    {
+      "default_tranche": "tennis_validation_and_external_evidence_gates",
+      "path": "/home/mrwatson/projects/atp-oracle",
+      "repo_id": "atp-oracle",
+      "role": "tennis_type2_candidate_with_model_quality_blockers"
+    },
+    {
+      "default_tranche": "dirty_tree_classification_and_t21_completion",
+      "path": "/home/mrwatson/projects/nba-analytics-platform",
+      "repo_id": "nba-analytics-platform",
+      "role": "high_upside_basketball_platform_dirty_state_stabilization"
+    },
+    {
+      "default_tranche": "status_and_validation_gate_export",
+      "path": "/home/mrwatson/projects/nfl_quant_glm51_greenfield",
+      "repo_id": "nfl_quant_glm51_greenfield",
+      "role": "governance_validation_pattern_source"
+    }
+  ],
+  "schema_version": 1
+}

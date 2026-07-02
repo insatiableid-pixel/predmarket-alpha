@@ -1,0 +1,22 @@
+# Example systemd user timer. Do not enable automatically.
+# Save as ~/.config/systemd/user/kalshi-universe-scan.timer after review.
+
+[Unit]
+Description=Run research-only Kalshi universe scan every 10 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+RandomizedDelaySec=45s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+# Matching service:
+# [Unit]
+# Description=Research-only Kalshi universe scan
+# [Service]
+# Type=oneshot
+# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# ExecStart=/usr/bin/make kalshi-universe-watch-once

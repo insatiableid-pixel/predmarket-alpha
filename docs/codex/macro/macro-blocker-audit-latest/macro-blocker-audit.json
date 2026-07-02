@@ -1,0 +1,193 @@
+{
+  "account_or_order_paths": false,
+  "database_writes": false,
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "unlock_scout_present",
+      "reasons": [
+        "Loaded 5 lane(s) from /home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-unlock-scout.json."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "all_lanes_marked_blocked",
+      "reasons": [
+        "At least one unlock-scout lane is not marked blocked."
+      ],
+      "status": "blocked"
+    },
+    {
+      "name": "all_missing_inputs_specific",
+      "reasons": [
+        "Every lane has a named missing input."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "all_next_commands_present",
+      "reasons": [
+        "Every lane has a next local command."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "no_usable_ev_rows",
+      "reasons": [
+        "Usable EV ledger rows: 12."
+      ],
+      "status": "blocked"
+    },
+    {
+      "name": "no_overlay_rows_written_without_evidence",
+      "reasons": [
+        "NFL overlay assembler wrote overlays; ledger/preflight must be reviewed instead of declaring blocked."
+      ],
+      "status": "blocked"
+    },
+    {
+      "name": "no_ready_nfl_target_contract_evidence",
+      "reasons": [
+        "Ready NFL target contract matches: 172."
+      ],
+      "status": "blocked"
+    },
+    {
+      "name": "research_only_safety",
+      "reasons": [
+        "Unlock scout and EV ledger are research-only and execution-disabled."
+      ],
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-01T19:26:37Z",
+  "inputs": {
+    "ev_ledger_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json",
+    "ev_ledger_sha256": "sha256:7e6bb75d 7467fe34 cec2595f 8b05a86a f0b6a68d 04cfc486 ab7deb3d 669753e0",
+    "latest_decision_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-decision.json",
+    "latest_decision_sha256": "sha256:17b531e5 74bd0bda 26fe3b41 9f1666a2 5ad68dde eb6b400b 6d0509b7 addc8a33",
+    "latest_status_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-status.json",
+    "latest_status_sha256": "sha256:f7ca170c 7b9127d5 75003468 e7ac57f1 be443f8b 85e1c7ac b828a12a 4962929e",
+    "local_contract_scout_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-ev-local-contract-evidence-scout.json",
+    "local_contract_scout_sha256": "sha256:30f735bb 5225237b 3bfe9968 73698049 986fc5fb 8ea9aa4f 334241b3 3735cc39",
+    "nfl_overlay_assembler_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-ev-nfl-overlay-assembler.json",
+    "nfl_overlay_assembler_sha256": "sha256:862f745b d273405d 75703371 af75cf32 802a115d aa360b7f 3059e4a8 eada5e25",
+    "unlock_scout_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-unlock-scout.json",
+    "unlock_scout_sha256": "sha256:5484b2bf 41ffd571 e2030520 bcf12e60 5eefdd5e 7843783b 3aef4d74 d0e845c7"
+  },
+  "lane_audits": [
+    {
+      "blocked": false,
+      "missing_input": "No new external input is needed for the ready target match; fill matching safe overlays outside the repo, then rerun preflight and ledger.",
+      "missing_input_specific": true,
+      "next_command_present": true,
+      "next_local_command": "make kalshi-ev-contract-mapping-work-order && make kalshi-ev-local-contract-evidence-scout && make kalshi-ev-nfl-overlay-assembler && make kalshi-ev-overlay-preflight && make kalshi-ev-ledger",
+      "proof_status": "blocked",
+      "repo_id": "predmarket-alpha",
+      "status": "local_contract_evidence_ready_for_overlay_fill",
+      "what_exists": "ev_ledger_status=kalshi_ev_ledger_ready_with_usable_contract_edges, ledger_rows=348, usable_rows=12, nfl_mapping_sides=32, source_model_rows=16, local_contract_evidence_status=local_contract_evidence_ready_for_overlay_fill, nfl_contract_evidence_rows=164, ready_target_matches=172, overlay_assembler_status=nfl_overlay_assembler_overlays_written, assembled_overlay_pairs=32"
+    },
+    {
+      "blocked": true,
+      "missing_input": "Public BetExplorer multi-market comparison is present and date-matched, but it is still narrow, has zero current-threshold rows, and does not justify a policy change. Next evidence is broader book/line/source coverage, an independent clean slate, or stronger true closing-line validation.",
+      "missing_input_specific": true,
+      "next_command_present": true,
+      "next_local_command": "cd /home/mrwatson/projects/mlb-platform && make macro-status",
+      "proof_status": "pass",
+      "repo_id": "mlb-platform",
+      "status": "betexplorer_market_closing_comparison_ready_no_policy_change",
+      "what_exists": "odds_api_json_files=16, kalshi_json_files=8, latest_intake_status=ready_pregame_pair, latest_intake_ready=True, latest_intake_blockers=0, latest_intake_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/2026-06-29-late-current-clean-subset-intake/pregame-drop-intake-status.json, latest_repeatability_status=repeatability_no_signal_clean_packets, clean_packets=0, clean_no_signal_packets=4, repeated_descriptors=0, latest_repeatability_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json, latest_repeatability_research_review_status=repeatability_research_review_blocked_threshold_not_met, stable_recurring_descriptors=0, same_slate_dates=[], latest_repeatability_research_review_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-repeatability-research-review-latest/type2-repeatability-research-review.json, latest_threshold_policy_status=threshold_policy_hold_current, current_threshold_count=0, max_abs_net_edge=0.02772647053226107, same_slate_date_count=1, best_lower_threshold=0.02, latest_threshold_policy_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-threshold-policy-review-latest/type2-threshold-policy-review.json, latest_settled_validation_status=settled_validation_no_policy_change_same_slate, valid_directional_rows=1239, directional_correct_rate=45.0%, current_threshold_count=0, same_slate_date_count=1, latest_settled_validation_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json, latest_closing_proxy_status=closing_proxy_same_slate_support_insufficient, paired_rows=819, current_threshold_count=0, same_slate_date_count=1, best_lower_threshold=0.025, best_lower_support=6, best_lower_against=0, latest_closing_proxy_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-closing-proxy-validation-latest/type2-closing-proxy-validation.json, latest_betexplorer_moneyline_status=betexplorer_moneyline_closing_comparison_ready_no_policy_change, matched_rows=22, current_threshold_count=0, converged=16, diverged=6, direction_support=17, direction_against=5, latest_betexplorer_moneyline_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-betexplorer-moneyline-closing-comparison-latest/type2-betexplorer-moneyline-closing-comparison.json, latest_betexplorer_market_status=betexplorer_market_closing_comparison_ready_no_policy_change, matched_rows=24, matched_by_market={'ml': 22, 'run_line': 2}, current_threshold_count=0, converged=16, diverged=8, direction_support=18, direction_against=6, latest_betexplorer_market_report=/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-betexplorer-market-closing-comparison-latest/type2-betexplorer-market-closing-comparison.json"
+    },
+    {
+      "blocked": true,
+      "missing_input": "Fresh validation/promotion evidence plus D3/G5/P5 external proof (3 blockers).",
+      "missing_input_specific": true,
+      "next_command_present": true,
+      "next_local_command": "cd /home/mrwatson/projects/atp-oracle && make type2-g1g2-diagnostic",
+      "proof_status": "pass",
+      "repo_id": "atp-oracle",
+      "status": "blocked_g1g2_model_quality_evidence",
+      "what_exists": "diagnostic_status=blocked_g1g2_model_quality_evidence, vision_score=93"
+    },
+    {
+      "blocked": true,
+      "missing_input": "New source-backed NBA signal or market dataset that can beat the current market-parity baseline; do not run new residual variants without that input.",
+      "missing_input_specific": true,
+      "next_command_present": true,
+      "next_local_command": "cd /home/mrwatson/projects/nba-analytics-platform && make macro-status",
+      "proof_status": "pass",
+      "repo_id": "nba-analytics-platform",
+      "status": "macro_partial_truth_shrinkage_clipped_residual_market_parity",
+      "what_exists": "router_priority=-11, gate_counts={'blocked': 3, 'fail': 0, 'pass': 11, 'warn': 0}"
+    },
+    {
+      "blocked": true,
+      "missing_input": "Forward-context evidence when due or manually dropped outside the repo: injuries, weather, official starting QBs/depth chart changes, and closing/reference line evidence. Current availability says these inputs are not yet due.",
+      "missing_input_specific": true,
+      "next_command_present": true,
+      "next_local_command": "cd /home/mrwatson/projects/nfl_quant_glm51_greenfield && make forward-context-availability && make macro-status",
+      "proof_status": "pass",
+      "repo_id": "nfl_quant_glm51_greenfield",
+      "status": "line_readiness_profiled_slate_forward_context_not_yet_due_research_only",
+      "what_exists": "router_priority=-5, gate_counts={'blocked': 0, 'fail': 0, 'pass': 11, 'warn': 4}"
+    }
+  ],
+  "live_calls_made": false,
+  "market_execution": false,
+  "next_action": "Blocker proof is incomplete for: predmarket-alpha.",
+  "provider_api_calls": false,
+  "raw_payloads_copied_to_repo": false,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true
+  },
+  "schema_version": 1,
+  "source_status_brief": {
+    "latest_decision_statuses": [
+      {
+        "priority": 31,
+        "repo_id": "predmarket-alpha",
+        "status": "kalshi_ev_review_queue_positive_candidates_need_robustness"
+      },
+      {
+        "priority": -3,
+        "repo_id": "atp-oracle",
+        "status": "tennis_type2_g1g2_diagnostic_ready_blocked_fresh_validation_external_evidence"
+      },
+      {
+        "priority": -4,
+        "repo_id": "mlb-platform",
+        "status": "primary_type2_betexplorer_market_closing_comparison_no_policy_change"
+      },
+      {
+        "priority": -5,
+        "repo_id": "nfl_quant_glm51_greenfield",
+        "status": "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+      },
+      {
+        "priority": -11,
+        "repo_id": "nba-analytics-platform",
+        "status": "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+      }
+    ],
+    "latest_status_repo_count": 5
+  },
+  "status": "macro_blocker_audit_incomplete",
+  "summary": {
+    "blocked_lane_count": 4,
+    "lane_count": 5,
+    "next_command_lane_count": 5,
+    "nfl_overlays_written": true,
+    "ready_nfl_target_match_count": 172,
+    "router_all_lanes_parked": false,
+    "router_recommended_repo_id": "predmarket-alpha",
+    "specific_missing_input_lane_count": 5,
+    "usable_ev_row_count": 12
+  }
+}

@@ -1,0 +1,44 @@
+{
+  "created_at_utc": "2026-06-29T22:49:44.062092Z",
+  "created_ts": 1782773384.062092,
+  "execution_enabled": false,
+  "inputs": {
+    "kalshi_json_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260629T224907Z.json",
+    "sportsbook_meta_path": "/home/mrwatson/manual_drops/odds_api/baseball_mlb_current_20260629T224907Z.meta.json",
+    "sportsbook_raw_path": "/home/mrwatson/manual_drops/odds_api/baseball_mlb_current_20260629T224907Z.json"
+  },
+  "policy": {
+    "kalshi_event_time_policy": "parse_event_ticker_as_america_new_york_start_time",
+    "matching_policy": "team_pair_plus_kalshi_event_time",
+    "max_event_delta_seconds": 180.0,
+    "provider_calls_allowed": false
+  },
+  "research_only": true,
+  "run_id": "type2-reference-builder-latest",
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_provider_payload_copied": false
+  },
+  "schema_version": 1,
+  "skipped_events": [
+    {
+      "away_team": "San Francisco Giants",
+      "commence_time": "2026-06-30T01:41:00Z",
+      "detail": "No Kalshi event matched San Francisco Giants at Arizona Diamondbacks.",
+      "home_team": "Arizona Diamondbacks",
+      "reason": "kalshi_event_not_matched"
+    }
+  ],
+  "status": "reference_built_with_warnings",
+  "summary": {
+    "duplicate_kalshi_ticker_count": 0,
+    "duplicate_kalshi_tickers": [],
+    "market_count": 52,
+    "max_event_match_delta_seconds": 60.0,
+    "skipped_event_count": 1,
+    "unique_kalshi_ticker_count": 52
+  }
+}

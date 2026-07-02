@@ -1,0 +1,179 @@
+{
+  "account_or_order_paths": false,
+  "authenticated_api_calls": false,
+  "capacity_rows": [],
+  "capture": {
+    "created_at_utc": "2026-07-02T18:16:53Z",
+    "status": "kalshi_public_orderbook_fetch_empty",
+    "summary": {
+      "error_count": 0,
+      "orderbook_count": 0
+    }
+  },
+  "database_writes": false,
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "replay_candidate_ready",
+      "reason": "Replay status is crypto_proxy_research_candidate_replay_blocked_predeployment_gates.",
+      "status": "pass"
+    },
+    {
+      "name": "current_candidates_present",
+      "reason": "0 current candidate row(s) selected.",
+      "status": "blocked"
+    },
+    {
+      "name": "raw_orderbook_dir_outside_repo",
+      "reason": "Raw public orderbook snapshots must stay outside the repo.",
+      "status": "pass"
+    },
+    {
+      "name": "public_orderbook_depth_present",
+      "reason": "0 orderbook(s), 0 error(s).",
+      "status": "blocked"
+    },
+    {
+      "name": "positive_capacity_depth",
+      "reason": "0.0 positive-depth contract(s), 0.0 cost notional.",
+      "status": "blocked"
+    },
+    {
+      "name": "correlation_cluster_limit",
+      "reason": "Largest cluster None has share None; max is 0.35.",
+      "status": "blocked"
+    },
+    {
+      "name": "decay_survival",
+      "reason": "Replay decay status recent_bucket_below_random, 4 bucket(s), 318 independent label(s). Recent bucket 2026-07-02T05:00Z accuracy 0.3333333333 (9 labels); cumulative accuracy 0.6 across 95 labels; 3/4 bucket(s) pass >= 0.5.",
+      "status": "blocked"
+    },
+    {
+      "name": "no_usable_sizing_or_execution",
+      "reason": "Capacity report remains research-only with zero usable rows and no sizing or execution.",
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-02T18:16:53Z",
+  "inputs": {
+    "candidate_selection_policy": "cluster_round_robin",
+    "depth": 0,
+    "feature_packet_path": "docs/codex/macro/latest-kalshi-crypto-proxy-feature-packet.json",
+    "feature_packet_status": "crypto_proxy_feature_packet_ready",
+    "max_close_hours": 6.0,
+    "max_tickers": 60,
+    "raw_orderbook_dir": "/home/mrwatson/manual_drops/kalshi_crypto_proxy_orderbooks",
+    "raw_orderbook_dir_outside_repo": true,
+    "replay_path": "docs/codex/macro/latest-kalshi-crypto-proxy-research-candidate-replay.json",
+    "replay_status": "crypto_proxy_research_candidate_replay_blocked_predeployment_gates"
+  },
+  "market_execution": false,
+  "method": {
+    "ask_derivation": "Orderbooks return YES/NO bids only; opposing bids are reciprocal asks.",
+    "boundary": "This report never emits usable rows, staking, sizing, execution, or account/order paths.",
+    "candidate_selection_rule": "Eligible current candidates are sorted inside each correlation cluster, then selected round-robin across clusters before truncating to the ticker cap.",
+    "correlation_rule": "Cluster current exposure by asset + contract family + close-time bucket.",
+    "decay_rule": "Require replay decay survival before paper overlay.",
+    "no_capacity_rule": "NO buy-side levels are derived from YES bids as no_ask = 1 - yes_bid.",
+    "orderbook_source": "Kalshi public market-data orderbook endpoint; unauthenticated.",
+    "positive_capacity_rule": "A level has positive capacity only if its fee-aware all-in break-even is below the conservative selected-side probability from the replay artifact.",
+    "yes_capacity_rule": "YES buy-side levels are derived from NO bids as yes_ask = 1 - no_bid."
+  },
+  "next_action": {
+    "name": "kalshi_crypto_proxy_decay_and_sample_accumulation",
+    "stop_condition": "Stop before lowering decay, sample, or correlation limits without an explicit policy review.",
+    "why": "Capacity/correlation/decay gates are not all passing yet."
+  },
+  "paid_calls": false,
+  "provider_api_calls": false,
+  "public_market_data_calls": true,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "execution_enabled": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": true,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "staking_or_sizing_guidance": false,
+  "status": "crypto_proxy_capacity_correlation_decay_blocked_no_current_candidates",
+  "summary": {
+    "asset_counts": {},
+    "candidate_cluster_count": 0,
+    "candidate_cluster_counts": {},
+    "candidate_row_count": 0,
+    "candidate_selection_policy": "cluster_round_robin",
+    "capacity_positive_row_count": 0,
+    "capacity_row_count": 0,
+    "capacity_status": "capacity_depth_missing_or_not_positive",
+    "conservative_calibrated_side_probability": 0.5156621967,
+    "correlation_cluster_count": 0,
+    "correlation_status": "correlation_cluster_concentrated_or_missing",
+    "decay_status": "decay_survival_blocked",
+    "feature_packet_status": "crypto_proxy_feature_packet_ready",
+    "gate_counts": {
+      "blocked": 5,
+      "pass": 3
+    },
+    "largest_correlation_cluster_cost": 0.0,
+    "largest_correlation_cluster_key": null,
+    "largest_correlation_cluster_share": null,
+    "max_cluster_share": 0.35,
+    "min_decay_buckets": 3,
+    "min_decay_labels": 100,
+    "min_positive_capacity_contracts": 1.0,
+    "orderbook_count": 0,
+    "orderbook_error_count": 0,
+    "positive_depth_contracts": 0.0,
+    "positive_depth_cost": 0.0,
+    "predicted_side_counts": {},
+    "replay_cumulative_decay_accuracy": 0.6,
+    "replay_decay_bucket_count": 4,
+    "replay_decay_buckets": [
+      {
+        "accuracy": 0.75,
+        "bucket": "2026-07-02T01:15Z",
+        "correct_count": 6,
+        "label_count": 8,
+        "pass_threshold": true
+      },
+      {
+        "accuracy": 0.8888888889,
+        "bucket": "2026-07-02T01:45Z",
+        "correct_count": 8,
+        "label_count": 9,
+        "pass_threshold": true
+      },
+      {
+        "accuracy": 0.5797101449,
+        "bucket": "2026-07-02T02:00Z",
+        "correct_count": 40,
+        "label_count": 69,
+        "pass_threshold": true
+      },
+      {
+        "accuracy": 0.3333333333,
+        "bucket": "2026-07-02T05:00Z",
+        "correct_count": 3,
+        "label_count": 9,
+        "pass_threshold": false
+      }
+    ],
+    "replay_decay_status": "recent_bucket_below_random",
+    "replay_independent_contract_label_count": 318,
+    "replay_passing_bucket_count": 3,
+    "replay_recent_bucket_accuracy": 0.3333333333,
+    "replay_recent_bucket_key": "2026-07-02T05:00Z",
+    "replay_recent_bucket_label_count": 9,
+    "replay_status": "crypto_proxy_research_candidate_replay_blocked_predeployment_gates",
+    "replay_total_decay_labels": 95,
+    "usable_row_count": 0
+  }
+}
