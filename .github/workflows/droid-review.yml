@@ -20,4 +20,4 @@ jobs:
       - name: Run Factory Droid code review
         uses: Factory-AI/droid-action@v1
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
+          github_token: ${{ secrets.GITHUB_TOKEN }}

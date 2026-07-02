@@ -75,13 +75,20 @@ jobs:
           python-version: "3.12"
       - name: Install Semgrep
         run: pip install semgrep
-      - name: Semgrep SAST scan with SARIF
+      - name: Semgrep SAST scan (SARIF)
         run: |
           semgrep scan \
             --config p/python \
             --config p/owasp-top-ten \
             --config p/command-injection \
             --sarif --output semgrep-results.sarif \
+            || true
+      - name: Semgrep SAST scan (JSON)
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/owasp-top-ten \
+            --config p/command-injection \
             --json --output semgrep-results.json \
             || true
       - name: Upload Semgrep SARIF to GitHub code scanning
