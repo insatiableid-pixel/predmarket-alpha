@@ -17,6 +17,6 @@ jobs:
           fetch-depth: 0
 
       - name: Run Factory Droid code review
-        uses: factory-ai/droid-review@v1
+        uses: Factory-AI/droid-action@v1
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
