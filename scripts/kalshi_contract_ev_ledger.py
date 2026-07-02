@@ -17,15 +17,15 @@ import hashlib
 import json
 import math
 import sys
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.feature_flags import FeatureFlag, is_enabled  # noqa: E402
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
@@ -103,7 +103,7 @@ ContractMapping = dict[str, Any]
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat().replace("+00:00", "Z")
 
 
 def load_active_universe(path: Path = ACTIVE_UNIVERSE_PATH) -> list[dict[str, Any]]:
@@ -128,6 +128,11 @@ def build_ledger(
     official_terms = load_official_terms_index(paths=official_terms_paths)
     calibrated_probabilities = load_calibrated_probability_index(paths=calibrated_probability_paths)
     contract_mappings = load_contract_mapping_index(paths=contract_mapping_paths)
+
+    # Feature flag: EV calibrated probability overlay enrichment. When enabled,
+    # each row gets an additional calibration cross-check comparing the overlay
+    # probability against break-even math. Disabled (default) = base overlay only.
+    overlay_enabled = is_enabled(FeatureFlag.EV_CALIBRATED_OVERLAY)
     rows: list[dict[str, Any]] = []
     feeds: list[dict[str, Any]] = []
     for repo in repos:
@@ -165,6 +170,22 @@ def build_ledger(
     for feed in feeds:
         gate = str(feed.get("gate_status") or "blocked")
         gate_counts[gate] = gate_counts.get(gate, 0) + 1
+
+    # Feature flag enrichment: cross-check calibrated probability against break-even.
+    overlay_cross_checks: list[dict[str, Any]] = []
+    if overlay_enabled:
+        for row in rows:
+            cal_prob = row.get("calibrated_probability")
+            break_even = row.get("all_in_break_even_probability")
+            ticker = row.get("contract_ticker", "")
+            if cal_prob is not None and break_even is not None:
+                overlay_cross_checks.append({
+                    "contract_ticker": ticker,
+                    "calibrated_probability": cal_prob,
+                    "break_even_probability": break_even,
+                    "margin": float(cal_prob) - float(break_even),
+                    "overlay_confirms_edge": float(cal_prob) > float(break_even),
+                })
 
     return {
         "schema_version": LEDGER_SCHEMA_VERSION,
@@ -217,6 +238,7 @@ def build_ledger(
             ),
             "effective_hold_probability": "all_in_break_even_probability - display_price",
             "margin_probability": "calibrated_probability - all_in_break_even_probability",
+            "ev_calibrated_overlay_enabled": overlay_enabled,
             "expected_value_per_contract": "calibrated_probability * payout_if_correct - all_in_cost",
             "expected_roi": "expected_value_per_contract / all_in_cost",
             "cost_basis_policy": (
@@ -237,6 +259,7 @@ def build_ledger(
         },
         "repo_feeds": feeds,
         "rows": rows,
+        "overlay_cross_checks": overlay_cross_checks if overlay_enabled else None,
         "next_action": next_action(feeds, rows),
         "safety": {
             "research_only": True,

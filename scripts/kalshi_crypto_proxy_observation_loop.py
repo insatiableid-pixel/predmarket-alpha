@@ -18,14 +18,16 @@ import sys
 import urllib.parse
 import urllib.request
 from collections import Counter
-from datetime import datetime, timezone
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping, Sequence
-
+from typing import Any
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
+
+from predmarket.feature_flags import FeatureFlag, is_enabled  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-crypto-proxy-feature-packet.json"
@@ -51,7 +53,17 @@ CSV_FIELDS = [
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def _safe_float(value: Any) -> float | None:
+    """Safely convert a value to float, returning None on failure."""
+    if value is None:
+        return None
+    try:
+        return float(value)
+    except (TypeError, ValueError):
+        return None
 
 
 def build_crypto_proxy_observation_loop(
@@ -93,6 +105,27 @@ def build_crypto_proxy_observation_loop(
         total_observation_count=len(all_observations),
         label_count=len(all_label_rows),
     )
+
+    # Feature flag: crypto proxy orderbook depth enrichment. When enabled,
+    # spread metrics are computed from the proxy ask vs. Kalshi yes_ask to
+    # flag observations where the orderbook depth suggests low fill confidence.
+    depth_enabled = is_enabled(FeatureFlag.CRYPTO_PROXY_ORDERBOOK_DEPTH)
+    depth_metrics: dict[str, Any] = {}
+    if depth_enabled and all_observations:
+        spreads = []
+        for row in all_observations:
+            ask = _safe_float(row.get("yes_ask"))
+            proxy = _safe_float(row.get("proxy_price"))
+            if ask is not None and proxy is not None and ask > 0:
+                spreads.append(abs(ask - proxy) / ask)
+        if spreads:
+            depth_metrics = {
+                "enabled": True,
+                "observed_spread_count": len(spreads),
+                "median_spread": sorted(spreads)[len(spreads) // 2],
+                "max_spread": max(spreads),
+                "mean_spread": sum(spreads) / len(spreads),
+            }
     gates = build_gates(
         feature_safe=feature_safe,
         observation_count=len(all_observations),
@@ -131,7 +164,9 @@ def build_crypto_proxy_observation_loop(
             "label_rule": "Attach outcomes only from public settled Kalshi market payloads matched by exact ticker.",
             "proxy_boundary": "Coinbase/public exchange data are model features only and never official settlement labels.",
             "ev_boundary": "This loop does not create calibrated probabilities, EV, usable rows, sizing, or orders.",
+            "orderbook_depth_enrichment": depth_enabled,
         },
+        "orderbook_depth": depth_metrics if depth_enabled else {"enabled": False},
         "summary": {
             "feature_packet_safe": feature_safe,
             "new_observation_row_count": len(new_observations),
@@ -260,7 +295,7 @@ def capture_public_observed_markets_snapshot(
             continue
         try:
             payload = fetch(f"{KALSHI_PUBLIC_BASE_URL}/markets/{urllib.parse.quote(ticker, safe='')}")
-        except Exception as exc:  # noqa: BLE001 - public fetch failures belong in the artifact, not stderr.
+        except Exception as exc:
             probe_errors.append({"ticker": ticker, "error": f"{type(exc).__name__}: {exc}"})
             continue
         market = payload.get("market") if isinstance(payload, Mapping) else None
@@ -315,7 +350,7 @@ def due_observed_tickers(
     if safe_research_artifact(feature_packet):
         rows.extend(feature_observations(feature_packet, feature_packet_path=feature_packet_path))
     rows.extend(load_packets(observation_dir)["rows"])
-    cutoff = timestamp(generated_utc) or datetime.now(timezone.utc).timestamp()
+    cutoff = timestamp(generated_utc) or datetime.now(UTC).timestamp()
     output: list[str] = []
     seen: set[str] = set()
     for row in rows:
@@ -331,7 +366,7 @@ def due_observed_tickers(
 
 
 def observation_due_summary(rows: Sequence[Mapping[str, Any]], *, generated_utc: str) -> dict[str, Any]:
-    cutoff = timestamp(generated_utc) or datetime.now(timezone.utc).timestamp()
+    cutoff = timestamp(generated_utc) or datetime.now(UTC).timestamp()
     due_rows = 0
     due_contracts: set[str] = set()
     not_due_contracts: set[str] = set()
@@ -781,7 +816,7 @@ def packet_rows(value: Any) -> list[Mapping[str, Any]]:
 
 
 def observation_id(*, ticker: str, decision_time: str, source_row_index: int) -> str:
-    material = f"{ticker}|{decision_time}|{source_row_index}".encode("utf-8")
+    material = f"{ticker}|{decision_time}|{source_row_index}".encode()
     return "crypto_obs_" + hashlib.sha256(material).hexdigest()[:20]
 
 
@@ -832,18 +867,18 @@ def timestamp(value: Any) -> float | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
     return parsed.timestamp()
 
 
 def iso_from_timestamp(value: float | None) -> str | None:
     if value is None:
         return None
-    return datetime.fromtimestamp(value, timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.fromtimestamp(value, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def bucket_time(value: float) -> str:
-    parsed = datetime.fromtimestamp(value, timezone.utc).replace(second=0, microsecond=0)
+    parsed = datetime.fromtimestamp(value, UTC).replace(second=0, microsecond=0)
     minute = (parsed.minute // 15) * 15
     return parsed.replace(minute=minute).isoformat(timespec="minutes").replace("+00:00", "Z")
 
@@ -852,7 +887,7 @@ def iso_time(value: Any) -> str | None:
     ts = timestamp(value)
     if ts is None:
         return None
-    return datetime.fromtimestamp(ts, timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.fromtimestamp(ts, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def counts(values: Sequence[Any]) -> dict[str, int]:

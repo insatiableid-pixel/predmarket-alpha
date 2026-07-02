@@ -19,10 +19,10 @@ import sys
 import time
 import urllib.request
 from collections import Counter
-from datetime import datetime, timezone
+from collections.abc import Callable, Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Callable, Mapping, Sequence
-
+from typing import Any
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
@@ -120,7 +120,7 @@ CRYPTO_PROXY_PROBES: tuple[tuple[str, str, str, Callable[[Any], dict[str, Any]]]
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def build_probability_breadth_scout(
@@ -300,7 +300,7 @@ def probe_crypto_proxy_sources(
                 "url": url,
                 "payload": payload,
             }
-        except Exception as exc:  # noqa: BLE001 - source probes are report evidence.
+        except Exception as exc:
             shaped = {}
             status = "unavailable"
             error = f"{type(exc).__name__}: {str(exc)[:240]}"

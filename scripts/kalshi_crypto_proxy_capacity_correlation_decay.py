@@ -681,7 +681,7 @@ def write_csv(report: Mapping[str, Any], path: Path) -> None:
 
 def fetch_json_url(url: str) -> Any:
     request = urllib.request.Request(url, headers={"accept": "application/json"})
-    with urllib.request.urlopen(request, timeout=20) as response:  # noqa: S310 - public fixed API URL
+    with urllib.request.urlopen(request, timeout=20) as response:
         return json.loads(response.read().decode("utf-8"))
 
 

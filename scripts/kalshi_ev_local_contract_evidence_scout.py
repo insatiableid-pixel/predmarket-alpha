@@ -14,10 +14,10 @@ import argparse
 import hashlib
 import json
 import re
-from datetime import datetime, timedelta, timezone
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Mapping, Sequence
-
+from typing import Any
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
@@ -114,7 +114,7 @@ TEAM_SUFFIX_ALIASES: dict[str, tuple[str, ...]] = {
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def build_local_contract_evidence_scout(
@@ -447,8 +447,8 @@ def parse_utc_datetime(value: str | None) -> datetime | None:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        return parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        return parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
 def local_contract_evidence_gates(

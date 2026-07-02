@@ -50,11 +50,24 @@ jobs:
       - name: Duplicate-code analysis (jscpd, advisory)
         continue-on-error: true
         run: npx --yes jscpd predmarket scripts main.py
+      - name: Dead feature flag check
+        run: PYTHONPATH=. python3 scripts/check_feature_flags.py --check
+        continue-on-error: true
+      - name: Collect quality metrics
+        run: |
+          mkdir -p .tmp
+          PYTHONPATH=. python3 scripts/collect_quality_metrics.py --output .tmp/quality-metrics.json
+      - name: Upload quality metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-metrics
+          path: .tmp/quality-metrics.json
 
   security-review:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      security-events: write
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
@@ -68,6 +81,11 @@ jobs:
             p/owasp-top-ten
             p/command-injection
           generateSarifReport: "1"
+      - name: Upload Semgrep SARIF to GitHub code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep.sarif
       - name: Gitleaks secret scan
         uses: gitleaks/gitleaks-action@v2
         env:
@@ -81,6 +99,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Record start time
+        id: timer
+        run: echo "start=$(date +%s)" >> $GITHUB_OUTPUT
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -111,6 +133,24 @@ jobs:
         with:
           name: coverage-report
           path: coverage.xml
+
+      - name: Record build metrics
+        if: matrix.python-version == '3.12'
+        run: |
+          mkdir -p .tmp
+          END_TIME=$(date +%s)
+          echo "BUILD_DURATION=${END_TIME}-${{ steps.timer.outputs.start }}" >> $GITHUB_ENV
+          PYTHONPATH=. python3 scripts/record_build_metrics.py --output .tmp/build-metrics.json --job-name test
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Upload build metrics
+        uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.12'
+        with:
+          name: build-metrics
+          path: .tmp/build-metrics.json
 
       - name: Run integration tests
         run: |

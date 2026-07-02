@@ -5,10 +5,10 @@ from __future__ import annotations
 
 import argparse
 import json
-from datetime import datetime, timezone
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Mapping, Optional, Sequence
-
+from typing import Any
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 DEFAULT_MANUAL_DROPS = Path("/home/mrwatson/manual_drops")
@@ -16,7 +16,7 @@ DEFAULT_MLB_REPO = Path("/home/mrwatson/projects/mlb-platform")
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def build_unlock_scout(
@@ -24,7 +24,7 @@ def build_unlock_scout(
     control_repo: Path = CONTROL_REPO,
     manual_drops: Path = DEFAULT_MANUAL_DROPS,
     mlb_repo: Path = DEFAULT_MLB_REPO,
-    as_of_utc: Optional[str] = None,
+    as_of_utc: str | None = None,
 ) -> dict[str, Any]:
     latest_decision = _read_json(control_repo / "docs/codex/macro/latest-decision.json")
     predmarket_builder = _read_json(control_repo / "docs/codex/artifacts/type2-reference-builder-latest/type2-reference-builder-latest.json")
@@ -966,7 +966,7 @@ def _read_json(path: Path) -> dict[str, Any]:
     return dict(payload) if isinstance(payload, Mapping) else {}
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Write a local-only macro unlock scout report.")
     parser.add_argument("--control-repo", default=str(CONTROL_REPO))
     parser.add_argument("--manual-drops", default=str(DEFAULT_MANUAL_DROPS))

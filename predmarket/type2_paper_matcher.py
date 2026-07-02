@@ -17,6 +17,8 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
 
+from predmarket.feature_flags import FeatureFlag, is_enabled
+
 
 @dataclass(frozen=True)
 class Type2PaperMatcherArtifacts:
@@ -114,6 +116,25 @@ def build_type2_paper_match_report(
 
     counts = _status_counts(candidates)
     report_status = _report_status(candidates, blockers, sportsbook_payload)
+
+    # Feature flag: real-time enhanced matching with tighter divergence thresholds.
+    # When enabled, run a secondary pass at half the divergence threshold to catch
+    # smaller mispricings that would be filtered in the standard batch pass.
+    real_time_enabled = is_enabled(FeatureFlag.TYPE2_REAL_TIME_MATCHER)
+    enhanced_candidates: List[Dict[str, Any]] = []
+    if real_time_enabled and references:
+        enhanced_threshold = min_net_divergence / 2.0
+        for reference in references:
+            candidate, _ = _candidate_from_reference(
+                reference,
+                row_by_ticker=row_by_ticker,
+                min_net_divergence=enhanced_threshold,
+                uncertainty_buffer=uncertainty_buffer,
+            )
+            if candidate is not None and candidate not in candidates:
+                candidate["matching_mode"] = "enhanced_real_time"
+                enhanced_candidates.append(candidate)
+
     report = {
         "schema_version": 1,
         "run_id": run_id
@@ -146,15 +167,18 @@ def build_type2_paper_match_report(
             "uncertainty_buffer": float(uncertainty_buffer),
             "matching_policy": "explicit_kalshi_ticker_only",
             "no_vig_method": "two_outcome_symmetric_overround_removal",
+            "real_time_matcher_enabled": real_time_enabled,
         },
         "summary": {
             "candidate_count": len(candidates),
+            "enhanced_candidate_count": len(enhanced_candidates),
             "review_only_pass": counts.get("REVIEW_ONLY_PASS", 0),
             "review_only_watch": counts.get("REVIEW_ONLY_WATCH", 0),
             "review_only_blocked": counts.get("REVIEW_ONLY_BLOCKED", 0),
             "blocker_count": len(blockers),
         },
         "candidates": candidates,
+        "enhanced_candidates": enhanced_candidates,
         "blockers": blockers,
     }
     return report

@@ -76,7 +76,14 @@ def main() -> int:
             cmd.extend(["--color", color, "--description", desc])
             result = subprocess.run(cmd, capture_output=True, text=True, cwd=ROOT)
             if result.returncode != 0:
-                print(f"    ERROR: {result.stderr.strip()}", file=sys.stderr)
+                # gh label edit may not support --force; retry without it
+                if existing is not None:
+                    cmd_retry = ["gh", "label", "edit", name, "--color", color, "--description", desc]
+                    result = subprocess.run(cmd_retry, capture_output=True, text=True, cwd=ROOT)
+                if result.returncode != 0:
+                    print(f"    ERROR: {result.stderr.strip()}", file=sys.stderr)
+                else:
+                    updated += 1
             else:
                 created += 1 if existing is None else 0
                 updated += 1 if existing is not None else 0

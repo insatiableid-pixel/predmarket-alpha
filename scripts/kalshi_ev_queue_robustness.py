@@ -7,19 +7,17 @@ import argparse
 import csv
 import hashlib
 import json
-from datetime import datetime, timezone
-from pathlib import Path
-from typing import Any, Mapping, Sequence
-
 import sys
-
+from collections.abc import Mapping, Sequence
+from datetime import UTC, datetime
+from pathlib import Path
+from typing import Any
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
-
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_QUEUE_PATH = MACRO_DIR / "latest-kalshi-ev-review-queue.json"
@@ -43,7 +41,7 @@ CSV_FIELDS = [
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def build_queue_robustness(

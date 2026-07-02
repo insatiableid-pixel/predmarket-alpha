@@ -1,4 +1,4 @@
-.PHONY: setup check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen validate-agents sync-labels quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
+.PHONY: setup check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen feature-flags-check validate-agents sync-labels quality-metrics quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
 
 # Default target
 help:
@@ -283,7 +283,7 @@ file-sizes-regen:
 	@PYTHONPATH=. $(PYTHON) scripts/check_file_sizes.py --regen
 
 # Aggregate: run every configured code-quality gate.
-quality: lint typecheck modularize deadcode deptry tech-debt-check file-sizes-check validate-agents
+quality: lint typecheck modularize deadcode deptry tech-debt-check file-sizes-check feature-flags-check validate-agents
 	@echo "All code-quality gates reported (some are advisory; see output above)."
 
 deptry:
@@ -293,6 +293,15 @@ deptry:
 
 validate-agents:
 	@PYTHONPATH=. $(PYTHON) scripts/validate_agents_md.py --check
+
+feature-flags-check:
+	@PYTHONPATH=. $(PYTHON) scripts/check_feature_flags.py
+
+quality-metrics:
+	@echo "Collecting code-quality metrics..."
+	@mkdir -p .tmp
+	@PYTHONPATH=. $(PYTHON) scripts/collect_quality_metrics.py --output .tmp/quality-metrics.json
+	@echo "Quality metrics written to .tmp/quality-metrics.json"
 
 sync-labels:
 	@PYTHONPATH=. $(PYTHON) scripts/sync_labels.py --apply

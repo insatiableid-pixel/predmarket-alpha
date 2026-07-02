@@ -14,10 +14,9 @@ import re
 import subprocess
 import sys
 from collections import Counter
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
-
 
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
@@ -719,7 +718,7 @@ PARKED_UNLOCKS: dict[str, str] = {
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def load_universe() -> dict[str, Any]:
