@@ -1,0 +1,77 @@
+{
+  "blocked_hypothesis_count": 36,
+  "execution_enabled": false,
+  "gate_counts": {
+    "blocked": 3,
+    "fail": 0,
+    "pass": 4,
+    "warn": 0
+  },
+  "gates": [
+    {
+      "name": "universe_inventory_safe",
+      "reason": "Universe inventory is research-only and available.",
+      "status": "pass"
+    },
+    {
+      "name": "hypothesis_registry_nonempty",
+      "reason": "36 hypothesis candidate(s) generated.",
+      "status": "pass"
+    },
+    {
+      "name": "contract_ev_cost_surface_available",
+      "reason": "EV ledger is available for all-in break-even costs.",
+      "status": "pass"
+    },
+    {
+      "name": "labeled_oos_evidence_available",
+      "reason": "No labeled outcomes/backtest packet exists for these hypothesis IDs.",
+      "status": "blocked"
+    },
+    {
+      "name": "walk_forward_or_purged_split",
+      "reason": "No time-safe split packet exists; random/k-fold validation is not acceptable.",
+      "status": "blocked"
+    },
+    {
+      "name": "fdr_multiple_testing_control",
+      "reason": "No Benjamini-Hochberg/BY or equivalent q-value packet exists for the tested family.",
+      "status": "blocked"
+    },
+    {
+      "name": "promotion_disabled_until_falsified",
+      "reason": "All generated hypotheses remain candidate_unvalidated.",
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-01T23:18:48Z",
+  "promoted_hypothesis_count": 0,
+  "registered_hypothesis_count": 36,
+  "rejected_hypothesis_count": 0,
+  "required_method": {
+    "costs": "all_in_kalshi_break_even_from_ev_ledger",
+    "minimum_policy": "promotion requires OOS survival after costs and FDR correction",
+    "multiple_testing": "fdr_controlled_q_values",
+    "split": "walk_forward_or_purged_oos"
+  },
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "source_artifacts": [
+    "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+    "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json"
+  ],
+  "status": "falsification_gate_blocked_missing_labeled_oos_evidence",
+  "tested_hypothesis_count": 0
+}

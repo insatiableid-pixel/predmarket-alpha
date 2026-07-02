@@ -1,0 +1,69 @@
+name: Error-to-Issue Triage
+
+on:
+  workflow_dispatch:
+    inputs:
+      error_type:
+        description: "Error type to triage"
+        required: true
+        default: "test_failure"
+      error_message:
+        description: "Error message"
+        required: true
+      context:
+        description: "Additional context (JSON)"
+        required: false
+        default: "{}"
+  schedule:
+    # Run daily at 09:00 UTC to check for CI failures
+    - cron: "0 9 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  create-issue-from-error:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Check for recent CI failures
+        id: check-failures
+        run: |
+          # Check if the most recent CI run failed
+          RUN_STATUS=$(gh run list --workflow=ci.yml --limit 1 --json conclusion --jq '.[0].conclusion' 2>/dev/null || echo "unknown")
+          echo "status=$RUN_STATUS" >> $GITHUB_OUTPUT
+          if [ "$RUN_STATUS" = "failure" ]; then
+            echo "should_create=true" >> $GITHUB_OUTPUT
+          else
+            echo "should_create=false" >> $GITHUB_OUTPUT
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Search for existing issue
+        if: steps.check-failures.outputs.should_create == 'true'
+        id: search
+        run: |
+          EXISTING=$(gh issue list --search "CI failure in:title" --state open --json number --jq 'length')
+          echo "existing=$EXISTING" >> $GITHUB_OUTPUT
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create issue from CI failure
+        if: steps.check-failures.outputs.should_create == 'true' && steps.search.outputs.existing == '0'
+        run: |
+          gh issue create \
+            --title "CI failure detected: automated triage $(date -u +%Y-%m-%d)" \
+            --label "bug,P1-high,area-infra" \
+            --body "## Automated CI Failure Report
+
+          The most recent CI run on \`main\` failed.
+
+          **Action needed:** Review the [CI run logs](${{ github.server_url }}/${{ github.repository }}/actions) and fix the failing job.
+
+          This issue was created automatically by the error-triage workflow.
+          "
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

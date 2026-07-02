@@ -1,0 +1,4389 @@
+{
+  "account_or_order_paths": false,
+  "authenticated_api_calls": false,
+  "database_writes": false,
+  "execution_enabled": false,
+  "falsification_gate": {
+    "blocked_hypothesis_count": 36,
+    "execution_enabled": false,
+    "gate_counts": {
+      "blocked": 3,
+      "fail": 0,
+      "pass": 4,
+      "warn": 0
+    },
+    "gates": [
+      {
+        "name": "universe_inventory_safe",
+        "reason": "Universe inventory is research-only and available.",
+        "status": "pass"
+      },
+      {
+        "name": "hypothesis_registry_nonempty",
+        "reason": "36 hypothesis candidate(s) generated.",
+        "status": "pass"
+      },
+      {
+        "name": "contract_ev_cost_surface_available",
+        "reason": "EV ledger is available for all-in break-even costs.",
+        "status": "pass"
+      },
+      {
+        "name": "labeled_oos_evidence_available",
+        "reason": "No labeled outcomes/backtest packet exists for these hypothesis IDs.",
+        "status": "blocked"
+      },
+      {
+        "name": "walk_forward_or_purged_split",
+        "reason": "No time-safe split packet exists; random/k-fold validation is not acceptable.",
+        "status": "blocked"
+      },
+      {
+        "name": "fdr_multiple_testing_control",
+        "reason": "No Benjamini-Hochberg/BY or equivalent q-value packet exists for the tested family.",
+        "status": "blocked"
+      },
+      {
+        "name": "promotion_disabled_until_falsified",
+        "reason": "All generated hypotheses remain candidate_unvalidated.",
+        "status": "pass"
+      }
+    ],
+    "generated_utc": "2026-07-01T23:18:48Z",
+    "promoted_hypothesis_count": 0,
+    "registered_hypothesis_count": 36,
+    "rejected_hypothesis_count": 0,
+    "required_method": {
+      "costs": "all_in_kalshi_break_even_from_ev_ledger",
+      "minimum_policy": "promotion requires OOS survival after costs and FDR correction",
+      "multiple_testing": "fdr_controlled_q_values",
+      "split": "walk_forward_or_purged_oos"
+    },
+    "research_only": true,
+    "safety": {
+      "account_or_order_paths": false,
+      "authenticated_api_calls": false,
+      "database_writes": false,
+      "market_execution": false,
+      "paid_calls": false,
+      "provider_api_calls": false,
+      "public_market_data_calls": false,
+      "raw_payloads_copied_to_repo": false,
+      "research_only": true,
+      "staking_or_sizing_guidance": false
+    },
+    "schema_version": 1,
+    "source_artifacts": [
+      "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json"
+    ],
+    "status": "falsification_gate_blocked_missing_labeled_oos_evidence",
+    "tested_hypothesis_count": 0
+  },
+  "generated_utc": "2026-07-01T23:18:48Z",
+  "hypotheses": [
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 78,
+      "classification": "macro_econ",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.8",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.9",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.2
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.0",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.58
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.1",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.15
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.6",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.26
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "release calendar timestamps",
+        "official economic release values"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_0026becd89f452f5",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "macro_econ",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::macro_econ::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "macro_econ_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 519,
+      "classification": "weather",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXRAINNYC-26JUL01",
+          "no_ask": 0.7,
+          "softness_score": 1.0,
+          "ticker": "KXRAINNYC-26JUL01-T0",
+          "time_to_close_hours": 5.1678,
+          "title": "Will it **rain** in New York City on Wednesday?",
+          "yes_ask": 0.48
+        },
+        {
+          "event_ticker": "KXWCDELAY-26JUL01USABIH",
+          "no_ask": 1.0,
+          "softness_score": 0.99,
+          "ticker": "KXWCDELAY-26JUL01USABIH-YES",
+          "time_to_close_hours": 5.1678,
+          "title": "USA vs Bosnia and Herzegovina: Weather Delay",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXLOWTMIA-26JUL01",
+          "no_ask": 0.46,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTMIA-26JUL01-B78.5",
+          "time_to_close_hours": 6.1844,
+          "title": "Will the minimum temperature be 78-79\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXHIGHTSEA-26JUL01",
+          "no_ask": 0.76,
+          "softness_score": 0.93,
+          "ticker": "KXHIGHTSEA-26JUL01-B64.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the maximum temperature be 64-65\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.34
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.84,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B53.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 53-54\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.35
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "station/location official weather observations",
+        "forecast snapshots available before close"
+      ],
+      "feature_family": "simple_rule_external_reference",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_0c24ec46f1b99258",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains simple_rule_external_reference",
+        "classification": "weather",
+        "feature_family": "simple_rule_external_reference",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::weather::simple_rule_external_reference",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Simple-rule markets with public external references have measurable crowd miscalibration.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "weather_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 453,
+      "classification": "unknown_soft_watch",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.6,
+          "softness_score": 1.0,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-205000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXTEMPHELP-26JUL02",
+          "no_ask": 0.17,
+          "softness_score": 1.0,
+          "ticker": "KXTEMPHELP-26JUL02-T2.480",
+          "time_to_close_hours": 14.6678,
+          "title": "Will All Employees, Temporary Help Services for June 2026 be above 2.480\u3164 million\u3164?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.15,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-200000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.61,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-220000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.52
+        },
+        {
+          "event_ticker": "KXCOPPERW-26JUL0217",
+          "no_ask": 0.24,
+          "softness_score": 0.93,
+          "ticker": "KXCOPPERW-26JUL0217-T5.48",
+          "time_to_close_hours": 22.1844,
+          "title": "Will the copper close price be above 5.48 USD/Lbs on July 02, 2026 at 5:00 PM EDT?",
+          "yes_ask": 1.0
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_0c315ac9fcb25567",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "unknown_soft_watch",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::unknown_soft_watch::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "unknown_soft_watch_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 678,
+      "classification": "unknown_soft_watch",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.6,
+          "softness_score": 1.0,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-205000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXTEMPHELP-26JUL02",
+          "no_ask": 0.17,
+          "softness_score": 1.0,
+          "ticker": "KXTEMPHELP-26JUL02-T2.480",
+          "time_to_close_hours": 14.6678,
+          "title": "Will All Employees, Temporary Help Services for June 2026 be above 2.480\u3164 million\u3164?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.15,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-200000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.61,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-220000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.52
+        },
+        {
+          "event_ticker": "KXCOPPERW-26JUL0217",
+          "no_ask": 0.24,
+          "softness_score": 0.93,
+          "ticker": "KXCOPPERW-26JUL0217-T5.48",
+          "time_to_close_hours": 22.1844,
+          "title": "Will the copper close price be above 5.48 USD/Lbs on July 02, 2026 at 5:00 PM EDT?",
+          "yes_ask": 1.0
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_1b14090ab1b720a9",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "unknown_soft_watch",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::unknown_soft_watch::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "unknown_soft_watch_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 12,
+      "classification": "nfl",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "all_in_break_even_probability": 0.6758000000000001,
+          "calibrated_probability": 0.6916445527276855,
+          "contract_ticker": "KXNFLGAME-26SEP09NESEA-SEA",
+          "gate_status": "pass",
+          "margin_probability": 0.01584455272768548,
+          "side": "yes",
+          "title": "SEA to beat NE"
+        },
+        {
+          "all_in_break_even_probability": 0.2008,
+          "calibrated_probability": 0.2081959141556554,
+          "contract_ticker": "KXNFLGAME-26SEP13ARILAC-ARI",
+          "gate_status": "pass",
+          "margin_probability": 0.007395914155655381,
+          "side": "yes",
+          "title": "ARI to beat LAC"
+        },
+        {
+          "all_in_break_even_probability": 0.6168,
+          "calibrated_probability": 0.6208232209366369,
+          "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-PIT",
+          "gate_status": "pass",
+          "margin_probability": 0.004023220936636873,
+          "side": "yes",
+          "title": "PIT to beat ATL"
+        },
+        {
+          "all_in_break_even_probability": 0.3965,
+          "calibrated_probability": 0.4153365117504308,
+          "contract_ticker": "KXNFLGAME-26SEP13BALIND-IND",
+          "gate_status": "pass",
+          "margin_probability": 0.018836511750430773,
+          "side": "yes",
+          "title": "IND to beat BAL"
+        },
+        {
+          "all_in_break_even_probability": 0.5275,
+          "calibrated_probability": 0.5357079846401166,
+          "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-HOU",
+          "gate_status": "pass",
+          "margin_probability": 0.008207984640116628,
+          "side": "yes",
+          "title": "HOU to beat BUF"
+        }
+      ],
+      "external_data_requirements": [
+        "settled contract outcomes",
+        "historical Kalshi quotes captured before decision time",
+        "model probabilities generated before market close",
+        "all-in execution cost estimates or verified ticket costs"
+      ],
+      "feature_family": "legacy_positive_margin_survival",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_1bd309192b72429c",
+      "market_universe_filter": {
+        "feature_family": "legacy_positive_margin_survival",
+        "market_type": "nfl_game_moneyline",
+        "source_repo_id": "nfl_quant_glm51_greenfield"
+      },
+      "model_route": "nfl_quant_glm51_greenfield",
+      "multiple_testing_family": "ev_ledger::nfl_quant_glm51_greenfield::nfl_game_moneyline::legacy_positive_margin_survival",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Calibrated model probability minus all-in Kalshi break-even remains positive after repeat snapshots, settlement, and cost-aware out-of-sample validation.",
+      "source": "contract_ev_ledger",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json",
+      "source_artifact_sha256": "sha256:7e6bb75d 7467fe34 cec2595f 8b05a86a f0b6a68d 04cfc486 ab7deb3d 669753e0",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "nfl_game_moneyline",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 393,
+      "classification": "mlb",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXKBOTOTAL-26JUN300530KTWHAN",
+          "no_ask": 0.45,
+          "softness_score": 0.89,
+          "ticker": "KXKBOTOTAL-26JUN300530KTWHAN-8",
+          "time_to_close_hours": 10.6844,
+          "title": "Over 7.5 runs scored?",
+          "yes_ask": 0.96
+        },
+        {
+          "event_ticker": "KXKBORFI-26JUN300530KTWHAN",
+          "no_ask": 0.2,
+          "softness_score": 0.81,
+          "ticker": "KXKBORFI-26JUN300530KTWHAN-Y",
+          "time_to_close_hours": 10.6844,
+          "title": "KT Wiz vs Hanwha Eagles: First Inning Run?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.84,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 1.5 runs?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.74,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN3",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 2.5 runs?",
+          "yes_ask": 0.83
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.99,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-KTW2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the KT Wiz win by over 1.5 runs?",
+          "yes_ask": 0.69
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "game/prop model probabilities generated before close",
+        "official settled game results"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_2583bc509f86cd04",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "mlb",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "mlb-platform"
+      },
+      "model_route": "mlb-platform",
+      "multiple_testing_family": "universe::mlb::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "mlb_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 13,
+      "classification": "politics_policy",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02-24.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will House Of Balloons by The Weeknd have above 24,654,903 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02-38.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will Harry's House by Harry Styles have above 38,658,074 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.98,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-39.6",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be below 39.6 according to RealClearPolitics?",
+          "yes_ask": 0.03
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.98,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-39.7",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be between 39.6 and 39.8 according to RealClearPolitics?",
+          "yes_ask": 0.03
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.97,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-40.0",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be between 39.9 and 40.1 according to RealClearPolitics?",
+          "yes_ask": 0.04
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "official resolution source timeline",
+        "timestamped public polling/news features"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_2d8d392bed55f6f5",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "politics_policy",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::politics_policy::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "politics_policy_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 3788,
+      "classification": "finance_crypto",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXAAAGASD-26JUL02",
+          "no_ask": 0.16,
+          "softness_score": 1.0,
+          "ticker": "KXAAAGASD-26JUL02-3.810",
+          "time_to_close_hours": 5.1678,
+          "title": "Will average **gas prices** be above $3.810?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.127",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12600 and 1.12799 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.31
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.99,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.129",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12800 and 1.12999 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.17
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.98,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.131",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13000 and 1.13199 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.3
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.96,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.133",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13200 and 1.13399 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "reference asset price snapshots",
+        "official settlement source values"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_348e374aac7a5809",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "finance_crypto",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::finance_crypto::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "finance_crypto_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 997,
+      "classification": "finance_crypto",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXAAAGASD-26JUL02",
+          "no_ask": 0.16,
+          "softness_score": 1.0,
+          "ticker": "KXAAAGASD-26JUL02-3.810",
+          "time_to_close_hours": 5.1678,
+          "title": "Will average **gas prices** be above $3.810?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.127",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12600 and 1.12799 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.31
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.99,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.129",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12800 and 1.12999 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.17
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.98,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.131",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13000 and 1.13199 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.3
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.96,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.133",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13200 and 1.13399 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "reference asset price snapshots",
+        "official settlement source values"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_38f513b2111a83f3",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "finance_crypto",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::finance_crypto::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "finance_crypto_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 799,
+      "classification": "finance_crypto",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXAAAGASD-26JUL02",
+          "no_ask": 0.16,
+          "softness_score": 1.0,
+          "ticker": "KXAAAGASD-26JUL02-3.810",
+          "time_to_close_hours": 5.1678,
+          "title": "Will average **gas prices** be above $3.810?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.127",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12600 and 1.12799 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.31
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.99,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.129",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12800 and 1.12999 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.17
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.98,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.131",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13000 and 1.13199 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.3
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.96,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.133",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13200 and 1.13399 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "reference asset price snapshots",
+        "official settlement source values"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_3ad9e636ba317514",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "finance_crypto",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::finance_crypto::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "finance_crypto_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 95,
+      "classification": "macro_econ",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.8",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.9",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.2
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.0",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.58
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.1",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.15
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.6",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.26
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "release calendar timestamps",
+        "official economic release values"
+      ],
+      "feature_family": "simple_rule_external_reference",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_4abf938760fed85d",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains simple_rule_external_reference",
+        "classification": "macro_econ",
+        "feature_family": "simple_rule_external_reference",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::macro_econ::simple_rule_external_reference",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Simple-rule markets with public external references have measurable crowd miscalibration.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "macro_econ_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 3109,
+      "classification": "finance_crypto",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXAAAGASD-26JUL02",
+          "no_ask": 0.16,
+          "softness_score": 1.0,
+          "ticker": "KXAAAGASD-26JUL02-3.810",
+          "time_to_close_hours": 5.1678,
+          "title": "Will average **gas prices** be above $3.810?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.127",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12600 and 1.12799 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.31
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.99,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.129",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12800 and 1.12999 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.17
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.98,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.131",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13000 and 1.13199 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.3
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.96,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.133",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13200 and 1.13399 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "reference asset price snapshots",
+        "official settlement source values"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_519e5ae02dcbb283",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "finance_crypto",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::finance_crypto::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "finance_crypto_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 494,
+      "classification": "weather",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXRAINNYC-26JUL01",
+          "no_ask": 0.7,
+          "softness_score": 1.0,
+          "ticker": "KXRAINNYC-26JUL01-T0",
+          "time_to_close_hours": 5.1678,
+          "title": "Will it **rain** in New York City on Wednesday?",
+          "yes_ask": 0.48
+        },
+        {
+          "event_ticker": "KXLOWTMIA-26JUL01",
+          "no_ask": 0.46,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTMIA-26JUL01-B78.5",
+          "time_to_close_hours": 6.1844,
+          "title": "Will the minimum temperature be 78-79\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXHIGHTSEA-26JUL01",
+          "no_ask": 0.76,
+          "softness_score": 0.93,
+          "ticker": "KXHIGHTSEA-26JUL01-B64.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the maximum temperature be 64-65\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.34
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.84,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B53.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 53-54\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.35
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.32,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B55.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 55-56\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.93
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "station/location official weather observations",
+        "forecast snapshots available before close"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_522612ff0b988fcd",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "weather",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::weather::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "weather_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 519,
+      "classification": "weather",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXRAINNYC-26JUL01",
+          "no_ask": 0.7,
+          "softness_score": 1.0,
+          "ticker": "KXRAINNYC-26JUL01-T0",
+          "time_to_close_hours": 5.1678,
+          "title": "Will it **rain** in New York City on Wednesday?",
+          "yes_ask": 0.48
+        },
+        {
+          "event_ticker": "KXWCDELAY-26JUL01USABIH",
+          "no_ask": 1.0,
+          "softness_score": 0.99,
+          "ticker": "KXWCDELAY-26JUL01USABIH-YES",
+          "time_to_close_hours": 5.1678,
+          "title": "USA vs Bosnia and Herzegovina: Weather Delay",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXLOWTMIA-26JUL01",
+          "no_ask": 0.46,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTMIA-26JUL01-B78.5",
+          "time_to_close_hours": 6.1844,
+          "title": "Will the minimum temperature be 78-79\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXHIGHTSEA-26JUL01",
+          "no_ask": 0.76,
+          "softness_score": 0.93,
+          "ticker": "KXHIGHTSEA-26JUL01-B64.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the maximum temperature be 64-65\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.34
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.84,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B53.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 53-54\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.35
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "station/location official weather observations",
+        "forecast snapshots available before close"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_674df6f109dd7bcf",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "weather",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::weather::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "weather_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 725,
+      "classification": "mlb",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXKBOTOTAL-26JUN300530KTWHAN",
+          "no_ask": 0.45,
+          "softness_score": 0.89,
+          "ticker": "KXKBOTOTAL-26JUN300530KTWHAN-8",
+          "time_to_close_hours": 10.6844,
+          "title": "Over 7.5 runs scored?",
+          "yes_ask": 0.96
+        },
+        {
+          "event_ticker": "KXKBORFI-26JUN300530KTWHAN",
+          "no_ask": 0.2,
+          "softness_score": 0.81,
+          "ticker": "KXKBORFI-26JUN300530KTWHAN-Y",
+          "time_to_close_hours": 10.6844,
+          "title": "KT Wiz vs Hanwha Eagles: First Inning Run?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.84,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 1.5 runs?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.74,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN3",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 2.5 runs?",
+          "yes_ask": 0.83
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.99,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-KTW2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the KT Wiz win by over 1.5 runs?",
+          "yes_ask": 0.69
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "game/prop model probabilities generated before close",
+        "official settled game results"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_6d6c5fb41df5ae35",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "mlb",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "mlb-platform"
+      },
+      "model_route": "mlb-platform",
+      "multiple_testing_family": "universe::mlb::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "mlb_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 11,
+      "classification": "mlb",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXKBOTOTAL-26JUN300530KTWHAN",
+          "no_ask": 0.45,
+          "softness_score": 0.89,
+          "ticker": "KXKBOTOTAL-26JUN300530KTWHAN-8",
+          "time_to_close_hours": 10.6844,
+          "title": "Over 7.5 runs scored?",
+          "yes_ask": 0.96
+        },
+        {
+          "event_ticker": "KXKBORFI-26JUN300530KTWHAN",
+          "no_ask": 0.2,
+          "softness_score": 0.81,
+          "ticker": "KXKBORFI-26JUN300530KTWHAN-Y",
+          "time_to_close_hours": 10.6844,
+          "title": "KT Wiz vs Hanwha Eagles: First Inning Run?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.84,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 1.5 runs?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.74,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN3",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 2.5 runs?",
+          "yes_ask": 0.83
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.99,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-KTW2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the KT Wiz win by over 1.5 runs?",
+          "yes_ask": 0.69
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "game/prop model probabilities generated before close",
+        "official settled game results"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_71fa0b0b7fcb8774",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "mlb",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "mlb-platform"
+      },
+      "model_route": "mlb-platform",
+      "multiple_testing_family": "universe::mlb::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "mlb_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 200,
+      "classification": "entertainment",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BAB",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Babydoll?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BEH",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Be Her?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BIL",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Billie Jean?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CHO",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Choosin' Texas?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CIN",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Cinderella (feat. Ty Dolla $ign)?",
+          "yes_ask": 0.74
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_7288defc8012fd8f",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "entertainment",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::entertainment::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "entertainment_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 95,
+      "classification": "macro_econ",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.8",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.9",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.2
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.0",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.58
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.1",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.15
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.6",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.26
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "release calendar timestamps",
+        "official economic release values"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_76f9dd000b009ba5",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "macro_econ",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::macro_econ::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "macro_econ_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 207,
+      "classification": "unknown_soft_watch",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.6,
+          "softness_score": 1.0,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-205000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXTEMPHELP-26JUL02",
+          "no_ask": 0.17,
+          "softness_score": 1.0,
+          "ticker": "KXTEMPHELP-26JUL02-T2.480",
+          "time_to_close_hours": 14.6678,
+          "title": "Will All Employees, Temporary Help Services for June 2026 be above 2.480\u3164 million\u3164?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.15,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-200000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.61,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-220000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.52
+        },
+        {
+          "event_ticker": "KXCOPPERW-26JUL0217",
+          "no_ask": 0.24,
+          "softness_score": 0.93,
+          "ticker": "KXCOPPERW-26JUL0217-T5.48",
+          "time_to_close_hours": 22.1844,
+          "title": "Will the copper close price be above 5.48 USD/Lbs on July 02, 2026 at 5:00 PM EDT?",
+          "yes_ask": 1.0
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_84a8b0fab1821bc5",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "unknown_soft_watch",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::unknown_soft_watch::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "unknown_soft_watch_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 45,
+      "classification": "other_sports",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.93,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-IEL",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.81
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.92,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-BRO",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.18
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-TIE",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.21
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.58,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-HUT",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.72,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-MYW",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.55
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_84b3043bd317e2ff",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "other_sports",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::other_sports::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "other_sports_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 86,
+      "classification": "entertainment",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BAB",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Babydoll?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BEH",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Be Her?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BIL",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Billie Jean?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CHO",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Choosin' Texas?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CIN",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Cinderella (feat. Ty Dolla $ign)?",
+          "yes_ask": 0.74
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_858b90d1778142bb",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "entertainment",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::entertainment::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "entertainment_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 3,
+      "classification": "other_sports",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.93,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-IEL",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.81
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.92,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-BRO",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.18
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-TIE",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_8bd132c6e5057892",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "other_sports",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::other_sports::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "other_sports_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 68,
+      "classification": "macro_econ",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.8",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.9",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.2
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.0",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.58
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.1",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.15
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.6",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.26
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "release calendar timestamps",
+        "official economic release values"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_8becbee3d19362a1",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "macro_econ",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::macro_econ::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "macro_econ_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 52,
+      "classification": "other_sports",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.93,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-IEL",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.81
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.92,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-BRO",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.18
+        },
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.83,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-TIE",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.21
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.58,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-HUT",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.72,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-MYW",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.55
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "low_liquidity_ghost_listing",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_956a2797766c6b8d",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains low_liquidity_ghost_listing",
+        "classification": "other_sports",
+        "feature_family": "low_liquidity_ghost_listing",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::other_sports::low_liquidity_ghost_listing",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Thin-liquidity markets contain stale or ghost-listing prices that decay after external reference updates.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "other_sports_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 13,
+      "classification": "politics_policy",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02-24.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will House Of Balloons by The Weeknd have above 24,654,903 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02-38.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will Harry's House by Harry Styles have above 38,658,074 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.98,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-39.6",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be below 39.6 according to RealClearPolitics?",
+          "yes_ask": 0.03
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.98,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-39.7",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be between 39.6 and 39.8 according to RealClearPolitics?",
+          "yes_ask": 0.03
+        },
+        {
+          "event_ticker": "KXAPRPOTUS-26JUL03",
+          "no_ask": 0.97,
+          "softness_score": 0.58,
+          "ticker": "KXAPRPOTUS-26JUL03-40.0",
+          "time_to_close_hours": 40.1844,
+          "title": "Will the President's approval rating be between 39.9 and 40.1 according to RealClearPolitics?",
+          "yes_ask": 0.04
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "official resolution source timeline",
+        "timestamped public polling/news features"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_a01a66cfee3a4638",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "politics_policy",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::politics_policy::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "politics_policy_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 32,
+      "classification": "nfl",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "all_in_break_even_probability": 0.5175,
+          "calibrated_probability": 0.2081959141556554,
+          "contract_ticker": "KXNFLGAME-26AUG06CARARI-ARI",
+          "gate_status": "warn",
+          "margin_probability": -0.30930408584434455,
+          "side": "yes",
+          "title": "ARI to beat LAC"
+        },
+        {
+          "all_in_break_even_probability": 0.7342,
+          "calibrated_probability": 0.2081959141556554,
+          "contract_ticker": "KXNFLGAME-26AUG13ARILV-ARI",
+          "gate_status": "warn",
+          "margin_probability": -0.5260040858443445,
+          "side": "yes",
+          "title": "ARI to beat LAC"
+        },
+        {
+          "all_in_break_even_probability": 0.3864,
+          "calibrated_probability": 0.3083554472723144,
+          "contract_ticker": "KXNFLGAME-26SEP09NESEA-NE",
+          "gate_status": "warn",
+          "margin_probability": -0.07804455272768562,
+          "side": "yes",
+          "title": "NE to beat SEA"
+        },
+        {
+          "all_in_break_even_probability": 0.6758000000000001,
+          "calibrated_probability": 0.6916445527276855,
+          "contract_ticker": "KXNFLGAME-26SEP09NESEA-SEA",
+          "gate_status": "pass",
+          "margin_probability": 0.01584455272768548,
+          "side": "yes",
+          "title": "SEA to beat NE"
+        },
+        {
+          "all_in_break_even_probability": 0.666,
+          "calibrated_probability": 0.6499379233448707,
+          "contract_ticker": "KXNFLGAME-26SEP10SFLAR-LAR",
+          "gate_status": "warn",
+          "margin_probability": -0.016062076655129376,
+          "side": "yes",
+          "title": "LA to beat SF"
+        }
+      ],
+      "external_data_requirements": [
+        "settled contract outcomes",
+        "historical Kalshi quotes captured before decision time",
+        "model probabilities generated before market close",
+        "all-in execution cost estimates or verified ticket costs"
+      ],
+      "feature_family": "calibrated_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_a03d6bf9a43d8eb5",
+      "market_universe_filter": {
+        "feature_family": "calibrated_probability_decay",
+        "market_type": "nfl_game_moneyline",
+        "source_repo_id": "nfl_quant_glm51_greenfield"
+      },
+      "model_route": "nfl_quant_glm51_greenfield",
+      "multiple_testing_family": "ev_ledger::nfl_quant_glm51_greenfield::nfl_game_moneyline::calibrated_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Calibrated model probability minus all-in Kalshi break-even remains positive after repeat snapshots, settlement, and cost-aware out-of-sample validation.",
+      "source": "contract_ev_ledger",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json",
+      "source_artifact_sha256": "sha256:7e6bb75d 7467fe34 cec2595f 8b05a86a f0b6a68d 04cfc486 ab7deb3d 669753e0",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "nfl_game_moneyline",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 20,
+      "classification": "other_sports",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXUSLGAME-26JUN17IELBRO",
+          "no_ask": 0.88,
+          "softness_score": 0.93,
+          "ticker": "KXUSLGAME-26JUN17IELBRO-IEL",
+          "time_to_close_hours": 0.1844,
+          "title": "Indy Eleven vs Brooklyn FC Winner?",
+          "yes_ask": 0.81
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.58,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-HUT",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020500MYWHUT",
+          "no_ask": 0.72,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020500MYWHUT-MYW",
+          "time_to_close_hours": 62.1844,
+          "title": "Hubli Tigers vs Mysore Warriors Winner?",
+          "yes_ask": 0.55
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020930SHICOA",
+          "no_ask": 0.65,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020930SHICOA-COA",
+          "time_to_close_hours": 66.6844,
+          "title": "Coastal Kings Mangaluru vs Shivamogga Lions Winner?",
+          "yes_ask": 0.59
+        },
+        {
+          "event_ticker": "KXT20MATCH-26JUL020930SHICOA",
+          "no_ask": 0.8,
+          "softness_score": 0.83,
+          "ticker": "KXT20MATCH-26JUL020930SHICOA-SHI",
+          "time_to_close_hours": 66.6844,
+          "title": "Coastal Kings Mangaluru vs Shivamogga Lions Winner?",
+          "yes_ask": 0.6
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_a3d08d82adf83b1b",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "other_sports",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::other_sports::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "other_sports_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 391,
+      "classification": "mlb",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXKBOTOTAL-26JUN300530KTWHAN",
+          "no_ask": 0.45,
+          "softness_score": 0.89,
+          "ticker": "KXKBOTOTAL-26JUN300530KTWHAN-8",
+          "time_to_close_hours": 10.6844,
+          "title": "Over 7.5 runs scored?",
+          "yes_ask": 0.96
+        },
+        {
+          "event_ticker": "KXKBORFI-26JUN300530KTWHAN",
+          "no_ask": 0.2,
+          "softness_score": 0.81,
+          "ticker": "KXKBORFI-26JUN300530KTWHAN-Y",
+          "time_to_close_hours": 10.6844,
+          "title": "KT Wiz vs Hanwha Eagles: First Inning Run?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.84,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 1.5 runs?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.74,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-HAN3",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the Hanwha Eagles win by over 2.5 runs?",
+          "yes_ask": 0.83
+        },
+        {
+          "event_ticker": "KXKBOSPREAD-26JUN300530KTWHAN",
+          "no_ask": 0.99,
+          "softness_score": 0.81,
+          "ticker": "KXKBOSPREAD-26JUN300530KTWHAN-KTW2",
+          "time_to_close_hours": 10.6844,
+          "title": "Will the KT Wiz win by over 1.5 runs?",
+          "yes_ask": 0.69
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "game/prop model probabilities generated before close",
+        "official settled game results"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_a5d4ca900c90cbcf",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "mlb",
+        "feature_family": "wide_spread_decay",
+        "model_route": "mlb-platform"
+      },
+      "model_route": "mlb-platform",
+      "multiple_testing_family": "universe::mlb::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "mlb_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 639,
+      "classification": "unknown_soft_watch",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.6,
+          "softness_score": 1.0,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-205000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXTEMPHELP-26JUL02",
+          "no_ask": 0.17,
+          "softness_score": 1.0,
+          "ticker": "KXTEMPHELP-26JUL02-T2.480",
+          "time_to_close_hours": 14.6678,
+          "title": "Will All Employees, Temporary Help Services for June 2026 be above 2.480\u3164 million\u3164?",
+          "yes_ask": 0.93
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.15,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-200000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXJOBLESSCLAIMS-26JUL02",
+          "no_ask": 0.61,
+          "softness_score": 0.93,
+          "ticker": "KXJOBLESSCLAIMS-26JUL02-220000",
+          "time_to_close_hours": 13.6011,
+          "title": "How many initial jobless claims will there be the week ending Jun 27, 2026?",
+          "yes_ask": 0.52
+        },
+        {
+          "event_ticker": "KXCOPPERW-26JUL0217",
+          "no_ask": 0.24,
+          "softness_score": 0.93,
+          "ticker": "KXCOPPERW-26JUL0217-T5.48",
+          "time_to_close_hours": 22.1844,
+          "title": "Will the copper close price be above 5.48 USD/Lbs on July 02, 2026 at 5:00 PM EDT?",
+          "yes_ask": 1.0
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_b1f22639b0e684cd",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "unknown_soft_watch",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::unknown_soft_watch::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "unknown_soft_watch_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 38,
+      "classification": "macro_econ",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.8",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 1.0
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T3.9",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.2
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.0",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.58
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.1",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.15
+        },
+        {
+          "event_ticker": "KXECONSTATU3-26JUN",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXECONSTATU3-26JUN-T4.6",
+          "time_to_close_hours": 13.6678,
+          "title": "Unemployment rate in Jun 2026?",
+          "yes_ask": 0.26
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "release calendar timestamps",
+        "official economic release values"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_b349f3d671225594",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "macro_econ",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::macro_econ::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "macro_econ_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 160,
+      "classification": "entertainment",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BAB",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Babydoll?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BEH",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Be Her?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BIL",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Billie Jean?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CHO",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Choosin' Texas?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CIN",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Cinderella (feat. Ty Dolla $ign)?",
+          "yes_ask": 0.74
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_bf7705e54857cb92",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "entertainment",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::entertainment::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "entertainment_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 47,
+      "classification": "weather",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXRAINNYC-26JUL01",
+          "no_ask": 0.7,
+          "softness_score": 1.0,
+          "ticker": "KXRAINNYC-26JUL01-T0",
+          "time_to_close_hours": 5.1678,
+          "title": "Will it **rain** in New York City on Wednesday?",
+          "yes_ask": 0.48
+        },
+        {
+          "event_ticker": "KXWCDELAY-26JUL01USABIH",
+          "no_ask": 1.0,
+          "softness_score": 0.99,
+          "ticker": "KXWCDELAY-26JUL01USABIH-YES",
+          "time_to_close_hours": 5.1678,
+          "title": "USA vs Bosnia and Herzegovina: Weather Delay",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXLOWTMIA-26JUL01",
+          "no_ask": 0.46,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTMIA-26JUL01-B78.5",
+          "time_to_close_hours": 6.1844,
+          "title": "Will the minimum temperature be 78-79\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXHIGHTSEA-26JUL01",
+          "no_ask": 0.76,
+          "softness_score": 0.93,
+          "ticker": "KXHIGHTSEA-26JUL01-B64.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the maximum temperature be 64-65\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.34
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.84,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B53.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 53-54\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.35
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "station/location official weather observations",
+        "forecast snapshots available before close"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_cb7c31f09f507e83",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "weather",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::weather::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "weather_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 266,
+      "classification": "weather",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXRAINNYC-26JUL01",
+          "no_ask": 0.7,
+          "softness_score": 1.0,
+          "ticker": "KXRAINNYC-26JUL01-T0",
+          "time_to_close_hours": 5.1678,
+          "title": "Will it **rain** in New York City on Wednesday?",
+          "yes_ask": 0.48
+        },
+        {
+          "event_ticker": "KXWCDELAY-26JUL01USABIH",
+          "no_ask": 1.0,
+          "softness_score": 0.99,
+          "ticker": "KXWCDELAY-26JUL01USABIH-YES",
+          "time_to_close_hours": 5.1678,
+          "title": "USA vs Bosnia and Herzegovina: Weather Delay",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXLOWTMIA-26JUL01",
+          "no_ask": 0.46,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTMIA-26JUL01-B78.5",
+          "time_to_close_hours": 6.1844,
+          "title": "Will the minimum temperature be 78-79\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.73
+        },
+        {
+          "event_ticker": "KXHIGHTSEA-26JUL01",
+          "no_ask": 0.76,
+          "softness_score": 0.93,
+          "ticker": "KXHIGHTSEA-26JUL01-B64.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the maximum temperature be 64-65\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.34
+        },
+        {
+          "event_ticker": "KXLOWTSFO-26JUL01",
+          "no_ask": 0.84,
+          "softness_score": 0.93,
+          "ticker": "KXLOWTSFO-26JUL01-B53.5",
+          "time_to_close_hours": 9.1844,
+          "title": "Will the minimum temperature be 53-54\u00b0 on Jul 1, 2026?",
+          "yes_ask": 0.35
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "station/location official weather observations",
+        "forecast snapshots available before close"
+      ],
+      "feature_family": "near_settlement_probability_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_ce68137c71180a21",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains near_settlement_probability_decay",
+        "classification": "weather",
+        "feature_family": "near_settlement_probability_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::weather::near_settlement_probability_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Near-settlement markets underreact to fresh external data before close.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "weather_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 2,
+      "classification": "politics_policy",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HBALLWEEKND26JUL02-24.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will House Of Balloons by The Weeknd have above 24,654,903 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        },
+        {
+          "event_ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02",
+          "no_ask": 1.0,
+          "softness_score": 0.91,
+          "ticker": "KXALBUMSTREAMSU-HHOUSESTYLES26JUL02-38.7M",
+          "time_to_close_hours": 63.1844,
+          "title": "Will Harry's House by Harry Styles have above 38,658,074 Streams on Luminate from June 26 - July 02?",
+          "yes_ask": 0.97
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "official resolution source timeline",
+        "timestamped public polling/news features"
+      ],
+      "feature_family": "wide_spread_decay",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_da5fcc690631c0de",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains wide_spread_decay",
+        "classification": "politics_policy",
+        "feature_family": "wide_spread_decay",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::politics_policy::wide_spread_decay",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Crowd-implied probabilities in wide-spread markets are miscalibrated relative to an external probability reference after fees.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "politics_policy_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 185,
+      "classification": "entertainment",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BAB",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Babydoll?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BEH",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Be Her?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-BIL",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Billie Jean?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CHO",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Choosin' Texas?",
+          "yes_ask": 0.74
+        },
+        {
+          "event_ticker": "KXSPOTIFY2D-26JUL01",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXSPOTIFY2D-26JUL01-CIN",
+          "time_to_close_hours": 5.1678,
+          "title": "Will the runner-up top Song on Jul 1, 2026 be Cinderella (feat. Ty Dolla $ign)?",
+          "yes_ask": 0.74
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "explicit external reference source selected before testing"
+      ],
+      "feature_family": "stale_metadata_update_lag",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_e1d27b9d6f99e7d2",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains stale_metadata_update_lag",
+        "classification": "entertainment",
+        "feature_family": "stale_metadata_update_lag",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::entertainment::stale_metadata_update_lag",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Markets with stale public metadata exhibit non-random crowd probability lag.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "entertainment_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    },
+    {
+      "blocked_reason": "missing_labeled_oos_fdr_cost_aware_evidence",
+      "calibrated_probability": null,
+      "candidate_count": 3788,
+      "classification": "finance_crypto",
+      "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
+      "edge_probability": null,
+      "example_contracts": [
+        {
+          "event_ticker": "KXAAAGASD-26JUL02",
+          "no_ask": 0.16,
+          "softness_score": 1.0,
+          "ticker": "KXAAAGASD-26JUL02-3.810",
+          "time_to_close_hours": 5.1678,
+          "title": "Will average **gas prices** be above $3.810?",
+          "yes_ask": 0.99
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 1.0,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.127",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12600 and 1.12799 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.31
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.99,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.129",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.12800 and 1.12999 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.17
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.98,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.131",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13000 and 1.13199 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.3
+        },
+        {
+          "event_ticker": "KXEURUSD-26JUL0210",
+          "no_ask": 0.96,
+          "softness_score": 1.0,
+          "ticker": "KXEURUSD-26JUL0210-B1.133",
+          "time_to_close_hours": 15.1844,
+          "title": "Will the EUR/USD open price be between 1.13200 and 1.13399 at Jul 2, 2026 at 10am EDT?",
+          "yes_ask": 0.21
+        }
+      ],
+      "external_data_requirements": [
+        "historical Kalshi quote snapshots before decision time",
+        "settled contract outcomes",
+        "all-in execution cost estimates or verified ticket costs",
+        "reference asset price snapshots",
+        "official settlement source values"
+      ],
+      "feature_family": "simple_rule_external_reference",
+      "gates": [
+        {
+          "name": "labeled_oos_evidence",
+          "reason": "No labeled out-of-sample evidence packet is attached to this hypothesis.",
+          "status": "blocked"
+        },
+        {
+          "name": "fdr_controlled_significance",
+          "reason": "No multiple-testing-corrected falsification result exists yet.",
+          "status": "blocked"
+        },
+        {
+          "name": "cost_aware_validation",
+          "reason": "No backtest packet proves the signal survives all-in execution costs.",
+          "status": "blocked"
+        },
+        {
+          "name": "no_execution_boundary",
+          "reason": "Hypothesis registry is research-only and contains no account/order fields.",
+          "status": "pass"
+        }
+      ],
+      "hypothesis_id": "hyp_ec1bf124a7aa2e85",
+      "market_universe_filter": {
+        "artifact_filter": "softness_reasons contains simple_rule_external_reference",
+        "classification": "finance_crypto",
+        "feature_family": "simple_rule_external_reference",
+        "model_route": "soft_market_research_backlog"
+      },
+      "model_route": "soft_market_research_backlog",
+      "multiple_testing_family": "universe::finance_crypto::simple_rule_external_reference",
+      "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
+      "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+      "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
+      "safety": {
+        "account_or_order_paths": false,
+        "authenticated_api_calls": false,
+        "database_writes": false,
+        "market_execution": false,
+        "paid_calls": false,
+        "provider_api_calls": false,
+        "public_market_data_calls": false,
+        "raw_payloads_copied_to_repo": false,
+        "research_only": true,
+        "staking_or_sizing_guidance": false
+      },
+      "schema_version": "HypothesisCandidateV1",
+      "signal_definition": "Simple-rule markets with public external references have measurable crowd miscalibration.",
+      "source": "universe_scan",
+      "source_artifact": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+      "source_artifact_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95",
+      "status": "candidate_unvalidated",
+      "target_contract_class": "finance_crypto_kalshi_public_market",
+      "training_window_policy": "Use only observations timestamped before the validation decision point.",
+      "usable": false,
+      "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap."
+    }
+  ],
+  "inputs": {
+    "ev_ledger_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-contract-ev-ledger.json",
+    "ev_ledger_sha256": "sha256:7e6bb75d 7467fe34 cec2595f 8b05a86a f0b6a68d 04cfc486 ab7deb3d 669753e0",
+    "universe_scan_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-universe-scan.json",
+    "universe_scan_sha256": "sha256:fd8560dd ab0a301e df2b82c4 16635682 dd664a63 9b9dfe0e c3277023 f4504f95"
+  },
+  "market_execution": false,
+  "next_action": {
+    "name": "kalshi_labeled_oos_backtest_harness",
+    "stop_condition": "Stop before sizing, execution, account/order paths, discretionary selection, or promoting a hypothesis without machine-readable falsification evidence.",
+    "why": "The registry can now generate hypotheses, but none can promote without labeled outcomes, time-safe splits, costs, and FDR correction."
+  },
+  "north_star": "Extract and exploit mispricings in Kalshi event contracts before the crowd corrects them.",
+  "policy": {
+    "ev_boundary": "This registry does not compute usable EV; the contract EV ledger remains the only margin surface.",
+    "false_discovery_control": "No hypothesis can be promoted without OOS, cost-aware, FDR-controlled evidence.",
+    "no_discretion": "Hypotheses are generated from deterministic artifact rules; human selection cannot promote a hypothesis.",
+    "signal_breadth": "The registry tracks feature families across routes/classes so many weak hypotheses can be tested without hand-picking."
+  },
+  "provider_api_calls": false,
+  "public_market_data_calls": false,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "staking_or_sizing_guidance": false,
+  "status": "hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence",
+  "summary": {
+    "blocked_by_falsification_count": 36,
+    "by_classification": {
+      "entertainment": 4,
+      "finance_crypto": 5,
+      "macro_econ": 5,
+      "mlb": 4,
+      "nfl": 2,
+      "other_sports": 4,
+      "politics_policy": 3,
+      "unknown_soft_watch": 4,
+      "weather": 5
+    },
+    "by_feature_family": {
+      "calibrated_probability_decay": 1,
+      "legacy_positive_margin_survival": 1,
+      "low_liquidity_ghost_listing": 8,
+      "near_settlement_probability_decay": 7,
+      "simple_rule_external_reference": 3,
+      "stale_metadata_update_lag": 8,
+      "wide_spread_decay": 8
+    },
+    "by_route": {
+      "mlb-platform": 4,
+      "nfl_quant_glm51_greenfield": 2,
+      "soft_market_research_backlog": 30
+    },
+    "by_status": {
+      "candidate_unvalidated": 36
+    },
+    "candidate_unvalidated_count": 36,
+    "falsification_status": "falsification_gate_blocked_missing_labeled_oos_evidence",
+    "gate_counts": {
+      "blocked": 3,
+      "fail": 0,
+      "pass": 4,
+      "warn": 0
+    },
+    "hypothesis_count": 36,
+    "multiple_testing_family_count": 36,
+    "promoted_hypothesis_count": 0,
+    "rejected_hypothesis_count": 0
+  }
+}

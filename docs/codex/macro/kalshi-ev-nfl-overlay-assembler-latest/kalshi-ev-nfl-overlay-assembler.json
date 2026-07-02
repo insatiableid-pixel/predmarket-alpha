@@ -1,0 +1,423 @@
+{
+  "account_or_order_paths": false,
+  "assembled_rows": [
+    {
+      "calibrated_probability": 0.2081959141556554,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13ARILAC-ARI",
+      "executable_price": 0.19,
+      "selection": "ARI",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.2081959141556554,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json",
+      "contract_ticker": "KXNFLGAME-26AUG06CARARI-ARI",
+      "executable_price": 0.5,
+      "selection": "ARI",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.2081959141556554,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json",
+      "contract_ticker": "KXNFLGAME-26AUG13ARILV-ARI",
+      "executable_price": 0.72,
+      "selection": "ARI",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.7918040858443446,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13ARILAC-LAC",
+      "executable_price": 0.85,
+      "selection": "LAC",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3791767790633631,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-ATL",
+      "executable_price": 0.42,
+      "selection": "ATL",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6208232209366369,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-PIT",
+      "executable_price": 0.6,
+      "selection": "PIT",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.5846634882495692,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13BALIND-BAL",
+      "executable_price": 0.66,
+      "selection": "BAL",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.4153365117504308,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13BALIND-IND",
+      "executable_price": 0.38,
+      "selection": "IND",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.4642920153598834,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-BUF",
+      "executable_price": 0.51,
+      "selection": "BUF",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.5357079846401166,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-HOU",
+      "executable_price": 0.51,
+      "selection": "HOU",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3983047217593665,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13CHICAR-CAR",
+      "executable_price": 0.44,
+      "selection": "CAR",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6016952782406335,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13CHICAR-CHI",
+      "executable_price": 0.59,
+      "selection": "CHI",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.2229654503545396,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13CLEJAC-CLE",
+      "executable_price": 0.25,
+      "selection": "CLE",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.7770345496454604,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13CLEJAC-JAC",
+      "executable_price": 0.77,
+      "selection": "JAX",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.4310609964570717,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13DALNYG-NYG",
+      "executable_price": 0.43,
+      "selection": "NYG",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6383921331431862,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP14DENKC-DEN",
+      "executable_price": 0.46,
+      "selection": "DEN",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3616078668568138,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP14DENKC-KC",
+      "executable_price": 0.6,
+      "selection": "KC",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3887168023031058,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13GBMIN-GB",
+      "executable_price": 0.5,
+      "selection": "GB",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6112831976968942,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13GBMIN-MIN",
+      "executable_price": 0.53,
+      "selection": "MIN",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3537645476392154,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13MIALV-LV",
+      "executable_price": 0.64,
+      "selection": "LV",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6462354523607845,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13MIALV-MIA",
+      "executable_price": 0.38,
+      "selection": "MIA",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3083554472723144,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP09NESEA-NE",
+      "executable_price": 0.37,
+      "selection": "NE",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6916445527276855,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP09NESEA-SEA",
+      "executable_price": 0.66,
+      "selection": "SEA",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.7882220767047202,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13NODET-DET",
+      "executable_price": 0.77,
+      "selection": "DET",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.2117779232952797,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13NODET-NO",
+      "executable_price": 0.25,
+      "selection": "NO",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.4835108350648447,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13NYJTEN-NYJ",
+      "executable_price": 0.45,
+      "selection": "NYJ",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.6499379233448707,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP10SFLAR-LAR",
+      "executable_price": 0.65,
+      "selection": "LA",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.3500620766551293,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP10SFLAR-SF",
+      "executable_price": 0.37,
+      "selection": "SF",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.5342965389653818,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13TBCIN-CIN",
+      "executable_price": 0.65,
+      "selection": "CIN",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.4657034610346182,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13TBCIN-TB",
+      "executable_price": 0.37,
+      "selection": "TB",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.7389329793351639,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13WASPHI-PHI",
+      "executable_price": 0.67,
+      "selection": "PHI",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    },
+    {
+      "calibrated_probability": 0.2610670206648361,
+      "contract_evidence_source": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "contract_ticker": "KXNFLGAME-26SEP13WASPHI-WAS",
+      "executable_price": 0.36,
+      "selection": "WAS",
+      "side": "yes",
+      "source_model_artifact": "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+      "timing_status": "pregame_clean"
+    }
+  ],
+  "database_writes": false,
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "research_only_no_live_calls",
+      "reasons": [
+        "Assembler consumes local scout/work-order JSON only; live/provider calls are not implemented."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "scout_present_safe",
+      "reasons": [
+        "Scout artifact is present and research-only."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "contract_mapping_work_order_present",
+      "reasons": [
+        "Loaded 32 work-order target side(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "ready_local_target_evidence_present",
+      "reasons": [
+        "Found 32 ready local target match(es)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "overlay_rows_assembled",
+      "reasons": [
+        "Assembled 32 overlay pair(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "overlay_output_dirs_outside_repo",
+      "reasons": [
+        "Overlay output directories are outside the repo."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "work_order_status_ready",
+      "reasons": [
+        "Work-order status is contract_mapping_work_order_ready."
+      ],
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-01T19:26:36Z",
+  "inputs": {
+    "scout_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-ev-local-contract-evidence-scout.json",
+    "scout_sha256": "sha256:30f735bb 5225237b 3bfe9968 73698049 986fc5fb 8ea9aa4f 334241b3 3735cc39",
+    "scout_status": "local_contract_evidence_ready_for_overlay_fill",
+    "work_order_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-ev-contract-mapping-work-order.json",
+    "work_order_sha256": "sha256:e6fe76da 04ca7dff ba594f2b 60a2bd52 59cb16a5 f6c13a7f 4ce8134f 38c8aa75",
+    "work_order_status": "contract_mapping_work_order_ready"
+  },
+  "live_calls_made": false,
+  "market_execution": false,
+  "next_action": "Run make kalshi-ev-overlay-preflight && make kalshi-ev-ledger to evaluate the assembled overlay rows; execution remains disabled.",
+  "outputs": {
+    "mapping_output_dir": "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings",
+    "mapping_overlay_path": "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json",
+    "mapping_overlay_sha256": "sha256:011cca76 67177840 10707fbd 2c673577 4f610b3f 3fa9ca06 21b29d09 44f05902",
+    "probability_output_dir": "/home/mrwatson/manual_drops/kalshi_ev_probabilities",
+    "probability_overlay_path": "/home/mrwatson/manual_drops/kalshi_ev_probabilities/kalshi_ev_nfl_calibrated_probability_overlay_keys_96008378d65c.json",
+    "probability_overlay_sha256": "sha256:1fbbae41 41d6dba7 155e62d1 a1250bbb 60bee542 857ad35e 564f9410 6e01be4a"
+  },
+  "provider_api_calls": false,
+  "raw_payloads_copied_to_repo": false,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true
+  },
+  "schema_version": 1,
+  "status": "nfl_overlay_assembler_overlays_written",
+  "summary": {
+    "assembled_overlay_pair_count": 32,
+    "mapping_overlay_row_count": 32,
+    "overlays_written": true,
+    "probability_overlay_row_count": 32,
+    "ready_target_match_count": 32,
+    "scout_target_match_count": 172,
+    "selected_ready_target_match_count": 32,
+    "target_contract_side_count": 32,
+    "total_unique_ready_target_match_count": 70
+  }
+}

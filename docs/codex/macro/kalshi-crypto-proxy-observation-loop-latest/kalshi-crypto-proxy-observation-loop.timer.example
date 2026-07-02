@@ -1,0 +1,23 @@
+# Example systemd user timer. Do not enable automatically.
+# Save as ~/.config/systemd/user/kalshi-crypto-proxy-observation-loop.timer after review.
+
+[Unit]
+Description=Run research-only Kalshi crypto proxy observation loop every 10 minutes
+
+[Timer]
+OnBootSec=2min
+OnUnitActiveSec=10min
+RandomizedDelaySec=45s
+Persistent=true
+
+[Install]
+WantedBy=timers.target
+
+# Matching service:
+# Save as ~/.config/systemd/user/kalshi-crypto-proxy-observation-loop.service after review.
+# [Unit]
+# Description=Research-only Kalshi crypto proxy observation loop
+# [Service]
+# Type=oneshot
+# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# ExecStart=/usr/bin/make kalshi-crypto-proxy-observation-watch-once

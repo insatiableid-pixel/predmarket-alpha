@@ -7,6 +7,102 @@ on:
     branches: [main]
 
 jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ruff
+      - name: Ruff baseline (ratchet) gate
+        run: python3 scripts/ruff_baseline_check.py
+
+  code-quality:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - name: Install dev tooling
+        run: pip install -r dev-requirements.txt
+      - name: AGENTS.md validation
+        run: python3 scripts/validate_agents_md.py --check
+      - name: Type checking (mypy strict, advisory)
+        continue-on-error: true
+        run: PYTHONPATH=. mypy predmarket/
+      - name: Import boundaries (gating)
+        run: PYTHONPATH=. lint-imports
+      - name: Tech-debt ratchet (gating)
+        run: PYTHONPATH=. python3 scripts/scan_tech_debt.py --check
+      - name: Large-file ratchet (gating)
+        run: PYTHONPATH=. python3 scripts/check_file_sizes.py --check
+      - name: Dead-code analysis (vulture, advisory)
+        continue-on-error: true
+        run: PYTHONPATH=. vulture predmarket/ scripts/ --min-confidence 60
+      - name: Unused dependency detection (deptry, advisory)
+        continue-on-error: true
+        run: PYTHONPATH=. deptry predmarket/
+      - name: Duplicate-code analysis (jscpd, advisory)
+        continue-on-error: true
+        run: npx --yes jscpd predmarket scripts main.py
+      - name: Dead feature flag check
+        run: PYTHONPATH=. python3 scripts/check_feature_flags.py --check
+        continue-on-error: true
+      - name: Collect quality metrics
+        run: |
+          mkdir -p .tmp
+          PYTHONPATH=. python3 scripts/collect_quality_metrics.py --output .tmp/quality-metrics.json
+      - name: Upload quality metrics
+        uses: actions/upload-artifact@v4
+        with:
+          name: quality-metrics
+          path: .tmp/quality-metrics.json
+
+  security-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      security-events: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install Semgrep
+        run: pip install semgrep
+      - name: Semgrep SAST scan (SARIF)
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/owasp-top-ten \
+            --config p/command-injection \
+            --sarif --output semgrep-results.sarif \
+            || true
+      - name: Semgrep SAST scan (JSON)
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/owasp-top-ten \
+            --config p/command-injection \
+            --json --output semgrep-results.json \
+            || true
+      - name: Upload Semgrep SARIF to GitHub code scanning
+        uses: github/codeql-action/upload-sarif@v3
+        if: always()
+        with:
+          sarif_file: semgrep-results.sarif
+      - name: Gitleaks secret scan
+        uses: gitleaks/gitleaks-action@v2
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   test:
     runs-on: ubuntu-latest
     strategy:
@@ -15,6 +111,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
+
+      - name: Record start time
+        id: timer
+        run: echo "start=$(date +%s)" >> $GITHUB_OUTPUT
 
       - name: Set up Python ${{ matrix.python-version }}
         uses: actions/setup-python@v5
@@ -31,6 +131,77 @@ jobs:
           mkdir -p data/raw data/processed
           alembic upgrade head
 
-      - name: Run tests with coverage
+      - name: Run unit tests with coverage and timing
         run: |
-          PYTHONPATH=. pytest tests/ -v --tb=short --cov=predmarket --cov-report=term-missing --cov-fail-under=65
+          PYTHONPATH=. pytest tests/ -v --tb=short -m "not integration" \
+            --cov=predmarket --cov-report=term-missing --cov-report=xml \
+            --cov-fail-under=65 \
+            --durations=10 --durations-min=0.5 \
+            --reruns=2 --reruns-delay=1
+
+      - name: Upload coverage report
+        uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.12'
+        with:
+          name: coverage-report
+          path: coverage.xml
+
+      - name: Record build metrics
+        if: matrix.python-version == '3.12'
+        run: |
+          mkdir -p .tmp
+          END_TIME=$(date +%s)
+          echo "BUILD_DURATION=${END_TIME}-${{ steps.timer.outputs.start }}" >> $GITHUB_ENV
+          PYTHONPATH=. python3 scripts/record_build_metrics.py --output .tmp/build-metrics.json --job-name test
+        env:
+          GITHUB_RUN_ID: ${{ github.run_id }}
+          GITHUB_SHA: ${{ github.sha }}
+
+      - name: Upload build metrics
+        uses: actions/upload-artifact@v4
+        if: matrix.python-version == '3.12'
+        with:
+          name: build-metrics
+          path: .tmp/build-metrics.json
+
+      - name: Run integration tests
+        run: |
+          PYTHONPATH=. pytest tests/integration/ -v --tb=short
+
+  release:
+    needs: [lint, code-quality, test]
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Generate changelog from commit history
+        run: |
+          git log --oneline --pretty=format:"- %s" $(git describe --tags --abbrev=0 2>/dev/null || git rev-list --max-parents=0 HEAD)..HEAD > CHANGELOG_RECENT.md 2>/dev/null || echo "- Initial release" > CHANGELOG_RECENT.md
+          cat CHANGELOG_RECENT.md
+
+      - name: Create or update GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: "latest-research"
+          name: "Latest Research Build"
+          body_path: CHANGELOG_RECENT.md
+          prerelease: true
+          draft: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and publish Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: ghcr.io/${{ github.repository }}:latest-research
+          cache-from: type=gha
+          cache-to: type=gha,mode=max

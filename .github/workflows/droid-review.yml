@@ -1,0 +1,23 @@
+name: Droid Code Review
+
+on:
+  pull_request:
+    branches: [main]
+
+jobs:
+  droid-review:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+      issues: write
+      id-token: write
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Run Factory Droid code review
+        uses: Factory-AI/droid-action@v1
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}

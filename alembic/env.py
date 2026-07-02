@@ -1,10 +1,9 @@
 import os
 import sys
-from pathlib import Path
 from logging.config import fileConfig
+from pathlib import Path
 
-from sqlalchemy import engine_from_config
-from sqlalchemy import pool
+from sqlalchemy import engine_from_config, pool
 
 from alembic import context
 
@@ -23,12 +22,16 @@ if config.config_file_name is not None:
 if "PYTEST_CURRENT_TEST" not in os.environ:
     try:
         from predmarket.config import load_config
+
         app_config = load_config()
         db_path = app_config.global_cfg.data_dir / "database.sqlite"
+        db_path.parent.mkdir(parents=True, exist_ok=True)
         config.set_main_option("sqlalchemy.url", f"sqlite:///{db_path}")
     except Exception:
         # Fallback to a sensible default if config loading fails
-        config.set_main_option("sqlalchemy.url", "sqlite:///./data/database.sqlite")
+        fallback_db_path = Path("./data/database.sqlite")
+        fallback_db_path.parent.mkdir(parents=True, exist_ok=True)
+        config.set_main_option("sqlalchemy.url", f"sqlite:///{fallback_db_path}")
 
 # target_metadata not used — this project uses raw SQLite, not SQLAlchemy ORM.
 # Migrations are written manually.
@@ -78,9 +81,7 @@ def run_migrations_online() -> None:
     )
 
     with connectable.connect() as connection:
-        context.configure(
-            connection=connection, target_metadata=target_metadata
-        )
+        context.configure(connection=connection, target_metadata=target_metadata)
 
         with context.begin_transaction():
             context.run_migrations()

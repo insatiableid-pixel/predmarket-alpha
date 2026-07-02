@@ -1,0 +1,101 @@
+{
+  "account_or_order_paths": false,
+  "authenticated_api_calls": false,
+  "clusters": [],
+  "controlled_rows": [],
+  "database_writes": false,
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "ccd_report_ready",
+      "reason": "CCD status is crypto_proxy_capacity_correlation_decay_blocked_no_current_candidates.",
+      "status": "pass"
+    },
+    {
+      "name": "upstream_capacity_and_decay_pass",
+      "reason": "Capacity status capacity_depth_missing_or_not_positive; decay status decay_survival_blocked.",
+      "status": "blocked"
+    },
+    {
+      "name": "positive_cluster_breadth",
+      "reason": "0 positive cluster(s); requires 3.",
+      "status": "blocked"
+    },
+    {
+      "name": "controlled_cluster_share_limit",
+      "reason": "Largest controlled cluster share None; max is 0.35.",
+      "status": "blocked"
+    },
+    {
+      "name": "no_usable_sizing_or_execution",
+      "reason": "Cluster-control report remains research-only with zero usable rows and no sizing or execution.",
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-02T18:16:59Z",
+  "inputs": {
+    "ccd_path": "docs/codex/macro/latest-kalshi-crypto-proxy-capacity-correlation-decay.json",
+    "ccd_status": "crypto_proxy_capacity_correlation_decay_blocked_no_current_candidates",
+    "max_cluster_share": 0.35,
+    "min_positive_clusters": 0,
+    "required_positive_clusters": 3
+  },
+  "market_execution": false,
+  "method": {
+    "boundary": "Controlled depth is capacity accounting for a future paper overlay, not sizing or staking guidance.",
+    "cluster_key": "asset_symbol + contract_family + close_time bucket from the upstream CCD report.",
+    "control_rule": "Positive-depth capacity may advance only when the selected clusters can satisfy the configured maximum share. With a single positive cluster and max share below 1, controlled capacity is zero.",
+    "row_order_rule": "Within each cluster, rows are retained by descending margin, then contract ticker."
+  },
+  "next_action": {
+    "name": "kalshi_crypto_proxy_correlation_cluster_control_audit",
+    "stop_condition": "Stop before paper overlay, sizing, execution, or account/order paths.",
+    "why": "Cluster control is blocked by missing or upstream-invalid CCD evidence."
+  },
+  "paid_calls": false,
+  "provider_api_calls": false,
+  "public_market_data_calls": false,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "execution_enabled": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "staking_or_sizing_guidance": false,
+  "status": "crypto_proxy_correlation_cluster_control_blocked_upstream_ccd",
+  "summary": {
+    "asset_counts": {},
+    "capacity_row_count": 0,
+    "ccd_capacity_status": "capacity_depth_missing_or_not_positive",
+    "ccd_decay_status": "decay_survival_blocked",
+    "ccd_status": "crypto_proxy_capacity_correlation_decay_blocked_no_current_candidates",
+    "cluster_counts": {},
+    "controlled_positive_row_count": 0,
+    "gate_counts": {
+      "blocked": 3,
+      "pass": 2
+    },
+    "largest_controlled_cluster_cost": 0.0,
+    "largest_controlled_cluster_key": null,
+    "largest_controlled_cluster_share": null,
+    "largest_positive_cluster_cost": 0.0,
+    "largest_positive_cluster_key": null,
+    "largest_positive_cluster_share": null,
+    "max_cluster_share": 0.35,
+    "positive_cluster_count": 0,
+    "positive_depth_row_count": 0,
+    "required_positive_cluster_count": 3,
+    "total_controlled_depth_cost": 0.0,
+    "total_positive_depth_cost": 0.0,
+    "usable_row_count": 0
+  }
+}

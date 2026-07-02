@@ -1,0 +1,20 @@
+{
+  "threshold": 0,
+  "reporters": ["console", "markdown"],
+  "output": "./docs/codex/artifacts/jscpd-report",
+  "format": ["python"],
+  "ignore": [
+    "**/node_modules/**",
+    "**/.venv/**",
+    "**/data/**",
+    "**/docs/**",
+    "**/htmlcov/**",
+    "**/__pycache__/**",
+    "**/test_*.py",
+    "**/conftest.py"
+  ],
+  "min-lines": 8,
+  "min-tokens": 80,
+  "absolute": true,
+  "gitignore": true
+}

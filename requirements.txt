@@ -1,52 +1,60 @@
 # Python Dependencies for Big Two Prediction Market Alpha (predmarket-alpha)
-# Pinned to stable major versions
+# Exact-pinned for reproducible installs and supply-chain safety.
 
 # Configuration & Env Management
-pydantic>=2.0.0             # Type-safe validation of config schemas
-pyyaml>=6.0.0               # Parsing and loading config.yaml
-python-dotenv>=1.0.0        # Secure credential loading from .env
+pydantic==2.13.4
+pyyaml==6.0.3
+python-dotenv==1.2.2
 
 # Asynchronous Ingestion & Network
-aiohttp>=3.9.0              # Async HTTP client for REST APIs
-websockets>=12.0            # High-performance async WebSocket client
-asyncio>=3.4.3              # Native async execution orchestration
+aiohttp==3.14.1
+websockets==16.0
 
 # Big Two Venue Clients
-kalshi-python>=2.0.0        # Official CFTC-regulated Kalshi SDK
-cryptography>=41.0.0        # Cryptographic keys and signatures required by kalshi-python
+kalshi-python==2.1.4
+cryptography==48.0.1
 
 # Data Science & Math
-numpy>=1.24.0               # Vectorized algebra and Kelly computations
-pandas>=2.0.0               # Dataframes for time-series and log ingestion
-scipy>=1.10.0               # Convex optimization solver for correlation Kelly
-scikit-learn>=1.2.0         # Model evaluation metrics and calibration curves
-duckdb>=1.0.0               # Point-in-time analytical research store
-pyarrow>=15.0.0             # Parquet persistence for research snapshots
-lightgbm>=4.0.0             # Tabular challenger models for event truth forecasting
-mapie>=0.9.0                # Conformal calibration utilities
+numpy==2.4.6
+pandas==3.0.3
+scipy==1.17.1
+scikit-learn==1.9.0
+duckdb==1.5.3
+pyarrow==24.0.0
+lightgbm==4.0.0
+mapie==0.9.0
 
 # Deep Learning / NLP Signal Extraction
-torch>=2.0.0 --extra-index-url https://download.pytorch.org/whl/cpu # CPU-only PyTorch for resource efficiency
-transformers>=4.30.0        # Hugging Face transformers for DeBERTa NLP signal modeling
-openai>=1.99.0              # Responses API structured-output LLM forecaster
+torch==2.12.0
+transformers==5.10.2
+openai==2.41.1
 
 # Dashboard & API Service
-fastapi>=0.100.0            # REST API wrapper for staging manual approvals
-uvicorn>=0.22.0             # High-performance ASGI web server
-dash>=2.11.0                # Live dashboard UI using Plotly React elements
-plotly>=5.15.0              # Statistical plotting and calibration curves
-dash-bootstrap-components>=1.0.0 # UI styling layout and elements
+fastapi==0.136.3
+uvicorn==0.49.0
+dash==4.2.0
+plotly==6.8.0
+dash-bootstrap-components==2.0.4
 
+# Resilience
+tenacity==9.0.0
+
+# Error tracking (optional: only active if SENTRY_DSN is set)
+sentry-sdk==2.20.0
 
 # Testing Framework
-pytest>=7.3.0               # Test runner
-pytest-asyncio>=0.21.0      # Async test fixtures and wrappers
-pytest-cov>=4.1.0           # Test suite coverage calculation
-alembic>=1.13.0             # Database migration framework
-prometheus-client>=0.19.0   # Prometheus /metrics endpoint
-python-json-logger>=2.0.0   # Structured JSON logging
-slowapi>=0.1.9              # Rate limiting for FastAPI endpoints
-itsdangerous>=2.1.0         # CSRF token signing
-arch>=6.0.0                 # GARCH volatility modeling
-xgboost>=2.0.0              # Gradient boosting for signal classification
-statsmodels>=0.14.0         # ARIMA, state-space models, statistical tests
+pytest==9.0.3
+pytest-asyncio==1.4.0
+pytest-cov==7.1.0
+pytest-rerunfailures==16.4
+alembic==1.18.4
+
+# Infrastructure
+prometheus-client==0.25.0
+python-json-logger==4.1.0
+slowapi==0.1.9
+itsdangerous==2.2.0
+SQLAlchemy==2.0.50
+arch==8.0.0
+xgboost==3.2.0
+statsmodels==0.14.6

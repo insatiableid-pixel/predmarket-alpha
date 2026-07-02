@@ -1,0 +1,156 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "contract_math": {
+      "required": [
+        "contract_price_break_even_probability",
+        "displayed_price_break_even_probability",
+        "all_in_break_even_probability",
+        "payout_implied_break_even_probability",
+        "break_even_probability",
+        "all_in_cost",
+        "effective_hold_probability",
+        "expected_value_per_contract",
+        "margin_probability",
+        "expected_roi",
+        "cost_basis_policy",
+        "fee_policy",
+        "resolution_policy"
+      ],
+      "type": "object"
+    },
+    "execution_enabled": {
+      "const": false
+    },
+    "generated_utc": {
+      "type": "string"
+    },
+    "repo_feeds": {
+      "items": {
+        "required": [
+          "repo_id",
+          "repo_path",
+          "status",
+          "gate_status",
+          "row_count",
+          "usable_row_count",
+          "blockers",
+          "source_artifacts",
+          "ev_readiness",
+          "research_only",
+          "execution_enabled"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "research_only": {
+      "const": true
+    },
+    "rows": {
+      "items": {
+        "required": [
+          "row_id",
+          "source_repo_id",
+          "contract_ticker",
+          "side",
+          "resolution_rule",
+          "resolution_rule_source",
+          "resolution_rule_status",
+          "resolution_rule_source_artifact",
+          "resolution_rule_source_sha256",
+          "display_price",
+          "display_price_source",
+          "executable_price",
+          "all_in_cost",
+          "gross_execution_cost",
+          "cost_basis_source",
+          "cost_quality",
+          "fee_source",
+          "fee_rate",
+          "fee_mode",
+          "payout_if_correct",
+          "payout_multiple",
+          "kalshi_payout_multiple",
+          "all_in_payout_multiple",
+          "payout_multiple_source",
+          "contract_price_break_even_probability",
+          "displayed_price_break_even_probability",
+          "all_in_break_even_probability",
+          "payout_implied_break_even_probability",
+          "gross_payout_implied_break_even_probability",
+          "fee_inclusive_payout_implied_break_even_probability",
+          "payout_multiplier_discrepancy_probability",
+          "break_even_probability",
+          "break_even_source",
+          "effective_hold_probability",
+          "calibrated_probability",
+          "calibrated_probability_source",
+          "calibration_status",
+          "calibrated_probability_source_artifact",
+          "calibrated_probability_source_sha256",
+          "estimated_probability",
+          "estimated_probability_source",
+          "reference_probability",
+          "reference_probability_source",
+          "edge_probability",
+          "margin_probability",
+          "expected_value_per_contract",
+          "source_gate_status",
+          "gate_status",
+          "gate_reasons",
+          "usable",
+          "research_only",
+          "execution_enabled"
+        ],
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "safety": {
+      "required": [
+        "research_only",
+        "provider_api_calls",
+        "database_writes",
+        "market_execution",
+        "account_or_order_paths"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": 1
+    },
+    "status": {
+      "type": "string"
+    },
+    "summary": {
+      "required": [
+        "repo_count",
+        "row_count",
+        "usable_row_count",
+        "positive_edge_row_count",
+        "verified_resolution_rule_row_count",
+        "inferred_resolution_rule_row_count",
+        "missing_calibrated_probability_row_count",
+        "calibrated_probability_overlay_row_count",
+        "contract_mapping_overlay_row_count",
+        "gate_counts"
+      ],
+      "type": "object"
+    }
+  },
+  "required": [
+    "schema_version",
+    "generated_utc",
+    "status",
+    "research_only",
+    "execution_enabled",
+    "summary",
+    "contract_math",
+    "repo_feeds",
+    "rows",
+    "safety"
+  ],
+  "title": "KalshiContractEVLedgerV1",
+  "type": "object"
+}

@@ -1,0 +1,208 @@
+{
+  "execution_enabled": false,
+  "gates": [
+    {
+      "name": "contract_mapping_files_present",
+      "reasons": [
+        "Found 1 contract-mapping overlay file(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "calibrated_probability_files_present",
+      "reasons": [
+        "Found 1 calibrated-probability overlay file(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "valid_contract_mapping_rows_present",
+      "reasons": [
+        "Loaded 32 valid contract-mapping row(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "valid_calibrated_probability_rows_present",
+      "reasons": [
+        "Loaded 32 valid calibrated-probability row(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "exact_ticker_side_join_present",
+      "reasons": [
+        "Found 32 exact contract_ticker/side join(s)."
+      ],
+      "status": "pass"
+    },
+    {
+      "name": "usable_overlay_ev_rows_present",
+      "reasons": [
+        "Found 12 usable overlay EV row(s)."
+      ],
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-01T19:26:36.358740Z",
+  "joined_keys": [
+    {
+      "contract_ticker": "KXNFLGAME-26AUG06CARARI-ARI",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26AUG13ARILV-ARI",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP09NESEA-NE",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP09NESEA-SEA",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP10SFLAR-LAR",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP10SFLAR-SF",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13ARILAC-ARI",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13ARILAC-LAC",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-ATL",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-PIT",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13BALIND-BAL",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13BALIND-IND",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-BUF",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-HOU",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13CHICAR-CAR",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13CHICAR-CHI",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13CLEJAC-CLE",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13CLEJAC-JAC",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13DALNYG-NYG",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13GBMIN-GB",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13GBMIN-MIN",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13MIALV-LV",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13MIALV-MIA",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13NODET-DET",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13NODET-NO",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13NYJTEN-NYJ",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13TBCIN-CIN",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13TBCIN-TB",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13WASPHI-PHI",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP13WASPHI-WAS",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP14DENKC-DEN",
+      "side": "yes"
+    },
+    {
+      "contract_ticker": "KXNFLGAME-26SEP14DENKC-KC",
+      "side": "yes"
+    }
+  ],
+  "next_action": "Review the usable overlay EV rows in the ledger; execution remains disabled.",
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true
+  },
+  "schema_version": 1,
+  "source_artifacts": {
+    "calibrated_probability_files": [
+      "/home/mrwatson/manual_drops/kalshi_ev_probabilities/kalshi_ev_nfl_calibrated_probability_overlay_keys_96008378d65c.json"
+    ],
+    "contract_mapping_files": [
+      "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json"
+    ]
+  },
+  "status": "overlay_preflight_usable_ev_rows_present",
+  "summary": {
+    "calibrated_probability_file_count": 1,
+    "contract_mapping_file_count": 1,
+    "exact_join_row_count": 32,
+    "overlay_ev_row_count": 32,
+    "usable_overlay_ev_row_count": 12,
+    "valid_calibrated_probability_row_count": 32,
+    "valid_contract_mapping_row_count": 32
+  }
+}

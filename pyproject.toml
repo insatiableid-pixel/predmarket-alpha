@@ -1,0 +1,141 @@
+# Central project + tooling configuration for predmarket-alpha.
+#
+# This file is the single source of truth for: static typing (mypy), linting and
+# formatting (ruff), dead-code analysis (vulture) and import-boundary enforcement
+# (import-linter). The Makefile targets and pre-commit hooks read these sections.
+
+[project]
+name = "predmarket-alpha"
+version = "0.1.0"
+description = "Kalshi event-contract mispricing research platform"
+requires-python = ">=3.12"
+readme = "README.md"
+
+# ---------------------------------------------------------------------------
+# Ruff: linter + formatter (ruff check / ruff format)
+# ---------------------------------------------------------------------------
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+extend-exclude = ["data", "docs", ".tmp", "htmlcov", "build", "dist"]
+
+[tool.ruff.lint]
+# Core rule set chosen for genuine, language-level value:
+#   E,W  pycodestyle errors/warnings (incl. E501 line-too-long)
+#   F    pyflakes (unused imports/locals, undefined names)
+#   I    isort (deterministic import ordering)
+#   N    pep8-naming (consistent naming conventions)
+#   C901 mccabe complexity (cyclomatic complexity gate)
+#   UP   pyupgrade (modern Python syntax)
+#   B    flake8-bugbear (likely-bug patterns)
+#   RUF  ruff-native rules
+select = ["E", "W", "F", "I", "N", "C901", "UP", "B", "RUF"]
+# Project intentionally keeps legacy suppression minimal. Per-rule ignores below
+# are deliberate scope decisions, not blanket silencing.
+ignore = [
+  "B008",   # FastAPI Depends()/Query() in defaults is the intended pattern here.
+  "E501",   # line-length is enforced by the formatter; tracked via the ruff baseline ratchet.
+]
+
+[tool.ruff.lint.mccabe]
+# Cyclomatic-complexity gate. Functions exceeding this must be split.
+max-complexity = 12
+
+[tool.ruff.lint.pycodestyle]
+max-line-length = 100
+
+[tool.ruff.format]
+# Explicit formatter configuration (run via `make format` / pre-commit ruff-format).
+line-ending = "lf"
+indent-style = "space"
+docstring-code-format = true
+
+# ---------------------------------------------------------------------------
+# mypy: static type checking (strict)
+# ---------------------------------------------------------------------------
+[tool.mypy]
+python_version = "3.12"
+# Strict mode is enabled project-wide. The library is mid-migration to full
+# annotation coverage; `make typecheck` surfaces the current strict-error count
+# so it can be ratcheted down rather than ignored.
+strict = true
+warn_unused_ignores = true
+warn_redundant_casts = true
+show_error_codes = true
+namespace_packages = true
+files = ["predmarket"]
+
+[[tool.mypy.overrides]]
+# Third-party libraries without shipped type stubs.
+module = [
+  "kalshi.*",
+  "duckdb",
+  "mapie.*",
+  "arch.*",
+  "statsmodels.*",
+  "pyarrow.*",
+  "dash.*",
+  "dash_bootstrap_components.*",
+  "plotly.*",
+  "prometheus_client.*",
+  "slowapi.*",
+]
+ignore_missing_imports = true
+
+# ---------------------------------------------------------------------------
+# vulture: dead-code detection
+# ---------------------------------------------------------------------------
+[tool.vulture]
+# Minimum confidence for reported items. 60 filters out most heuristic noise
+# while still flagging provably-unused code. Tune up to 80 once the backlog
+# (currently ~176 items) is triaged.
+min_confidence = 60
+paths = ["predmarket", "scripts"]
+sort_by_size = true
+
+# ---------------------------------------------------------------------------
+# deptry: unused/missing dependency detection
+# ---------------------------------------------------------------------------
+[tool.deptry]
+# Check the predmarket package for unused and missing dependencies.
+exclude = ["venv", ".venv", "docs", "tests", "scripts", "data"]
+
+# ---------------------------------------------------------------------------
+# pytest: test configuration
+# ---------------------------------------------------------------------------
+[tool.pytest.ini_options]
+markers = [
+    "integration: marks tests as integration tests (deselect with '-m \"not integration\"')",
+]
+addopts = "--durations=10 --durations-min=0.5"
+
+# ---------------------------------------------------------------------------
+# import-linter: architectural boundary enforcement
+# ---------------------------------------------------------------------------
+[tool.importlinter]
+# The library package (`predmarket`) must never depend on CLI/orchestration
+# scripts. scripts import predmarket; the reverse direction is forbidden.
+# include_external_packages lets the forbidden contract reason about `scripts`.
+root_package = "predmarket"
+include_external_packages = true
+
+[[tool.importlinter.contracts]]
+name = "Library code must not import CLI scripts"
+type = "forbidden"
+source_modules = ["predmarket"]
+forbidden_modules = ["scripts"]
+
+[[tool.importlinter.contracts]]
+name = "Foundational modules must not import higher-level layers"
+# config/contracts/store are leaf-level; they must not pull in research,
+# execution or dashboard layers (keeps the dependency graph acyclic by layer).
+type = "forbidden"
+source_modules = ["predmarket.config", "predmarket.contracts"]
+forbidden_modules = [
+  "predmarket.research",
+  "predmarket.execution",
+  "predmarket.forecasting_pipeline",
+  "predmarket.kalshi_research_cycle",
+  "predmarket.kalshi_live_rank",
+  "predmarket.dashboard",
+]

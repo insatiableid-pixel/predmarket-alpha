@@ -3,6 +3,66 @@ import shutil
 from pathlib import Path
 from predmarket.config import Config, GlobalConfig, VenuesConfig, ForecastingConfig, PortfolioConfig
 
+# --- N+1 query detection ---
+# Enable SQLAlchemy query counting to surface N+1 patterns during tests.
+# The fixture tracks total queries per test; tests using the DB can assert
+# reasonable query counts. Set ``query_counter`` on a test to access it.
+
+class QueryCounter:
+    """Counts SQL queries executed during a test to detect N+1 patterns."""
+
+    def __init__(self) -> None:
+        self.count = 0
+        self.statements: list[str] = []
+
+    def reset(self) -> None:
+        self.count = 0
+        self.statements = []
+
+    def before_cursor_execute(self, conn, cursor, statement, parameters, context, executemany) -> None:
+        self.count += 1
+        self.statements.append(statement)
+
+
+@pytest.fixture
+def query_counter():
+    """Fixture that counts SQL queries. Use to detect N+1 patterns.
+
+    Example::
+
+        def test_no_n_plus_one(query_counter, test_data_dir):
+            store = PointInTimeStore(test_data_dir / "database.sqlite")
+            for i in range(10):
+                store.add_record(...)
+            assert query_counter.count < 20  # flag if too many queries
+    """
+    counter = QueryCounter()
+
+    try:
+        from sqlalchemy import event
+        from predmarket.store import PointInTimeStore
+        # Attach to new SQLite engines created by PointInTimeStore
+        original_init = PointInTimeStore.__init__
+
+        def patched_init(self, *args, **kwargs):
+            original_init(self, *args, **kwargs)
+            if hasattr(self, "engine"):
+                event.listen(self.engine, "before_cursor_execute", counter.before_cursor_execute)
+
+        PointInTimeStore.__init__ = patched_init
+    except ImportError:
+        pass
+
+    yield counter
+    counter.reset()
+
+    try:
+        from predmarket.store import PointInTimeStore
+        PointInTimeStore.__init__ = original_init  # type: ignore[name-defined]
+    except (NameError, ImportError):
+        pass
+
+
 @pytest.fixture(autouse=True)
 def setup_api_key_env(monkeypatch):
     monkeypatch.setenv("API_KEY", "predmarket_secret_key_123")

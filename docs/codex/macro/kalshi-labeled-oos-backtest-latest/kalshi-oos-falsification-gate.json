@@ -1,0 +1,57 @@
+{
+  "blocked_hypothesis_count": 36,
+  "execution_enabled": false,
+  "gate_counts": {
+    "blocked": 4,
+    "fail": 0,
+    "pass": 1,
+    "warn": 0
+  },
+  "gates": [
+    {
+      "name": "label_packets_available",
+      "reason": "0 safe label packet(s) loaded.",
+      "status": "blocked"
+    },
+    {
+      "name": "valid_time_safe_observations",
+      "reason": "0 valid observation row(s); 0 invalid row(s).",
+      "status": "blocked"
+    },
+    {
+      "name": "oos_hypotheses_tested",
+      "reason": "0 hypothesis/hypotheses have OOS test statistics.",
+      "status": "blocked"
+    },
+    {
+      "name": "fdr_controlled_promotions",
+      "reason": "0 research promotion(s) after FDR control.",
+      "status": "blocked"
+    },
+    {
+      "name": "no_execution_boundary",
+      "reason": "Harness is research-only and emits no account/order fields.",
+      "status": "pass"
+    }
+  ],
+  "generated_utc": "2026-07-01T23:52:35Z",
+  "promoted_hypothesis_count": 0,
+  "registered_hypothesis_count": 36,
+  "rejected_hypothesis_count": 0,
+  "research_only": true,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "status": "falsification_gate_blocked_missing_labeled_oos_evidence",
+  "tested_hypothesis_count": 0
+}

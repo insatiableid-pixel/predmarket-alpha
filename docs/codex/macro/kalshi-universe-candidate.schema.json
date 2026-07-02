@@ -1,0 +1,75 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "classification": {
+      "enum": [
+        "nfl",
+        "mlb",
+        "nba",
+        "atp",
+        "other_sports",
+        "weather",
+        "macro_econ",
+        "politics_policy",
+        "finance_crypto",
+        "entertainment",
+        "geopolitics",
+        "unknown_soft_watch"
+      ]
+    },
+    "ev_status": {
+      "const": "not_evaluated_universe_inventory_only"
+    },
+    "safety": {
+      "required": [
+        "research_only",
+        "execution_enabled",
+        "market_execution",
+        "account_or_order_paths"
+      ],
+      "type": "object"
+    },
+    "schema_version": {
+      "const": "KalshiUniverseCandidateV1"
+    },
+    "ticker": {
+      "type": "string"
+    },
+    "usable": {
+      "const": false
+    }
+  },
+  "required": [
+    "schema_version",
+    "ticker",
+    "event_ticker",
+    "series_ticker",
+    "title",
+    "status",
+    "close_ts",
+    "time_to_close_hours",
+    "yes_bid",
+    "yes_ask",
+    "no_bid",
+    "no_ask",
+    "volume",
+    "open_interest",
+    "liquidity",
+    "official_rules_hash",
+    "official_rules_source",
+    "classification",
+    "model_route",
+    "softness_score",
+    "softness_reasons",
+    "gate_status",
+    "gates",
+    "calibrated_probability",
+    "edge_probability",
+    "expected_value_per_contract",
+    "usable",
+    "ev_status",
+    "safety"
+  ],
+  "title": "KalshiUniverseCandidateV1",
+  "type": "object"
+}

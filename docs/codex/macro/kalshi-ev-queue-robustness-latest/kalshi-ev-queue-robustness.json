@@ -1,0 +1,630 @@
+{
+  "account_or_order_paths": false,
+  "database_writes": false,
+  "execution_enabled": false,
+  "generated_utc": "2026-07-01T22:21:13Z",
+  "inputs": {
+    "queue_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/macro/latest-kalshi-ev-review-queue.json",
+    "queue_status": "kalshi_ev_review_queue_positive_candidates_need_robustness",
+    "snapshot_dir": "/home/mrwatson/manual_drops/kalshi"
+  },
+  "live_calls_made": false,
+  "market_execution": false,
+  "next_action": "Repeat-positive rows exist, but current robustness is cost-caveated. Next useful input is actual all-in ticket-cost confirmation without order submission, plus forward-context and independent validation.",
+  "policy": {
+    "distinct_snapshot_key": "created_at_utc",
+    "min_robust_margin": 0.02,
+    "repeat_positive_rule": "at least two distinct snapshots with positive margin",
+    "robust_rule": "repeat positive plus min margin >= threshold and no cost-quality caveat; current public snapshots normally remain cost-caveated until actual all-in ticket cost is verified"
+  },
+  "provider_api_calls": false,
+  "research_only": true,
+  "rows": [
+    {
+      "calibrated_probability": 0.6462354523607845,
+      "contract_ticker": "KXNFLGAME-26SEP13MIALV-MIA",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.3965,
+      "latest_margin_probability": 0.24973545236078448,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.24973545236078448,
+      "min_margin_probability": 0.24973545236078448,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.3965,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0165,
+          "margin_probability": 0.24973545236078448,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.38,
+          "yes_bid": 0.35,
+          "yes_spread": 0.03
+        },
+        {
+          "all_in_break_even_probability": 0.3965,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0165,
+          "margin_probability": 0.24973545236078448,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.38,
+          "yes_bid": 0.35,
+          "yes_spread": 0.03
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 1,
+      "robustness_reasons": [
+        "fee is estimated from executable price"
+      ],
+      "selection": "MIA",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.6383921331431862,
+      "contract_ticker": "KXNFLGAME-26SEP14DENKC-DEN",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.47740000000000005,
+      "latest_margin_probability": 0.16099213314318617,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.16099213314318617,
+      "min_margin_probability": 0.16099213314318617,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.47740000000000005,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0174,
+          "margin_probability": 0.16099213314318617,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.46,
+          "yes_bid": 0.43,
+          "yes_spread": 0.03
+        },
+        {
+          "all_in_break_even_probability": 0.47740000000000005,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0174,
+          "margin_probability": 0.16099213314318617,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.46,
+          "yes_bid": 0.43,
+          "yes_spread": 0.03
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 2,
+      "robustness_reasons": [
+        "fee is estimated from executable price"
+      ],
+      "selection": "DEN",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.4657034610346182,
+      "contract_ticker": "KXNFLGAME-26SEP13TBCIN-TB",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.3864,
+      "latest_margin_probability": 0.07930346103461816,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.07930346103461816,
+      "min_margin_probability": 0.07930346103461816,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.3864,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0164,
+          "margin_probability": 0.07930346103461816,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.37,
+          "yes_bid": 0.36,
+          "yes_spread": 0.01
+        },
+        {
+          "all_in_break_even_probability": 0.3864,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0164,
+          "margin_probability": 0.07930346103461816,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.37,
+          "yes_bid": 0.36,
+          "yes_spread": 0.01
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 3,
+      "robustness_reasons": [
+        "fee is estimated from executable price"
+      ],
+      "selection": "TB",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.6112831976968942,
+      "contract_ticker": "KXNFLGAME-26SEP13GBMIN-MIN",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.5475,
+      "latest_margin_probability": 0.06378319769689422,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.06378319769689422,
+      "min_margin_probability": 0.06378319769689422,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.5475,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0175,
+          "margin_probability": 0.06378319769689422,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.53,
+          "yes_bid": 0.51,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.5475,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0175,
+          "margin_probability": 0.06378319769689422,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.53,
+          "yes_bid": 0.51,
+          "yes_spread": 0.02
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 4,
+      "robustness_reasons": [
+        "fee is estimated from executable price"
+      ],
+      "selection": "MIN",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.7389329793351639,
+      "contract_ticker": "KXNFLGAME-26SEP13WASPHI-PHI",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.6855,
+      "latest_margin_probability": 0.05343297933516389,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.05343297933516389,
+      "min_margin_probability": 0.05343297933516389,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.6855,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0155,
+          "margin_probability": 0.05343297933516389,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.67,
+          "yes_bid": 0.65,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.6855,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0155,
+          "margin_probability": 0.05343297933516389,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.67,
+          "yes_bid": 0.65,
+          "yes_spread": 0.02
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 5,
+      "robustness_reasons": [
+        "fee is estimated from executable price"
+      ],
+      "selection": "PHI",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.4153365117504308,
+      "contract_ticker": "KXNFLGAME-26SEP13BALIND-IND",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.3965,
+      "latest_margin_probability": 0.018836511750430773,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.018836511750430773,
+      "min_margin_probability": 0.018836511750430773,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.3965,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0165,
+          "margin_probability": 0.018836511750430773,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.38,
+          "yes_bid": 0.36,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.3965,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0165,
+          "margin_probability": 0.018836511750430773,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.38,
+          "yes_bid": 0.35,
+          "yes_spread": 0.03
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 6,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "IND",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.4835108350648447,
+      "contract_ticker": "KXNFLGAME-26SEP13NYJTEN-NYJ",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.46740000000000004,
+      "latest_margin_probability": 0.016110835064844675,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.016110835064844675,
+      "min_margin_probability": 0.016110835064844675,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.46740000000000004,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0174,
+          "margin_probability": 0.016110835064844675,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.45,
+          "yes_bid": 0.4,
+          "yes_spread": 0.05
+        },
+        {
+          "all_in_break_even_probability": 0.46740000000000004,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0174,
+          "margin_probability": 0.016110835064844675,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.45,
+          "yes_bid": 0.4,
+          "yes_spread": 0.05
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 7,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "NYJ",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.6916445527276855,
+      "contract_ticker": "KXNFLGAME-26SEP09NESEA-SEA",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.6758000000000001,
+      "latest_margin_probability": 0.01584455272768548,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.01584455272768548,
+      "min_margin_probability": 0.01584455272768548,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.6758000000000001,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0158,
+          "margin_probability": 0.01584455272768548,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.66,
+          "yes_bid": 0.65,
+          "yes_spread": 0.01
+        },
+        {
+          "all_in_break_even_probability": 0.6758000000000001,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0158,
+          "margin_probability": 0.01584455272768548,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.66,
+          "yes_bid": 0.65,
+          "yes_spread": 0.01
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 8,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "SEA",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.5357079846401166,
+      "contract_ticker": "KXNFLGAME-26SEP13BUFHOU-HOU",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.5275,
+      "latest_margin_probability": 0.008207984640116628,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.008207984640116628,
+      "min_margin_probability": 0.008207984640116628,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.5275,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0175,
+          "margin_probability": 0.008207984640116628,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.51,
+          "yes_bid": 0.49,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.5275,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0175,
+          "margin_probability": 0.008207984640116628,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.51,
+          "yes_bid": 0.48,
+          "yes_spread": 0.03
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 9,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "HOU",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.2081959141556554,
+      "contract_ticker": "KXNFLGAME-26SEP13ARILAC-ARI",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.2008,
+      "latest_margin_probability": 0.007395914155655381,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.007395914155655381,
+      "min_margin_probability": 0.007395914155655381,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.2008,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0108,
+          "margin_probability": 0.007395914155655381,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.19,
+          "yes_bid": 0.17,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.2008,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0108,
+          "margin_probability": 0.007395914155655381,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.19,
+          "yes_bid": 0.17,
+          "yes_spread": 0.02
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 10,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "ARI",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.7882220767047202,
+      "contract_ticker": "KXNFLGAME-26SEP13NODET-DET",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.7824,
+      "latest_margin_probability": 0.005822076704720236,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.005822076704720236,
+      "min_margin_probability": 0.005822076704720236,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.7824,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0124,
+          "margin_probability": 0.005822076704720236,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.77,
+          "yes_bid": 0.76,
+          "yes_spread": 0.01
+        },
+        {
+          "all_in_break_even_probability": 0.7824,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0124,
+          "margin_probability": 0.005822076704720236,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.77,
+          "yes_bid": 0.76,
+          "yes_spread": 0.01
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 11,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "DET",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    },
+    {
+      "calibrated_probability": 0.6208232209366369,
+      "contract_ticker": "KXNFLGAME-26SEP13ATLPIT-PIT",
+      "disposition": "repeat_positive_cost_caveated",
+      "latest_all_in_break_even": 0.6168,
+      "latest_margin_probability": 0.004023220936636873,
+      "margin_delta_first_to_latest": 0.0,
+      "max_margin_probability": 0.004023220936636873,
+      "min_margin_probability": 0.004023220936636873,
+      "observations": [
+        {
+          "all_in_break_even_probability": 0.6168,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T18:57:56Z",
+          "fee_estimate": 0.0168,
+          "margin_probability": 0.004023220936636873,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+          "source_sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5",
+          "yes_ask": 0.6,
+          "yes_bid": 0.58,
+          "yes_spread": 0.02
+        },
+        {
+          "all_in_break_even_probability": 0.6168,
+          "cost_quality": "estimated_fee_from_executable_price",
+          "created_at_utc": "2026-07-01T22:12:33Z",
+          "fee_estimate": 0.0168,
+          "margin_probability": 0.004023220936636873,
+          "positive": true,
+          "source_path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+          "source_sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693",
+          "yes_ask": 0.6,
+          "yes_bid": 0.58,
+          "yes_spread": 0.02
+        }
+      ],
+      "positive_snapshot_count": 2,
+      "queue_rank": 12,
+      "robustness_reasons": [
+        "minimum repeated margin below robust threshold 0.0200",
+        "fee is estimated from executable price"
+      ],
+      "selection": "PIT",
+      "side": "yes",
+      "snapshot_count": 2,
+      "source_repo_id": "nfl_quant_glm51_greenfield"
+    }
+  ],
+  "safety": {
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true
+  },
+  "schema_version": 1,
+  "snapshots": [
+    {
+      "created_at_utc": "2026-07-01T18:57:56Z",
+      "market_count": 66,
+      "path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T185756Z.json",
+      "sha256": "sha256:524c18d6 58fe690b 2b34319a 9229c378 dbf5b646 8882d128 65b6c1b5 d0a07ff5"
+    },
+    {
+      "created_at_utc": "2026-07-01T22:12:33Z",
+      "market_count": 66,
+      "path": "/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_20260701T221233Z.json",
+      "sha256": "sha256:32bb1a6b 2a82365e 84334faa c7a8e041 bf431623 a014786e 01a12b82 92105693"
+    }
+  ],
+  "staking_or_sizing_guidance": false,
+  "status": "kalshi_ev_queue_robustness_repeat_positive_cost_caveated",
+  "summary": {
+    "cost_caveated_row_count": 12,
+    "distinct_snapshot_count": 2,
+    "missing_latest_quote_count": 0,
+    "queue_row_count": 12,
+    "repeat_positive_row_count": 12,
+    "robust_candidate_count": 0,
+    "rows_with_two_plus_snapshots": 12
+  }
+}

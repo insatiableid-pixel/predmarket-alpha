@@ -1,0 +1,73 @@
+{
+  "all_lanes_parked": false,
+  "as_of_utc": "2026-07-02T18:17:00Z",
+  "blocker_summary": [],
+  "priority_formula": "3*architecture_leverage + 2*evidence_delta + 2*edge_feedback_speed + blocker_criticality - dirty_risk - live_data_risk - verification_cost",
+  "ranked_repos": [
+    {
+      "dirty_total": 62,
+      "gate_counts": {
+        "blocked": 1,
+        "fail": 0,
+        "pass": 30,
+        "warn": 2
+      },
+      "priority": 34,
+      "repo_id": "predmarket-alpha",
+      "status": "signal_factory_crypto_proxy_capacity_depth_blocked"
+    },
+    {
+      "dirty_total": 182,
+      "gate_counts": {
+        "blocked": 4,
+        "fail": 0,
+        "pass": 2,
+        "warn": 1
+      },
+      "priority": -3,
+      "repo_id": "atp-oracle",
+      "status": "tennis_type2_g1g2_diagnostic_ready_blocked_fresh_validation_external_evidence"
+    },
+    {
+      "dirty_total": 226,
+      "gate_counts": {
+        "blocked": 4,
+        "fail": 0,
+        "pass": 12,
+        "warn": 6
+      },
+      "priority": -4,
+      "repo_id": "mlb-platform",
+      "status": "primary_type2_betexplorer_market_closing_comparison_no_policy_change"
+    },
+    {
+      "dirty_total": 206,
+      "gate_counts": {
+        "blocked": 0,
+        "fail": 0,
+        "pass": 11,
+        "warn": 4
+      },
+      "priority": -5,
+      "repo_id": "nfl_quant_glm51_greenfield",
+      "status": "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+    },
+    {
+      "dirty_total": 552,
+      "gate_counts": {
+        "blocked": 3,
+        "fail": 0,
+        "pass": 11,
+        "warn": 0
+      },
+      "priority": -11,
+      "repo_id": "nba-analytics-platform",
+      "status": "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+    }
+  ],
+  "recommended_next_tranche": "Use predmarket as the Kalshi signal-factory command center: accumulate public orderbook depth for current crypto proxy candidates and keep capacity blocked until positive depth clears the conservative probability hurdle.",
+  "recommended_repo_id": "predmarket-alpha",
+  "recommended_repo_path": "/home/mrwatson/projects/predmarket-alpha",
+  "schema_version": 1,
+  "stop_condition": "Stop before inferring capacity from top-of-book prices without depth."
+}

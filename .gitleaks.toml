@@ -1,0 +1,14 @@
+title = "predmarket-alpha gitleaks config"
+
+[extend]
+useDefault = true
+
+[[allowlists]]
+description = "Generated command-center JSON stores SHA-256 audit digests, not credentials."
+condition = "AND"
+paths = [
+  '''docs/codex/macro/.*\.json''',
+]
+regexes = [
+  '''[a-f0-9]{64}''',
+]
