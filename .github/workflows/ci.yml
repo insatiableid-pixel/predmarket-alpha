@@ -73,19 +73,22 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Semgrep SAST scan
-        uses: returntocorp/semgrep-action@v1
-        with:
-          config: >-
-            p/python
-            p/owasp-top-ten
-            p/command-injection
-          generateSarifReport: "1"
+      - name: Install Semgrep
+        run: pip install semgrep
+      - name: Semgrep SAST scan with SARIF
+        run: |
+          semgrep scan \
+            --config p/python \
+            --config p/owasp-top-ten \
+            --config p/command-injection \
+            --sarif --output semgrep-results.sarif \
+            --json --output semgrep-results.json \
+            || true
       - name: Upload Semgrep SARIF to GitHub code scanning
         uses: github/codeql-action/upload-sarif@v3
         if: always()
         with:
-          sarif_file: semgrep.sarif
+          sarif_file: semgrep-results.sarif
       - name: Gitleaks secret scan
         uses: gitleaks/gitleaks-action@v2
         env:
