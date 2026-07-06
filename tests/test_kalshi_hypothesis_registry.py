@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_hypothesis_registry.py"
 SCHEMA_PATH = (
     Path(__file__).resolve().parents[1]
@@ -114,13 +113,21 @@ def test_registry_generates_versioned_unvalidated_hypotheses(tmp_path: Path) -> 
         generated_utc="2026-07-01T23:30:00Z",
     )
 
-    assert report["status"] == "hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence"
+    assert (
+        report["status"]
+        == "hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence"
+    )
     assert report["research_only"] is True
     assert report["execution_enabled"] is False
     assert report["safety"]["market_execution"] is False
     assert report["summary"]["hypothesis_count"] >= 4
-    assert report["summary"]["multiple_testing_family_count"] == report["summary"]["hypothesis_count"]
-    assert report["falsification_gate"]["status"] == "falsification_gate_blocked_missing_labeled_oos_evidence"
+    assert (
+        report["summary"]["multiple_testing_family_count"] == report["summary"]["hypothesis_count"]
+    )
+    assert (
+        report["falsification_gate"]["status"]
+        == "falsification_gate_blocked_missing_labeled_oos_evidence"
+    )
     assert report["falsification_gate"]["tested_hypothesis_count"] == 0
     assert report["falsification_gate"]["promoted_hypothesis_count"] == 0
     ids = [row["hypothesis_id"] for row in report["hypotheses"]]
@@ -179,7 +186,50 @@ def test_writer_emits_registry_gate_latest_json_markdown_and_csv(tmp_path: Path)
     assert Path(paths["latest_json_path"]).exists()
     assert Path(paths["latest_falsification_gate_json_path"]).exists()
     assert "Kalshi Hypothesis Registry" in Path(paths["markdown_path"]).read_text(encoding="utf-8")
-    assert "Kalshi Falsification Gate" in Path(paths["falsification_gate_markdown_path"]).read_text(encoding="utf-8")
+    assert "Kalshi Falsification Gate" in Path(paths["falsification_gate_markdown_path"]).read_text(
+        encoding="utf-8"
+    )
+
+
+def test_registry_registers_flow_and_passive_liquidity_with_own_acceptance_policy(
+    tmp_path: Path,
+) -> None:
+    module = load_registry_module()
+    universe_path = tmp_path / "universe.json"
+    write_json(
+        universe_path,
+        safe_artifact(
+            summary={"candidate_count": 1},
+            candidates=[
+                {
+                    "ticker": "KXMLBGAME-26JUL01-CHC",
+                    "event_ticker": "KXMLBGAME-26JUL01",
+                    "title": "Will Chicago win?",
+                    "classification": "mlb",
+                    "model_route": "mlb-platform",
+                    "softness_reasons": [
+                        "settles within 2h",
+                        "low displayed liquidity",
+                    ],
+                }
+            ],
+        ),
+    )
+
+    report = module.build_hypothesis_registry(
+        universe_scan_path=universe_path,
+        ev_ledger_path=tmp_path / "missing-ledger.json",
+        generated_utc="2026-07-01T23:30:00Z",
+    )
+
+    by_family = {row["feature_family"]: row for row in report["hypotheses"]}
+    flow = by_family["near_resolution_informed_flow"]
+    passive = by_family["passive_liquidity_provision"]
+    assert flow["primary_metric"] == "pre_close_flow_lead_lag_survival"
+    assert passive["primary_metric"] == "maker_fill_net_ev_after_adverse_selection"
+    assert "generic directional" in flow["acceptance_criteria"]
+    assert "generic directional" in passive["acceptance_criteria"]
+    assert "adverse-selection" in passive["promotion_rule"]
 
 
 def test_schema_and_makefile_target_exist() -> None:

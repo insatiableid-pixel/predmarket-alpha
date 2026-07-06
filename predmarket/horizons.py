@@ -8,7 +8,7 @@ for longer horizons.
 
 import logging
 from enum import Enum
-from typing import Dict, Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -20,15 +20,15 @@ logger = logging.getLogger("predmarket.horizons")
 class ForecastHorizon(Enum):
     """Standard forecast horizons aligned with prediction market resolution times."""
 
-    INTRADAY = "1h"   # ~1 hour to resolution
-    SHORT = "1d"       # ~1 day
-    MEDIUM = "7d"      # ~1 week
-    LONG = "30d"       # ~1 month
+    INTRADAY = "1h"  # ~1 hour to resolution
+    SHORT = "1d"  # ~1 day
+    MEDIUM = "7d"  # ~1 week
+    LONG = "30d"  # ~1 month
 
 
 # Multipliers applied to base uncertainty for each horizon.
 # Longer horizons are inherently less certain.
-_HORIZON_UNCERTAINTY_SCALE: Dict[ForecastHorizon, float] = {
+_HORIZON_UNCERTAINTY_SCALE: dict[ForecastHorizon, float] = {
     ForecastHorizon.INTRADAY: 0.5,
     ForecastHorizon.SHORT: 1.0,
     ForecastHorizon.MEDIUM: 2.0,
@@ -36,7 +36,7 @@ _HORIZON_UNCERTAINTY_SCALE: Dict[ForecastHorizon, float] = {
 }
 
 # Seconds per horizon (used for automatic mapping)
-_HORIZON_SECONDS: Dict[ForecastHorizon, float] = {
+_HORIZON_SECONDS: dict[ForecastHorizon, float] = {
     ForecastHorizon.INTRADAY: 3600.0,
     ForecastHorizon.SHORT: 86400.0,
     ForecastHorizon.MEDIUM: 604800.0,
@@ -115,7 +115,7 @@ class HorizonSpecificForecaster:
         snapshot: Any,
         category: str,
         base_uncertainty: float = 0.1,
-    ) -> Dict[ForecastHorizon, DensityForecast]:
+    ) -> dict[ForecastHorizon, DensityForecast]:
         """Generate forecasts at all four standard horizons.
 
         Returns:
@@ -123,8 +123,7 @@ class HorizonSpecificForecaster:
         """
         point = self.base_forecaster.forecast(snapshot, category)
         return {
-            h: self._apply_horizon_adjustment(point, h, base_uncertainty)
-            for h in ForecastHorizon
+            h: self._apply_horizon_adjustment(point, h, base_uncertainty) for h in ForecastHorizon
         }
 
 
@@ -157,7 +156,7 @@ class HorizonWeightScheduler:
     @staticmethod
     def get_horizon_weights(
         time_to_resolution: float, temperature: float = 1.0
-    ) -> Dict[ForecastHorizon, float]:
+    ) -> dict[ForecastHorizon, float]:
         """Compute softmax weights over horizons based on time-to-resolution.
 
         The closer a horizon's typical duration is to the actual
@@ -175,7 +174,7 @@ class HorizonWeightScheduler:
             temperature = 0.1
 
         # Compute negative log-distance for each horizon
-        log_scores: Dict[ForecastHorizon, float] = {}
+        log_scores: dict[ForecastHorizon, float] = {}
         for h, secs in _HORIZON_SECONDS.items():
             ratio = max(time_to_resolution, 1.0) / max(secs, 1.0)
             # Score peaks when ratio=1 (exact match), falls off smoothly
@@ -183,8 +182,6 @@ class HorizonWeightScheduler:
 
         # Softmax
         max_score = max(log_scores.values())
-        exp_scores = {
-            h: np.exp((s - max_score) / temperature) for h, s in log_scores.items()
-        }
+        exp_scores = {h: np.exp((s - max_score) / temperature) for h, s in log_scores.items()}
         total = sum(exp_scores.values())
         return {h: s / total for h, s in exp_scores.items()}

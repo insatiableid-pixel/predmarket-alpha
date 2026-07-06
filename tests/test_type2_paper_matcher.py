@@ -132,6 +132,8 @@ def test_cli_runner_writes_review_only_reports(tmp_path):
     assert loaded["safety"]["provider_api_calls"] is False
     assert loaded["safety"]["account_or_order_paths"] is False
     assert "Mode: review-only" in markdown
-    assert "`REVIEW_ONLY_PASS` means the row is eligible for manual research review only" in markdown
+    assert (
+        "`REVIEW_ONLY_PASS` means the row is eligible for manual research review only" in markdown
+    )
     forbidden = ["Kelly", "bankroll", "stake", "place a bet", "wager"]
     assert not any(term in markdown for term in forbidden)

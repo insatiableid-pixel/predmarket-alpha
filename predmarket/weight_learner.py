@@ -23,8 +23,8 @@ Usage:
 """
 
 import logging
+
 import numpy as np
-from typing import Dict, List, Tuple, Optional
 
 logger = logging.getLogger("predmarket.weight_learner")
 
@@ -41,7 +41,7 @@ class WeightLearner:
 
     def __init__(
         self,
-        component_names: List[str],
+        component_names: list[str],
         decay_factor: float = 0.95,
         min_observations: int = 10,
         max_history: int = 500,
@@ -52,12 +52,12 @@ class WeightLearner:
         self.max_history = max_history
 
         # Per-component history: list of (forecast, outcome) tuples
-        self._history: Dict[str, List[Tuple[float, float]]] = {
+        self._history: dict[str, list[tuple[float, float]]] = {
             name: [] for name in self.component_names
         }
         self._n_observations = 0
 
-    def update(self, component_forecasts: Dict[str, float], outcome: float):
+    def update(self, component_forecasts: dict[str, float], outcome: float):
         """Record a new observation for each component.
 
         Call this after every resolved trade with each component's forecast
@@ -79,11 +79,10 @@ class WeightLearner:
 
         self._n_observations += 1
         logger.debug(
-            f"WeightLearner: recorded observation #{self._n_observations}, "
-            f"outcome={outcome}"
+            f"WeightLearner: recorded observation #{self._n_observations}, outcome={outcome}"
         )
 
-    def get_weights(self) -> Dict[str, float]:
+    def get_weights(self) -> dict[str, float]:
         """Compute current adaptive weights via softmax(inverse_brier).
 
         Returns uniform weights if fewer than min_observations have been recorded.
@@ -108,7 +107,7 @@ class WeightLearner:
         weights = self._softmax(np.array(inverse_briers))
         return {name: float(w) for name, w in zip(self.component_names, weights)}
 
-    def get_weights_with_confidence(self) -> Tuple[Dict[str, float], float]:
+    def get_weights_with_confidence(self) -> tuple[dict[str, float], float]:
         """Compute weights and a confidence score.
 
         Confidence is based on the number of observations relative to
@@ -125,8 +124,7 @@ class WeightLearner:
             # Ramp from 0.0 to 1.0 over [min_obs, 3*min_obs]
             confidence = min(
                 1.0,
-                (self._n_observations - self.min_observations)
-                / (2.0 * self.min_observations),
+                (self._n_observations - self.min_observations) / (2.0 * self.min_observations),
             )
 
         return weights, confidence
@@ -149,9 +147,7 @@ class WeightLearner:
             return 0.5  # Worst Brier for binary events is 1.0, 0.5 is mediocre
 
         n = len(history)
-        weights = np.array(
-            [self.decay_factor ** (n - 1 - i) for i in range(n)]
-        )
+        weights = np.array([self.decay_factor ** (n - 1 - i) for i in range(n)])
         weights /= weights.sum()
 
         forecasts = np.array([h[0] for h in history])
@@ -178,12 +174,12 @@ class WeightLearner:
         exp_x = np.exp(shifted)
         return exp_x / exp_x.sum()
 
-    def _uniform_weights(self) -> Dict[str, float]:
+    def _uniform_weights(self) -> dict[str, float]:
         """Return equal weights for all components."""
         n = len(self.component_names)
         return {name: 1.0 / n for name in self.component_names}
 
-    def get_component_scores(self) -> Dict[str, Dict[str, float]]:
+    def get_component_scores(self) -> dict[str, dict[str, float]]:
         """Return detailed scores for each component.
 
         Useful for dashboard display and debugging.
@@ -245,7 +241,7 @@ class AdaptiveWeightLearner:
 
     def __init__(
         self,
-        component_names: Optional[List[str]] = None,
+        component_names: list[str] | None = None,
         decay_factor: float = 0.95,
         min_observations: int = 10,
         max_history: int = 500,
@@ -254,8 +250,8 @@ class AdaptiveWeightLearner:
         self.decay_factor = decay_factor
         self.min_observations = min_observations
         self.max_history = max_history
-        self._learners: Dict[str, WeightLearner] = {}
-        self._component_brier: Dict[str, Dict[str, float]] = {}
+        self._learners: dict[str, WeightLearner] = {}
+        self._component_brier: dict[str, dict[str, float]] = {}
 
     def _learner(self, category: str) -> WeightLearner:
         bucket = category or "default"
@@ -271,21 +267,17 @@ class AdaptiveWeightLearner:
     def update(
         self,
         category: str,
-        component_forecasts: Dict[str, float],
+        component_forecasts: dict[str, float],
         outcome: float,
     ) -> None:
         learner = self._learner(category)
         learner.update(component_forecasts, outcome)
         self._component_brier[category or "default"] = {
-            name: values["decayed_brier"]
-            for name, values in learner.get_component_scores().items()
+            name: values["decayed_brier"] for name, values in learner.get_component_scores().items()
         }
 
-    def get_weights(self, category: str = "default") -> Dict[str, float]:
+    def get_weights(self, category: str = "default") -> dict[str, float]:
         return self._learner(category).get_weights()
 
-    def get_status(self) -> Dict[str, Dict[str, float]]:
-        return {
-            category: learner.get_weights()
-            for category, learner in self._learners.items()
-        }
+    def get_status(self) -> dict[str, dict[str, float]]:
+        return {category: learner.get_weights() for category, learner in self._learners.items()}

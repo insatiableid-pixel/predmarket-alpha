@@ -11,9 +11,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -76,12 +75,14 @@ def build_crypto_proxy_research_candidate_replay(
     rows, invalid_rows = normalize_label_rows(label_load["rows"])
     independent_rows = independent_contract_rows(rows)
     candidate_eval = research_candidate_evaluation(model_report)
-    selected_rows = [row for row in independent_rows if proxy_state_prediction(row.get("proxy_state")) is not None]
-    split_index = chronological_split_index(len(independent_rows), model_report)
+    selected_rows = [row for row in independent_rows if crypto_prediction_rule(row)[0] is not None]
+    _method = model_report.get("method") if isinstance(model_report.get("method"), Mapping) else {}
+    _test_fraction = optional_float(_method.get("test_fraction")) if _method else None
+    split_index = chronological_split_index(len(independent_rows), _test_fraction or 0.30)
     oos_rows = [
         row
         for row in independent_rows[split_index:]
-        if proxy_state_prediction(row.get("proxy_state")) is not None
+        if crypto_prediction_rule(row)[0] is not None
     ]
     calibration = conservative_side_probability(
         oos_rows=oos_rows,
@@ -227,17 +228,6 @@ def normalize_label_rows(rows: Sequence[Mapping[str, Any]]) -> tuple[list[dict[s
     return normalized, invalid
 
 
-def independent_contract_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    by_ticker: dict[str, dict[str, Any]] = {}
-    for row in rows:
-        ticker = str(row.get("contract_ticker") or "")
-        if not ticker:
-            continue
-        if ticker not in by_ticker or float(row.get("decision_ts") or 0) < float(by_ticker[ticker].get("decision_ts") or 0):
-            by_ticker[ticker] = dict(row)
-    return sorted(by_ticker.values(), key=lambda item: (item["decision_ts"], item["contract_ticker"]))
-
-
 def research_candidate_evaluation(model_report: Mapping[str, Any]) -> dict[str, Any] | None:
     for item in model_report.get("evaluations", []):
         if (
@@ -290,7 +280,7 @@ def replay_contract_rows(
     calibrated = probability(calibration.get("conservative_calibrated_side_probability"))
     replay_rows: list[dict[str, Any]] = []
     for row in rows:
-        prediction = proxy_state_prediction(row.get("proxy_state"))
+        prediction = crypto_prediction_rule(row)[0]
         if prediction is None:
             continue
         side = "yes" if prediction == 1 else "no"
@@ -619,6 +609,30 @@ def write_csv(report: Mapping[str, Any], path: Path) -> None:
                 writer.writerow({field: row.get(field) for field in CSV_FIELDS})
 
 
+# Import single-sourced helpers from predmarket (replaces local duplicates).
+from predmarket.crypto_family import crypto_prediction_rule  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402
+    bucket_time,
+    chronological_split_index,
+    counts,
+    gate,
+    independent_contract_rows,
+    iso_from_timestamp,
+    json_float,
+    mapping,
+    mean,
+    median,
+    optional_float,
+    outcome_value,
+    positive_number,
+    probability,
+    read_json_or_empty,
+    safety_flags,
+    timestamp,
+    wilson_lower_bound,
+)
+
+
 def selected_side_price(row: Mapping[str, Any], side: str) -> float | None:
     if side == "yes":
         return probability(row.get("yes_ask"))
@@ -627,42 +641,11 @@ def selected_side_price(row: Mapping[str, Any], side: str) -> float | None:
 
 
 def selected_side_outcome(row: Mapping[str, Any]) -> int | None:
-    prediction = proxy_state_prediction(row.get("proxy_state"))
+    prediction = crypto_prediction_rule(row)[0]
     yes_outcome = outcome_value(row.get("yes_outcome"))
     if prediction is None or yes_outcome is None:
         return None
     return yes_outcome if prediction == 1 else 1 - yes_outcome
-
-
-def proxy_state_prediction(value: Any) -> int | None:
-    text = str(value or "").lower()
-    if "above" in text:
-        return 1
-    if "below" in text:
-        return 0
-    return None
-
-
-def chronological_split_index(count: int, model_report: Mapping[str, Any]) -> int:
-    method = model_report.get("method") if isinstance(model_report.get("method"), Mapping) else {}
-    test_fraction = optional_float(method.get("test_fraction"))
-    if test_fraction is None:
-        test_fraction = 0.30
-    if count <= 0:
-        return 0
-    test_count = max(1, math.ceil(count * min(max(test_fraction, 0.0), 1.0)))
-    return max(0, count - test_count)
-
-
-def wilson_lower_bound(wins: int, count: int, z: float) -> float:
-    if count <= 0:
-        return 0.0
-    p_hat = wins / count
-    z2 = z * z
-    denominator = 1 + z2 / count
-    center = p_hat + z2 / (2 * count)
-    margin = z * math.sqrt((p_hat * (1 - p_hat) + z2 / (4 * count)) / count)
-    return max(0.0, min(1.0, (center - margin) / denominator))
 
 
 def decay_summary(oos_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
@@ -675,10 +658,10 @@ def decay_summary(oos_rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     """
     buckets: dict[str, list[int]] = defaultdict(list)
     for row in oos_rows:
-        bucket = bucket_time(row.get("close_time"))
+        bk = bucket_time(row.get("close_time"))
         outcome = selected_side_outcome(row)
-        if bucket and outcome is not None:
-            buckets[bucket].append(outcome)
+        if bk and outcome is not None:
+            buckets[bk].append(outcome)
     if not buckets:
         return {
             "bucket_count": 0,
@@ -735,24 +718,12 @@ def correlation_cluster_key(row: Mapping[str, Any]) -> str:
     )
 
 
-def bucket_time(value: Any) -> str | None:
-    ts = timestamp(value)
-    if ts is None:
-        return None
-    parsed = datetime.fromtimestamp(ts, UTC)
-    return parsed.strftime("%Y-%m-%dT%H:%MZ")
-
-
-def gate(name: str, status: str, reason: str) -> dict[str, str]:
-    return {"name": name, "status": status, "reason": reason}
-
-
-def read_json_or_empty(path: Path) -> dict[str, Any]:
+def outside_repo(path: Path) -> bool:
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (FileNotFoundError, json.JSONDecodeError, OSError):
-        return {}
-    return raw if isinstance(raw, dict) else {}
+        path.expanduser().resolve().relative_to(CONTROL_REPO.resolve())
+    except ValueError:
+        return True
+    return False
 
 
 def safe_research_artifact(payload: Mapping[str, Any]) -> bool:
@@ -767,130 +738,6 @@ def safe_research_artifact(payload: Mapping[str, Any]) -> bool:
         and safety.get("account_or_order_paths") is False
         and safety.get("database_writes") is False
     )
-
-
-def outside_repo(path: Path) -> bool:
-    try:
-        resolved = path.resolve()
-        CONTROL_REPO.resolve()
-    except OSError:
-        return False
-    return CONTROL_REPO.resolve() not in (resolved, *resolved.parents)
-
-
-def outcome_value(value: Any) -> int | None:
-    if isinstance(value, bool):
-        return int(value)
-    number = probability(value)
-    if number is not None:
-        if number >= 0.999:
-            return 1
-        if number <= 0.001:
-            return 0
-    text = str(value or "").strip().lower()
-    if text in {"yes", "true", "win", "1"}:
-        return 1
-    if text in {"no", "false", "loss", "0"}:
-        return 0
-    return None
-
-
-def probability(value: Any) -> float | None:
-    number = optional_float(value)
-    return number if number is not None and 0.0 <= number <= 1.0 else None
-
-
-def optional_float(value: Any) -> float | None:
-    try:
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = value.strip().rstrip("%")
-            if not value:
-                return None
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    return number if math.isfinite(number) else None
-
-
-def positive_number(value: Any) -> bool:
-    number = optional_float(value)
-    return number is not None and number > 0
-
-
-def timestamp(value: Any) -> float | None:
-    if value is None:
-        return None
-    if isinstance(value, (int, float)):
-        number = float(value)
-        return number if math.isfinite(number) else None
-    text = str(value).strip()
-    if not text:
-        return None
-    try:
-        number = float(text)
-    except ValueError:
-        number = None
-    if number is not None:
-        return number if math.isfinite(number) else None
-    try:
-        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
-    return parsed.timestamp()
-
-
-def iso_from_timestamp(value: float | None) -> str | None:
-    if value is None:
-        return None
-    return datetime.fromtimestamp(value, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-
-def counts(values: Sequence[Any]) -> dict[str, int]:
-    counter = Counter(str(value if value is not None else "unknown") for value in values)
-    return dict(sorted(counter.items(), key=lambda item: (-item[1], item[0])))
-
-
-def mean(values: Sequence[float]) -> float | None:
-    return sum(values) / len(values) if values else None
-
-
-def median(values: Sequence[float]) -> float | None:
-    if not values:
-        return None
-    ordered = sorted(values)
-    midpoint = len(ordered) // 2
-    if len(ordered) % 2:
-        return ordered[midpoint]
-    return (ordered[midpoint - 1] + ordered[midpoint]) / 2
-
-
-def json_float(value: Any) -> float | None:
-    number = optional_float(value)
-    return round(number, 10) if number is not None else None
-
-
-def mapping(value: Any) -> Mapping[str, Any]:
-    return value if isinstance(value, Mapping) else {}
-
-
-def safety_flags() -> dict[str, bool]:
-    return {
-        "research_only": True,
-        "execution_enabled": False,
-        "public_market_data_calls": False,
-        "authenticated_api_calls": False,
-        "provider_api_calls": False,
-        "paid_calls": False,
-        "database_writes": False,
-        "market_execution": False,
-        "account_or_order_paths": False,
-        "raw_payloads_copied_to_repo": False,
-        "staking_or_sizing_guidance": False,
-    }
 
 
 def build_parser() -> argparse.ArgumentParser:

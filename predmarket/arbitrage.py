@@ -2,8 +2,9 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -12,7 +13,7 @@ class VenueQuote:
     market_id: str
     bid: float
     ask: float
-    no_ask: Optional[float] = None
+    no_ask: float | None = None
     yes_fee: float = 0.0
     no_fee: float = 0.0
     max_size: float = 0.0
@@ -33,20 +34,18 @@ class ArbitrageOpportunity:
 
 def detect_cross_venue_arbitrage(
     event_id: str,
-    quotes: Iterable[VenueQuote | Dict[str, Any]],
+    quotes: Iterable[VenueQuote | dict[str, Any]],
     min_net_edge: float = 0.005,
     min_semantic_confidence: float = 0.85,
-) -> List[ArbitrageOpportunity]:
+) -> list[ArbitrageOpportunity]:
     """Find executable YES/NO packages costing less than one payout unit."""
     normalized = [_coerce_quote(q) for q in quotes]
-    opportunities: List[ArbitrageOpportunity] = []
+    opportunities: list[ArbitrageOpportunity] = []
     for yes_quote in normalized:
         for no_quote in normalized:
             if yes_quote.market_id == no_quote.market_id and yes_quote.venue == no_quote.venue:
                 continue
-            semantic_confidence = min(
-                yes_quote.semantic_confidence, no_quote.semantic_confidence
-            )
+            semantic_confidence = min(yes_quote.semantic_confidence, no_quote.semantic_confidence)
             if semantic_confidence < min_semantic_confidence:
                 continue
             yes_cost = yes_quote.ask + yes_quote.yes_fee
@@ -76,7 +75,7 @@ def min_positive(a: float, b: float) -> float:
     return min(values) if values else 0.0
 
 
-def _coerce_quote(value: VenueQuote | Dict[str, Any]) -> VenueQuote:
+def _coerce_quote(value: VenueQuote | dict[str, Any]) -> VenueQuote:
     if isinstance(value, VenueQuote):
         return value
     return VenueQuote(
@@ -84,11 +83,7 @@ def _coerce_quote(value: VenueQuote | Dict[str, Any]) -> VenueQuote:
         market_id=str(value.get("market_id", value.get("contract_id", ""))),
         bid=float(value.get("bid", 0.0)),
         ask=float(value.get("ask", value.get("market_implied", 1.0))),
-        no_ask=(
-            float(value["no_ask"])
-            if value.get("no_ask") is not None
-            else None
-        ),
+        no_ask=(float(value["no_ask"]) if value.get("no_ask") is not None else None),
         yes_fee=float(value.get("yes_fee", value.get("fee", 0.0))),
         no_fee=float(value.get("no_fee", value.get("fee", 0.0))),
         max_size=float(value.get("max_size", value.get("size", 0.0))),

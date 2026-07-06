@@ -6,15 +6,16 @@ import argparse
 import hashlib
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any
 
 
 @dataclass(frozen=True)
 class Type2CandidateDispositionArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
@@ -24,12 +25,12 @@ def build_type2_candidate_disposition(
     sportsbook_payload: Mapping[str, Any],
     kalshi_payload: Mapping[str, Any],
     *,
-    paper_matcher_path: Optional[Path] = None,
-    sportsbook_path: Optional[Path] = None,
-    kalshi_path: Optional[Path] = None,
-    run_id: Optional[str] = None,
-    created_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    paper_matcher_path: Path | None = None,
+    sportsbook_path: Path | None = None,
+    kalshi_path: Path | None = None,
+    run_id: str | None = None,
+    created_ts: float | None = None,
+) -> dict[str, Any]:
     ts = float(created_ts or time.time())
     references, duplicate_reference_tickers = _reference_by_ticker(sportsbook_payload)
     kalshi_capture = _parse_time(kalshi_payload.get("created_at_utc"))
@@ -38,7 +39,8 @@ def build_type2_candidate_disposition(
             candidate,
             references.get(str(candidate.get("kalshi_ticker") or "")),
             kalshi_capture,
-            duplicate_reference=str(candidate.get("kalshi_ticker") or "") in duplicate_reference_tickers,
+            duplicate_reference=str(candidate.get("kalshi_ticker") or "")
+            in duplicate_reference_tickers,
         )
         for candidate in _candidates(paper_report)
     ]
@@ -60,7 +62,7 @@ def build_type2_candidate_disposition(
         "schema_version": 1,
         "run_id": run_id or _stable_run_id(paper_report, sportsbook_payload, kalshi_payload),
         "created_ts": ts,
-        "created_at_utc": datetime.fromtimestamp(ts, timezone.utc).isoformat().replace("+00:00", "Z"),
+        "created_at_utc": datetime.fromtimestamp(ts, UTC).isoformat().replace("+00:00", "Z"),
         "status": status,
         "research_only": True,
         "execution_enabled": False,
@@ -95,7 +97,7 @@ def run_type2_candidate_disposition(
     sportsbook_json: Path,
     kalshi_json: Path,
     output_dir: Path,
-    run_id: Optional[str] = None,
+    run_id: str | None = None,
 ) -> Type2CandidateDispositionArtifacts:
     paper_report = _read_json(paper_matcher_json)
     sportsbook_payload = _read_json(sportsbook_json)
@@ -151,7 +153,11 @@ def render_type2_candidate_disposition_markdown(report: Mapping[str, Any]) -> st
         "## Kept Review Candidates",
         "",
     ]
-    kept = [row for row in report.get("dispositions", []) if row.get("disposition") == "KEPT_REVIEW_CANDIDATE"]
+    kept = [
+        row
+        for row in report.get("dispositions", [])
+        if row.get("disposition") == "KEPT_REVIEW_CANDIDATE"
+    ]
     if not kept:
         lines.append("No rows survived the timing policy as review candidates.")
     for row in kept[:25]:
@@ -167,7 +173,11 @@ def render_type2_candidate_disposition_markdown(report: Mapping[str, Any]) -> st
                 "",
             ]
         )
-    downgraded = [row for row in report.get("dispositions", []) if row.get("disposition") == "DOWNGRADED_TEMPORAL_MISMATCH"]
+    downgraded = [
+        row
+        for row in report.get("dispositions", [])
+        if row.get("disposition") == "DOWNGRADED_TEMPORAL_MISMATCH"
+    ]
     if downgraded:
         lines.extend(["## Downgraded Timing Mismatches", ""])
         for row in downgraded[:25]:
@@ -188,11 +198,11 @@ def render_type2_candidate_disposition_markdown(report: Mapping[str, Any]) -> st
 
 def _disposition_for_candidate(
     candidate: Mapping[str, Any],
-    reference: Optional[Mapping[str, Any]],
-    kalshi_capture: Optional[datetime],
+    reference: Mapping[str, Any] | None,
+    kalshi_capture: datetime | None,
     *,
     duplicate_reference: bool = False,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     ticker = str(candidate.get("kalshi_ticker") or "")
     original_status = str(candidate.get("review_status") or "")
     reference = reference or {}
@@ -240,13 +250,15 @@ def _disposition_for_candidate(
     }
 
 
-def _reference_by_ticker(payload: Mapping[str, Any]) -> tuple[Dict[str, Mapping[str, Any]], set[str]]:
+def _reference_by_ticker(
+    payload: Mapping[str, Any],
+) -> tuple[dict[str, Mapping[str, Any]], set[str]]:
     rows: Sequence[Any]
     if isinstance(payload, list):
         rows = payload
     else:
         rows = payload.get("markets") or payload.get("references") or payload.get("rows") or []
-    out: Dict[str, Mapping[str, Any]] = {}
+    out: dict[str, Mapping[str, Any]] = {}
     duplicates: set[str] = set()
     for row in rows:
         if isinstance(row, Mapping):
@@ -258,7 +270,7 @@ def _reference_by_ticker(payload: Mapping[str, Any]) -> tuple[Dict[str, Mapping[
     return out, duplicates
 
 
-def _candidates(payload: Mapping[str, Any]) -> List[Mapping[str, Any]]:
+def _candidates(payload: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     rows = payload.get("candidates") if isinstance(payload, Mapping) else []
     return [row for row in rows if isinstance(row, Mapping)]
 
@@ -270,20 +282,22 @@ def _status(summary: Mapping[str, int]) -> str:
         return "candidate_disposition_review_candidates_present"
     if summary.get("manual_review_timing_unknown", 0):
         return "candidate_disposition_manual_timing_review"
-    if summary.get("downgraded_temporal_mismatch", 0) and summary.get("original_review_only_pass", 0):
+    if summary.get("downgraded_temporal_mismatch", 0) and summary.get(
+        "original_review_only_pass", 0
+    ):
         return "candidate_disposition_all_passes_downgraded"
     return "candidate_disposition_watch_only"
 
 
-def _counts(rows: Sequence[Mapping[str, Any]], key: str) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _counts(rows: Sequence[Mapping[str, Any]], key: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
     for row in rows:
         value = str(row.get(key) or "unknown")
         counts[value] = counts.get(value, 0) + 1
     return counts
 
 
-def _parse_time(value: Any) -> Optional[datetime]:
+def _parse_time(value: Any) -> datetime | None:
     if not value:
         return None
     text = str(value).strip()
@@ -296,14 +310,14 @@ def _parse_time(value: Any) -> Optional[datetime]:
     except ValueError:
         return None
     if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=timezone.utc)
-    return parsed.astimezone(timezone.utc)
+        parsed = parsed.replace(tzinfo=UTC)
+    return parsed.astimezone(UTC)
 
 
-def _format_time(value: Optional[datetime]) -> Optional[str]:
+def _format_time(value: datetime | None) -> str | None:
     if value is None:
         return None
-    return value.astimezone(timezone.utc).isoformat().replace("+00:00", "Z")
+    return value.astimezone(UTC).isoformat().replace("+00:00", "Z")
 
 
 def _stable_run_id(
@@ -316,7 +330,9 @@ def _stable_run_id(
         "sportsbook": sportsbook_payload,
         "kalshi_capture": kalshi_payload.get("created_at_utc"),
     }
-    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()[:12]
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()[
+        :12
+    ]
     return f"type2-candidate-disposition-{digest}"
 
 
@@ -330,12 +346,24 @@ def _read_json(path: Path) -> Mapping[str, Any]:
     raise ValueError(f"Expected JSON object or list in {path}")
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the review-only Type 2 candidate disposition.")
-    parser.add_argument("--paper-matcher-json", default="docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json")
-    parser.add_argument("--sportsbook-json", default="/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json")
-    parser.add_argument("--kalshi-json", default="data/kalshi_mlb_game_series_live_current_20260620T230203Z.json")
-    parser.add_argument("--output-dir", default="docs/codex/artifacts/type2-candidate-disposition-latest")
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run the review-only Type 2 candidate disposition."
+    )
+    parser.add_argument(
+        "--paper-matcher-json",
+        default="docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json",
+    )
+    parser.add_argument(
+        "--sportsbook-json",
+        default="/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json",
+    )
+    parser.add_argument(
+        "--kalshi-json", default="data/kalshi_mlb_game_series_live_current_20260620T230203Z.json"
+    )
+    parser.add_argument(
+        "--output-dir", default="docs/codex/artifacts/type2-candidate-disposition-latest"
+    )
     parser.add_argument("--run-id", default=None)
     args = parser.parse_args(argv)
 

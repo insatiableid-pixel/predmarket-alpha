@@ -11,12 +11,11 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
 import time
 import urllib.parse
 import urllib.request
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Callable, Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -193,7 +192,7 @@ def select_current_candidates(
     for row in feature_packet.get("feature_rows", []):
         if not isinstance(row, Mapping):
             continue
-        prediction = proxy_state_prediction(row.get("proxy_state"))
+        prediction = crypto_prediction_rule(row)[0]
         close_ts = timestamp(row.get("close_time"))
         if prediction is None or close_ts is None:
             continue
@@ -685,16 +684,26 @@ def fetch_json_url(url: str) -> Any:
         return json.loads(response.read().decode("utf-8"))
 
 
-def proxy_state_prediction(value: Any) -> int | None:
-    text = str(value or "").lower()
-    if "above" in text:
-        return 1
-    if "below" in text:
-        return 0
-    return None
+# Import single-sourced helpers from predmarket (replaces local duplicates).
+from predmarket.crypto_family import crypto_prediction_rule  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402
+    bucket_time,
+    counts,
+    gate,
+    gate_status,
+    json_float,
+    nonnegative_float,
+    path_is_within,
+    price_probability,
+    probability,
+    read_json_or_empty,
+    safety_flags,
+    timestamp,
+)
 
 
 def correlation_cluster_key(row: Mapping[str, Any]) -> str:
+    """Compose crypto cluster key: asset_symbol|contract_family|close_bucket."""
     return "|".join(
         str(part or "unknown")
         for part in (
@@ -713,23 +722,12 @@ def capture_brief(capture: Mapping[str, Any]) -> dict[str, Any]:
     }
 
 
-def gate(name: str, status: str, reason: str) -> dict[str, str]:
-    return {"name": name, "status": status, "reason": reason}
-
-
-def gate_status(gates: Sequence[Mapping[str, Any]], name: str) -> str:
-    for item in gates:
-        if item.get("name") == name:
-            return str(item.get("status") or "")
-    return "blocked"
-
-
-def read_json_or_empty(path: Path) -> dict[str, Any]:
+def outside_repo(path: Path) -> bool:
     try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return raw if isinstance(raw, dict) else {}
+        path.expanduser().resolve().relative_to(CONTROL_REPO.resolve())
+    except ValueError:
+        return True
+    return False
 
 
 def summary(value: Any) -> dict[str, Any]:
@@ -738,111 +736,8 @@ def summary(value: Any) -> dict[str, Any]:
     return {}
 
 
-def outside_repo(path: Path) -> bool:
-    try:
-        resolved = path.resolve()
-        root = CONTROL_REPO.resolve()
-    except OSError:
-        return False
-    return root not in (resolved, *resolved.parents)
-
-
-def path_is_within(path: Path, root: Path) -> bool:
-    try:
-        path.resolve().relative_to(root.resolve())
-    except (OSError, ValueError):
-        return False
-    return True
-
-
 def safe_stamp(value: str) -> str:
     return value.replace("-", "").replace(":", "").replace("+00:00", "Z").replace("Z", "Z").replace("T", "T")
-
-
-def bucket_time(value: Any) -> str | None:
-    ts = timestamp(value)
-    if ts is None:
-        return None
-    return datetime.fromtimestamp(ts, UTC).strftime("%Y-%m-%dT%H:%MZ")
-
-
-def timestamp(value: Any) -> float | None:
-    if value is None:
-        return None
-    if isinstance(value, (int, float)):
-        number = float(value)
-        return number if math.isfinite(number) else None
-    text = str(value).strip()
-    if not text:
-        return None
-    try:
-        number = float(text)
-    except ValueError:
-        number = None
-    if number is not None:
-        return number if math.isfinite(number) else None
-    try:
-        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
-    return parsed.timestamp()
-
-
-def price_probability(value: Any) -> float | None:
-    number = probability(value)
-    if number is not None:
-        return number
-    raw = nonnegative_float(value)
-    if raw is not None and raw > 1.0 and raw <= 100.0:
-        return raw / 100.0
-    return None
-
-
-def probability(value: Any) -> float | None:
-    number = nonnegative_float(value)
-    return number if number is not None and 0.0 <= number <= 1.0 else None
-
-
-def nonnegative_float(value: Any) -> float | None:
-    try:
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = value.strip().rstrip("%")
-            if not value:
-                return None
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    return number if math.isfinite(number) and number >= 0 else None
-
-
-def json_float(value: Any) -> float | None:
-    number = nonnegative_float(value)
-    return round(number, 10) if number is not None else None
-
-
-def counts(values: Sequence[Any]) -> dict[str, int]:
-    counter = Counter(str(value if value is not None else "unknown") for value in values)
-    return dict(sorted(counter.items(), key=lambda item: (-item[1], item[0])))
-
-
-def safety_flags(*, public_market_data_calls: bool) -> dict[str, bool]:
-    return {
-        "research_only": True,
-        "execution_enabled": False,
-        "public_market_data_calls": public_market_data_calls,
-        "authenticated_api_calls": False,
-        "provider_api_calls": False,
-        "paid_calls": False,
-        "database_writes": False,
-        "market_execution": False,
-        "account_or_order_paths": False,
-        "raw_payloads_copied_to_repo": False,
-        "staking_or_sizing_guidance": False,
-    }
 
 
 def build_parser() -> argparse.ArgumentParser:

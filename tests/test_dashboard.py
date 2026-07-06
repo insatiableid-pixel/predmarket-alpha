@@ -1,10 +1,18 @@
-import pytest
 import sqlite3
-from predmarket.dashboard import app, server, get_db_connection, fetch_performance_metrics, update_dashboard_data, approve_staged_order_db, get_staged_orders, approve_order_endpoint, ApprovalRequest
-from predmarket.dashboard import callbacks as _callbacks  # ensure callbacks are registered
-import predmarket.dashboard.data as db_module
+
+import pytest
 from starlette.requests import Request as StarletteRequest
 from starlette.responses import Response
+
+import predmarket.dashboard.data as db_module
+from predmarket.dashboard import (
+    ApprovalRequest,
+    app,
+    approve_order_endpoint,
+    fetch_performance_metrics,
+    get_staged_orders,
+    update_dashboard_data,
+)
 
 
 def make_request(path="/api/staged", method="GET", headers=None):
@@ -28,16 +36,18 @@ def make_request(path="/api/staged", method="GET", headers=None):
 
     return StarletteRequest(scope, receive)
 
+
 @pytest.fixture
 def setup_dashboard_db(test_data_dir, monkeypatch):
     # Setup database file
     db_path = test_data_dir / "database.sqlite"
-    
+
     # Patch get_db_connection in dashboard.data module to use our test DB
     def mock_get_db_connection():
         return sqlite3.connect(str(db_path))
+
     monkeypatch.setattr(db_module, "get_db_connection", mock_get_db_connection)
-    
+
     # Initialize DB tables
     conn = mock_get_db_connection()
     cursor = conn.cursor()
@@ -73,6 +83,7 @@ def setup_dashboard_db(test_data_dir, monkeypatch):
     conn.close()
     return db_path
 
+
 def test_dashboard_layout():
     # Verify layout contains essential component IDs and types
     assert app.layout is not None
@@ -83,11 +94,13 @@ def test_dashboard_layout():
     assert "position-sizing-slate" in layout_str
     assert "error-banner" in layout_str
 
+
 def test_performance_metrics_empty(setup_dashboard_db):
     metrics = fetch_performance_metrics()
     assert metrics["brier_score"] == 0.0
     assert metrics["pnl"] == 0.0
     assert metrics["win_rate"] == 0.0
+
 
 def test_performance_metrics_with_data(setup_dashboard_db):
     # Seed mock resolved trades
@@ -104,23 +117,25 @@ def test_performance_metrics_with_data(setup_dashboard_db):
     """)
     conn.commit()
     conn.close()
-    
+
     metrics = fetch_performance_metrics()
     # model_prob = 0.60, outcome = 1 -> Brier score = (0.60 - 1.0)^2 = 0.16
     assert abs(metrics["brier_score"] - 0.16) < 1e-5
     assert metrics["pnl"] > 0
     assert metrics["win_rate"] == 1.0
 
+
 @pytest.mark.asyncio
 async def test_dashboard_callback_update(setup_dashboard_db):
     res = await update_dashboard_data(0)
-    assert len(res) == 9 # 9 outputs returned
+    assert len(res) == 9  # 9 outputs returned
     brier, logloss, pnl, drawdown, cal_fig, eq_fig, opp_table, slate, err = res
     assert brier is not None
     assert logloss is not None
     assert pnl is not None
     assert drawdown is not None
-    assert err is None # no errors
+    assert err is None  # no errors
+
 
 @pytest.mark.asyncio
 async def test_fastapi_endpoints(setup_dashboard_db, mock_config, monkeypatch):
@@ -139,20 +154,24 @@ async def test_fastapi_endpoints(setup_dashboard_db, mock_config, monkeypatch):
     """)
     conn.commit()
     conn.close()
-    
+
     # 1. Test get_staged_orders function (slowapi requires a Request object)
     mock_req = make_request()
-    staged_list = get_staged_orders(request=mock_req, api_key="predmarket_secret_key_123")
+    staged_list = get_staged_orders(request=mock_req, api_key="test-token")
     assert len(staged_list) == 1
     assert staged_list[0]["contract"] == "CON-2"
     staged_id = staged_list[0]["id"]
-    
+
     # 2. Test approve_order_endpoint function
-    res_json = await approve_order_endpoint(request=mock_req, body=ApprovalRequest(id=staged_id), api_key="predmarket_secret_key_123")
+    res_json = await approve_order_endpoint(
+        request=mock_req, body=ApprovalRequest(id=staged_id), api_key="test-token"
+    )
     assert "status" in res_json
+
 
 def test_api_key_authentication_routing(setup_dashboard_db):
     from fastapi import HTTPException
+
     from predmarket.dashboard.server import get_api_key
 
     with pytest.raises(HTTPException) as missing:
@@ -164,10 +183,10 @@ def test_api_key_authentication_routing(setup_dashboard_db):
         get_api_key("wrong_key")
     assert invalid.value.status_code == 401
 
-    assert get_api_key("predmarket_secret_key_123") == "predmarket_secret_key_123"
+    assert get_api_key("test-token") == "test-token"
     staged = get_staged_orders(
-        request=make_request(headers={"X-API-Key": "predmarket_secret_key_123"}),
-        api_key="predmarket_secret_key_123",
+        request=make_request(headers={"X-API-Key": "test-token"}),
+        api_key="test-token",
     )
     assert staged == []
 
@@ -186,6 +205,7 @@ async def test_basic_auth_middleware(setup_dashboard_db):
 
     # 2. Request with invalid Basic credentials should return 401
     import base64
+
     invalid_token = base64.b64encode(b"admin:wrong_password").decode("utf-8")
     response = await dashboard_auth_middleware(
         make_request(path="/", headers={"Authorization": f"Basic {invalid_token}"}),
@@ -194,7 +214,7 @@ async def test_basic_auth_middleware(setup_dashboard_db):
     assert response.status_code == 401
 
     # 3. Request with valid Basic credentials should bypass middleware
-    valid_token = base64.b64encode(b"admin:predmarket_secret_key_123").decode("utf-8")
+    valid_token = base64.b64encode(b"admin:test-token").decode("utf-8")
     response = await dashboard_auth_middleware(
         make_request(path="/", headers={"Authorization": f"Basic {valid_token}"}),
         call_next,

@@ -446,18 +446,14 @@ KALSHI_CRYPTO_PROXY_RESEARCH_REPLAY_TRANCHE = (
     "against conservative calibrated probability, all-in execution cost, capacity, correlation, and decay gates."
 )
 
-KALSHI_CRYPTO_PROXY_RESEARCH_REPLAY_STOP_CONDITION = (
-    "Stop before sizing positions, execution, account/order paths, or treating positive replay rows as deployable."
-)
+KALSHI_CRYPTO_PROXY_RESEARCH_REPLAY_STOP_CONDITION = "Stop before sizing positions, execution, account/order paths, or treating positive replay rows as deployable."
 
 KALSHI_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_TRANCHE = (
     "Use predmarket as the Kalshi signal-factory command center: add safe capacity-depth, correlation-cluster, "
     "and decay-survival gates for crypto proxy replay candidates before any paper probability overlay."
 )
 
-KALSHI_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_STOP_CONDITION = (
-    "Stop before sizing positions, execution, account/order paths, staking guidance, or using replay rows as live edges."
-)
+KALSHI_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_STOP_CONDITION = "Stop before sizing positions, execution, account/order paths, staking guidance, or using replay rows as live edges."
 
 KALSHI_CRYPTO_PROXY_CLUSTER_BREADTH_TRANCHE = (
     "Use predmarket as the Kalshi signal-factory command center: accumulate diversified current crypto proxy "
@@ -467,6 +463,117 @@ KALSHI_CRYPTO_PROXY_CLUSTER_BREADTH_TRANCHE = (
 KALSHI_CRYPTO_PROXY_CLUSTER_BREADTH_STOP_CONDITION = (
     "Stop before reducing cluster breadth requirements, paper overlay, sizing positions, execution, "
     "or account/order paths without an explicit policy review."
+)
+
+KALSHI_SPORTS_PROXY_FEATURE_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: build contract-keyed sports proxy "
+    "feature packets for fast-settling Kalshi baseball game-winner contracts (MLB/KBO/LMB), while "
+    "preserving the official game result as the settlement source and treating MLB Stats API / ESPN "
+    "data as model features only."
+)
+
+KALSHI_SPORTS_PROXY_FEATURE_STOP_CONDITION = (
+    "Stop before treating proxy feeds as official settlement labels, computing usable EV, sizing positions, "
+    "execution, account/order paths, or promoting any sports hypothesis without settled Kalshi outcomes and "
+    "OOS cost-aware FDR evidence."
+)
+
+KALSHI_SPORTS_PROXY_OBSERVATION_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: run a repeated sports proxy observation loop "
+    "that saves contract-keyed feature snapshots, waits for settled Kalshi outcomes (official game results), "
+    "and builds label-ready packets for OOS falsification without using proxy feeds as settlement truth."
+)
+
+KALSHI_SPORTS_PROXY_OBSERVATION_STOP_CONDITION = (
+    "Stop before treating proxy feeds as official settlement labels, computing usable EV, sizing positions, "
+    "execution, account/order paths, or promoting any sports hypothesis without settled Kalshi outcomes and "
+    "OOS cost-aware FDR evidence."
+)
+
+KALSHI_SPORTS_PROXY_OBSERVATION_ACCUMULATION_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: continue the sports proxy observation loop "
+    "until public Kalshi settlements attach true outcomes to archived contract-keyed feature snapshots."
+)
+
+KALSHI_SPORTS_PROXY_OBSERVATION_ACCUMULATION_STOP_CONDITION = (
+    "Stop before using proxy feeds as labels, calibrated probabilities, EV, sizing positions, execution, "
+    "or account/order paths."
+)
+
+KALSHI_SPORTS_PROXY_FEATURE_MODEL_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: train and falsify the first sports proxy "
+    "feature model against true settled Kalshi labels with all-in execution cost and FDR-controlled OOS gates."
+)
+
+KALSHI_SPORTS_PROXY_FEATURE_MODEL_STOP_CONDITION = (
+    "Stop before promotion, sizing positions, execution, or account/order paths without calibrated probabilities, "
+    "all-in costs, capacity/correlation constraints, and FDR-controlled OOS survival."
+)
+
+KALSHI_SPORTS_STACK_SEQUENCING_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: run the family-specific near-term "
+    "sports evidence loop in order: World Cup/FIFA first, MLB second, ATP third. Current ghost-listing "
+    "depth has passed, so consume that depth for cap_i inputs while keeping sport feature layers separate."
+)
+
+KALSHI_SPORTS_STACK_SEQUENCING_STOP_CONDITION = (
+    "Stop before merging sport feature layers, locking capacity from stale depth, treating unresolved "
+    "settlements as labels, sizing positions, execution, account/order paths, or making live edge claims."
+)
+
+KALSHI_SPORTS_STACK_CAP_I_BLOCKED_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: rerun the ghost-listing depth diagnostic "
+    "against current public orderbooks before locking cap_i for the sequenced World Cup/MLB/ATP sports lanes."
+)
+
+KALSHI_SPORTS_STACK_CAP_I_BLOCKED_STOP_CONDITION = (
+    "Stop before locking cap_i, sizing positions, execution, account/order paths, or inferring capacity "
+    "from inventory-only/top-of-book artifacts."
+)
+
+KALSHI_WEATHER_PROXY_FEATURE_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: build contract-keyed weather proxy "
+    "feature packets for fast-settling Kalshi high/low temperature contracts (KXHIGH/KXLOW), while "
+    "preserving the NWS Daily Climate Report as the settlement source and treating api.weather.gov "
+    "observations/forecasts as model features only."
+)
+
+KALSHI_WEATHER_PROXY_FEATURE_STOP_CONDITION = (
+    "Stop before treating proxy feeds as official settlement labels, computing usable EV, sizing positions, "
+    "execution, account/order paths, or promoting any weather hypothesis without settled Kalshi outcomes and "
+    "OOS cost-aware FDR evidence."
+)
+
+KALSHI_WEATHER_PROXY_OBSERVATION_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: run a repeated weather proxy observation loop "
+    "that saves contract-keyed feature snapshots, waits for settled Kalshi outcomes (NWS Daily Climate Report), "
+    "and builds label-ready packets for OOS falsification without using proxy feeds as settlement truth."
+)
+
+KALSHI_WEATHER_PROXY_OBSERVATION_STOP_CONDITION = (
+    "Stop before treating proxy feeds as official settlement labels, computing usable EV, sizing positions, "
+    "execution, account/order paths, or promoting any weather hypothesis without settled Kalshi outcomes and "
+    "OOS cost-aware FDR evidence."
+)
+
+KALSHI_WEATHER_PROXY_OBSERVATION_ACCUMULATION_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: continue the weather proxy observation loop "
+    "until public Kalshi settlements attach true outcomes to archived contract-keyed feature snapshots."
+)
+
+KALSHI_WEATHER_PROXY_OBSERVATION_ACCUMULATION_STOP_CONDITION = (
+    "Stop before using proxy feeds as labels, calibrated probabilities, EV, sizing positions, execution, "
+    "or account/order paths."
+)
+
+KALSHI_WEATHER_PROXY_FEATURE_MODEL_TRANCHE = (
+    "Use predmarket as the Kalshi signal-factory command center: train and falsify the first weather proxy "
+    "feature model against true settled Kalshi labels with all-in execution cost and FDR-controlled OOS gates."
+)
+
+KALSHI_WEATHER_PROXY_FEATURE_MODEL_STOP_CONDITION = (
+    "Stop before promotion, sizing positions, execution, or account/order paths without calibrated probabilities, "
+    "all-in costs, capacity/correlation constraints, and FDR-controlled OOS survival."
 )
 
 PARKED_UNLOCKS: dict[str, str] = {
@@ -566,6 +673,44 @@ PARKED_UNLOCKS: dict[str, str] = {
     ),
     "signal_factory_blocked_missing_universe_inventory": (
         "Run the public Kalshi universe scan before signal-factory work."
+    ),
+    "signal_factory_sports_stack_sequencing_ready_current_depth_passed": (
+        "Sports stack sequencing is current; run World Cup/FIFA, MLB, then ATP family-specific evidence loops."
+    ),
+    "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked": (
+        "Sports stack sequencing exists, but current-depth proof must pass before cap_i can be locked."
+    ),
+    "signal_factory_sports_baseball_feature_packet_ready": (
+        "Contract-keyed sports proxy feature packets exist; run repeated observations and settled outcome matching next."
+    ),
+    "signal_factory_sports_baseball_observations_waiting_settlement": (
+        "Sports proxy feature observations are archived; keep accumulating snapshots and public settled outcomes."
+    ),
+    "signal_factory_sports_baseball_labels_ready": (
+        "Sports proxy observations have true settled Kalshi labels; run model falsification before any sizing work."
+    ),
+    "signal_factory_sports_baseball_blocked_missing_feature_packet": (
+        "No sports proxy feature packet exists yet; build the baseball lane feature packet to add sports breadth."
+    ),
+    "signal_factory_probability_breadth_scout_ready_sports_baseball_route": (
+        "Fast-settling baseball game-winner contracts are available and keyless feature sources are reachable; "
+        "build contract-keyed sports feature packets without treating proxies as official labels."
+    ),
+    "signal_factory_weather_proxy_feature_packet_ready": (
+        "Contract-keyed weather proxy feature packets exist; run repeated observations and settled outcome matching next."
+    ),
+    "signal_factory_weather_proxy_observations_waiting_settlement": (
+        "Weather proxy feature observations are archived; keep accumulating snapshots and public settled outcomes."
+    ),
+    "signal_factory_weather_proxy_labels_ready": (
+        "Weather proxy observations have true settled Kalshi labels; run model falsification before any sizing work."
+    ),
+    "signal_factory_weather_proxy_blocked_missing_feature_packet": (
+        "No weather proxy feature packet exists yet; build the weather lane feature packet to add weather breadth."
+    ),
+    "signal_factory_probability_breadth_scout_ready_weather_proxy_route": (
+        "Fast-settling weather high/low temperature contracts are available and keyless NWS feature sources are reachable; "
+        "build contract-keyed weather feature packets without treating proxies as official labels."
     ),
     "universe_scan_ready_with_model_routes": (
         "Public Kalshi universe scan found candidates for existing model routes; dispatch work orders before EV."
@@ -803,7 +948,8 @@ def git_snapshot(root: Path) -> dict[str, Any]:
             p.startswith(("data/", "reports/", ".tmp/", "dist/", "build/")) for p in sample_paths
         ),
         "ide_or_temp_paths": any(
-            p.startswith((".idea/", ".vscode/", ".hermes/")) or ".hermes-tmp" in p for p in sample_paths
+            p.startswith((".idea/", ".vscode/", ".hermes/")) or ".hermes-tmp" in p
+            for p in sample_paths
         ),
         "large_dirty_tree": dirty_counts["total"] >= 100,
         "massive_dirty_tree": dirty_counts["total"] >= 500,
@@ -935,7 +1081,14 @@ def json_brief(value: Any) -> dict[str, Any]:
         }
     if isinstance(value, dict):
         brief: dict[str, Any] = {"json_type": "object", "top_level_keys": sorted(value)[:30]}
-        for key in ("status", "generated_at", "blocker_count", "claim_count", "ready_claim_count", "blocked_claim_count"):
+        for key in (
+            "status",
+            "generated_at",
+            "blocker_count",
+            "claim_count",
+            "ready_claim_count",
+            "blocked_claim_count",
+        ):
             if key in value:
                 brief[key] = value[key]
         return brief
@@ -999,7 +1152,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
     repo_id = status["repo_id"]
     components = dict(BASE_COMPONENTS[repo_id])
     evidence_status = status.get("evidence", {}).get("status")
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_pregame_intake_blocked_missing_operator_drop":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_pregame_intake_blocked_missing_operator_drop"
+    ):
         components.update(
             {
                 "architecture_leverage": 3,
@@ -1032,7 +1188,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 8,
             }
         )
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_repeatability_ready_for_research_review":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_repeatability_ready_for_research_review"
+    ):
         components.update(
             {
                 "architecture_leverage": 5,
@@ -1089,7 +1248,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         )
     if (
         repo_id == "predmarket-alpha"
-        and evidence_status == "kalshi_type2_reference_preflight_blocked_missing_sportsbook_reference"
+        and evidence_status
+        == "kalshi_type2_reference_preflight_blocked_missing_sportsbook_reference"
     ):
         components.update(
             {
@@ -1100,7 +1260,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 8,
             }
         )
-    if repo_id == "predmarket-alpha" and evidence_status == "kalshi_type2_candidate_disposition_all_passes_downgraded":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "kalshi_type2_candidate_disposition_all_passes_downgraded"
+    ):
         components.update(
             {
                 "architecture_leverage": 3,
@@ -1110,7 +1273,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 8,
             }
         )
-    if repo_id == "predmarket-alpha" and evidence_status == "kalshi_type2_candidate_disposition_watch_only":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "kalshi_type2_candidate_disposition_watch_only"
+    ):
         components.update(
             {
                 "architecture_leverage": 3,
@@ -1120,7 +1286,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 8,
             }
         )
-    if repo_id == "predmarket-alpha" and evidence_status == "kalshi_type2_matcher_blocked_missing_sportsbook_reference":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "kalshi_type2_matcher_blocked_missing_sportsbook_reference"
+    ):
         components.update(
             {
                 "evidence_delta": 1,
@@ -1148,7 +1317,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 3,
             }
         )
-    if repo_id == "predmarket-alpha" and evidence_status == "kalshi_ev_ledger_ready_with_usable_contract_edges":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "kalshi_ev_ledger_ready_with_usable_contract_edges"
+    ):
         components.update(
             {
                 "architecture_leverage": 5,
@@ -1262,6 +1434,16 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         "signal_factory_hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence",
         "signal_factory_foundation_ready_falsification_missing",
         "signal_factory_foundation_ready",
+        "signal_factory_sports_stack_sequencing_ready_current_depth_passed",
+        "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked",
+        "signal_factory_sports_baseball_feature_packet_ready",
+        "signal_factory_sports_baseball_observations_waiting_settlement",
+        "signal_factory_sports_baseball_labels_ready",
+        "signal_factory_probability_breadth_scout_ready_sports_baseball_route",
+        "signal_factory_weather_proxy_feature_packet_ready",
+        "signal_factory_weather_proxy_observations_waiting_settlement",
+        "signal_factory_weather_proxy_labels_ready",
+        "signal_factory_probability_breadth_scout_ready_weather_proxy_route",
     }:
         components.update(
             {
@@ -1272,7 +1454,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 2,
             }
         )
-    if repo_id == "predmarket-alpha" and evidence_status == "signal_factory_blocked_missing_universe_inventory":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "signal_factory_blocked_missing_universe_inventory"
+    ):
         components.update(
             {
                 "architecture_leverage": 5,
@@ -1282,7 +1467,36 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "verification_cost": 2,
             }
         )
-    if repo_id == "atp-oracle" and evidence_status == "tennis_type2_readiness_blocked_model_quality_external_evidence":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "signal_factory_sports_baseball_blocked_missing_feature_packet"
+    ):
+        components.update(
+            {
+                "architecture_leverage": 5,
+                "evidence_delta": 2,
+                "edge_feedback_speed": 2,
+                "blocker_criticality": 3,
+                "verification_cost": 2,
+            }
+        )
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "signal_factory_weather_proxy_blocked_missing_feature_packet"
+    ):
+        components.update(
+            {
+                "architecture_leverage": 5,
+                "evidence_delta": 2,
+                "edge_feedback_speed": 2,
+                "blocker_criticality": 3,
+                "verification_cost": 2,
+            }
+        )
+    if (
+        repo_id == "atp-oracle"
+        and evidence_status == "tennis_type2_readiness_blocked_model_quality_external_evidence"
+    ):
         components.update(
             {
                 "evidence_delta": 1,
@@ -1293,7 +1507,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         )
     if (
         repo_id == "atp-oracle"
-        and evidence_status == "tennis_type2_g1g2_diagnostic_ready_blocked_fresh_validation_external_evidence"
+        and evidence_status
+        == "tennis_type2_g1g2_diagnostic_ready_blocked_fresh_validation_external_evidence"
     ):
         components.update(
             {
@@ -1317,12 +1532,14 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
             {
                 "architecture_leverage": (
                     2
-                    if evidence_status == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+                    if evidence_status
+                    == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
                     else components["architecture_leverage"]
                 ),
                 "evidence_delta": (
                     0
-                    if evidence_status == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+                    if evidence_status
+                    == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
                     else (
                         4
                         if evidence_status
@@ -1338,17 +1555,20 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 ),
                 "edge_feedback_speed": (
                     0
-                    if evidence_status == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+                    if evidence_status
+                    == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
                     else 2
                 ),
                 "blocker_criticality": (
                     0
-                    if evidence_status == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+                    if evidence_status
+                    == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
                     else 4
                 ),
                 "verification_cost": (
                     8
-                    if evidence_status == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
+                    if evidence_status
+                    == "macro_partial_truth_shrinkage_clipped_residual_market_parity"
                     else 4
                 ),
             }
@@ -1361,7 +1581,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
             {
                 "architecture_leverage": (
                     3
-                    if evidence_status == "governance_macro_export_ready_fresh_snapshots_research_only"
+                    if evidence_status
+                    == "governance_macro_export_ready_fresh_snapshots_research_only"
                     else components["architecture_leverage"]
                 ),
                 "evidence_delta": 0,
@@ -1369,7 +1590,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "blocker_criticality": 0,
                 "verification_cost": (
                     10
-                    if evidence_status == "governance_macro_export_ready_fresh_snapshots_research_only"
+                    if evidence_status
+                    == "governance_macro_export_ready_fresh_snapshots_research_only"
                     else 4
                 ),
             }
@@ -1388,12 +1610,14 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
             {
                 "architecture_leverage": (
                     2
-                    if evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+                    if evidence_status
+                    == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
                     else 5
                 ),
                 "evidence_delta": (
                     0
-                    if evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+                    if evidence_status
+                    == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
                     else 4
                     if evidence_status
                     in {
@@ -1406,12 +1630,14 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 ),
                 "edge_feedback_speed": (
                     0
-                    if evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+                    if evidence_status
+                    == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
                     else 2
                 ),
                 "blocker_criticality": (
                     0
-                    if evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+                    if evidence_status
+                    == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
                     else 4
                     if evidence_status
                     in {
@@ -1423,7 +1649,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 ),
                 "verification_cost": (
                     8
-                    if evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+                    if evidence_status
+                    == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
                     else 4
                 ),
             }
@@ -1440,7 +1667,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
     )
     recommended_next_tranche = TRANCHES[repo_id]
     stop_condition = STOP_CONDITIONS[repo_id]
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_repeatability_ready_for_research_review":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_repeatability_ready_for_research_review"
+    ):
         recommended_next_tranche = MLB_REPEATABILITY_RESEARCH_REVIEW_TRANCHE
         stop_condition = MLB_REPEATABILITY_RESEARCH_REVIEW_STOP_CONDITION
     if repo_id == "nfl_quant_glm51_greenfield" and evidence_status in {
@@ -1456,7 +1686,8 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         stop_condition = NFL_LINE_READINESS_CONTEXT_STOP_CONDITION
     if (
         repo_id == "nfl_quant_glm51_greenfield"
-        and evidence_status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+        and evidence_status
+        == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
     ):
         recommended_next_tranche = (
             "Park NFL forward-context collection: the fair-line/current-market machinery is ready, "
@@ -1473,39 +1704,65 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
     ):
         recommended_next_tranche = MLB_REPEATABILITY_CROSS_SLATE_TRANCHE
         stop_condition = MLB_REPEATABILITY_CROSS_SLATE_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_repeatability_blocked_no_clean_packets":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_repeatability_blocked_no_clean_packets"
+    ):
         recommended_next_tranche = MLB_REPEATABILITY_NO_CLEAN_PACKETS_TRANCHE
         stop_condition = MLB_REPEATABILITY_NO_CLEAN_PACKETS_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_repeatability_no_signal_clean_packets":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_repeatability_no_signal_clean_packets"
+    ):
         recommended_next_tranche = MLB_REPEATABILITY_NO_SIGNAL_TRANCHE
         stop_condition = MLB_REPEATABILITY_NO_SIGNAL_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_threshold_policy_hold_current":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_threshold_policy_hold_current"
+    ):
         recommended_next_tranche = MLB_THRESHOLD_POLICY_HOLD_TRANCHE
         stop_condition = MLB_THRESHOLD_POLICY_HOLD_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_threshold_policy_review_candidate":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_threshold_policy_review_candidate"
+    ):
         recommended_next_tranche = MLB_THRESHOLD_POLICY_REVIEW_TRANCHE
         stop_condition = MLB_THRESHOLD_POLICY_REVIEW_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_settled_validation_no_policy_change_same_slate":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_settled_validation_no_policy_change_same_slate"
+    ):
         recommended_next_tranche = MLB_SETTLED_VALIDATION_NO_POLICY_TRANCHE
         stop_condition = MLB_SETTLED_VALIDATION_NO_POLICY_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_settled_validation_review_candidate":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_settled_validation_review_candidate"
+    ):
         recommended_next_tranche = MLB_SETTLED_VALIDATION_REVIEW_TRANCHE
         stop_condition = MLB_SETTLED_VALIDATION_REVIEW_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_closing_proxy_same_slate_support_insufficient":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_closing_proxy_same_slate_support_insufficient"
+    ):
         recommended_next_tranche = MLB_CLOSING_PROXY_INSUFFICIENT_TRANCHE
         stop_condition = MLB_CLOSING_PROXY_INSUFFICIENT_STOP_CONDITION
-    if repo_id == "mlb-platform" and evidence_status == "primary_type2_closing_proxy_review_candidate":
+    if (
+        repo_id == "mlb-platform"
+        and evidence_status == "primary_type2_closing_proxy_review_candidate"
+    ):
         recommended_next_tranche = MLB_CLOSING_PROXY_REVIEW_TRANCHE
         stop_condition = MLB_CLOSING_PROXY_REVIEW_STOP_CONDITION
     if (
         repo_id == "mlb-platform"
-        and evidence_status == "primary_type2_betexplorer_moneyline_closing_comparison_no_policy_change"
+        and evidence_status
+        == "primary_type2_betexplorer_moneyline_closing_comparison_no_policy_change"
     ):
         recommended_next_tranche = MLB_BETEXPLORER_MONEYLINE_NO_POLICY_TRANCHE
         stop_condition = MLB_BETEXPLORER_MONEYLINE_NO_POLICY_STOP_CONDITION
     if (
         repo_id == "mlb-platform"
-        and evidence_status == "primary_type2_betexplorer_market_closing_comparison_no_policy_change"
+        and evidence_status
+        == "primary_type2_betexplorer_market_closing_comparison_no_policy_change"
     ):
         recommended_next_tranche = MLB_BETEXPLORER_MARKET_NO_POLICY_TRANCHE
         stop_condition = MLB_BETEXPLORER_MARKET_NO_POLICY_STOP_CONDITION
@@ -1542,15 +1799,25 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         "signal_factory_foundation_ready_falsification_missing",
         "signal_factory_foundation_ready",
         "signal_factory_blocked_missing_universe_inventory",
+        "signal_factory_sports_stack_sequencing_ready_current_depth_passed",
+        "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked",
+        "signal_factory_sports_baseball_feature_packet_ready",
+        "signal_factory_sports_baseball_observations_waiting_settlement",
+        "signal_factory_sports_baseball_labels_ready",
+        "signal_factory_sports_baseball_blocked_missing_feature_packet",
+        "signal_factory_probability_breadth_scout_ready_sports_baseball_route",
+        "signal_factory_weather_proxy_feature_packet_ready",
+        "signal_factory_weather_proxy_observations_waiting_settlement",
+        "signal_factory_weather_proxy_labels_ready",
+        "signal_factory_weather_proxy_blocked_missing_feature_packet",
+        "signal_factory_probability_breadth_scout_ready_weather_proxy_route",
     }:
         if evidence_status == "signal_factory_crypto_proxy_cluster_control_ready_paper_overlay":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: build a paper-only crypto proxy "
                 "probability overlay and decay monitor from cluster-control-passing research candidates."
             )
-            stop_condition = (
-                "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
-            )
+            stop_condition = "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
         elif evidence_status == "signal_factory_crypto_proxy_cluster_breadth_blocked":
             recommended_next_tranche = KALSHI_CRYPTO_PROXY_CLUSTER_BREADTH_TRANCHE
             stop_condition = KALSHI_CRYPTO_PROXY_CLUSTER_BREADTH_STOP_CONDITION
@@ -1559,7 +1826,9 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "Use predmarket as the Kalshi signal-factory command center: refine deterministic crypto proxy "
                 "cluster caps until positive-depth candidates satisfy the configured share limit."
             )
-            stop_condition = "Stop before paper overlay until the controlled cluster share limit is passing."
+            stop_condition = (
+                "Stop before paper overlay until the controlled cluster share limit is passing."
+            )
         elif evidence_status in {
             "signal_factory_crypto_proxy_cluster_control_blocked_upstream_ccd",
             "signal_factory_crypto_proxy_cluster_control_missing_ccd",
@@ -1571,23 +1840,24 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "Use predmarket as the Kalshi signal-factory command center: accumulate public orderbook depth "
                 "for current crypto proxy candidates before retrying cluster exposure controls."
             )
-            stop_condition = "Stop before inferring capacity from top-of-book prices without public depth."
+            stop_condition = (
+                "Stop before inferring capacity from top-of-book prices without public depth."
+            )
         elif evidence_status == "signal_factory_crypto_proxy_cluster_control_failed_safety_gate":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: audit and repair the failed crypto "
                 "proxy cluster-control research-only safety gate."
             )
-            stop_condition = (
-                "Stop before any paper overlay, sizing, execution, or account/order path until the failed safety gate is fixed."
-            )
-        elif evidence_status == "signal_factory_crypto_proxy_capacity_correlation_decay_ready_paper_overlay":
+            stop_condition = "Stop before any paper overlay, sizing, execution, or account/order path until the failed safety gate is fixed."
+        elif (
+            evidence_status
+            == "signal_factory_crypto_proxy_capacity_correlation_decay_ready_paper_overlay"
+        ):
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: build a paper-only crypto proxy "
                 "probability overlay and decay monitor from CCD-passing research candidates."
             )
-            stop_condition = (
-                "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
-            )
+            stop_condition = "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
         elif evidence_status == "signal_factory_crypto_proxy_capacity_depth_blocked":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: accumulate public orderbook depth "
@@ -1600,26 +1870,29 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "Use predmarket as the Kalshi signal-factory command center: add correlation-cluster exposure "
                 "controls for crypto proxy candidates before any paper overlay."
             )
-            stop_condition = (
-                "Stop before paper overlay until cluster exposure limits are machine-readable and passing."
-            )
+            stop_condition = "Stop before paper overlay until cluster exposure limits are machine-readable and passing."
         elif evidence_status == "signal_factory_crypto_proxy_decay_survival_blocked":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: accumulate repeated settled buckets "
                 "and keep the crypto proxy signal blocked until decay survival is passing."
             )
-            stop_condition = "Stop before lowering decay or sample thresholds without an explicit policy review."
+            stop_condition = (
+                "Stop before lowering decay or sample thresholds without an explicit policy review."
+            )
         elif evidence_status == "signal_factory_crypto_proxy_current_candidates_missing":
             recommended_next_tranche = KALSHI_CRYPTO_PROXY_OBSERVATION_ACCUMULATION_TRANCHE
-            stop_condition = "Stop before treating stale expired replay rows as current capacity evidence."
-        elif evidence_status == "signal_factory_crypto_proxy_capacity_correlation_decay_failed_safety_gate":
+            stop_condition = (
+                "Stop before treating stale expired replay rows as current capacity evidence."
+            )
+        elif (
+            evidence_status
+            == "signal_factory_crypto_proxy_capacity_correlation_decay_failed_safety_gate"
+        ):
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: audit and repair the failed "
                 "capacity/correlation/decay research-only safety gate."
             )
-            stop_condition = (
-                "Stop before any paper overlay, sizing, execution, or account/order path until the failed safety gate is fixed."
-            )
+            stop_condition = "Stop before any paper overlay, sizing, execution, or account/order path until the failed safety gate is fixed."
         elif evidence_status == "signal_factory_crypto_proxy_replay_blocked_predeployment_gates":
             recommended_next_tranche = KALSHI_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_TRANCHE
             stop_condition = KALSHI_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_STOP_CONDITION
@@ -1628,17 +1901,13 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "Use predmarket as the Kalshi signal-factory command center: build a paper-only crypto proxy "
                 "probability overlay and decay monitor from replay-ready research candidates."
             )
-            stop_condition = (
-                "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
-            )
+            stop_condition = "Stop before real positions, execution, account/order paths, staking guidance, or live edge claims."
         elif evidence_status == "signal_factory_crypto_proxy_replay_no_positive_cost_adjusted_rows":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: rotate to new registered crypto "
                 "feature families after conservative all-in cost replay found no positive rows."
             )
-            stop_condition = (
-                "Stop before discretionary signal selection or reusing failed hypotheses without new registered features."
-            )
+            stop_condition = "Stop before discretionary signal selection or reusing failed hypotheses without new registered features."
         elif evidence_status == "signal_factory_crypto_proxy_feature_model_research_candidates":
             recommended_next_tranche = KALSHI_CRYPTO_PROXY_RESEARCH_REPLAY_TRANCHE
             stop_condition = KALSHI_CRYPTO_PROXY_RESEARCH_REPLAY_STOP_CONDITION
@@ -1647,9 +1916,7 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
                 "Use predmarket as the Kalshi signal-factory command center: rotate to new registered crypto "
                 "feature families after the current proxy model failed falsification."
             )
-            stop_condition = (
-                "Stop before discretionary signal selection or reusing failed hypotheses without new registered features."
-            )
+            stop_condition = "Stop before discretionary signal selection or reusing failed hypotheses without new registered features."
         elif evidence_status == "signal_factory_crypto_proxy_feature_model_insufficient_labels":
             recommended_next_tranche = KALSHI_CRYPTO_PROXY_OBSERVATION_ACCUMULATION_TRANCHE
             stop_condition = (
@@ -1674,26 +1941,75 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
         elif evidence_status == "signal_factory_oos_label_packet_ready_backtest_pending":
             recommended_next_tranche = KALSHI_LABELED_OOS_BACKTEST_TRANCHE
             stop_condition = KALSHI_LABELED_OOS_BACKTEST_STOP_CONDITION
-        elif evidence_status == "signal_factory_oos_backtest_harness_ready_labeled_observations_missing":
+        elif (
+            evidence_status
+            == "signal_factory_oos_backtest_harness_ready_labeled_observations_missing"
+        ):
             recommended_next_tranche = KALSHI_LABELED_OBSERVATION_PACKET_TRANCHE
             stop_condition = KALSHI_LABELED_OBSERVATION_PACKET_STOP_CONDITION
-        elif evidence_status == "signal_factory_oos_backtest_harness_ready_oos_samples_insufficient":
+        elif (
+            evidence_status == "signal_factory_oos_backtest_harness_ready_oos_samples_insufficient"
+        ):
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: accumulate more time-safe labeled "
                 "OOS observations for the registered hypotheses without lowering validation thresholds."
             )
-            stop_condition = "Stop before lowering OOS/FDR thresholds without an explicit policy review."
+            stop_condition = (
+                "Stop before lowering OOS/FDR thresholds without an explicit policy review."
+            )
         elif evidence_status == "signal_factory_oos_backtest_ready_research_promotions_present":
             recommended_next_tranche = (
                 "Use predmarket as the Kalshi signal-factory command center: build capacity, correlation, decay, "
                 "and execution-control gates for research-promoted hypotheses before any sizing work."
             )
-            stop_condition = (
-                "Stop before execution/account/order paths until capacity, correlation, sizing, and kill-switch gates exist."
-            )
-        elif evidence_status == "signal_factory_hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence":
+            stop_condition = "Stop before execution/account/order paths until capacity, correlation, sizing, and kill-switch gates exist."
+        elif (
+            evidence_status
+            == "signal_factory_hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence"
+        ):
             recommended_next_tranche = KALSHI_LABELED_OOS_BACKTEST_TRANCHE
             stop_condition = KALSHI_LABELED_OOS_BACKTEST_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_stack_sequencing_ready_current_depth_passed":
+            recommended_next_tranche = KALSHI_SPORTS_STACK_SEQUENCING_TRANCHE
+            stop_condition = KALSHI_SPORTS_STACK_SEQUENCING_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked":
+            recommended_next_tranche = KALSHI_SPORTS_STACK_CAP_I_BLOCKED_TRANCHE
+            stop_condition = KALSHI_SPORTS_STACK_CAP_I_BLOCKED_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_baseball_feature_packet_ready":
+            recommended_next_tranche = KALSHI_SPORTS_PROXY_OBSERVATION_TRANCHE
+            stop_condition = KALSHI_SPORTS_PROXY_OBSERVATION_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_baseball_observations_waiting_settlement":
+            recommended_next_tranche = KALSHI_SPORTS_PROXY_OBSERVATION_ACCUMULATION_TRANCHE
+            stop_condition = KALSHI_SPORTS_PROXY_OBSERVATION_ACCUMULATION_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_baseball_labels_ready":
+            recommended_next_tranche = KALSHI_SPORTS_PROXY_FEATURE_MODEL_TRANCHE
+            stop_condition = KALSHI_SPORTS_PROXY_FEATURE_MODEL_STOP_CONDITION
+        elif evidence_status == "signal_factory_sports_baseball_blocked_missing_feature_packet":
+            recommended_next_tranche = KALSHI_SPORTS_PROXY_FEATURE_TRANCHE
+            stop_condition = KALSHI_SPORTS_PROXY_FEATURE_STOP_CONDITION
+        elif (
+            evidence_status
+            == "signal_factory_probability_breadth_scout_ready_sports_baseball_route"
+        ):
+            recommended_next_tranche = KALSHI_SPORTS_PROXY_FEATURE_TRANCHE
+            stop_condition = KALSHI_SPORTS_PROXY_FEATURE_STOP_CONDITION
+        elif evidence_status == "signal_factory_weather_proxy_feature_packet_ready":
+            recommended_next_tranche = KALSHI_WEATHER_PROXY_OBSERVATION_TRANCHE
+            stop_condition = KALSHI_WEATHER_PROXY_OBSERVATION_STOP_CONDITION
+        elif evidence_status == "signal_factory_weather_proxy_observations_waiting_settlement":
+            recommended_next_tranche = KALSHI_WEATHER_PROXY_OBSERVATION_ACCUMULATION_TRANCHE
+            stop_condition = KALSHI_WEATHER_PROXY_OBSERVATION_ACCUMULATION_STOP_CONDITION
+        elif evidence_status == "signal_factory_weather_proxy_labels_ready":
+            recommended_next_tranche = KALSHI_WEATHER_PROXY_FEATURE_MODEL_TRANCHE
+            stop_condition = KALSHI_WEATHER_PROXY_FEATURE_MODEL_STOP_CONDITION
+        elif evidence_status == "signal_factory_weather_proxy_blocked_missing_feature_packet":
+            recommended_next_tranche = KALSHI_WEATHER_PROXY_FEATURE_TRANCHE
+            stop_condition = KALSHI_WEATHER_PROXY_FEATURE_STOP_CONDITION
+        elif (
+            evidence_status == "signal_factory_probability_breadth_scout_ready_weather_proxy_route"
+        ):
+            recommended_next_tranche = KALSHI_WEATHER_PROXY_FEATURE_TRANCHE
+            stop_condition = KALSHI_WEATHER_PROXY_FEATURE_STOP_CONDITION
         else:
             recommended_next_tranche = KALSHI_SIGNAL_FACTORY_TRANCHE
             stop_condition = KALSHI_SIGNAL_FACTORY_STOP_CONDITION
@@ -1729,7 +2045,10 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
     }:
         recommended_next_tranche = KALSHI_EV_CALIBRATION_WORK_ORDER_TRANCHE
         stop_condition = KALSHI_EV_CALIBRATION_WORK_ORDER_STOP_CONDITION
-    if repo_id == "predmarket-alpha" and evidence_status == "kalshi_ev_contract_mapping_work_order_ready":
+    if (
+        repo_id == "predmarket-alpha"
+        and evidence_status == "kalshi_ev_contract_mapping_work_order_ready"
+    ):
         recommended_next_tranche = KALSHI_EV_CONTRACT_MAPPING_WORK_ORDER_TRANCHE
         stop_condition = KALSHI_EV_CONTRACT_MAPPING_WORK_ORDER_STOP_CONDITION
     if repo_id == "predmarket-alpha" and evidence_status in {
@@ -1749,7 +2068,9 @@ def apply_scheduling(status: dict[str, Any]) -> dict[str, Any]:
     return status
 
 
-def finish_status(status: dict[str, Any], evidence: dict[str, Any], gates: list[dict[str, Any]]) -> dict[str, Any]:
+def finish_status(
+    status: dict[str, Any], evidence: dict[str, Any], gates: list[dict[str, Any]]
+) -> dict[str, Any]:
     evidence = dict(evidence)
     evidence["gate_counts"] = gate_counts(gates)
     status["evidence"] = evidence
@@ -1820,6 +2141,12 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         "docs/codex/macro/latest-kalshi-crypto-proxy-feature-model-falsification.json",
         "docs/codex/macro/latest-kalshi-crypto-proxy-feature-model-falsification.md",
         "docs/codex/macro/latest-kalshi-crypto-proxy-feature-model-falsification.csv",
+        "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.json",
+        "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.md",
+        "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.csv",
+        "docs/codex/macro/latest-kalshi-sports-proxy-observation-loop.json",
+        "docs/codex/macro/latest-kalshi-sports-proxy-observation-loop.md",
+        "docs/codex/macro/latest-kalshi-sports-proxy-observation-loop.csv",
         "docs/codex/macro/latest-macro-blocker-audit.json",
         "docs/codex/macro/latest-macro-blocker-audit.md",
         "docs/codex/current-state.md",
@@ -1975,7 +2302,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         "docs/codex/artifacts/type2-threshold-sensitivity-latest/type2-threshold-sensitivity-latest.json",
     )
     kalshi_ev_ledger = read_json(root, "docs/codex/macro/latest-kalshi-contract-ev-ledger.json")
-    kalshi_ev_overlay_preflight = read_json(root, "docs/codex/macro/latest-kalshi-ev-overlay-preflight.json")
+    kalshi_ev_overlay_preflight = read_json(
+        root, "docs/codex/macro/latest-kalshi-ev-overlay-preflight.json"
+    )
     kalshi_ev_calibration_work_order = read_json(
         root,
         "docs/codex/macro/latest-kalshi-ev-calibration-work-order.json",
@@ -2076,7 +2405,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         and type2_preflight["safety"].get("provider_api_calls") is False
         and type2_preflight["safety"].get("account_or_order_paths") is False
     )
-    type2_preflight_status = type2_preflight.get("status") if isinstance(type2_preflight, dict) else None
+    type2_preflight_status = (
+        type2_preflight.get("status") if isinstance(type2_preflight, dict) else None
+    )
     type2_disposition_present = (
         isinstance(type2_disposition, dict)
         and type2_disposition.get("research_only") is True
@@ -2085,8 +2416,12 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         and type2_disposition["safety"].get("provider_api_calls") is False
         and type2_disposition["safety"].get("account_or_order_paths") is False
     )
-    type2_disposition_status = type2_disposition.get("status") if isinstance(type2_disposition, dict) else None
-    type2_disposition_summary = type2_disposition.get("summary") if isinstance(type2_disposition, dict) else {}
+    type2_disposition_status = (
+        type2_disposition.get("status") if isinstance(type2_disposition, dict) else None
+    )
+    type2_disposition_summary = (
+        type2_disposition.get("summary") if isinstance(type2_disposition, dict) else {}
+    )
     type2_threshold_sensitivity_present = (
         isinstance(type2_threshold_sensitivity, dict)
         and type2_threshold_sensitivity.get("research_only") is True
@@ -2105,7 +2440,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         if isinstance(type2_threshold_sensitivity, dict)
         else {}
     )
-    kalshi_capture_summary = kalshi_capture.get("summary") if isinstance(kalshi_capture, dict) else {}
+    kalshi_capture_summary = (
+        kalshi_capture.get("summary") if isinstance(kalshi_capture, dict) else {}
+    )
     kalshi_capture_present = (
         isinstance(kalshi_capture, dict)
         and kalshi_capture.get("research_only") is True
@@ -2116,9 +2453,13 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         and kalshi_capture["safety"].get("database_writes") is False
         and int(kalshi_capture_summary.get("market_count") or 0) > 0
     )
-    kalshi_capture_status = kalshi_capture.get("status") if isinstance(kalshi_capture, dict) else None
+    kalshi_capture_status = (
+        kalshi_capture.get("status") if isinstance(kalshi_capture, dict) else None
+    )
     kalshi_ev_ledger_present = safe_research_json(kalshi_ev_ledger)
-    kalshi_ev_ledger_status = kalshi_ev_ledger.get("status") if isinstance(kalshi_ev_ledger, dict) else None
+    kalshi_ev_ledger_status = (
+        kalshi_ev_ledger.get("status") if isinstance(kalshi_ev_ledger, dict) else None
+    )
     kalshi_ev_ledger_summary = (
         kalshi_ev_ledger.get("summary")
         if isinstance(kalshi_ev_ledger, dict) and isinstance(kalshi_ev_ledger.get("summary"), dict)
@@ -2152,7 +2493,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         )
         else {}
     )
-    kalshi_ev_contract_mapping_work_order_present = safe_research_json(kalshi_ev_contract_mapping_work_order)
+    kalshi_ev_contract_mapping_work_order_present = safe_research_json(
+        kalshi_ev_contract_mapping_work_order
+    )
     kalshi_ev_contract_mapping_work_order_status = (
         kalshi_ev_contract_mapping_work_order.get("status")
         if isinstance(kalshi_ev_contract_mapping_work_order, dict)
@@ -2198,9 +2541,7 @@ def predmarket_status(root: Path) -> dict[str, Any]:
     )
     kalshi_ev_review_queue_present = safe_research_json(kalshi_ev_review_queue)
     kalshi_ev_review_queue_status = (
-        kalshi_ev_review_queue.get("status")
-        if isinstance(kalshi_ev_review_queue, dict)
-        else None
+        kalshi_ev_review_queue.get("status") if isinstance(kalshi_ev_review_queue, dict) else None
     )
     kalshi_ev_review_queue_summary = (
         kalshi_ev_review_queue.get("summary")
@@ -2226,9 +2567,7 @@ def predmarket_status(root: Path) -> dict[str, Any]:
     )
     kalshi_universe_scan_present = safe_research_json(kalshi_universe_scan)
     kalshi_universe_scan_status = (
-        kalshi_universe_scan.get("status")
-        if isinstance(kalshi_universe_scan, dict)
-        else None
+        kalshi_universe_scan.get("status") if isinstance(kalshi_universe_scan, dict) else None
     )
     kalshi_universe_scan_summary = (
         kalshi_universe_scan.get("summary")
@@ -2272,7 +2611,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         if isinstance(kalshi_falsification_gate, dict)
         else None
     )
-    kalshi_labeled_observation_builder_present = safe_research_json(kalshi_labeled_observation_builder)
+    kalshi_labeled_observation_builder_present = safe_research_json(
+        kalshi_labeled_observation_builder
+    )
     kalshi_labeled_observation_builder_status = (
         kalshi_labeled_observation_builder.get("status")
         if isinstance(kalshi_labeled_observation_builder, dict)
@@ -2314,7 +2655,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         )
         else {}
     )
-    kalshi_crypto_proxy_feature_packet_present = safe_research_json(kalshi_crypto_proxy_feature_packet)
+    kalshi_crypto_proxy_feature_packet_present = safe_research_json(
+        kalshi_crypto_proxy_feature_packet
+    )
     kalshi_crypto_proxy_feature_packet_status = (
         kalshi_crypto_proxy_feature_packet.get("status")
         if isinstance(kalshi_crypto_proxy_feature_packet, dict)
@@ -2328,7 +2671,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         )
         else {}
     )
-    kalshi_crypto_proxy_observation_loop_present = safe_research_json(kalshi_crypto_proxy_observation_loop)
+    kalshi_crypto_proxy_observation_loop_present = safe_research_json(
+        kalshi_crypto_proxy_observation_loop
+    )
     kalshi_crypto_proxy_observation_loop_status = (
         kalshi_crypto_proxy_observation_loop.get("status")
         if isinstance(kalshi_crypto_proxy_observation_loop, dict)
@@ -2393,19 +2738,31 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         make_gate(
             "research_only_execution_disabled",
             "pass" if execution_disabled else "fail",
-            ["config/config.yaml keeps Kalshi execution disabled." if execution_disabled else "Kalshi execution flag is not explicitly false."],
+            [
+                "config/config.yaml keeps Kalshi execution disabled."
+                if execution_disabled
+                else "Kalshi execution flag is not explicitly false."
+            ],
             ["config/config.yaml"],
         ),
         make_gate(
             "kalshi_type2_strategy_loaded",
             "pass" if type2_loaded else "blocked",
-            ["Kalshi strategy memo prioritizes Type 2 sports props." if type2_loaded else "Type 2 strategy memo was not found."],
+            [
+                "Kalshi strategy memo prioritizes Type 2 sports props."
+                if type2_loaded
+                else "Type 2 strategy memo was not found."
+            ],
             ["docs/kalshi_edge_strategy.md"],
         ),
         make_gate(
             "june_16_kalshi_paper_artifacts",
             "pass" if refined or scored else "warn",
-            ["June 16 Kalshi scored artifacts are present." if refined or scored else "No June 16 scored artifact found."],
+            [
+                "June 16 Kalshi scored artifacts are present."
+                if refined or scored
+                else "No June 16 scored artifact found."
+            ],
             ["data/kalshi_scored_refined_2026-06-16.json", "data/kalshi_scored_2026-06-16.json"],
         ),
         make_gate(
@@ -2498,7 +2855,11 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             (
                 "blocked"
                 if missing_mapped_sportsbook_reference
-                else ("pass" if type2_preflight_status == "reference_ready" else ("pass" if type2_matcher_present else "blocked"))
+                else (
+                    "pass"
+                    if type2_preflight_status == "reference_ready"
+                    else ("pass" if type2_matcher_present else "blocked")
+                )
             ),
             [
                 (
@@ -2546,7 +2907,11 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             (
                 "pass"
                 if kept_disposition_candidates > 0
-                else ("blocked" if type2_disposition_status == "candidate_disposition_all_passes_downgraded" else "warn")
+                else (
+                    "blocked"
+                    if type2_disposition_status == "candidate_disposition_all_passes_downgraded"
+                    else "warn"
+                )
             ),
             [
                 (
@@ -2599,7 +2964,8 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             "kalshi_ev_ledger_ready",
             (
                 "pass"
-                if kalshi_ev_ledger_present and int(kalshi_ev_ledger_summary.get("row_count") or 0) > 0
+                if kalshi_ev_ledger_present
+                and int(kalshi_ev_ledger_summary.get("row_count") or 0) > 0
                 else "blocked"
             ),
             [
@@ -2648,7 +3014,8 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                     kalshi_ev_calibration_work_order_present
                     and kalshi_ev_calibration_work_order_status
                     in {"calibration_work_order_ready", "calibration_work_order_ready_source_gated"}
-                    and int(kalshi_ev_calibration_work_order_summary.get("selected_row_count") or 0) > 0
+                    and int(kalshi_ev_calibration_work_order_summary.get("selected_row_count") or 0)
+                    > 0
                 )
                 else "blocked"
             ),
@@ -2676,8 +3043,15 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                 "pass"
                 if (
                     kalshi_ev_contract_mapping_work_order_present
-                    and kalshi_ev_contract_mapping_work_order_status == "contract_mapping_work_order_ready"
-                    and int(kalshi_ev_contract_mapping_work_order_summary.get("selected_contract_side_count") or 0) > 0
+                    and kalshi_ev_contract_mapping_work_order_status
+                    == "contract_mapping_work_order_ready"
+                    and int(
+                        kalshi_ev_contract_mapping_work_order_summary.get(
+                            "selected_contract_side_count"
+                        )
+                        or 0
+                    )
+                    > 0
                 )
                 else "blocked"
             ),
@@ -2726,14 +3100,24 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             "kalshi_ev_ready_local_target_contract_evidence_present",
             (
                 "pass"
-                if int(kalshi_ev_local_contract_evidence_scout_summary.get("ready_target_match_count") or 0) > 0
+                if int(
+                    kalshi_ev_local_contract_evidence_scout_summary.get("ready_target_match_count")
+                    or 0
+                )
+                > 0
                 else "blocked"
             ),
             [
                 (
                     "Ready local target contract evidence rows present: "
                     f"{kalshi_ev_local_contract_evidence_scout_summary.get('ready_target_match_count')}."
-                    if int(kalshi_ev_local_contract_evidence_scout_summary.get("ready_target_match_count") or 0) > 0
+                    if int(
+                        kalshi_ev_local_contract_evidence_scout_summary.get(
+                            "ready_target_match_count"
+                        )
+                        or 0
+                    )
+                    > 0
                     else (
                         "No selected NFL target has local exact ticker, official terms, and executable cost evidence."
                     )
@@ -2829,7 +3213,10 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                 "pass"
                 if (
                     kalshi_ev_queue_robustness_present
-                    and int(kalshi_ev_queue_robustness_summary.get("repeat_positive_row_count") or 0) > 0
+                    and int(
+                        kalshi_ev_queue_robustness_summary.get("repeat_positive_row_count") or 0
+                    )
+                    > 0
                 )
                 else ("warn" if kalshi_ev_queue_robustness_present else "blocked")
             ),
@@ -2894,7 +3281,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                 "pass"
                 if kalshi_signal_factory_status_present
                 and kalshi_signal_factory_evidence_status
-                and not str(kalshi_signal_factory_evidence_status).startswith("signal_factory_blocked")
+                and not str(kalshi_signal_factory_evidence_status).startswith(
+                    "signal_factory_blocked"
+                )
                 else ("blocked" if not kalshi_signal_factory_status_present else "warn")
             ),
             [
@@ -2958,7 +3347,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             (
                 "blocked"
                 if kalshi_falsification_gate_present
-                and str(kalshi_falsification_gate_status or "").startswith("falsification_gate_blocked")
+                and str(kalshi_falsification_gate_status or "").startswith(
+                    "falsification_gate_blocked"
+                )
                 else ("pass" if kalshi_falsification_gate_present else "blocked")
             ),
             [
@@ -2981,11 +3372,7 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "kalshi_labeled_observation_builder_ready",
-            (
-                "pass"
-                if kalshi_labeled_observation_builder_present
-                else "blocked"
-            ),
+            ("pass" if kalshi_labeled_observation_builder_present else "blocked"),
             [
                 (
                     "Labeled observation builder is present with status "
@@ -3010,11 +3397,7 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "kalshi_labeled_oos_backtest_ready",
-            (
-                "pass"
-                if kalshi_labeled_oos_backtest_present
-                else "blocked"
-            ),
+            ("pass" if kalshi_labeled_oos_backtest_present else "blocked"),
             [
                 (
                     "Labeled OOS backtest is present with status "
@@ -3046,7 +3429,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
             (
                 "pass"
                 if kalshi_probability_breadth_scout_present
-                and str(kalshi_probability_breadth_scout_status or "").startswith("probability_breadth_scout_ready")
+                and str(kalshi_probability_breadth_scout_status or "").startswith(
+                    "probability_breadth_scout_ready"
+                )
                 else ("warn" if kalshi_probability_breadth_scout_present else "blocked")
             ),
             [
@@ -3149,7 +3534,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                     "crypto_proxy_feature_model_falsification_ready_no_research_candidates",
                     "crypto_proxy_feature_model_falsification_ready_with_research_candidates",
                 }
-                else ("warn" if kalshi_crypto_proxy_feature_model_falsification_present else "blocked")
+                else (
+                    "warn" if kalshi_crypto_proxy_feature_model_falsification_present else "blocked"
+                )
             ),
             [
                 (
@@ -3185,7 +3572,9 @@ def predmarket_status(root: Path) -> dict[str, Any]:
                     "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay",
                     "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows",
                 }
-                else ("warn" if kalshi_crypto_proxy_research_candidate_replay_present else "blocked")
+                else (
+                    "warn" if kalshi_crypto_proxy_research_candidate_replay_present else "blocked"
+                )
             ),
             [
                 (
@@ -3408,8 +3797,7 @@ def predmarket_status(root: Path) -> dict[str, Any]:
     ):
         predmarket_evidence_status = str(kalshi_ev_review_queue_status)
     elif (
-        kalshi_ev_ledger_present
-        and int(kalshi_ev_ledger_summary.get("usable_row_count") or 0) > 0
+        kalshi_ev_ledger_present and int(kalshi_ev_ledger_summary.get("usable_row_count") or 0) > 0
     ):
         predmarket_evidence_status = "kalshi_ev_ledger_ready_with_usable_contract_edges"
     elif (
@@ -3422,13 +3810,10 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         and kalshi_ev_contract_mapping_work_order_status == "contract_mapping_work_order_ready"
     ):
         predmarket_evidence_status = "kalshi_ev_contract_mapping_work_order_ready"
-    elif (
-        kalshi_ev_calibration_work_order_present
-        and kalshi_ev_calibration_work_order_status in {
-            "calibration_work_order_ready",
-            "calibration_work_order_ready_source_gated",
-        }
-    ):
+    elif kalshi_ev_calibration_work_order_present and kalshi_ev_calibration_work_order_status in {
+        "calibration_work_order_ready",
+        "calibration_work_order_ready_source_gated",
+    }:
         predmarket_evidence_status = f"kalshi_ev_{kalshi_ev_calibration_work_order_status}"
     elif kalshi_ev_overlay_preflight_present and kalshi_ev_overlay_preflight_status:
         predmarket_evidence_status = f"kalshi_ev_{kalshi_ev_overlay_preflight_status}"
@@ -3438,8 +3823,12 @@ def predmarket_status(root: Path) -> dict[str, Any]:
         predmarket_evidence_status = "kalshi_type2_candidate_disposition_all_passes_downgraded"
     elif type2_disposition_status == "candidate_disposition_watch_only":
         predmarket_evidence_status = "kalshi_type2_candidate_disposition_watch_only"
-    elif type2_preflight_present and type2_preflight_status == "blocked_missing_sportsbook_reference":
-        predmarket_evidence_status = "kalshi_type2_reference_preflight_blocked_missing_sportsbook_reference"
+    elif (
+        type2_preflight_present and type2_preflight_status == "blocked_missing_sportsbook_reference"
+    ):
+        predmarket_evidence_status = (
+            "kalshi_type2_reference_preflight_blocked_missing_sportsbook_reference"
+        )
     elif type2_preflight_present and type2_preflight_status == "reference_ready":
         predmarket_evidence_status = "kalshi_type2_reference_preflight_ready"
     elif type2_matcher_present and type2_matcher_status == "blocked_missing_sportsbook_reference":
@@ -3635,15 +4024,29 @@ def mlb_status(root: Path) -> dict[str, Any]:
         "tests/test_reports/test_type2_betexplorer_market_closing_comparison.py",
     ]
     capabilities = exists_map(root, capability_paths)
-    current_kalshi_exchange_artifact = read_json(root, "docs/codex/artifacts/2026-06-20-kalshi-exchange-probabilities.json")
-    legacy_kalshi_exchange_artifact = read_json(root, "docs/codex/artifacts/2026-06-16-kalshi-exchange-probabilities.json")
+    current_kalshi_exchange_artifact = read_json(
+        root, "docs/codex/artifacts/2026-06-20-kalshi-exchange-probabilities.json"
+    )
+    legacy_kalshi_exchange_artifact = read_json(
+        root, "docs/codex/artifacts/2026-06-16-kalshi-exchange-probabilities.json"
+    )
     kalshi_exchange_artifact = current_kalshi_exchange_artifact or legacy_kalshi_exchange_artifact
-    sportsbook_preflight = read_json(root, "docs/codex/artifacts/2026-06-20-type2-sportsbook-bridge-preflight.json")
-    sportsbook_inventory = read_json(root, "docs/codex/artifacts/2026-06-20-mlb-sportsbook-local-inventory.json")
+    sportsbook_preflight = read_json(
+        root, "docs/codex/artifacts/2026-06-20-type2-sportsbook-bridge-preflight.json"
+    )
+    sportsbook_inventory = read_json(
+        root, "docs/codex/artifacts/2026-06-20-mlb-sportsbook-local-inventory.json"
+    )
     latest_summary_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/summary.json")
-    latest_review_packet_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/review-packet.json")
-    latest_review_adjudication_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/review-adjudication.json")
-    latest_repeatability_ledger_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/type2-repeatability-ledger.json")
+    latest_review_packet_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/review-packet.json"
+    )
+    latest_review_adjudication_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/review-adjudication.json"
+    )
+    latest_repeatability_ledger_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/type2-repeatability-ledger.json"
+    )
     latest_repeatability_research_review_rel = _latest_artifact_rel(
         root,
         "docs/codex/artifacts/*/type2-repeatability-research-review.json",
@@ -3680,19 +4083,33 @@ def mlb_status(root: Path) -> dict[str, Any]:
         root,
         "docs/codex/artifacts/*/type2-betexplorer-market-closing-comparison.json",
     )
-    latest_temporal_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/temporal-mismatch-disposition.json")
-    latest_pregame_readiness_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/pregame-pairing-readiness.json")
-    latest_pregame_intake_rel = _latest_artifact_rel(root, "docs/codex/artifacts/*/pregame-drop-intake-status.json")
+    latest_temporal_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/temporal-mismatch-disposition.json"
+    )
+    latest_pregame_readiness_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/pregame-pairing-readiness.json"
+    )
+    latest_pregame_intake_rel = _latest_artifact_rel(
+        root, "docs/codex/artifacts/*/pregame-drop-intake-status.json"
+    )
     current_audit_summary = read_json(
         root,
-        latest_summary_rel or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/summary.json",
+        latest_summary_rel
+        or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/summary.json",
     )
     review_packet = read_json(
         root,
-        latest_review_packet_rel or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/review-packet.json",
+        latest_review_packet_rel
+        or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/review-packet.json",
     )
-    review_adjudication = read_json(root, latest_review_adjudication_rel) if latest_review_adjudication_rel else None
-    repeatability_ledger = read_json(root, latest_repeatability_ledger_rel) if latest_repeatability_ledger_rel else None
+    review_adjudication = (
+        read_json(root, latest_review_adjudication_rel) if latest_review_adjudication_rel else None
+    )
+    repeatability_ledger = (
+        read_json(root, latest_repeatability_ledger_rel)
+        if latest_repeatability_ledger_rel
+        else None
+    )
     repeatability_research_review = (
         read_json(root, latest_repeatability_research_review_rel)
         if latest_repeatability_research_review_rel
@@ -3704,9 +4121,7 @@ def mlb_status(root: Path) -> dict[str, Any]:
         else None
     )
     settled_validation = (
-        read_json(root, latest_settled_validation_rel)
-        if latest_settled_validation_rel
-        else None
+        read_json(root, latest_settled_validation_rel) if latest_settled_validation_rel else None
     )
     closing_proxy_validation = (
         read_json(root, latest_closing_proxy_validation_rel)
@@ -3740,15 +4155,18 @@ def mlb_status(root: Path) -> dict[str, Any]:
     )
     temporal_disposition = read_json(
         root,
-        latest_temporal_rel or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/temporal-mismatch-disposition.json",
+        latest_temporal_rel
+        or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/temporal-mismatch-disposition.json",
     )
     pregame_readiness = read_json(
         root,
-        latest_pregame_readiness_rel or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/pregame-pairing-readiness.json",
+        latest_pregame_readiness_rel
+        or "docs/codex/artifacts/2026-06-20-type2-audit-bundle-current/pregame-pairing-readiness.json",
     )
     pregame_intake = read_json(
         root,
-        latest_pregame_intake_rel or "docs/codex/artifacts/type2-pregame-drop-intake-latest/pregame-drop-intake-status.json",
+        latest_pregame_intake_rel
+        or "docs/codex/artifacts/type2-pregame-drop-intake-latest/pregame-drop-intake-status.json",
     )
     offline_bridge_report = read_text(
         root,
@@ -3760,9 +4178,7 @@ def mlb_status(root: Path) -> dict[str, Any]:
         else 0
     )
     inventory_conclusion = (
-        sportsbook_inventory.get("conclusion", {})
-        if isinstance(sportsbook_inventory, dict)
-        else {}
+        sportsbook_inventory.get("conclusion", {}) if isinstance(sportsbook_inventory, dict) else {}
     )
     local_mlb_sportsbook_rows = (
         int(inventory_conclusion.get("local_baseball_mlb_sportsbook_odds_rows_found", -1))
@@ -3806,7 +4222,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and isinstance(current_audit_summary.get("counts"), dict)
         and int(current_audit_summary["counts"].get("review_ready_count", 0)) > 0
     )
-    review_packet_summary = review_packet.get("summary_counts", {}) if isinstance(review_packet, dict) else {}
+    review_packet_summary = (
+        review_packet.get("summary_counts", {}) if isinstance(review_packet, dict) else {}
+    )
     review_packet_suspects = (
         review_packet.get("suspicious_rows_to_downgrade_or_manually_check", {})
         if isinstance(review_packet, dict)
@@ -3842,8 +4260,12 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and review_packet_missing_spread == 0
         and review_packet_wide_spread == 0
     )
-    temporal_summary = temporal_disposition.get("summary", {}) if isinstance(temporal_disposition, dict) else {}
-    temporal_downgraded_count = int(temporal_summary.get("downgraded_temporal_mismatch_count", 0) or 0)
+    temporal_summary = (
+        temporal_disposition.get("summary", {}) if isinstance(temporal_disposition, dict) else {}
+    )
+    temporal_downgraded_count = int(
+        temporal_summary.get("downgraded_temporal_mismatch_count", 0) or 0
+    )
     temporal_manual_count = int(temporal_summary.get("needs_manual_verification_count", 0) or 0)
     temporal_unclassified_count = int(temporal_summary.get("unclassified_count", 0) or 0)
     temporal_disposition_ready = (
@@ -3855,7 +4277,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and int(temporal_summary.get("suspicious_row_count", 0) or 0) == temporal_mismatch_count
         and temporal_unclassified_count == 0
     )
-    pregame_summary = pregame_readiness.get("summary", {}) if isinstance(pregame_readiness, dict) else {}
+    pregame_summary = (
+        pregame_readiness.get("summary", {}) if isinstance(pregame_readiness, dict) else {}
+    )
     pregame_failing_gates = (
         list(pregame_summary.get("failing_gates", []))
         if isinstance(pregame_summary.get("failing_gates", []), list)
@@ -3870,7 +4294,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and "ready" in pregame_readiness
         and isinstance(pregame_readiness.get("gates"), list)
     )
-    pregame_ready = bool(pregame_readiness.get("ready")) if isinstance(pregame_readiness, dict) else False
+    pregame_ready = (
+        bool(pregame_readiness.get("ready")) if isinstance(pregame_readiness, dict) else False
+    )
     pregame_intake_present = (
         isinstance(pregame_intake, dict)
         and pregame_intake.get("review_only") is True
@@ -3880,8 +4306,12 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and pregame_intake.get("raw_payload_copied_into_repo") is False
         and "status" in pregame_intake
     )
-    pregame_intake_status = pregame_intake.get("status") if isinstance(pregame_intake, dict) else None
-    pregame_intake_ready = bool(pregame_intake.get("ready")) if isinstance(pregame_intake, dict) else False
+    pregame_intake_status = (
+        pregame_intake.get("status") if isinstance(pregame_intake, dict) else None
+    )
+    pregame_intake_ready = (
+        bool(pregame_intake.get("ready")) if isinstance(pregame_intake, dict) else False
+    )
     review_adjudication_summary = (
         review_adjudication.get("summary", {}) if isinstance(review_adjudication, dict) else {}
     )
@@ -3903,7 +4333,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
     repeatability_summary = (
         repeatability_ledger.get("summary", {}) if isinstance(repeatability_ledger, dict) else {}
     )
-    repeatability_status = repeatability_ledger.get("status") if isinstance(repeatability_ledger, dict) else None
+    repeatability_status = (
+        repeatability_ledger.get("status") if isinstance(repeatability_ledger, dict) else None
+    )
     repeatability_safe = (
         isinstance(repeatability_ledger, dict)
         and repeatability_ledger.get("review_only") is True
@@ -3911,9 +4343,15 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and repeatability_ledger.get("provider_api_calls") is False
         and repeatability_ledger.get("database_writes") is False
     )
-    repeatability_observed = repeatability_safe and repeatability_status == "repeatability_observed_two_clean_packets"
-    repeatability_insufficient = repeatability_safe and repeatability_status == "repeatability_insufficient_one_clean_packet"
-    repeatability_ready_for_review = repeatability_safe and repeatability_status == "repeatability_ready_for_research_review"
+    repeatability_observed = (
+        repeatability_safe and repeatability_status == "repeatability_observed_two_clean_packets"
+    )
+    repeatability_insufficient = (
+        repeatability_safe and repeatability_status == "repeatability_insufficient_one_clean_packet"
+    )
+    repeatability_ready_for_review = (
+        repeatability_safe and repeatability_status == "repeatability_ready_for_research_review"
+    )
     repeatability_blocked_no_clean_packets = (
         repeatability_safe and repeatability_status == "repeatability_blocked_no_clean_packets"
     )
@@ -3944,9 +4382,7 @@ def mlb_status(root: Path) -> dict[str, Any]:
         else {}
     )
     threshold_policy_status = (
-        threshold_policy_review.get("status")
-        if isinstance(threshold_policy_review, dict)
-        else None
+        threshold_policy_review.get("status") if isinstance(threshold_policy_review, dict) else None
     )
     threshold_policy_safe = (
         isinstance(threshold_policy_review, dict)
@@ -3957,19 +4393,17 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and threshold_policy_review.get("market_execution") is False
         and threshold_policy_review.get("account_or_order_paths") is False
     )
-    threshold_policy_hold_current = threshold_policy_safe and threshold_policy_status == "threshold_policy_hold_current"
+    threshold_policy_hold_current = (
+        threshold_policy_safe and threshold_policy_status == "threshold_policy_hold_current"
+    )
     threshold_policy_review_candidate = (
         threshold_policy_safe and threshold_policy_status == "threshold_policy_review_candidate"
     )
     settled_validation_summary = (
-        settled_validation.get("summary", {})
-        if isinstance(settled_validation, dict)
-        else {}
+        settled_validation.get("summary", {}) if isinstance(settled_validation, dict) else {}
     )
     settled_validation_status = (
-        settled_validation.get("status")
-        if isinstance(settled_validation, dict)
-        else None
+        settled_validation.get("status") if isinstance(settled_validation, dict) else None
     )
     settled_validation_safe = (
         isinstance(settled_validation, dict)
@@ -3985,7 +4419,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
         "settled_validation_no_policy_change",
     }
     settled_validation_review_candidate = (
-        settled_validation_safe and settled_validation_status == "settled_validation_review_candidate"
+        settled_validation_safe
+        and settled_validation_status == "settled_validation_review_candidate"
     )
     closing_proxy_summary = (
         closing_proxy_validation.get("summary", {})
@@ -4015,9 +4450,7 @@ def mlb_status(root: Path) -> dict[str, Any]:
         closing_proxy_safe and closing_proxy_status == "closing_proxy_review_candidate"
     )
     public_closing_scout_summary = (
-        public_closing_scout.get("summary", {})
-        if isinstance(public_closing_scout, dict)
-        else {}
+        public_closing_scout.get("summary", {}) if isinstance(public_closing_scout, dict) else {}
     )
     public_closing_scout_safe = (
         isinstance(public_closing_scout, dict)
@@ -4044,7 +4477,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
         and betexplorer_full_slate_import.get("market_execution") is False
         and betexplorer_full_slate_import.get("account_or_order_paths") is False
         and betexplorer_full_slate_import.get("raw_payload_copied_into_repo") is False
-        and betexplorer_full_slate_import.get("status") == "betexplorer_public_closing_full_slate_import_ready"
+        and betexplorer_full_slate_import.get("status")
+        == "betexplorer_public_closing_full_slate_import_ready"
     )
     betexplorer_moneyline_summary = (
         betexplorer_moneyline_comparison.get("summary", {})
@@ -4069,7 +4503,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
     )
     betexplorer_moneyline_no_policy = (
         betexplorer_moneyline_safe
-        and betexplorer_moneyline_status == "betexplorer_moneyline_closing_comparison_ready_no_policy_change"
+        and betexplorer_moneyline_status
+        == "betexplorer_moneyline_closing_comparison_ready_no_policy_change"
     )
     betexplorer_market_summary = (
         betexplorer_market_comparison.get("summary", {})
@@ -4094,28 +4529,43 @@ def mlb_status(root: Path) -> dict[str, Any]:
     )
     betexplorer_market_no_policy = (
         betexplorer_market_safe
-        and betexplorer_market_status == "betexplorer_market_closing_comparison_ready_no_policy_change"
+        and betexplorer_market_status
+        == "betexplorer_market_closing_comparison_ready_no_policy_change"
     )
     has_makefile = (root / "Makefile").is_file()
     readme = read_text(root, "README.md")
-    live_review_required = "live data quality" in readme.lower() or "operator review" in readme.lower()
+    live_review_required = (
+        "live data quality" in readme.lower() or "operator review" in readme.lower()
+    )
     gates = [
         make_gate(
             "type2_market_capabilities_present",
             "pass" if core_ready else "blocked",
-            ["MLB has no-vig/implied probability, edge, CLV, backtest, and source-preflight modules." if core_ready else "One or more core Type 2 capability files is missing."],
+            [
+                "MLB has no-vig/implied probability, edge, CLV, backtest, and source-preflight modules."
+                if core_ready
+                else "One or more core Type 2 capability files is missing."
+            ],
             [path for path, exists in capabilities.items() if exists],
         ),
         make_gate(
             "macro_makefile_target_available",
             "pass" if has_makefile else "blocked",
-            ["Makefile exists for macro-status wiring." if has_makefile else "No Makefile exists yet."],
+            [
+                "Makefile exists for macro-status wiring."
+                if has_makefile
+                else "No Makefile exists yet."
+            ],
             ["Makefile"] if has_makefile else [],
         ),
         make_gate(
             "kalshi_exchange_adapter_ready",
             "pass" if kalshi_exchange_ready else "blocked",
-            [f"Local Kalshi exchange artifact contains {kalshi_exchange_count} Type 2 quotes." if kalshi_exchange_ready else "Kalshi exchange adapter or generated artifact is missing."],
+            [
+                f"Local Kalshi exchange artifact contains {kalshi_exchange_count} Type 2 quotes."
+                if kalshi_exchange_ready
+                else "Kalshi exchange adapter or generated artifact is missing."
+            ],
             [
                 path
                 for path in [
@@ -4135,7 +4585,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
                 if real_sportsbook_jsonl_present
                 else "No real operator-dropped baseball_mlb sportsbook odds JSONL with matching Kalshi-derived game IDs has been verified. The engineering bridge is ready; the blocker is now the data drop."
             ],
-            [real_sportsbook_jsonl] if real_sportsbook_jsonl_present else [
+            [real_sportsbook_jsonl]
+            if real_sportsbook_jsonl_present
+            else [
                 "docs/codex/artifacts/2026-06-20-mlb-sportsbook-local-inventory.json",
                 "COMPLETION_REPORT_2026-06-20_MLB_TYPE2_ZERO_SPEND_SPORTSBOOK_UNLOCK_FULFILLED.md",
             ],
@@ -4201,7 +4653,12 @@ def mlb_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "temporal_mismatch_manual_review",
-            "pass" if (not temporal_mismatch_count or (temporal_disposition_ready and temporal_manual_count == 0)) else "warn",
+            "pass"
+            if (
+                not temporal_mismatch_count
+                or (temporal_disposition_ready and temporal_manual_count == 0)
+            )
+            else "warn",
             [
                 (
                     f"Review packet flagged {temporal_mismatch_count} likely live-game temporal mismatch rows; "
@@ -4225,7 +4682,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "pregame_pair_required",
-            "warn" if pregame_readiness_present and not pregame_ready else ("pass" if pregame_ready else "blocked"),
+            "warn"
+            if pregame_readiness_present and not pregame_ready
+            else ("pass" if pregame_ready else "blocked"),
             [
                 (
                     "Current pre-game pairing readiness report is blocked on: "
@@ -4281,7 +4740,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
             [
                 (
                     "No same-slate pregame sportsbook/Kalshi operator drop was supplied; intake is intentionally blocked."
-                    if pregame_intake_present and pregame_intake_status == "blocked_missing_operator_drop"
+                    if pregame_intake_present
+                    and pregame_intake_status == "blocked_missing_operator_drop"
                     else (
                         "Pregame operator drop intake reports ready."
                         if pregame_intake_ready
@@ -4325,7 +4785,11 @@ def mlb_status(root: Path) -> dict[str, Any]:
             (
                 "pass"
                 if repeatability_observed or repeatability_ready_for_review
-                else ("warn" if repeatability_insufficient or repeatability_no_signal_clean_packets else "blocked")
+                else (
+                    "warn"
+                    if repeatability_insufficient or repeatability_no_signal_clean_packets
+                    else "blocked"
+                )
             ),
             [
                 (
@@ -4350,7 +4814,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "repeatability_research_review_ready",
-            "pass" if repeatability_research_review_ready else ("warn" if repeatability_ready_for_review else "blocked"),
+            "pass"
+            if repeatability_research_review_ready
+            else ("warn" if repeatability_ready_for_review else "blocked"),
             [
                 (
                     f"Repeatability research review status {repeatability_research_review_status}; "
@@ -4468,7 +4934,11 @@ def mlb_status(root: Path) -> dict[str, Any]:
             (
                 "pass"
                 if betexplorer_moneyline_no_policy
-                else ("warn" if betexplorer_full_slate_safe or public_closing_scout_safe else "blocked")
+                else (
+                    "warn"
+                    if betexplorer_full_slate_safe or public_closing_scout_safe
+                    else "blocked"
+                )
             ),
             [
                 (
@@ -4511,7 +4981,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "betexplorer_market_closing_comparison_present",
-            "pass" if betexplorer_market_no_policy else ("warn" if betexplorer_full_slate_safe else "blocked"),
+            "pass"
+            if betexplorer_market_no_policy
+            else ("warn" if betexplorer_full_slate_safe else "blocked"),
             [
                 (
                     f"BetExplorer market comparison status {betexplorer_market_status}; "
@@ -4545,13 +5017,21 @@ def mlb_status(root: Path) -> dict[str, Any]:
         make_gate(
             "trap_stats_guard_present",
             "pass" if capabilities.get("tests/test_trap_stats.py") else "warn",
-            ["Trap stats guard test exists." if capabilities.get("tests/test_trap_stats.py") else "Trap stats guard test was not found."],
+            [
+                "Trap stats guard test exists."
+                if capabilities.get("tests/test_trap_stats.py")
+                else "Trap stats guard test was not found."
+            ],
             ["tests/test_trap_stats.py"] if capabilities.get("tests/test_trap_stats.py") else [],
         ),
         make_gate(
             "live_data_operator_review",
             "warn",
-            ["README requires live data quality/source freshness operator review before production; current audit remains review-only." if live_review_required else "Production live-data review language was not found in README."],
+            [
+                "README requires live data quality/source freshness operator review before production; current audit remains review-only."
+                if live_review_required
+                else "Production live-data review language was not found in README."
+            ],
             ["README.md"],
         ),
         make_gate(
@@ -4615,7 +5095,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
                                                                             if pregame_intake_ready
                                                                             else (
                                                                                 "primary_type2_pregame_gate_ready_operator_drop_required"
-                                                                                if pregame_readiness_present and not pregame_ready
+                                                                                if pregame_readiness_present
+                                                                                and not pregame_ready
                                                                                 else (
                                                                                     "primary_type2_pregame_pair_clean_ready"
                                                                                     if pregame_ready
@@ -4623,7 +5104,8 @@ def mlb_status(root: Path) -> dict[str, Any]:
                                                                                         "primary_type2_temporal_downgraded_pregame_pair_required"
                                                                                         if review_packet_ready
                                                                                         and temporal_disposition_ready
-                                                                                        and temporal_manual_count == 0
+                                                                                        and temporal_manual_count
+                                                                                        == 0
                                                                                         else (
                                                                                             "primary_type2_review_packet_ready_temporal_mismatch_verification_needed"
                                                                                             if review_packet_ready
@@ -4681,7 +5163,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
                 "game_id_match_modes": review_packet.get("game_id_match_modes", {})
                 if isinstance(review_packet, dict)
                 else {},
-                "exchange_spread_distribution": review_packet.get("exchange_spread_distribution", {})
+                "exchange_spread_distribution": review_packet.get(
+                    "exchange_spread_distribution", {}
+                )
                 if isinstance(review_packet, dict)
                 else {},
                 "review_ready_rows_with_missing_spread": review_packet_missing_spread,
@@ -4702,7 +5186,9 @@ def mlb_status(root: Path) -> dict[str, Any]:
                 "missing": pregame_readiness is None,
                 "present": pregame_readiness_present,
                 "ready": pregame_ready,
-                "status": pregame_readiness.get("status") if isinstance(pregame_readiness, dict) else None,
+                "status": pregame_readiness.get("status")
+                if isinstance(pregame_readiness, dict)
+                else None,
                 "source_artifact": latest_pregame_readiness_rel,
                 "summary": pregame_summary,
                 "failing_gates": pregame_failing_gates,
@@ -4855,7 +5341,9 @@ def atp_status(root: Path) -> dict[str, Any]:
     active_goal = read_text(root, ".codex/ACTIVE_GOAL.md")
     goal_status = read_text(root, "VISION_GOAL_STATUS_2026-06-10.md")
     vision_md = read_text(root, "docs/vision-implementation-matrix.md")
-    type2_readiness = read_json(root, "docs/codex/artifacts/type2-readiness-latest/type2-readiness.json")
+    type2_readiness = read_json(
+        root, "docs/codex/artifacts/type2-readiness-latest/type2-readiness.json"
+    )
     type2_g1g2_diagnostic = read_json(
         root,
         "docs/codex/artifacts/type2-g1g2-diagnostic-latest/type2-g1g2-diagnostic.json",
@@ -4863,8 +5351,12 @@ def atp_status(root: Path) -> dict[str, Any]:
     text = f"{active_goal}\n{goal_status}\n{vision_md}"
     score = (
         extract_score(goal_status, [r"Matrix score:\*\*\s*\*\*(\d+)\s*/\s*100"])
-        or extract_score(vision_md, [r"Current evidence-backed implementation score:\s*\*\*(\d+)\s*/\s*100"])
-        or extract_score(active_goal, [r"\|\s*2026-06-\d+\s*\|\s*(\d+)\s*/\s*100\s*\|[^\n]*remains"])
+        or extract_score(
+            vision_md, [r"Current evidence-backed implementation score:\s*\*\*(\d+)\s*/\s*100"]
+        )
+        or extract_score(
+            active_goal, [r"\|\s*2026-06-\d+\s*\|\s*(\d+)\s*/\s*100\s*\|[^\n]*remains"]
+        )
     )
     mentions_g1 = "G1" in text and ("failing" in text.lower() or "not promoted" in text.lower())
     mentions_g2 = "G2" in text and "failing" in text.lower()
@@ -4877,8 +5369,12 @@ def atp_status(root: Path) -> dict[str, Any]:
         and type2_readiness["safety"].get("provider_api_calls") is False
         and type2_readiness["safety"].get("score_or_promotion_changed") is False
     )
-    type2_readiness_status = type2_readiness.get("status") if isinstance(type2_readiness, dict) else None
-    type2_readiness_ready = bool(type2_readiness.get("ready")) if isinstance(type2_readiness, dict) else False
+    type2_readiness_status = (
+        type2_readiness.get("status") if isinstance(type2_readiness, dict) else None
+    )
+    type2_readiness_ready = (
+        bool(type2_readiness.get("ready")) if isinstance(type2_readiness, dict) else False
+    )
     type2_g1g2_present = (
         isinstance(type2_g1g2_diagnostic, dict)
         and type2_g1g2_diagnostic.get("research_only") is True
@@ -4890,30 +5386,48 @@ def atp_status(root: Path) -> dict[str, Any]:
         and type2_g1g2_diagnostic["safety"].get("model_promotion") is False
         and type2_g1g2_diagnostic["safety"].get("threshold_changed") is False
     )
-    type2_g1g2_status = type2_g1g2_diagnostic.get("status") if isinstance(type2_g1g2_diagnostic, dict) else None
+    type2_g1g2_status = (
+        type2_g1g2_diagnostic.get("status") if isinstance(type2_g1g2_diagnostic, dict) else None
+    )
     gates = [
         make_gate(
             "vision_score_not_complete",
             "blocked" if score is not None and score < 100 else "warn",
-            [f"Vision score is {score}/100." if score is not None else "Vision score was not found."],
+            [
+                f"Vision score is {score}/100."
+                if score is not None
+                else "Vision score was not found."
+            ],
             [".codex/ACTIVE_GOAL.md", "VISION_GOAL_STATUS_2026-06-10.md"],
         ),
         make_gate(
             "g1_model_quality_gate",
             "blocked" if mentions_g1 else "warn",
-            ["G1 Brier/Elo promotion remains blocked." if mentions_g1 else "G1 blocker text was not found."],
+            [
+                "G1 Brier/Elo promotion remains blocked."
+                if mentions_g1
+                else "G1 blocker text was not found."
+            ],
             [".codex/ACTIVE_GOAL.md"],
         ),
         make_gate(
             "g2_calibration_gate",
             "blocked" if mentions_g2 else "warn",
-            ["G2 calibration gate remains blocked." if mentions_g2 else "G2 blocker text was not found."],
+            [
+                "G2 calibration gate remains blocked."
+                if mentions_g2
+                else "G2 blocker text was not found."
+            ],
             [".codex/ACTIVE_GOAL.md"],
         ),
         make_gate(
             "external_proof_gaps",
             "blocked" if external_gap else "warn",
-            ["D3/G5/P5 external evidence gaps remain." if external_gap else "External gap text was not found."],
+            [
+                "D3/G5/P5 external evidence gaps remain."
+                if external_gap
+                else "External gap text was not found."
+            ],
             [".codex/ACTIVE_GOAL.md", "VISION_GOAL_STATUS_2026-06-10.md"],
         ),
         make_gate(
@@ -5012,12 +5526,16 @@ def nba_status(root: Path) -> dict[str, Any]:
     t21_rel = "docs/annex/NBA_SUBSTITUTION_IDENTITY_DIAGNOSTIC_T21_2026-06-15.json"
     t21_completion_rel = "completion_report_t21_ambiguous_substitution_identity_diagnostic.md"
     market_gate_rel = "docs/codex/artifacts/nba-market-claim-gate-latest/nba-market-claim-gate.json"
-    market_bakeoff_rel = "docs/codex/artifacts/nba-market-claim-gate-latest/market-challenger-bakeoff.json"
-    model_design_rel = "docs/codex/artifacts/nba-model-promotability-latest/nba-model-promotability-design.json"
-    residual_signal_rel = "docs/codex/artifacts/nba-residual-signal-latest/nba-residual-signal-diagnostic.json"
-    residual_overcorrection_rel = (
-        "docs/codex/artifacts/nba-residual-overcorrection-latest/nba-residual-overcorrection-diagnostic.json"
+    market_bakeoff_rel = (
+        "docs/codex/artifacts/nba-market-claim-gate-latest/market-challenger-bakeoff.json"
     )
+    model_design_rel = (
+        "docs/codex/artifacts/nba-model-promotability-latest/nba-model-promotability-design.json"
+    )
+    residual_signal_rel = (
+        "docs/codex/artifacts/nba-residual-signal-latest/nba-residual-signal-diagnostic.json"
+    )
+    residual_overcorrection_rel = "docs/codex/artifacts/nba-residual-overcorrection-latest/nba-residual-overcorrection-diagnostic.json"
     artifact_paths = [
         platform_rel,
         claim_rel,
@@ -5085,7 +5603,9 @@ def nba_status(root: Path) -> dict[str, Any]:
     claims = read_json(root, claim_rel) or {}
     consistency = read_json(root, consistency_rel) or {}
     t21 = read_json(root, t21_rel) or {}
-    stabilization = read_json(root, "docs/codex/artifacts/nba-stabilization-latest/nba-stabilization.json")
+    stabilization = read_json(
+        root, "docs/codex/artifacts/nba-stabilization-latest/nba-stabilization.json"
+    )
     market_gate = read_json(root, market_gate_rel)
     market_bakeoff = read_json(root, market_bakeoff_rel)
     model_design = read_json(root, model_design_rel)
@@ -5094,11 +5614,15 @@ def nba_status(root: Path) -> dict[str, Any]:
     completion_exists = (root / t21_completion_rel).is_file()
     platform_blockers = int(platform.get("blocker_count", 13))
     claim_count = int(claims.get("claim_count", 14))
-    ready_claim_count = int(claims.get("ready_claim_count", claim_count - int(claims.get("blocked_claim_count", 8))))
+    ready_claim_count = int(
+        claims.get("ready_claim_count", claim_count - int(claims.get("blocked_claim_count", 8)))
+    )
     blocked_claim_count = int(claims.get("blocked_claim_count", 8))
-    consistency_passed = all(
-        check.get("status") == "passed" for check in consistency.get("checks", [])
-    ) if isinstance(consistency.get("checks"), list) else False
+    consistency_passed = (
+        all(check.get("status") == "passed" for check in consistency.get("checks", []))
+        if isinstance(consistency.get("checks"), list)
+        else False
+    )
     t21_status = t21.get("status")
     t21_counts = t21.get("counts", {}) if isinstance(t21.get("counts"), dict) else {}
     stabilization_present = (
@@ -5122,7 +5646,11 @@ def nba_status(root: Path) -> dict[str, Any]:
         and market_gate["safety"].get("market_execution") is False
     )
     market_gate_summary = market_gate.get("summary", {}) if isinstance(market_gate, dict) else {}
-    next_market_blocker = market_gate_summary.get("next_single_blocker") if isinstance(market_gate_summary, dict) else None
+    next_market_blocker = (
+        market_gate_summary.get("next_single_blocker")
+        if isinstance(market_gate_summary, dict)
+        else None
+    )
     model_design_candidate = (
         model_design.get("recommended_candidate", {}) if isinstance(model_design, dict) else {}
     )
@@ -5148,10 +5676,17 @@ def nba_status(root: Path) -> dict[str, Any]:
     residual_challenger = {}
     if isinstance(market_bakeoff, dict) and isinstance(market_bakeoff.get("challengers"), list):
         for challenger in market_bakeoff["challengers"]:
-            if isinstance(challenger, dict) and challenger.get("challenger") == "market_residual_calibration_challenger_v1":
+            if (
+                isinstance(challenger, dict)
+                and challenger.get("challenger") == "market_residual_calibration_challenger_v1"
+            ):
                 residual_challenger = challenger
                 break
-    residual_summary = residual_challenger.get("residual_contribution_summary", {}) if isinstance(residual_challenger, dict) else {}
+    residual_summary = (
+        residual_challenger.get("residual_contribution_summary", {})
+        if isinstance(residual_challenger, dict)
+        else {}
+    )
     if not isinstance(residual_summary, dict):
         residual_summary = {}
     residual_evaluator_present = (
@@ -5170,7 +5705,10 @@ def nba_status(root: Path) -> dict[str, Any]:
     canonical_challenger = {}
     if isinstance(market_bakeoff, dict) and isinstance(market_bakeoff.get("challengers"), list):
         for challenger in market_bakeoff["challengers"]:
-            if isinstance(challenger, dict) and challenger.get("challenger") == "canonical_side_market_residual_challenger_v1":
+            if (
+                isinstance(challenger, dict)
+                and challenger.get("challenger") == "canonical_side_market_residual_challenger_v1"
+            ):
                 canonical_challenger = challenger
                 break
     canonical_summary = (
@@ -5200,7 +5738,8 @@ def nba_status(root: Path) -> dict[str, Any]:
         for challenger in market_bakeoff["challengers"]:
             if (
                 isinstance(challenger, dict)
-                and challenger.get("challenger") == "canonical_side_shrinkage_clipped_residual_challenger_v1"
+                and challenger.get("challenger")
+                == "canonical_side_shrinkage_clipped_residual_challenger_v1"
             ):
                 shrinkage_clipped_challenger = challenger
                 break
@@ -5218,7 +5757,8 @@ def nba_status(root: Path) -> dict[str, Any]:
         bool(shrinkage_clipped_challenger)
         and shrinkage_clipped_challenger.get("status") == "ok"
         and int(shrinkage_clipped_challenger.get("tested_rows") or 0) > 0
-        and shrinkage_clipped_summary.get("strategy") == "prior_oos_one_se_shrinkage_and_clip_selection"
+        and shrinkage_clipped_summary.get("strategy")
+        == "prior_oos_one_se_shrinkage_and_clip_selection"
     )
     shrinkage_clipped_market_parity = (
         shrinkage_clipped_evaluator_present
@@ -5232,12 +5772,16 @@ def nba_status(root: Path) -> dict[str, Any]:
     if not isinstance(residual_signal_conclusion, dict):
         residual_signal_conclusion = {}
     residual_signal_mirrored = (
-        residual_signal.get("mirrored_pair_diagnostic", {}) if isinstance(residual_signal, dict) else {}
+        residual_signal.get("mirrored_pair_diagnostic", {})
+        if isinstance(residual_signal, dict)
+        else {}
     )
     if not isinstance(residual_signal_mirrored, dict):
         residual_signal_mirrored = {}
     residual_signal_canonical = (
-        residual_signal.get("canonical_side_diagnostic", {}) if isinstance(residual_signal, dict) else {}
+        residual_signal.get("canonical_side_diagnostic", {})
+        if isinstance(residual_signal, dict)
+        else {}
     )
     if not isinstance(residual_signal_canonical, dict):
         residual_signal_canonical = {}
@@ -5252,16 +5796,22 @@ def nba_status(root: Path) -> dict[str, Any]:
         and all(value is False for value in residual_signal["safety"].values())
         and residual_signal_conclusion.get("cause_id") == "two_sided_feature_label_cancellation"
         and int(residual_signal_mirrored.get("pair_rows") or 0) > 0
-        and residual_signal_mirrored.get("pair_rows") == residual_signal_mirrored.get("cancelled_pair_rows")
-        and residual_signal_mirrored.get("pair_rows") == residual_signal_mirrored.get("same_feature_pair_rows")
+        and residual_signal_mirrored.get("pair_rows")
+        == residual_signal_mirrored.get("cancelled_pair_rows")
+        and residual_signal_mirrored.get("pair_rows")
+        == residual_signal_mirrored.get("same_feature_pair_rows")
     )
     overcorrection_conclusion = (
-        residual_overcorrection.get("conclusion", {}) if isinstance(residual_overcorrection, dict) else {}
+        residual_overcorrection.get("conclusion", {})
+        if isinstance(residual_overcorrection, dict)
+        else {}
     )
     if not isinstance(overcorrection_conclusion, dict):
         overcorrection_conclusion = {}
     overcorrection_diagnostics = (
-        residual_overcorrection.get("diagnostics", {}) if isinstance(residual_overcorrection, dict) else {}
+        residual_overcorrection.get("diagnostics", {})
+        if isinstance(residual_overcorrection, dict)
+        else {}
     )
     if not isinstance(overcorrection_diagnostics, dict):
         overcorrection_diagnostics = {}
@@ -5296,13 +5846,21 @@ def nba_status(root: Path) -> dict[str, Any]:
         make_gate(
             "platform_readiness_consistency",
             "pass" if consistency_passed else "blocked",
-            ["All platform consistency checks passed." if consistency_passed else "Platform consistency checks are missing or not all passed."],
+            [
+                "All platform consistency checks passed."
+                if consistency_passed
+                else "Platform consistency checks are missing or not all passed."
+            ],
             [consistency_rel],
         ),
         make_gate(
             "t21_completion_note",
             "pass" if completion_exists else "blocked",
-            ["T21 completion note exists." if completion_exists else "T21 completion note is missing."],
+            [
+                "T21 completion note exists."
+                if completion_exists
+                else "T21 completion note is missing."
+            ],
             [t21_completion_rel] if completion_exists else [t21_rel],
         ),
         make_gate(
@@ -5501,7 +6059,9 @@ def nba_status(root: Path) -> dict[str, Any]:
         ),
         make_gate(
             "dirty_tree_risk",
-            "blocked" if status["git"]["dirty_counts"]["total"] >= 500 else ("warn" if status["git"]["dirty_counts"]["total"] else "pass"),
+            "blocked"
+            if status["git"]["dirty_counts"]["total"] >= 500
+            else ("warn" if status["git"]["dirty_counts"]["total"] else "pass"),
             [f"Dirty paths: {status['git']['dirty_counts']['total']}."],
             [],
         ),
@@ -5521,66 +6081,66 @@ def nba_status(root: Path) -> dict[str, Any]:
             and residual_overcorrection_present
             and shrinkage_clipped_market_parity
             else (
-            "macro_partial_truth_residual_overcorrection_large_correction_overfit"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            and model_design_present
-            and residual_collapsed_to_market
-            and residual_signal_present
-            and canonical_not_promotable
-            and residual_overcorrection_present
-            else (
-            "macro_partial_truth_canonical_residual_not_promotable"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            and model_design_present
-            and residual_collapsed_to_market
-            and residual_signal_present
-            and canonical_not_promotable
-            else (
-            "macro_partial_truth_residual_signal_cancellation_explained"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            and model_design_present
-            and residual_collapsed_to_market
-            and residual_signal_present
-            else (
-            "macro_partial_truth_residual_evaluator_collapsed_to_market"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            and model_design_present
-            and residual_collapsed_to_market
-            else (
-            "macro_partial_truth_model_promotability_design_ready"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            and model_design_present
-            else (
-            "macro_partial_truth_market_gate_blocked_model_promotability"
-            if completion_exists
-            and stabilization_present
-            and market_gate_present
-            and next_market_blocker == "model_promotability"
-            else (
-            "macro_partial_truth_stabilized_dirty_classified"
-            if completion_exists and stabilization_present
-            else "macro_partial_truth_gated"
-            )
-            )
-            )
-            )
-            )
-            )
+                "macro_partial_truth_residual_overcorrection_large_correction_overfit"
+                if completion_exists
+                and stabilization_present
+                and market_gate_present
+                and next_market_blocker == "model_promotability"
+                and model_design_present
+                and residual_collapsed_to_market
+                and residual_signal_present
+                and canonical_not_promotable
+                and residual_overcorrection_present
+                else (
+                    "macro_partial_truth_canonical_residual_not_promotable"
+                    if completion_exists
+                    and stabilization_present
+                    and market_gate_present
+                    and next_market_blocker == "model_promotability"
+                    and model_design_present
+                    and residual_collapsed_to_market
+                    and residual_signal_present
+                    and canonical_not_promotable
+                    else (
+                        "macro_partial_truth_residual_signal_cancellation_explained"
+                        if completion_exists
+                        and stabilization_present
+                        and market_gate_present
+                        and next_market_blocker == "model_promotability"
+                        and model_design_present
+                        and residual_collapsed_to_market
+                        and residual_signal_present
+                        else (
+                            "macro_partial_truth_residual_evaluator_collapsed_to_market"
+                            if completion_exists
+                            and stabilization_present
+                            and market_gate_present
+                            and next_market_blocker == "model_promotability"
+                            and model_design_present
+                            and residual_collapsed_to_market
+                            else (
+                                "macro_partial_truth_model_promotability_design_ready"
+                                if completion_exists
+                                and stabilization_present
+                                and market_gate_present
+                                and next_market_blocker == "model_promotability"
+                                and model_design_present
+                                else (
+                                    "macro_partial_truth_market_gate_blocked_model_promotability"
+                                    if completion_exists
+                                    and stabilization_present
+                                    and market_gate_present
+                                    and next_market_blocker == "model_promotability"
+                                    else (
+                                        "macro_partial_truth_stabilized_dirty_classified"
+                                        if completion_exists and stabilization_present
+                                        else "macro_partial_truth_gated"
+                                    )
+                                )
+                            )
+                        )
+                    )
+                )
             )
         ),
         "latest_artifacts": artifacts,
@@ -5617,7 +6177,9 @@ def nba_status(root: Path) -> dict[str, Any]:
             else {"missing": True},
             "model_promotability_design_present": model_design_present,
             "model_promotability_candidate": model_design_candidate_id,
-            "model_promotability_first_market_focus": model_design_candidate.get("first_market_focus"),
+            "model_promotability_first_market_focus": model_design_candidate.get(
+                "first_market_focus"
+            ),
             "market_residual_evaluator_present": residual_evaluator_present,
             "market_residual_collapsed_to_market": residual_collapsed_to_market,
             "market_residual_tested_rows": residual_challenger.get("tested_rows")
@@ -5635,8 +6197,12 @@ def nba_status(root: Path) -> dict[str, Any]:
             "residual_signal_diagnostic_present": residual_signal_present,
             "residual_signal_cause_id": residual_signal_conclusion.get("cause_id"),
             "residual_signal_pair_rows": residual_signal_mirrored.get("pair_rows"),
-            "residual_signal_cancelled_pair_rows": residual_signal_mirrored.get("cancelled_pair_rows"),
-            "residual_signal_same_feature_pair_rows": residual_signal_mirrored.get("same_feature_pair_rows"),
+            "residual_signal_cancelled_pair_rows": residual_signal_mirrored.get(
+                "cancelled_pair_rows"
+            ),
+            "residual_signal_same_feature_pair_rows": residual_signal_mirrored.get(
+                "same_feature_pair_rows"
+            ),
             "residual_signal_canonical_max_abs_feature_correlation": residual_signal_canonical.get(
                 "max_abs_feature_correlation"
             ),
@@ -5657,7 +6223,9 @@ def nba_status(root: Path) -> dict[str, Any]:
             else None,
             "canonical_residual_max_abs_correction": canonical_summary.get("max_abs_correction"),
             "canonical_residual_canonical_rows": canonical_summary.get("canonical_rows"),
-            "canonical_residual_dropped_mirrored_rows": canonical_summary.get("dropped_mirrored_rows"),
+            "canonical_residual_dropped_mirrored_rows": canonical_summary.get(
+                "dropped_mirrored_rows"
+            ),
             "residual_overcorrection_diagnostic": json_brief(residual_overcorrection)
             if residual_overcorrection is not None
             else {"missing": True},
@@ -5675,7 +6243,9 @@ def nba_status(root: Path) -> dict[str, Any]:
             ),
             "shrinkage_clipped_residual_evaluator_present": shrinkage_clipped_evaluator_present,
             "shrinkage_clipped_residual_market_parity": shrinkage_clipped_market_parity,
-            "shrinkage_clipped_residual_tested_rows": shrinkage_clipped_challenger.get("tested_rows")
+            "shrinkage_clipped_residual_tested_rows": shrinkage_clipped_challenger.get(
+                "tested_rows"
+            )
             if isinstance(shrinkage_clipped_challenger, dict)
             else None,
             "shrinkage_clipped_zero_shrinkage_season_count": shrinkage_clipped_selected.get(
@@ -5684,8 +6254,12 @@ def nba_status(root: Path) -> dict[str, Any]:
             "shrinkage_clipped_nonzero_shrinkage_season_count": shrinkage_clipped_selected.get(
                 "nonzero_shrinkage_season_count"
             ),
-            "shrinkage_clipped_mean_abs_correction": shrinkage_clipped_summary.get("mean_abs_correction"),
-            "shrinkage_clipped_max_abs_correction": shrinkage_clipped_summary.get("max_abs_correction"),
+            "shrinkage_clipped_mean_abs_correction": shrinkage_clipped_summary.get(
+                "mean_abs_correction"
+            ),
+            "shrinkage_clipped_max_abs_correction": shrinkage_clipped_summary.get(
+                "max_abs_correction"
+            ),
             "dirty_total": status["git"]["dirty_counts"]["total"],
         },
     }
@@ -5694,10 +6268,17 @@ def nba_status(root: Path) -> dict[str, Any]:
 
 def nfl_status(root: Path) -> dict[str, Any]:
     status = base_status("nfl_quant_glm51_greenfield", root)
-    completion_reports = latest_matching(root, ["COMPLETION_REPORT_*.md", "docs/**/COMPLETION_REPORT_*.md"], limit=5)
+    completion_reports = latest_matching(
+        root, ["COMPLETION_REPORT_*.md", "docs/**/COMPLETION_REPORT_*.md"], limit=5
+    )
     validation_artifacts = latest_matching(
         root,
-        ["**/*validation*ledger*.json", "**/*validation*ledger*.md", "**/*profile*validation*.json", "**/*artifact*audit*.json"],
+        [
+            "**/*validation*ledger*.json",
+            "**/*validation*ledger*.md",
+            "**/*profile*validation*.json",
+            "**/*artifact*audit*.json",
+        ],
         limit=8,
     )
     artifact_paths = [
@@ -5769,12 +6350,24 @@ def nfl_status(root: Path) -> dict[str, Any]:
     ]
     artifacts, hashes = artifact_pack(root, artifact_paths)
     makefile = read_text(root, "Makefile")
-    completion_text = "\n".join(read_text(root, path, max_chars=80_000) for path in completion_reports)
-    governance_export = read_json(root, "docs/codex/artifacts/nfl-governance-latest/nfl-governance.json")
-    line_readiness = read_json(root, "docs/codex/artifacts/nfl-line-readiness-latest/line-readiness-summary.json")
-    fair_line_review = read_json(root, "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json")
-    forward_context = read_json(root, "docs/codex/artifacts/nfl-forward-context-latest/forward-context-readiness.json")
-    forward_context_seed = read_json(root, "docs/codex/artifacts/nfl-forward-context-seed-latest/forward-context-seed.json")
+    completion_text = "\n".join(
+        read_text(root, path, max_chars=80_000) for path in completion_reports
+    )
+    governance_export = read_json(
+        root, "docs/codex/artifacts/nfl-governance-latest/nfl-governance.json"
+    )
+    line_readiness = read_json(
+        root, "docs/codex/artifacts/nfl-line-readiness-latest/line-readiness-summary.json"
+    )
+    fair_line_review = read_json(
+        root, "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"
+    )
+    forward_context = read_json(
+        root, "docs/codex/artifacts/nfl-forward-context-latest/forward-context-readiness.json"
+    )
+    forward_context_seed = read_json(
+        root, "docs/codex/artifacts/nfl-forward-context-seed-latest/forward-context-seed.json"
+    )
     manual_drop = read_json(
         root,
         "docs/codex/artifacts/nfl-forward-context-manual-drop-latest/forward-context-manual-drop-readiness.json",
@@ -5808,7 +6401,9 @@ def nfl_status(root: Path) -> dict[str, Any]:
         "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
     )
     governance_snapshots = (
-        governance_export.get("evidence_snapshots", {}) if isinstance(governance_export, dict) else {}
+        governance_export.get("evidence_snapshots", {})
+        if isinstance(governance_export, dict)
+        else {}
     )
     if not isinstance(governance_snapshots, dict):
         governance_snapshots = {}
@@ -5837,10 +6432,14 @@ def nfl_status(root: Path) -> dict[str, Any]:
         and governance_export["safety"].get("pricing_model_simulation_changes") is False
         and governance_snapshots_ready
     )
-    line_profiled_slate = line_readiness.get("profiled_slate", {}) if isinstance(line_readiness, dict) else {}
+    line_profiled_slate = (
+        line_readiness.get("profiled_slate", {}) if isinstance(line_readiness, dict) else {}
+    )
     if not isinstance(line_profiled_slate, dict):
         line_profiled_slate = {}
-    line_model_evidence = line_readiness.get("model_evidence", {}) if isinstance(line_readiness, dict) else {}
+    line_model_evidence = (
+        line_readiness.get("model_evidence", {}) if isinstance(line_readiness, dict) else {}
+    )
     if not isinstance(line_model_evidence, dict):
         line_model_evidence = {}
     line_safety = line_readiness.get("safety", {}) if isinstance(line_readiness, dict) else {}
@@ -5848,7 +6447,9 @@ def nfl_status(root: Path) -> dict[str, Any]:
         line_safety = {}
     fair_lines_path_value = line_profiled_slate.get("fair_lines_csv")
     fair_lines_present = _path_value_exists(root, fair_lines_path_value)
-    fair_line_review_safety = fair_line_review.get("safety", {}) if isinstance(fair_line_review, dict) else {}
+    fair_line_review_safety = (
+        fair_line_review.get("safety", {}) if isinstance(fair_line_review, dict) else {}
+    )
     if not isinstance(fair_line_review_safety, dict):
         fair_line_review_safety = {}
     fair_line_review_ready = (
@@ -5875,8 +6476,12 @@ def nfl_status(root: Path) -> dict[str, Any]:
         and line_model_evidence.get("validation_status") == "pass"
         and line_model_evidence.get("validation_decision") == "promotable"
     )
-    forward_context_status = forward_context.get("status") if isinstance(forward_context, dict) else None
-    forward_context_safety = forward_context.get("safety", {}) if isinstance(forward_context, dict) else {}
+    forward_context_status = (
+        forward_context.get("status") if isinstance(forward_context, dict) else None
+    )
+    forward_context_safety = (
+        forward_context.get("safety", {}) if isinstance(forward_context, dict) else {}
+    )
     if not isinstance(forward_context_safety, dict):
         forward_context_safety = {}
     forward_context_safe = (
@@ -5995,7 +6600,9 @@ def nfl_status(root: Path) -> dict[str, Any]:
         else "warn"
     )
     historical_line_backtest_safety = (
-        historical_line_backtest.get("safety", {}) if isinstance(historical_line_backtest, dict) else {}
+        historical_line_backtest.get("safety", {})
+        if isinstance(historical_line_backtest, dict)
+        else {}
     )
     if not isinstance(historical_line_backtest_safety, dict):
         historical_line_backtest_safety = {}
@@ -6020,25 +6627,41 @@ def nfl_status(root: Path) -> dict[str, Any]:
         make_gate(
             "offline_status_json_available",
             "pass" if has_status_json else "blocked",
-            ["Existing CLI exposes offline status JSON." if has_status_json else "Could not confirm offline status JSON support."],
+            [
+                "Existing CLI exposes offline status JSON."
+                if has_status_json
+                else "Could not confirm offline status JSON support."
+            ],
             ["Makefile", "src/nfl_quant/cli.py"],
         ),
         make_gate(
             "artifact_audit_gate_available",
             "pass" if has_artifact_audit else "blocked",
-            ["Artifact audit CI targets are present." if has_artifact_audit else "Artifact audit CI targets were not found."],
+            [
+                "Artifact audit CI targets are present."
+                if has_artifact_audit
+                else "Artifact audit CI targets were not found."
+            ],
             ["Makefile"],
         ),
         make_gate(
             "profile_validation_gate_available",
             "pass" if has_profile_validation else "blocked",
-            ["Profile validation CI target is present." if has_profile_validation else "Profile validation CI target was not found."],
+            [
+                "Profile validation CI target is present."
+                if has_profile_validation
+                else "Profile validation CI target was not found."
+            ],
             ["Makefile"],
         ),
         make_gate(
             "completion_report_evidence",
             "pass" if completion_reports else "warn",
-            [f"Latest completion reports found: {len(completion_reports)}." if completion_reports else "No completion report found."],
+            [
+                f"Latest completion reports found: {len(completion_reports)}."
+                if completion_reports
+                else "No completion report found."
+            ],
             completion_reports,
         ),
         make_gate(
@@ -6258,11 +6881,10 @@ def nfl_status(root: Path) -> dict[str, Any]:
         ),
     ]
     if line_readiness_ready:
-        if (
-            availability_status == "forward_context_availability_not_yet_due"
-            and availability_safe
-        ):
-            evidence_status = "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+        if availability_status == "forward_context_availability_not_yet_due" and availability_safe:
+            evidence_status = (
+                "line_readiness_profiled_slate_forward_context_not_yet_due_research_only"
+            )
         elif forward_context_safe:
             if isinstance(manual_drop, dict):
                 if manual_drop_status == "manual_drop_ready_safe_inputs" and manual_drop_safe:
@@ -6272,11 +6894,17 @@ def nfl_status(root: Path) -> dict[str, Any]:
                 else:
                     evidence_status = "line_readiness_profiled_slate_forward_context_manual_drop_blocked_research_only"
             elif forward_context_status == "forward_context_ready_safe_inputs":
-                evidence_status = "line_readiness_profiled_slate_forward_context_ready_research_only"
+                evidence_status = (
+                    "line_readiness_profiled_slate_forward_context_ready_research_only"
+                )
             elif forward_context_status == "forward_context_partial_safe_inputs":
-                evidence_status = "line_readiness_profiled_slate_forward_context_partial_research_only"
+                evidence_status = (
+                    "line_readiness_profiled_slate_forward_context_partial_research_only"
+                )
             else:
-                evidence_status = "line_readiness_profiled_slate_forward_context_blocked_research_only"
+                evidence_status = (
+                    "line_readiness_profiled_slate_forward_context_blocked_research_only"
+                )
         else:
             evidence_status = "line_readiness_profiled_slate_context_missing_research_only"
     else:
@@ -6304,7 +6932,9 @@ def nfl_status(root: Path) -> dict[str, Any]:
             "governance_export_present": governance_export_present,
             "governance_snapshots_ready": governance_snapshots_ready,
             "profile_validation_snapshot_status": profile_validation_snapshot.get("gate_status"),
-            "profile_validation_snapshot_decision": profile_validation_snapshot.get("aggregate_decision"),
+            "profile_validation_snapshot_decision": profile_validation_snapshot.get(
+                "aggregate_decision"
+            ),
             "profile_validation_snapshot_fresh": profile_validation_snapshot.get("fresh"),
             "artifact_audit_snapshot_status": artifact_audit_snapshot.get("gate_status"),
             "artifact_audit_snapshot_audit_status": artifact_audit_snapshot.get("status"),
@@ -6415,7 +7045,9 @@ def nfl_status(root: Path) -> dict[str, Any]:
                 else None
             ),
             "consensus_market_raw_row_count": (
-                consensus_market.get("raw_row_count") if isinstance(consensus_market, dict) else None
+                consensus_market.get("raw_row_count")
+                if isinstance(consensus_market, dict)
+                else None
             ),
             "market_snapshot_ledger": json_brief(market_snapshot_ledger)
             if market_snapshot_ledger is not None
@@ -6499,7 +7131,9 @@ def decide(statuses: list[dict[str, Any]]) -> dict[str, Any]:
     ranked = sorted(statuses, key=lambda item: item["scheduling"]["priority"], reverse=True)
     all_lanes_parked = all(int(status["scheduling"]["priority"]) <= 0 for status in ranked)
     if all_lanes_parked:
-        top = next((status for status in statuses if status["repo_id"] == "predmarket-alpha"), ranked[0])
+        top = next(
+            (status for status in statuses if status["repo_id"] == "predmarket-alpha"), ranked[0]
+        )
         recommended_next_tranche = PARKED_COMMAND_CENTER_TRANCHE
         stop_condition = PARKED_COMMAND_CENTER_STOP_CONDITION
     else:
@@ -6542,7 +7176,9 @@ def parked_blocker_summary(statuses: list[dict[str, Any]]) -> list[dict[str, Any
                 "status": evidence_status,
                 "priority": status["scheduling"]["priority"],
                 "gate_counts": status["evidence"]["gate_counts"],
-                "unlock": PARKED_UNLOCKS.get(evidence_status, status["scheduling"]["stop_condition"]),
+                "unlock": PARKED_UNLOCKS.get(
+                    evidence_status, status["scheduling"]["stop_condition"]
+                ),
             }
         )
     return summary
@@ -6551,7 +7187,11 @@ def parked_blocker_summary(statuses: list[dict[str, Any]]) -> list[dict[str, Any
 def write_route_outputs(statuses: list[dict[str, Any]], decision: dict[str, Any]) -> None:
     MACRO_DIR.mkdir(parents=True, exist_ok=True)
     (MACRO_DIR / "latest-status.json").write_text(
-        json.dumps({"schema_version": STATUS_VERSION, "as_of_utc": utc_now(), "repos": statuses}, indent=2, sort_keys=True)
+        json.dumps(
+            {"schema_version": STATUS_VERSION, "as_of_utc": utc_now(), "repos": statuses},
+            indent=2,
+            sort_keys=True,
+        )
         + "\n",
         encoding="utf-8",
     )
@@ -6607,8 +7247,12 @@ def build_parser() -> argparse.ArgumentParser:
     status_parser = subparsers.add_parser("status", help="Print MacroRepoStatusV1 for one repo")
     status_parser.add_argument("--repo-id", required=True, choices=sorted(repo_configs()))
 
-    route_parser = subparsers.add_parser("route", help="Collect all statuses and choose one next tranche")
-    route_parser.add_argument("--write", action="store_true", help="Write latest-status and latest-decision artifacts")
+    route_parser = subparsers.add_parser(
+        "route", help="Collect all statuses and choose one next tranche"
+    )
+    route_parser.add_argument(
+        "--write", action="store_true", help="Write latest-status and latest-decision artifacts"
+    )
     return parser
 
 

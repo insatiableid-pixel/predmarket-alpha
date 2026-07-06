@@ -44,6 +44,7 @@ except ImportError:
 @dataclass
 class Breadcrumb:
     """A breadcrumb for error context tracking."""
+
     timestamp: str
     category: str
     message: str
@@ -66,12 +67,14 @@ class ErrorTracker:
         self._error_count = 0
 
     def add_breadcrumb(self, category: str, message: str, **data: Any) -> None:
-        self._breadcrumbs.append(Breadcrumb(
-            timestamp=datetime.now(UTC).isoformat(),
-            category=category,
-            message=message,
-            data=data,
-        ))
+        self._breadcrumbs.append(
+            Breadcrumb(
+                timestamp=datetime.now(UTC).isoformat(),
+                category=category,
+                message=message,
+                data=data,
+            )
+        )
 
     def capture_exception(self, exc: Exception, *, context: dict[str, Any] | None = None) -> str:
         """Capture an exception with full context and route alerts.
@@ -112,15 +115,17 @@ class ErrorTracker:
         try:
             payload = {
                 "text": ":rotating_light: Error in predmarket-alpha",
-                "attachments": [{
-                    "color": "danger",
-                    "fields": [
-                        {"title": "Error ID", "value": error_id, "short": True},
-                        {"title": "Type", "value": type(exc).__name__, "short": True},
-                        {"title": "Message", "value": str(exc)[:500]},
-                        {"title": "Context", "value": json.dumps(context, default=str)[:500]},
-                    ],
-                }],
+                "attachments": [
+                    {
+                        "color": "danger",
+                        "fields": [
+                            {"title": "Error ID", "value": error_id, "short": True},
+                            {"title": "Type", "value": type(exc).__name__, "short": True},
+                            {"title": "Message", "value": str(exc)[:500]},
+                            {"title": "Context", "value": json.dumps(context, default=str)[:500]},
+                        ],
+                    }
+                ],
             }
             req = Request(
                 self._slack_webhook,  # type: ignore[arg-type]
@@ -166,6 +171,7 @@ def track_event(event_name: str, **properties: Any) -> None:
     Example::
 
         from predmarket.observability import track_event
+
         track_event("kalshi_universe_scan", candidates=1420, window_hours=72)
     """
     event = {

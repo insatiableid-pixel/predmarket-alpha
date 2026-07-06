@@ -1,5 +1,6 @@
 import json
 
+from predmarket.kalshi_dataset import persist_rows
 from predmarket.kalshi_live_rank import KalshiLiveRankConfig, build_live_row, rank_live_rows
 from predmarket.kalshi_research_cycle import (
     KalshiPaperConfig,
@@ -17,9 +18,7 @@ from predmarket.kalshi_research_cycle import (
     stale_open_paper_intents,
     summarize_paper_ledger,
 )
-from predmarket.kalshi_dataset import persist_rows
 from predmarket.store import PointInTimeStore
-
 
 AS_OF_TS = 1781550000.0
 
@@ -240,7 +239,9 @@ def test_build_paper_intents_blocks_non_research_only_rank_report():
 def test_build_paper_intents_blocks_non_kalshi_opportunity():
     rank_report = dict(_rank_report())
     rank_report["created_ts"] = AS_OF_TS
-    rank_report["top_opportunities"] = [dict(rank_report["top_opportunities"][0], venue="Polymarket")]
+    rank_report["top_opportunities"] = [
+        dict(rank_report["top_opportunities"][0], venue="Polymarket")
+    ]
     intents, blocked = build_paper_intents(
         rank_report,
         config=KalshiPaperConfig(
@@ -482,7 +483,9 @@ def test_research_cycle_does_not_duplicate_open_intents(tmp_path, mock_config):
 
     assert first.report["paper"]["intended_count"] == 1
     assert second.report["paper"]["intended_count"] == 0
-    assert second.report["paper"]["blocked"][0]["paper_blocking_reasons"] == ["paper_duplicate_open_intent"]
+    assert second.report["paper"]["blocked"][0]["paper_blocking_reasons"] == [
+        "paper_duplicate_open_intent"
+    ]
     assert second.report["paper"]["blocking_reason_counts"] == {"paper_duplicate_open_intent": 1}
     assert "## Blocked Opportunities" in second.markdown_path.read_text()
     assert "paper_duplicate_open_intent" in second.markdown_path.read_text()

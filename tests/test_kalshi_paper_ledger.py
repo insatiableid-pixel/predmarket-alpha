@@ -14,7 +14,6 @@ from predmarket.kalshi_research_cycle import (
 )
 from predmarket.store import PointInTimeStore
 
-
 AS_OF_TS = 1781550000.0
 
 

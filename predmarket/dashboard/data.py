@@ -1,14 +1,14 @@
 """Database helpers, performance metrics, and staged-order approval logic."""
 
-import sqlite3
 import logging
-from typing import Dict, Any
+import sqlite3
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 import pandas as pd
 
-from .metrics import METRIC_TRADES_STAGED, METRIC_TRADES_EXECUTED, METRIC_TRADES_FAILED
+from .metrics import METRIC_TRADES_EXECUTED, METRIC_TRADES_FAILED
 
 logger = logging.getLogger("predmarket.dashboard")
 
@@ -34,7 +34,7 @@ def get_db_connection() -> sqlite3.Connection:
 # ---------------------------------------------------------------------------
 
 
-def fetch_performance_metrics() -> Dict[str, Any]:
+def fetch_performance_metrics() -> dict[str, Any]:
     conn = get_db_connection()
     df_trades = pd.read_sql_query(
         """
@@ -45,9 +45,7 @@ def fetch_performance_metrics() -> Dict[str, Any]:
         """,
         conn,
     )
-    df_equity = pd.read_sql_query(
-        "SELECT timestamp, total_equity FROM equity_history", conn
-    )
+    df_equity = pd.read_sql_query("SELECT timestamp, total_equity FROM equity_history", conn)
     conn.close()
 
     if df_trades.empty:
@@ -62,9 +60,7 @@ def fetch_performance_metrics() -> Dict[str, Any]:
         }
 
     # Resolved trades: those with known binary outcomes
-    df_resolved = df_trades[
-        df_trades["outcome"].notna() & df_trades["outcome"].isin([0, 1])
-    ]
+    df_resolved = df_trades[df_trades["outcome"].notna() & df_trades["outcome"].isin([0, 1])]
 
     # Brier Score = 1/N * sum((f_i - o_i)^2)
     brier = (
@@ -89,9 +85,9 @@ def fetch_performance_metrics() -> Dict[str, Any]:
         outcome_val = row.get("outcome")
         if outcome_val is None:
             continue
-        contract_won = (
-            outcome_val == 1 and str(row["side"]).upper() == "YES"
-        ) or (outcome_val == 0 and str(row["side"]).upper() == "NO")
+        contract_won = (outcome_val == 1 and str(row["side"]).upper() == "YES") or (
+            outcome_val == 0 and str(row["side"]).upper() == "NO"
+        )
         if contract_won:
             wins += 1
             pnl += row["size"] * (1.0 / max(row["price"], 0.01) - 1.0)
@@ -148,16 +144,14 @@ async def approve_staged_order_db(staged_id: int) -> dict:
     venue, contract, category, side, size, price, model_prob, market_implied = row
     logger.info(f"Found staged order: {venue} | {contract} | {side}")
 
-    cursor.execute(
-        "UPDATE audit_trail SET status = 'EXECUTING' WHERE id = ?", (staged_id,)
-    )
+    cursor.execute("UPDATE audit_trail SET status = 'EXECUTING' WHERE id = ?", (staged_id,))
     conn.commit()
     conn.close()
     logger.info(f"Updated staged order {staged_id} status to EXECUTING")
 
     try:
-        from predmarket.config import load_config
         from predmarket.audit import AuditLogger
+        from predmarket.config import load_config
         from predmarket.execution import ExecutionManager
 
         config = load_config()
@@ -166,8 +160,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
 
         quantity = size / price if price > 0 else 0
         logger.info(
-            f"Routing order execution: venue={venue}, contract={contract}, "
-            f"quantity={quantity}"
+            f"Routing order execution: venue={venue}, contract={contract}, quantity={quantity}"
         )
         res = await execution.execute_order(
             venue=venue,
@@ -180,8 +173,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
             market_implied=market_implied,
         )
         logger.info(
-            f"Order execution result: {res.get('status')} "
-            f"(order_id={res.get('order_id', 'N/A')})"
+            f"Order execution result: {res.get('status')} (order_id={res.get('order_id', 'N/A')})"
         )
 
         if res.get("status") == "FILLED":
@@ -202,9 +194,7 @@ async def approve_staged_order_db(staged_id: int) -> dict:
             METRIC_TRADES_FAILED.inc()
             conn = get_db_connection()
             cursor = conn.cursor()
-            cursor.execute(
-                "UPDATE audit_trail SET status = 'FAILED' WHERE id = ?", (staged_id,)
-            )
+            cursor.execute("UPDATE audit_trail SET status = 'FAILED' WHERE id = ?", (staged_id,))
             conn.commit()
             conn.close()
             return {"status": "error", "message": f"Execution failed on {venue}."}

@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_ev_review_queue.py"
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
@@ -100,7 +99,9 @@ def test_review_queue_labels_thin_positive_margin(tmp_path: Path) -> None:
     assert row["all_in_break_even_probability"] == 0.2008
     assert row["calibrated_probability"] == 0.2082
     assert "margin below robust review threshold" in row["robustness_reasons"][0]
-    assert "calibrated contract probability is missing" in report["summary"]["rejected_reason_counts"]
+    assert (
+        "calibrated contract probability is missing" in report["summary"]["rejected_reason_counts"]
+    )
 
 
 def test_review_queue_promotes_robust_research_candidate(tmp_path: Path) -> None:
@@ -138,7 +139,9 @@ def test_review_queue_labels_positive_watch_when_only_cost_caveat_remains(tmp_pa
     ledger_path = tmp_path / "ledger.json"
     write_json(
         ledger_path,
-        ledger_payload(usable_row(contract_ticker="WATCH", margin_probability=0.04, expected_roi=0.09)),
+        ledger_payload(
+            usable_row(contract_ticker="WATCH", margin_probability=0.04, expected_roi=0.09)
+        ),
     )
 
     report = queue.build_review_queue(

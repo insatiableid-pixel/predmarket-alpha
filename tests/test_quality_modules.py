@@ -3,16 +3,14 @@
 from __future__ import annotations
 
 import logging
-import os
-from pathlib import Path
 
-from predmarket.feature_flags import FeatureFlag, is_enabled, all_flags
-from predmarket.log_sanitizer import SanitizingFilter, redact_value, sanitize_record
+from predmarket.feature_flags import FeatureFlag, all_flags, is_enabled
+from predmarket.log_sanitizer import SanitizingFilter, redact_value
+from predmarket.observability import ErrorTracker
 from predmarket.resilience import CircuitBreaker, CircuitBreakerOpen, resilient_external_call
-from predmarket.observability import ErrorTracker, Breadcrumb
-
 
 # --- Feature flags ---
+
 
 def test_feature_flag_defaults_disabled() -> None:
     assert is_enabled(FeatureFlag.CRYPTO_PROXY_DECAY_MONITORING) is False
@@ -34,6 +32,7 @@ def test_all_flags_returns_dict() -> None:
 
 
 # --- Log sanitizer ---
+
 
 def test_redact_api_key() -> None:
     result = redact_value("api_key=aaaaaaaaaaaaaaaa")
@@ -58,8 +57,13 @@ def test_redact_preserves_normal_text() -> None:
 
 def test_sanitizing_filter_scrubs_record() -> None:
     record = logging.LogRecord(
-        name="test", level=logging.INFO, pathname="", lineno=0,
-        msg="api_key=bbbbbbbbbbbbbbbb", args=None, exc_info=None,
+        name="test",
+        level=logging.INFO,
+        pathname="",
+        lineno=0,
+        msg="api_key=bbbbbbbbbbbbbbbb",
+        args=None,
+        exc_info=None,
     )
     f = SanitizingFilter()
     assert f.filter(record) is True
@@ -67,6 +71,7 @@ def test_sanitizing_filter_scrubs_record() -> None:
 
 
 # --- Circuit breaker ---
+
 
 def test_circuit_breaker_opens_after_failures() -> None:
     cb = CircuitBreaker(failure_threshold=3, recovery_seconds=300, name="test")
@@ -126,6 +131,7 @@ def test_resilient_external_call_retries_on_network_error() -> None:
 
 
 # --- Error tracker / observability ---
+
 
 def test_error_tracker_captures_exception() -> None:
     tracker = ErrorTracker()

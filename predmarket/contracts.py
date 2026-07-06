@@ -11,7 +11,7 @@ import json
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, List, Optional, Protocol
+from typing import Any, Protocol
 
 import numpy as np
 
@@ -24,7 +24,7 @@ def stable_hash(value: Any) -> str:
     return hashlib.sha256(_stable_json(value).encode("utf-8")).hexdigest()
 
 
-def monotone_quantiles(quantiles: Dict[float, float]) -> Dict[float, float]:
+def monotone_quantiles(quantiles: dict[float, float]) -> dict[float, float]:
     """Return bounded, non-crossing quantiles keyed by probability level."""
     if not quantiles:
         return {}
@@ -43,13 +43,11 @@ class SourceDocument:
     published_ts: float
     retrieved_ts: float
     text: str
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     def validate_as_of(self, as_of_ts: float) -> None:
         if self.published_ts > as_of_ts or self.retrieved_ts > as_of_ts:
-            raise ValueError(
-                f"source document {self.source_id} is after as_of_ts={as_of_ts}"
-            )
+            raise ValueError(f"source document {self.source_id} is after as_of_ts={as_of_ts}")
 
 
 @dataclass
@@ -59,10 +57,10 @@ class ForecastContext:
     as_of_ts: float
     category: str
     snapshot: Any
-    market_history: List[float] = field(default_factory=list)
-    orderbook: Dict[str, Any] = field(default_factory=dict)
-    source_documents: List[SourceDocument] = field(default_factory=list)
-    features: Dict[str, float] = field(default_factory=dict)
+    market_history: list[float] = field(default_factory=list)
+    orderbook: dict[str, Any] = field(default_factory=dict)
+    source_documents: list[SourceDocument] = field(default_factory=list)
+    features: dict[str, float] = field(default_factory=dict)
 
     def validate_point_in_time(self) -> None:
         for doc in self.source_documents:
@@ -72,12 +70,12 @@ class ForecastContext:
 @dataclass
 class ForecastDistribution:
     p_mean: float
-    quantiles: Dict[float, float] = field(default_factory=dict)
-    samples: Optional[List[float]] = None
+    quantiles: dict[float, float] = field(default_factory=dict)
+    samples: list[float] | None = None
     method: str = "unknown"
     model_version: str = "0"
-    status_flags: List[str] = field(default_factory=list)
-    evidence_refs: List[str] = field(default_factory=list)
+    status_flags: list[str] = field(default_factory=list)
+    evidence_refs: list[str] = field(default_factory=list)
 
     def __post_init__(self) -> None:
         self.p_mean = float(np.clip(self.p_mean, 0.0, 1.0))
@@ -88,12 +86,12 @@ class ForecastDistribution:
     @classmethod
     def from_samples(
         cls,
-        samples: List[float],
+        samples: list[float],
         method: str,
         model_version: str,
-        evidence_refs: Optional[List[str]] = None,
-        status_flags: Optional[List[str]] = None,
-    ) -> "ForecastDistribution":
+        evidence_refs: list[str] | None = None,
+        status_flags: list[str] | None = None,
+    ) -> ForecastDistribution:
         arr = np.clip(np.asarray(samples, dtype=float), 0.0, 1.0)
         qs = [0.025, 0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95, 0.975]
         quantiles = {q: float(np.quantile(arr, q)) for q in qs}
@@ -117,13 +115,13 @@ class ForecastRecord:
     method: str
     model_version: str
     p_mean: float
-    quantiles: Dict[float, float]
+    quantiles: dict[float, float]
     density_samples_ref: str
     base_rate_ref: str
-    evidence_refs: List[str]
+    evidence_refs: list[str]
     feature_hash: str
     calibration_bucket: str
-    status_flags: List[str]
+    status_flags: list[str]
     forecast_id: str = field(default_factory=lambda: str(uuid.uuid4()))
 
     @classmethod
@@ -135,10 +133,10 @@ class ForecastRecord:
         as_of_ts: float,
         horizon: str,
         distribution: ForecastDistribution,
-        features: Optional[Dict[str, Any]] = None,
+        features: dict[str, Any] | None = None,
         base_rate_ref: str = "",
         calibration_bucket: str = "",
-    ) -> "ForecastRecord":
+    ) -> ForecastRecord:
         samples_payload = distribution.samples or []
         return cls(
             event_id=event_id,
@@ -157,7 +155,7 @@ class ForecastRecord:
             status_flags=distribution.status_flags,
         )
 
-    def to_json_dict(self) -> Dict[str, Any]:
+    def to_json_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["quantiles"] = {str(k): v for k, v in self.quantiles.items()}
         return payload
@@ -168,9 +166,9 @@ class EventSpec:
     event_id: str
     title: str
     category: str
-    resolution_rules: Dict[str, Any]
+    resolution_rules: dict[str, Any]
     created_ts: float = field(default_factory=time.time)
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -178,7 +176,7 @@ class MarketLink:
     event_id: str
     venue: str
     market_id: str
-    resolution_rules: Dict[str, Any]
+    resolution_rules: dict[str, Any]
     confidence: float
     linked_ts: float = field(default_factory=time.time)
 
@@ -187,5 +185,4 @@ class Forecaster(Protocol):
     name: str
     model_version: str
 
-    def forecast(self, context: ForecastContext) -> ForecastDistribution:
-        ...
+    def forecast(self, context: ForecastContext) -> ForecastDistribution: ...

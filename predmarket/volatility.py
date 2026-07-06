@@ -10,8 +10,8 @@ modeling that feeds into both the ensemble and risk management.
 """
 
 import logging
+
 import numpy as np
-from typing import Dict, Tuple, Optional, List
 
 logger = logging.getLogger("predmarket.volatility")
 
@@ -34,10 +34,10 @@ class VolatilityModel:
         self._fitted = False
         self._residual_variance: float = 0.0
         self._conditional_volatility: float = 0.0
-        self._params: Dict[str, float] = {}
-        self._last_returns: Optional[np.ndarray] = None
+        self._params: dict[str, float] = {}
+        self._last_returns: np.ndarray | None = None
 
-    def fit(self, line_history: List[float]) -> "VolatilityModel":
+    def fit(self, line_history: list[float]) -> "VolatilityModel":
         """Fit GARCH(1,1) to a price series.
 
         Converts prices to log-returns, then fits a GARCH(1,1) model.
@@ -96,7 +96,7 @@ class VolatilityModel:
 
         return self
 
-    def _fallback_fit(self, line_history: List[float]):
+    def _fallback_fit(self, line_history: list[float]):
         """Fallback: use simple rolling standard deviation as volatility estimate."""
         prices = np.array(line_history, dtype=float)
         if len(prices) < 2:
@@ -110,7 +110,7 @@ class VolatilityModel:
         self._last_returns = np.diff(prices) if len(prices) >= 2 else np.array([0.0])
         self._fitted = True
 
-    def forecast_volatility(self, horizon: int = 1) -> Tuple[float, float]:
+    def forecast_volatility(self, horizon: int = 1) -> tuple[float, float]:
         """Forecast conditional volatility at the given horizon.
 
         Uses the GARCH(1,1) recursion:
@@ -150,14 +150,14 @@ class VolatilityModel:
 
     def detect_regime_change(
         self,
-        line_history: List[float],
+        line_history: list[float],
         window: int = 10,
         threshold: float = 2.0,
     ) -> bool:
         """Detect if recent volatility indicates a regime change.
 
         Compares recent rolling volatility (last `window` periods) against
-        the preceding period's volatility. If recent vol exceeds threshold * 
+        the preceding period's volatility. If recent vol exceeds threshold *
         the baseline (pre-recent) volatility, a regime change is flagged.
 
         This compares recent vs. prior volatility rather than recent vs. full-sample,
@@ -181,7 +181,7 @@ class VolatilityModel:
             return False
 
         # Baseline: volatility of everything BEFORE the recent window
-        baseline_returns = returns[: -window]
+        baseline_returns = returns[:-window]
         recent_returns = returns[-window:]
 
         if len(baseline_returns) < 2:
@@ -197,7 +197,7 @@ class VolatilityModel:
 
         return ratio > threshold
 
-    def get_volatility_features(self, line_history: List[float]) -> Dict[str, float]:
+    def get_volatility_features(self, line_history: list[float]) -> dict[str, float]:
         """Extract volatility features from a price series.
 
         Computes multiple volatility estimators that capture different
@@ -282,7 +282,7 @@ class VolatilityModel:
 
         return features
 
-    def analyze(self, line_history: List[float]) -> Dict[str, float]:
+    def analyze(self, line_history: list[float]) -> dict[str, float]:
         """Fit/update volatility state and return pipeline-facing features."""
         self.fit(line_history)
         conditional_vol, annualized_vol = self.forecast_volatility(horizon=1)
@@ -291,9 +291,7 @@ class VolatilityModel:
             {
                 "conditional_vol": conditional_vol,
                 "annualized_vol": annualized_vol,
-                "regime_change": 1.0
-                if self.detect_regime_change(line_history)
-                else 0.0,
+                "regime_change": 1.0 if self.detect_regime_change(line_history) else 0.0,
             }
         )
         return features
@@ -307,5 +305,5 @@ class VolatilityModel:
         return self._conditional_volatility
 
     @property
-    def params(self) -> Dict[str, float]:
+    def params(self) -> dict[str, float]:
         return dict(self._params)

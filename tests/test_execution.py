@@ -1,7 +1,10 @@
-import pytest
 from unittest.mock import MagicMock
-from predmarket.execution import ExecutionManager
+
+import pytest
+
 from predmarket.audit import AuditLogger
+from predmarket.execution import ExecutionManager
+from predmarket.kalshi_execution_cost import kalshi_net_fee
 
 
 async def run_blocking_inline(func, *args, **kwargs):
@@ -25,9 +28,10 @@ async def test_execution_fee_modeling(mock_config, test_data_dir):
     audit = AuditLogger(str(test_data_dir))
     exec_mgr = make_execution_manager(mock_config, audit)
 
-    # Kalshi: Volume (0.15% of size) + Spread (0.2% of size)
+    # Kalshi: Delegates to canonical fee engine (kalshi_net_fee) per contract
     k_cost = exec_mgr.calculate_transaction_costs("Kalshi", 200.0, 0.40)
-    assert abs(k_cost - (80.0 * 0.0035)) < 1e-6
+    expected = kalshi_net_fee(price=0.40, contract_count=1.0, fee_mode="maker") * 200.0
+    assert abs(k_cost - expected) < 1e-6
 
     with pytest.raises(ValueError, match="Kalshi is the only executable venue"):
         exec_mgr.calculate_transaction_costs("Polymarket", 100.0, 0.50)
@@ -50,7 +54,7 @@ async def test_execution_staging_default(mock_config, test_data_dir):
         quantity=100.0,
         price=0.50,
         model_prob=0.60,
-        market_implied=0.50
+        market_implied=0.50,
     )
 
     assert res["status"] == "STAGED"
@@ -72,7 +76,7 @@ async def test_execution_rejects_polymarket_action(mock_config, test_data_dir):
         quantity=10.0,
         price=0.55,
         model_prob=0.60,
-        market_implied=0.55
+        market_implied=0.55,
     )
 
     assert res["status"] == "FAILED"
@@ -94,7 +98,7 @@ async def test_stage_order_rejects_polymarket(mock_config, test_data_dir):
         quantity=10.0,
         price=0.55,
         model_prob=0.60,
-        market_implied=0.55
+        market_implied=0.55,
     )
 
     assert res["status"] == "FAILED"
@@ -116,7 +120,7 @@ async def test_execution_unsupported_venue(mock_config, test_data_dir):
         quantity=10.0,
         price=0.50,
         model_prob=0.60,
-        market_implied=0.50
+        market_implied=0.50,
     )
 
     assert res["status"] == "FAILED"
@@ -144,7 +148,7 @@ async def test_execution_kalshi_missing_credentials(mock_config, test_data_dir):
         quantity=10.0,
         price=0.50,
         model_prob=0.60,
-        market_implied=0.50
+        market_implied=0.50,
     )
 
     # Without API credentials, Kalshi execution should fail
@@ -174,7 +178,7 @@ async def test_execution_kalshi_order_mocked(mock_config, test_data_dir):
         quantity=5.0,
         price=0.45,
         model_prob=0.55,
-        market_implied=0.45
+        market_implied=0.45,
     )
 
     assert res["status"] == "FILLED"
@@ -201,7 +205,7 @@ async def test_execution_retry_exhaustion(mock_config, test_data_dir):
         quantity=5.0,
         price=0.45,
         model_prob=0.55,
-        market_implied=0.45
+        market_implied=0.45,
     )
 
     assert res["status"] == "FAILED"
@@ -222,7 +226,7 @@ async def test_execution_stage_order_audit_trail(mock_config, test_data_dir):
         quantity=50.0,
         price=0.40,
         model_prob=0.35,
-        market_implied=0.40
+        market_implied=0.40,
     )
 
     assert res["status"] == "STAGED"
@@ -244,7 +248,7 @@ async def test_execution_unknown_venue_rejected_before_staging(mock_config, test
         quantity=10.0,
         price=0.50,
         model_prob=0.60,
-        market_implied=0.50
+        market_implied=0.50,
     )
 
     assert res["status"] == "FAILED"

@@ -249,7 +249,9 @@ def test_crypto_proxy_capture_observed_markets(tmp_path: Path) -> None:
     injected fetch that returns settled market data."""
     import importlib.util
 
-    script_path = Path(__file__).resolve().parents[2] / "scripts" / "kalshi_crypto_proxy_observation_loop.py"
+    script_path = (
+        Path(__file__).resolve().parents[2] / "scripts" / "kalshi_crypto_proxy_observation_loop.py"
+    )
     spec = importlib.util.spec_from_file_location("observation_loop", script_path)
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)

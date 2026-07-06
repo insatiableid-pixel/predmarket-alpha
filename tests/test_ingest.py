@@ -1,5 +1,7 @@
-import pytest
 from unittest.mock import AsyncMock, MagicMock
+
+import pytest
+
 from predmarket.ingest import MarketIngestManager, MarketSnapshot
 
 
@@ -32,13 +34,16 @@ async def test_ingest_polymarket_live_fetch(mock_config):
 
     class MockResponse:
         status = 200
+
         async def json(self):
             return {
                 "bids": [{"price": "0.60", "size": "1000"}],
-                "asks": [{"price": "0.62", "size": "800"}]
+                "asks": [{"price": "0.62", "size": "800"}],
             }
+
         async def __aenter__(self):
             return self
+
         async def __aexit__(self, *args):
             pass
 
@@ -97,10 +102,13 @@ async def test_ingest_polymarket_api_error_graceful(mock_config):
 
     class MockErrorResponse:
         status = 503
+
         async def json(self):
             return {}
+
         async def __aenter__(self):
             return self
+
         async def __aexit__(self, *args):
             pass
 
@@ -122,16 +130,40 @@ async def test_ingest_polymarket_api_error_graceful(mock_config):
 def test_ingest_snapshot_mid_calculation():
     """Test MarketSnapshot mid-price calculation edge cases."""
     # bid/ask both > 0
-    snap = MarketSnapshot("Test", "C-1", "Title", bid=0.50, ask=0.52, last_price=0.49,
-                          open_interest=1000, volume_24h=100)
+    snap = MarketSnapshot(
+        "Test",
+        "C-1",
+        "Title",
+        bid=0.50,
+        ask=0.52,
+        last_price=0.49,
+        open_interest=1000,
+        volume_24h=100,
+    )
     assert snap.mid == 0.51
 
     # bid=0, should use last_price
-    snap2 = MarketSnapshot("Test", "C-2", "Title", bid=0.0, ask=0.0, last_price=0.60,
-                           open_interest=1000, volume_24h=100)
+    snap2 = MarketSnapshot(
+        "Test",
+        "C-2",
+        "Title",
+        bid=0.0,
+        ask=0.0,
+        last_price=0.60,
+        open_interest=1000,
+        volume_24h=100,
+    )
     assert snap2.mid == 0.60
 
     # line_history default
-    snap3 = MarketSnapshot("Test", "C-3", "Title", bid=0.50, ask=0.52, last_price=0.51,
-                           open_interest=1000, volume_24h=100)
+    snap3 = MarketSnapshot(
+        "Test",
+        "C-3",
+        "Title",
+        bid=0.50,
+        ask=0.52,
+        last_price=0.51,
+        open_interest=1000,
+        volume_24h=100,
+    )
     assert snap3.line_history == [0.51]

@@ -1,5 +1,4 @@
-import pytest
-from predmarket.signals import NLPEventSignalExtractor, BaseRateModel, MacroSignalExtractor
+from predmarket.signals import BaseRateModel, MacroSignalExtractor, NLPEventSignalExtractor
 
 
 def test_nlp_extraction_semantic_fallback():
@@ -7,7 +6,9 @@ def test_nlp_extraction_semantic_fallback():
     extractor.initialized = False
 
     # Positive headlines should yield high probability
-    p1, w1 = extractor.get_event_probability("Congress passes new historical budget bill", "Tax reform passes")
+    p1, w1 = extractor.get_event_probability(
+        "Congress passes new historical budget bill", "Tax reform passes"
+    )
     assert p1 > 0.50
 
     # Negative headlines should yield low probability
@@ -39,7 +40,9 @@ def test_nlp_recency_anchor():
     extractor.initialized = False
 
     # Breaking news should get high weight (> 0.60 triggers RECENCY-ANCHOR)
-    p1, w1 = extractor.get_event_probability("BREAKING: Congress announces agreement on bill", "Bill passes")
+    p1, w1 = extractor.get_event_probability(
+        "BREAKING: Congress announces agreement on bill", "Bill passes"
+    )
     assert w1 == 0.65  # Breaking news weight
 
     # Regular news gets lower weight

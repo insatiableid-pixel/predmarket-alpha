@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[1]
     / "scripts"
@@ -14,7 +13,9 @@ MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
 def load_model_module():
-    spec = importlib.util.spec_from_file_location("kalshi_crypto_proxy_feature_model_falsification", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_crypto_proxy_feature_model_falsification", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -48,7 +49,13 @@ def safe_packet(rows=None, **overrides):
     return payload
 
 
-def label_row(idx: int, *, ticker: str | None = None, proxy_state: str = "proxy_above_floor_not_label", outcome: int = 1):
+def label_row(
+    idx: int,
+    *,
+    ticker: str | None = None,
+    proxy_state: str = "proxy_above_floor_not_label",
+    outcome: int = 1,
+):
     day = 2
     hour = 1 + idx // 8
     minute = (idx % 8) * 5
@@ -89,9 +96,24 @@ def test_feature_model_falsification_collapses_duplicate_contract_labels(tmp_pat
     module = load_model_module()
     label_dir = tmp_path / "labels"
     rows = [
-        label_row(0, ticker="KXBTC15M-26JUL012115-15", proxy_state="proxy_below_floor_not_label", outcome=0),
-        label_row(1, ticker="KXBTC15M-26JUL012115-15", proxy_state="proxy_above_floor_not_label", outcome=1),
-        label_row(2, ticker="KXETH15M-26JUL012115-15", proxy_state="proxy_above_floor_not_label", outcome=1),
+        label_row(
+            0,
+            ticker="KXBTC15M-26JUL012115-15",
+            proxy_state="proxy_below_floor_not_label",
+            outcome=0,
+        ),
+        label_row(
+            1,
+            ticker="KXBTC15M-26JUL012115-15",
+            proxy_state="proxy_above_floor_not_label",
+            outcome=1,
+        ),
+        label_row(
+            2,
+            ticker="KXETH15M-26JUL012115-15",
+            proxy_state="proxy_above_floor_not_label",
+            outcome=1,
+        ),
     ]
     write_json(label_dir / "labels.json", safe_packet(rows=rows))
 
@@ -105,13 +127,18 @@ def test_feature_model_falsification_collapses_duplicate_contract_labels(tmp_pat
     assert report["summary"]["valid_label_row_count"] == 3
     assert report["summary"]["independent_contract_label_count"] == 2
     assert report["summary"]["duplicate_label_row_count"] == 1
-    assert report["status"] == "crypto_proxy_feature_model_falsification_blocked_insufficient_independent_labels"
+    assert (
+        report["status"]
+        == "crypto_proxy_feature_model_falsification_blocked_insufficient_independent_labels"
+    )
 
 
 def test_feature_model_falsification_promotes_only_after_oos_fdr_pass(tmp_path: Path) -> None:
     module = load_model_module()
     label_dir = tmp_path / "labels"
-    rows = [label_row(idx, proxy_state="proxy_above_floor_not_label", outcome=1) for idx in range(20)]
+    rows = [
+        label_row(idx, proxy_state="proxy_above_floor_not_label", outcome=1) for idx in range(20)
+    ]
     write_json(label_dir / "labels.json", safe_packet(rows=rows))
 
     report = module.build_crypto_proxy_feature_model_falsification(
@@ -122,8 +149,15 @@ def test_feature_model_falsification_promotes_only_after_oos_fdr_pass(tmp_path: 
         fdr_alpha=0.10,
     )
 
-    directional = next(item for item in report["evaluations"] if item["model_id"] == "proxy_state_directional_accuracy")
-    assert report["status"] == "crypto_proxy_feature_model_falsification_ready_with_research_candidates"
+    directional = next(
+        item
+        for item in report["evaluations"]
+        if item["model_id"] == "proxy_state_directional_accuracy"
+    )
+    assert (
+        report["status"]
+        == "crypto_proxy_feature_model_falsification_ready_with_research_candidates"
+    )
     assert report["summary"]["research_candidate_count"] == 1
     assert directional["status"] == "research_candidate_fdr_passed"
     assert directional["q_value"] <= 0.10
@@ -148,9 +182,9 @@ def test_feature_model_falsification_writer_emits_latest_outputs(tmp_path: Path)
     assert Path(paths["markdown_path"]).exists()
     assert Path(paths["csv_path"]).exists()
     assert Path(paths["latest_json_path"]).exists()
-    assert "Kalshi Crypto Proxy Feature Model Falsification" in Path(paths["markdown_path"]).read_text(
-        encoding="utf-8"
-    )
+    assert "Kalshi Crypto Proxy Feature Model Falsification" in Path(
+        paths["markdown_path"]
+    ).read_text(encoding="utf-8")
 
 
 def test_feature_model_falsification_makefile_target_exists() -> None:
@@ -158,12 +192,14 @@ def test_feature_model_falsification_makefile_target_exists() -> None:
 
     assert "kalshi-crypto-proxy-feature-model-falsification" in makefile
     assert "scripts/kalshi_crypto_proxy_feature_model_falsification.py" in makefile
-    watch_target = makefile.split("kalshi-crypto-proxy-observation-watch-once:", 1)[1].split("\n\n", 1)[0]
+    watch_target = makefile.split("kalshi-crypto-proxy-observation-watch-once:", 1)[1].split(
+        "\n\n", 1
+    )[0]
     assert "kalshi-crypto-proxy-observation-loop" in watch_target
     assert "kalshi-crypto-proxy-feature-model-falsification" in watch_target
     assert watch_target.index("kalshi-crypto-proxy-observation-loop") < watch_target.index(
         "kalshi-crypto-proxy-feature-model-falsification"
     )
-    assert watch_target.index("kalshi-crypto-proxy-feature-model-falsification") < watch_target.index(
-        "kalshi-signal-factory-status"
-    )
+    assert watch_target.index(
+        "kalshi-crypto-proxy-feature-model-falsification"
+    ) < watch_target.index("kalshi-signal-factory-status")

@@ -8,11 +8,11 @@ structured reasoning capture, concern tracking, and per-analyst scoring.
 """
 
 import logging
-import time
 import sqlite3
-from dataclasses import dataclass, field, asdict
-from typing import List, Dict, Optional, Any
+import time
+from dataclasses import dataclass, field
 from pathlib import Path
+from typing import Any
 
 import numpy as np
 
@@ -44,7 +44,7 @@ class JudgmentRequest:
     edge: float
     category: str
     venue: str
-    structured_questions: List[str] = field(default_factory=list)
+    structured_questions: list[str] = field(default_factory=list)
 
 
 @dataclass
@@ -66,8 +66,8 @@ class JudgmentResponse:
     approved: bool
     confidence: float = 0.5
     reasoning: str = ""
-    concerns: List[str] = field(default_factory=list)
-    override_probability: Optional[float] = None
+    concerns: list[str] = field(default_factory=list)
+    override_probability: float | None = None
     analyst_id: str = ""
     timestamp: float = field(default_factory=time.time)
 
@@ -86,7 +86,7 @@ class StructuredJudgmentProtocol:
     """
 
     # Category-specific question templates
-    _QUESTIONS: Dict[str, List[str]] = {
+    _QUESTIONS: dict[str, list[str]] = {
         "political": [
             "Is the base rate appropriate for this specific race/context?",
             "Are there recent developments (scandals, endorsements, court rulings) "
@@ -98,8 +98,7 @@ class StructuredJudgmentProtocol:
         ],
         "econ": [
             "Is the base rate for this economic indicator appropriate?",
-            "Has there been a regime change (policy shift, crisis) the model "
-            "hasn't adapted to?",
+            "Has there been a regime change (policy shift, crisis) the model hasn't adapted to?",
             "Are leading indicators consistent with the model's forecast?",
             "Could central bank intervention or fiscal policy change the outcome?",
         ],
@@ -116,7 +115,7 @@ class StructuredJudgmentProtocol:
         ],
     }
 
-    def create_judgment_request(self, forecast_dict: Dict[str, Any]) -> JudgmentRequest:
+    def create_judgment_request(self, forecast_dict: dict[str, Any]) -> JudgmentRequest:
         """Generate a structured judgment request from a forecast.
 
         Args:
@@ -184,9 +183,7 @@ class StructuredJudgmentProtocol:
             return False
         return True
 
-    def aggregate_judgments(
-        self, responses: List[JudgmentResponse]
-    ) -> JudgmentResponse:
+    def aggregate_judgments(self, responses: list[JudgmentResponse]) -> JudgmentResponse:
         """Aggregate multiple analyst judgments into a single consensus.
 
         Uses median probability, union of concerns, and mean confidence.
@@ -229,9 +226,7 @@ class StructuredJudgmentProtocol:
                     all_concerns.append(c)
 
         # Reasoning: concatenate
-        combined_reasoning = " | ".join(
-            f"[{r.analyst_id}]: {r.reasoning}" for r in responses
-        )
+        combined_reasoning = " | ".join(f"[{r.analyst_id}]: {r.reasoning}" for r in responses)
 
         return JudgmentResponse(
             contract_id=responses[0].contract_id,
@@ -260,11 +255,9 @@ class JudgmentTracker:
     All data is persisted in a SQLite table `judgment_history`.
     """
 
-    def __init__(self, db_path: Optional[str] = None):
+    def __init__(self, db_path: str | None = None):
         if db_path is None:
-            db_path = str(
-                Path(__file__).resolve().parents[1] / "data" / "database.sqlite"
-            )
+            db_path = str(Path(__file__).resolve().parents[1] / "data" / "database.sqlite")
         self.db_path = db_path
         self._ensure_table()
 
@@ -315,7 +308,7 @@ class JudgmentTracker:
         conn.commit()
         conn.close()
 
-    def get_analyst_calibration(self, analyst_id: str) -> Dict[str, float]:
+    def get_analyst_calibration(self, analyst_id: str) -> dict[str, float]:
         """Compute calibration metrics for a specific analyst.
 
         Returns:
@@ -350,9 +343,9 @@ class JudgmentTracker:
         brier = float(np.mean([(p - o) ** 2 for p, o in zip(probs, outcomes)]))
         predicted_yes = [p > 0.5 for p in probs]
         actual_yes = [o == 1 for o in outcomes]
-        accuracy = sum(
-            1 for pred, act in zip(predicted_yes, actual_yes) if pred == act
-        ) / len(outcomes)
+        accuracy = sum(1 for pred, act in zip(predicted_yes, actual_yes) if pred == act) / len(
+            outcomes
+        )
 
         # Calibration slope: regress outcome on forecast probability
         cal_slope = float("nan")
@@ -362,9 +355,7 @@ class JudgmentTracker:
             # Simple OLS: outcome = a + b * prob
             b = np.corrcoef(probs_arr, outcomes_arr)[0, 1]
             if not np.isnan(b):
-                cal_slope = float(
-                    b * np.std(outcomes_arr) / max(np.std(probs_arr), 1e-10)
-                )
+                cal_slope = float(b * np.std(outcomes_arr) / max(np.std(probs_arr), 1e-10))
 
         return {
             "brier_score": brier,
@@ -374,7 +365,7 @@ class JudgmentTracker:
             "n_judgments": len(rows),
         }
 
-    def get_best_analysts(self, n: int = 5) -> List[str]:
+    def get_best_analysts(self, n: int = 5) -> list[str]:
         """Return top analysts ranked by Brier score (lower is better).
 
         Args:

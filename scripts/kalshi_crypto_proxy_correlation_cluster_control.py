@@ -11,9 +11,8 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
-from collections import Counter, defaultdict
+from collections import defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -130,35 +129,34 @@ def positive_cluster_costs(rows: Sequence[Mapping[str, Any]]) -> dict[str, float
     return dict(sorted(costs.items(), key=lambda item: (-item[1], item[0])))
 
 
-def required_cluster_count(max_cluster_share: float, min_positive_clusters: int) -> int:
-    if max_cluster_share <= 0:
-        return max(1, min_positive_clusters)
-    return max(min_positive_clusters, math.ceil(1 / max_cluster_share))
+from predmarket.shared_helpers import (  # noqa: E402
+    controlled_cluster_costs,
+    counts,
+    gate,
+    gate_status,
+    json_float,
+    nonnegative_float,
+    path_is_within,
+    read_json_or_empty,
+    required_cluster_count,
+    safety_flags,
+)
 
 
-def controlled_cluster_costs(cluster_costs: Mapping[str, float], max_cluster_share: float) -> dict[str, float]:
-    positive_costs = {key: value for key, value in cluster_costs.items() if value > 0}
-    if not positive_costs or max_cluster_share <= 0:
-        return {}
-    total_available = sum(positive_costs.values())
-    if total_available <= 0:
-        return {}
-    lo = 0.0
-    hi = total_available
-    for _ in range(80):
-        mid = (lo + hi) / 2
-        if sum(min(cost, max_cluster_share * mid) for cost in positive_costs.values()) + 1e-9 >= mid:
-            lo = mid
-        else:
-            hi = mid
-    if lo <= 1e-9:
-        return {}
-    controlled = {
-        key: min(cost, max_cluster_share * lo)
-        for key, cost in positive_costs.items()
-        if min(cost, max_cluster_share * lo) > 1e-9
-    }
-    return dict(sorted(controlled.items(), key=lambda item: (-item[1], item[0])))
+def largest_item(values: Mapping[str, float]) -> tuple[str | None, float]:
+    if not values:
+        return None, 0.0
+    return max(values.items(), key=lambda item: (item[1], item[0]))
+
+
+def positive_depth_cost(row: Mapping[str, Any]) -> float:
+    return nonnegative_float(row.get("positive_depth_cost")) or 0.0
+
+
+def summary(value: Any) -> dict[str, Any]:
+    if isinstance(value, Mapping) and isinstance(value.get("summary"), Mapping):
+        return dict(value["summary"])
+    return {}
 
 
 def controlled_capacity_rows(
@@ -449,89 +447,6 @@ def cluster_rows(cluster_costs: Mapping[str, float], controlled_clusters: Mappin
         }
         for key in keys
     ]
-
-
-def gate(name: str, status: str, reason: str) -> dict[str, str]:
-    return {"name": name, "status": status, "reason": reason}
-
-
-def gate_status(gates: Sequence[Mapping[str, Any]], name: str) -> str:
-    for item in gates:
-        if item.get("name") == name:
-            return str(item.get("status") or "")
-    return "blocked"
-
-
-def largest_item(values: Mapping[str, float]) -> tuple[str | None, float]:
-    if not values:
-        return None, 0.0
-    return max(values.items(), key=lambda item: (item[1], item[0]))
-
-
-def positive_depth_cost(row: Mapping[str, Any]) -> float:
-    return nonnegative_float(row.get("positive_depth_cost")) or 0.0
-
-
-def read_json_or_empty(path: Path) -> dict[str, Any]:
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return raw if isinstance(raw, dict) else {}
-
-
-def summary(value: Any) -> dict[str, Any]:
-    if isinstance(value, Mapping) and isinstance(value.get("summary"), Mapping):
-        return dict(value["summary"])
-    return {}
-
-
-def path_is_within(path: Path, root: Path) -> bool:
-    try:
-        path.resolve().relative_to(root.resolve())
-    except (OSError, ValueError):
-        return False
-    return True
-
-
-def nonnegative_float(value: Any) -> float | None:
-    try:
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = value.strip().rstrip("%")
-            if not value:
-                return None
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    return number if math.isfinite(number) and number >= 0 else None
-
-
-def json_float(value: Any) -> float | None:
-    number = nonnegative_float(value)
-    return round(number, 10) if number is not None else None
-
-
-def counts(values: Sequence[Any]) -> dict[str, int]:
-    counter = Counter(str(value if value is not None else "unknown") for value in values)
-    return dict(sorted(counter.items(), key=lambda item: (-item[1], item[0])))
-
-
-def safety_flags() -> dict[str, bool]:
-    return {
-        "research_only": True,
-        "execution_enabled": False,
-        "public_market_data_calls": False,
-        "authenticated_api_calls": False,
-        "provider_api_calls": False,
-        "paid_calls": False,
-        "database_writes": False,
-        "market_execution": False,
-        "account_or_order_paths": False,
-        "raw_payloads_copied_to_repo": False,
-        "staking_or_sizing_guidance": False,
-    }
 
 
 def build_parser() -> argparse.ArgumentParser:

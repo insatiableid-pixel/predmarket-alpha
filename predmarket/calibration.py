@@ -2,8 +2,8 @@
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from dataclasses import dataclass, field
-from typing import Dict, Iterable, List
 
 import numpy as np
 
@@ -45,7 +45,7 @@ def expected_calibration_error(
 class ConformalCalibrator:
     """Symmetric residual conformal calibrator for bounded probabilities."""
 
-    residuals_by_bucket: Dict[str, List[float]] = field(default_factory=dict)
+    residuals_by_bucket: dict[str, list[float]] = field(default_factory=dict)
 
     def update(self, bucket: str, predicted_prob: float, outcome: float) -> None:
         self.residuals_by_bucket.setdefault(bucket, []).append(
@@ -60,16 +60,14 @@ class ConformalCalibrator:
             radius = 0.25
         else:
             q = min(max(1.0 - alpha, 0.0), 1.0)
-            radius = float(
-                np.quantile(np.asarray(residuals, dtype=float), q, method="higher")
-            )
+            radius = float(np.quantile(np.asarray(residuals, dtype=float), q, method="higher"))
         lo = max(0.0, float(predicted_prob) - radius)
         hi = min(1.0, float(predicted_prob) + radius)
         return lo, hi
 
     def quantiles(
-        self, bucket: str, predicted_prob: float, levels: List[float] | None = None
-    ) -> Dict[float, float]:
+        self, bucket: str, predicted_prob: float, levels: list[float] | None = None
+    ) -> dict[float, float]:
         levels = levels or [0.05, 0.1, 0.25, 0.5, 0.75, 0.9, 0.95]
         residuals = self.residuals_by_bucket.get(bucket, [])
         if not residuals:
@@ -86,7 +84,7 @@ class ConformalCalibrator:
         return {float(level): float(value) for level, value in zip(levels, clipped)}
 
 
-def quantiles_from_samples(samples: Iterable[float]) -> Dict[float, float]:
+def quantiles_from_samples(samples: Iterable[float]) -> dict[float, float]:
     arr = np.clip(np.asarray(list(samples), dtype=float), 0.0, 1.0)
     if len(arr) == 0:
         arr = np.asarray([0.5])

@@ -93,7 +93,10 @@ def test_after_start_kalshi_capture_is_downgraded():
     )
 
     assert report["summary"]["downgraded_temporal_mismatch"] == 1
-    assert report["dispositions"][0]["reason"] == "At least one snapshot was captured at or after first pitch."
+    assert (
+        report["dispositions"][0]["reason"]
+        == "At least one snapshot was captured at or after first pitch."
+    )
 
 
 def test_missing_timing_requires_manual_review():
@@ -122,7 +125,10 @@ def test_duplicate_reference_tickers_require_manual_review():
 
     assert report["status"] == "candidate_disposition_manual_timing_review"
     assert report["summary"]["duplicate_reference_ticker_count"] == 1
-    assert report["dispositions"][0]["reason"] == "Multiple sportsbook reference rows were found for this explicit ticker."
+    assert (
+        report["dispositions"][0]["reason"]
+        == "Multiple sportsbook reference rows were found for this explicit ticker."
+    )
 
 
 def test_watch_only_remains_watch_only_when_timing_passes():

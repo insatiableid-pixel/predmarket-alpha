@@ -15,15 +15,19 @@ Remediation notes:
 import json
 import logging
 
-import numpy as np
-import pandas as pd
-from dash import Input, Output, State, callback_context, ALL, html, dcc
 import dash_bootstrap_components as dbc
+import pandas as pd
 import plotly.graph_objs as go
+from dash import ALL, Input, Output, callback_context, html
 from sklearn.calibration import calibration_curve
 
-from .layout import app, DARK_BG, CARD_BG, ACCENT_BLUE, ACCENT_GREEN, ACCENT_RED, ACCENT_ORANGE
-from .data import fetch_performance_metrics, get_db_connection, approve_staged_order_db, fetch_opportunities
+from .data import (
+    approve_staged_order_db,
+    fetch_opportunities,
+    fetch_performance_metrics,
+    get_db_connection,
+)
+from .layout import ACCENT_BLUE, ACCENT_GREEN, ACCENT_ORANGE, ACCENT_RED, CARD_BG, DARK_BG, app
 
 logger = logging.getLogger("predmarket.dashboard")
 
@@ -55,9 +59,7 @@ async def fetch_metrics_callback(n):
         metrics = fetch_performance_metrics()
         return metrics, None
     except Exception as e:
-        return {}, dbc.Alert(
-            f"Data refresh error: {e}", color="danger", dismissable=True
-        )
+        return {}, dbc.Alert(f"Data refresh error: {e}", color="danger", dismissable=True)
 
 
 @app.callback(
@@ -100,8 +102,12 @@ def render_calibration_plot(metrics):
             if n_resolved < 10:
                 cal_fig.add_annotation(
                     text=f"Insufficient data for calibration ({n_resolved} trades, need ≥10)",
-                    xref="paper", yref="paper", x=0.5, y=0.5,
-                    showarrow=False, font=dict(size=14, color="#8B949E"),
+                    xref="paper",
+                    yref="paper",
+                    x=0.5,
+                    y=0.5,
+                    showarrow=False,
+                    font=dict(size=14, color="#8B949E"),
                 )
             else:
                 y_true = [t["outcome"] for t in resolved_trades]
@@ -122,7 +128,8 @@ def render_calibration_plot(metrics):
                     )
         cal_fig.add_trace(
             go.Scatter(
-                x=[0, 1], y=[0, 1],
+                x=[0, 1],
+                y=[0, 1],
                 line=dict(dash="dash", color="grey"),
                 name="Perfect Calibration",
             )
@@ -131,7 +138,9 @@ def render_calibration_plot(metrics):
         title="Forecasting Epistemic Calibration Curve",
         xaxis_title="Mean Predicted Probability",
         yaxis_title="Fraction of Positives",
-        template="plotly_dark", plot_bgcolor=CARD_BG, paper_bgcolor=DARK_BG,
+        template="plotly_dark",
+        plot_bgcolor=CARD_BG,
+        paper_bgcolor=DARK_BG,
     )
     return cal_fig
 
@@ -145,24 +154,27 @@ def render_equity_plot(metrics):
     eq_fig = go.Figure()
     try:
         conn = get_db_connection()
-        df_eq = pd.read_sql_query(
-            "SELECT timestamp, total_equity FROM equity_history", conn
-        )
+        df_eq = pd.read_sql_query("SELECT timestamp, total_equity FROM equity_history", conn)
         conn.close()
         if not df_eq.empty:
             df_eq["time"] = pd.to_datetime(df_eq["timestamp"], unit="s")
             eq_fig.add_trace(
                 go.Scatter(
-                    x=df_eq["time"], y=df_eq["total_equity"],
-                    line=dict(color=ACCENT_GREEN, width=2), mode="lines",
+                    x=df_eq["time"],
+                    y=df_eq["total_equity"],
+                    line=dict(color=ACCENT_GREEN, width=2),
+                    mode="lines",
                 )
             )
     except Exception:
         pass
     eq_fig.update_layout(
         title="Portfolio Account Net Equity (30d)",
-        xaxis_title="Timestamp", yaxis_title="Equity (USD)",
-        template="plotly_dark", plot_bgcolor=CARD_BG, paper_bgcolor=DARK_BG,
+        xaxis_title="Timestamp",
+        yaxis_title="Equity (USD)",
+        template="plotly_dark",
+        plot_bgcolor=CARD_BG,
+        paper_bgcolor=DARK_BG,
     )
     return eq_fig
 
@@ -182,32 +194,42 @@ def render_opportunity_board(metrics):
         )
 
     opp_table_headers = [
-        "Venue", "Contract", "Category", "Model Prob",
-        "Market Implied", "Edge %", "Status",
+        "Venue",
+        "Contract",
+        "Category",
+        "Model Prob",
+        "Market Implied",
+        "Edge %",
+        "Status",
     ]
     opp_rows = []
     for item in sim_opportunities:
         edge = item["prob"] - item["implied"]
         opp_rows.append(
-            html.Tr([
-                html.Td(item["venue"]),
-                html.Td(item["contract"]),
-                html.Td(item["category"]),
-                html.Td(f"{item['prob']:.1%}"),
-                html.Td(f"{item['implied']:.1%}"),
-                html.Td(
-                    f"{edge:+.1%}",
-                    style={"color": ACCENT_GREEN if edge > 0 else ACCENT_RED},
-                ),
-                html.Td(
-                    item["status"],
-                    style={"color": ACCENT_BLUE if item["status"] == "READY" else ACCENT_RED},
-                ),
-            ])
+            html.Tr(
+                [
+                    html.Td(item["venue"]),
+                    html.Td(item["contract"]),
+                    html.Td(item["category"]),
+                    html.Td(f"{item['prob']:.1%}"),
+                    html.Td(f"{item['implied']:.1%}"),
+                    html.Td(
+                        f"{edge:+.1%}",
+                        style={"color": ACCENT_GREEN if edge > 0 else ACCENT_RED},
+                    ),
+                    html.Td(
+                        item["status"],
+                        style={"color": ACCENT_BLUE if item["status"] == "READY" else ACCENT_RED},
+                    ),
+                ]
+            )
         )
     return dbc.Table(
         [html.Thead(html.Tr([html.Th(h) for h in opp_table_headers])), html.Tbody(opp_rows)],
-        bordered=True, hover=True, color="dark", responsive=True,
+        bordered=True,
+        hover=True,
+        color="dark",
+        responsive=True,
     )
 
 
@@ -235,35 +257,37 @@ def render_position_sizing_slate(metrics):
             recommended_allocation_pct = row["size"] / 10000.0
             slate_cards.append(
                 dbc.Card(
-                    dbc.CardBody([
-                        html.H5(
-                            f"VENUE: {row['venue']} | CONTRACT: {row['contract']}",
-                            className="card-title",
-                            style={"color": ACCENT_ORANGE},
-                        ),
-                        html.P(
-                            f"SIDE: {row['side']} at {row['price']} | "
-                            f"MODEL PROB: {row['model_prob']:.1%} | "
-                            f"IMPLIED: {row['market_implied']:.1%} | "
-                            f"raw edge: {edge:+.1%} | "
-                            f"net edge: {row['net_edge']:+.1%}"
-                        ),
-                        html.P(
-                            f"RECOMMENDED ALLOCATION: ${row['size']:.2f} "
-                            f"({recommended_allocation_pct:.2%})"
-                        ),
-                        html.P(
-                            f"DETAILS / KEY RESOLUTION: {row['details']}",
-                            className="text-muted mb-1",
-                        ),
-                        dbc.Button(
-                            "Approve Trade Intent",
-                            color="warning",
-                            className="mt-2",
-                            id={"type": "approve-btn", "index": int(row["id"])},
-                            title=f"Approve trade {row['contract']} on {row['venue']}",
-                        ),
-                    ]),
+                    dbc.CardBody(
+                        [
+                            html.H5(
+                                f"VENUE: {row['venue']} | CONTRACT: {row['contract']}",
+                                className="card-title",
+                                style={"color": ACCENT_ORANGE},
+                            ),
+                            html.P(
+                                f"SIDE: {row['side']} at {row['price']} | "
+                                f"MODEL PROB: {row['model_prob']:.1%} | "
+                                f"IMPLIED: {row['market_implied']:.1%} | "
+                                f"raw edge: {edge:+.1%} | "
+                                f"net edge: {row['net_edge']:+.1%}"
+                            ),
+                            html.P(
+                                f"RECOMMENDED ALLOCATION: ${row['size']:.2f} "
+                                f"({recommended_allocation_pct:.2%})"
+                            ),
+                            html.P(
+                                f"DETAILS / KEY RESOLUTION: {row['details']}",
+                                className="text-muted mb-1",
+                            ),
+                            dbc.Button(
+                                "Approve Trade Intent",
+                                color="warning",
+                                className="mt-2",
+                                id={"type": "approve-btn", "index": int(row["id"])},
+                                title=f"Approve trade {row['contract']} on {row['venue']}",
+                            ),
+                        ]
+                    ),
                     className="approval-card",
                 )
             )
@@ -302,8 +326,15 @@ async def update_dashboard_data(n):
         slate = render_position_sizing_slate(metrics)
 
         return (
-            brier_str, logloss_str, pnl_str, drawdown_str,
-            cal_fig, eq_fig, opp_table, slate, None,
+            brier_str,
+            logloss_str,
+            pnl_str,
+            drawdown_str,
+            cal_fig,
+            eq_fig,
+            opp_table,
+            slate,
+            None,
         )
     except Exception as e:
         err_alert = dbc.Alert(
@@ -313,8 +344,12 @@ async def update_dashboard_data(n):
         )
         kpi_err = html.Span("— Error —", className="kpi-error")
         return (
-            kpi_err, kpi_err, kpi_err, kpi_err,
-            _empty_fig(), _empty_fig(),
+            kpi_err,
+            kpi_err,
+            kpi_err,
+            kpi_err,
+            _empty_fig(),
+            _empty_fig(),
             html.P("Error loading opportunities.", className="text-danger"),
             html.P("Error loading slate.", className="text-danger"),
             err_alert,

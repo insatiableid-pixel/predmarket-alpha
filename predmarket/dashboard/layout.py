@@ -6,8 +6,8 @@ F6 remediation: External Google Fonts replaced with local @font-face.
 F8 remediation: Inline styles replaced with CSS classes where possible.
 """
 
-from dash import Dash, dcc, html
 import dash_bootstrap_components as dbc
+from dash import Dash, dcc, html
 
 from .server import server
 
@@ -54,9 +54,14 @@ skip_nav = html.A(
     href="#main-content",
     className="skip-nav",
     style={
-        "position": "absolute", "top": "-40px", "left": "0",
-        "background": ACCENT_BLUE, "color": "#000", "padding": "8px",
-        "z-index": "1000", "font-weight": "bold",
+        "position": "absolute",
+        "top": "-40px",
+        "left": "0",
+        "background": ACCENT_BLUE,
+        "color": "#000",
+        "padding": "8px",
+        "z-index": "1000",
+        "font-weight": "bold",
     },
 )
 
@@ -208,7 +213,11 @@ app.layout = dbc.Container(
                         ),
                         dbc.CardBody(
                             dcc.Loading(
-                                html.Div(id="opportunity-board-table", role="region", **{"aria-label": "Market opportunities"}),
+                                html.Div(
+                                    id="opportunity-board-table",
+                                    role="region",
+                                    **{"aria-label": "Market opportunities"},
+                                ),
                                 type="border",
                             )
                         ),
@@ -230,7 +239,11 @@ app.layout = dbc.Container(
                         ),
                         dbc.CardBody(
                             dcc.Loading(
-                                html.Div(id="position-sizing-slate", role="region", **{"aria-label": "Position sizing recommendations"}),
+                                html.Div(
+                                    id="position-sizing-slate",
+                                    role="region",
+                                    **{"aria-label": "Position sizing recommendations"},
+                                ),
                                 type="border",
                             )
                         ),

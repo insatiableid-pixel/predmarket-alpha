@@ -4,11 +4,8 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "scripts"
-    / "kalshi_labeled_observation_builder.py"
+    Path(__file__).resolve().parents[1] / "scripts" / "kalshi_labeled_observation_builder.py"
 )
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
@@ -200,9 +197,23 @@ def test_writer_keeps_packets_outside_repo(tmp_path: Path) -> None:
     builder.MACRO_DIR = tmp_path / "repo/macro"
     report = safe_payload(
         status="labeled_observation_builder_pending_observations_waiting_settlement",
-        summary={"total_pending_row_count": 1, "eligible_pending_row_count": 1, "settled_market_count": 0, "label_row_count": 0},
+        summary={
+            "total_pending_row_count": 1,
+            "eligible_pending_row_count": 1,
+            "settled_market_count": 0,
+            "label_row_count": 0,
+        },
         gates=[],
-        pending_packet=safe_payload(rows=[{"hypothesis_id": "hyp", "contract_ticker": "KX", "side": "yes", "decision_time": "2026-07-01T00:00:00Z"}]),
+        pending_packet=safe_payload(
+            rows=[
+                {
+                    "hypothesis_id": "hyp",
+                    "contract_ticker": "KX",
+                    "side": "yes",
+                    "decision_time": "2026-07-01T00:00:00Z",
+                }
+            ]
+        ),
         label_packet=safe_payload(rows=[]),
         pending_rows_sample=[],
         blocked_source_rows_sample=[],

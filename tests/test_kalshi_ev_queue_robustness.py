@@ -4,8 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-from predmarket.kalshi_execution_cost import kalshi_trade_fee
-
+from predmarket.kalshi_execution_cost import GENERAL_MAKER_FEE_RATE, kalshi_trade_fee
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_ev_queue_robustness.py"
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
@@ -74,8 +73,14 @@ def test_queue_robustness_marks_repeat_positive_as_cost_caveated(tmp_path: Path)
     queue_path = tmp_path / "queue.json"
     snapshot_dir = tmp_path / "snapshots"
     write_json(queue_path, queue_payload(queue_row()))
-    write_json(snapshot_dir / "snapshot-1.json", snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40))
-    write_json(snapshot_dir / "snapshot-2.json", snapshot_payload(created_at="2026-07-01T22:00:00Z", ask=0.41))
+    write_json(
+        snapshot_dir / "snapshot-1.json",
+        snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40),
+    )
+    write_json(
+        snapshot_dir / "snapshot-2.json",
+        snapshot_payload(created_at="2026-07-01T22:00:00Z", ask=0.41),
+    )
 
     report = robustness.build_queue_robustness(
         queue_path=queue_path,
@@ -84,7 +89,9 @@ def test_queue_robustness_marks_repeat_positive_as_cost_caveated(tmp_path: Path)
         min_robust_margin=0.02,
     )
 
-    expected_latest_break_even = 0.41 + kalshi_trade_fee(price=0.41)
+    expected_latest_break_even = 0.41 + kalshi_trade_fee(
+        price=0.41, fee_rate=GENERAL_MAKER_FEE_RATE
+    )
     assert report["status"] == "kalshi_ev_queue_robustness_repeat_positive_cost_caveated"
     assert report["research_only"] is True
     assert report["execution_enabled"] is False
@@ -121,7 +128,9 @@ def test_queue_robustness_dedupes_latest_snapshot_by_created_at(tmp_path: Path) 
     )
 
     assert report["summary"]["distinct_snapshot_count"] == 1
-    assert report["rows"][0]["latest_all_in_break_even"] == 0.41 + kalshi_trade_fee(price=0.41)
+    assert report["rows"][0]["latest_all_in_break_even"] == 0.41 + kalshi_trade_fee(
+        price=0.41, fee_rate=GENERAL_MAKER_FEE_RATE
+    )
     assert "kalshi_mlb_game_series_20260701T220000Z.json" in report["snapshots"][0]["path"]
 
 
@@ -130,8 +139,14 @@ def test_queue_robustness_blocks_when_positive_margin_does_not_repeat(tmp_path: 
     queue_path = tmp_path / "queue.json"
     snapshot_dir = tmp_path / "snapshots"
     write_json(queue_path, queue_payload(queue_row(calibrated_probability=0.43)))
-    write_json(snapshot_dir / "snapshot-1.json", snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40))
-    write_json(snapshot_dir / "snapshot-2.json", snapshot_payload(created_at="2026-07-01T22:00:00Z", ask=0.45))
+    write_json(
+        snapshot_dir / "snapshot-1.json",
+        snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40),
+    )
+    write_json(
+        snapshot_dir / "snapshot-2.json",
+        snapshot_payload(created_at="2026-07-01T22:00:00Z", ask=0.45),
+    )
 
     report = robustness.build_queue_robustness(
         queue_path=queue_path,
@@ -153,7 +168,10 @@ def test_queue_robustness_writer_emits_json_markdown_and_csv(tmp_path: Path) -> 
     queue_path = tmp_path / "queue.json"
     snapshot_dir = tmp_path / "snapshots"
     write_json(queue_path, queue_payload(queue_row()))
-    write_json(snapshot_dir / "snapshot-1.json", snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40))
+    write_json(
+        snapshot_dir / "snapshot-1.json",
+        snapshot_payload(created_at="2026-07-01T20:00:00Z", ask=0.40),
+    )
 
     report = robustness.build_queue_robustness(
         queue_path=queue_path,

@@ -1170,3 +1170,144 @@ def _status_for_decision(router, repo_id: str, priority: int, evidence_status: s
             "stop_condition": f"{repo_id} stop",
         },
     }
+
+
+# ---------------------------------------------------------------------------
+# Family-aware sports router entries (VAL-ORCH-015..018, 025)
+# ---------------------------------------------------------------------------
+
+SPORTS_SIGNAL_STATUSES = [
+    "signal_factory_sports_stack_sequencing_ready_current_depth_passed",
+    "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked",
+    "signal_factory_sports_baseball_feature_packet_ready",
+    "signal_factory_sports_baseball_observations_waiting_settlement",
+    "signal_factory_sports_baseball_labels_ready",
+    "signal_factory_probability_breadth_scout_ready_sports_baseball_route",
+]
+
+SPORTS_BLOCKED_STATUSES = [
+    "signal_factory_sports_baseball_blocked_missing_feature_packet",
+]
+
+
+def _apply_scheduling_for(router, evidence_status: str) -> dict:
+    return router.apply_scheduling(
+        {
+            "repo_id": "predmarket-alpha",
+            "git": {
+                "dirty_counts": {"total": 0},
+                "risk_flags": {
+                    "staged_changes": False,
+                    "deleted_paths": False,
+                    "ide_or_temp_paths": False,
+                },
+            },
+            "evidence": {"status": evidence_status},
+        }
+    )
+
+
+def test_sports_signal_factory_status_routes_to_positive_priority() -> None:
+    """VAL-ORCH-015: sports statuses get priority >= 0, tier parity with crypto."""
+    router = load_router_module()
+    for sports_status in SPORTS_SIGNAL_STATUSES:
+        status = _apply_scheduling_for(router, sports_status)
+        assert status["scheduling"]["priority"] >= 0, f"{sports_status} priority < 0"
+        # Tier parity: compare with a comparable crypto status.
+        crypto_status = _apply_scheduling_for(
+            router, "signal_factory_crypto_proxy_feature_packet_ready"
+        )
+        assert (
+            status["scheduling"]["score_components"]["architecture_leverage"]
+            == crypto_status["scheduling"]["score_components"]["architecture_leverage"]
+        )
+
+
+def test_sports_signal_factory_status_routes_to_sports_tranche() -> None:
+    """VAL-ORCH-016: sports status -> sports tranche, not generic fallback."""
+    router = load_router_module()
+    for sports_status in SPORTS_SIGNAL_STATUSES:
+        status = _apply_scheduling_for(router, sports_status)
+        tranche = status["scheduling"]["recommended_next_tranche"]
+        assert "sports" in tranche.lower() or "baseball" in tranche.lower(), (
+            f"{sports_status} tranche does not mention sports: {tranche}"
+        )
+        assert tranche != router.KALSHI_SIGNAL_FACTORY_TRANCHE, (
+            f"{sports_status} fell through to generic KALSHI_SIGNAL_FACTORY_TRANCHE"
+        )
+        stop = status["scheduling"]["stop_condition"]
+        assert "execution" in stop.lower() or "account" in stop.lower() or "order" in stop.lower()
+
+
+def test_every_sports_status_has_parked_unlock_entry() -> None:
+    """VAL-ORCH-017: every signal_factory_sports_* status has a PARKED_UNLOCKS entry."""
+    router = load_router_module()
+    all_sports_statuses = SPORTS_SIGNAL_STATUSES + SPORTS_BLOCKED_STATUSES
+    for sports_status in all_sports_statuses:
+        assert sports_status in router.PARKED_UNLOCKS, (
+            f"{sports_status} missing from PARKED_UNLOCKS"
+        )
+        unlock = router.PARKED_UNLOCKS[sports_status]
+        assert unlock, f"{sports_status} has empty PARKED_UNLOCKS value"
+        assert "sport" in unlock.lower() or "baseball" in unlock.lower(), (
+            f"{sports_status} unlock does not mention sports: {unlock}"
+        )
+
+
+def test_sports_parked_state_routes_to_command_center() -> None:
+    """VAL-ORCH-018: sports-led predmarket parked -> command center + blocker summary."""
+    router = load_router_module()
+    statuses = [
+        _status_for_decision(
+            router, "mlb-platform", -4, "primary_type2_pregame_intake_blocked_missing_operator_drop"
+        ),
+        _status_for_decision(
+            router,
+            "nfl_quant_glm51_greenfield",
+            -4,
+            "governance_macro_export_ready_fresh_snapshots_research_only",
+        ),
+        _status_for_decision(
+            router,
+            "predmarket-alpha",
+            -3,
+            "signal_factory_sports_baseball_blocked_missing_feature_packet",
+        ),
+    ]
+
+    decision = router.decide(statuses)
+
+    assert decision["all_lanes_parked"] is True
+    assert decision["recommended_repo_id"] == "predmarket-alpha"
+    assert decision["recommended_next_tranche"] == router.PARKED_COMMAND_CENTER_TRANCHE
+    assert len(decision["blocker_summary"]) >= 1
+    blocker_statuses = [item.get("status") for item in decision["blocker_summary"]]
+    assert "signal_factory_sports_baseball_blocked_missing_feature_packet" in blocker_statuses
+
+
+def test_crypto_router_priority_unchanged_after_sports_additions() -> None:
+    """VAL-ORCH-025: crypto statuses keep the same priority and tranche."""
+    router = load_router_module()
+    crypto_statuses = [
+        "signal_factory_crypto_proxy_feature_packet_ready",
+        "signal_factory_foundation_ready",
+        "signal_factory_probability_breadth_scout_ready_crypto_proxy_route",
+        "signal_factory_crypto_proxy_labels_ready",
+    ]
+    for crypto_status in crypto_statuses:
+        status = _apply_scheduling_for(router, crypto_status)
+        assert status["scheduling"]["priority"] > 0
+        assert (
+            "Kalshi signal-factory command center"
+            in status["scheduling"]["recommended_next_tranche"]
+        )
+
+
+def test_sports_blocked_status_has_lower_priority_tier() -> None:
+    """Sports blocked statuses get lower priority like crypto blocked."""
+    router = load_router_module()
+    for blocked_status in SPORTS_BLOCKED_STATUSES:
+        status = _apply_scheduling_for(router, blocked_status)
+        # Should still be recognized (not base fallback) but lower priority.
+        components = status["scheduling"]["score_components"]
+        assert components["architecture_leverage"] == 5

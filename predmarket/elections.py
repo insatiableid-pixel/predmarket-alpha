@@ -12,7 +12,6 @@ The three-component approach mirrors established practice:
 
 import logging
 import time
-from typing import Dict, List, Optional, Any
 
 import numpy as np
 from scipy.special import expit as sigmoid
@@ -41,7 +40,7 @@ class ElectionModel:
     # Component 1: Fundamental model (Fair 1978, simplified)
     # ------------------------------------------------------------------
 
-    def fundamental_forecast(self, economic_data: Dict[str, float]) -> float:
+    def fundamental_forecast(self, economic_data: dict[str, float]) -> float:
         """Predict incumbent-party win probability from economic fundamentals.
 
         Uses a simplified Fair (1978) model:
@@ -67,9 +66,7 @@ class ElectionModel:
     # Component 2: Polling aggregation
     # ------------------------------------------------------------------
 
-    def polling_aggregate(
-        self, polls: List[Dict[str, float]], decay: float = 0.9
-    ) -> float:
+    def polling_aggregate(self, polls: list[dict[str, float]], decay: float = 0.9) -> float:
         """Compute recency-weighted polling average.
 
         Each poll is weighted by decay^(days_ago) * sqrt(sample_size).
@@ -99,7 +96,7 @@ class ElectionModel:
         for poll in polls:
             days_ago = max(0.0, (now - poll.get("date", now)) / day_seconds)
             sample_size = poll.get("sample_size", 500)
-            weight = (decay ** days_ago) * np.sqrt(sample_size)
+            weight = (decay**days_ago) * np.sqrt(sample_size)
             weighted_sum += poll.get("yes_share", 0.5) * weight
             weight_total += weight
 
@@ -111,7 +108,7 @@ class ElectionModel:
     # Component 3: Expert aggregation
     # ------------------------------------------------------------------
 
-    def expert_aggregate(self, experts: List[Dict[str, float]]) -> float:
+    def expert_aggregate(self, experts: list[dict[str, float]]) -> float:
         """Aggregate expert probability estimates via median.
 
         Args:
@@ -135,9 +132,9 @@ class ElectionModel:
 
     def combined_election_forecast(
         self,
-        economic_data: Optional[Dict[str, float]] = None,
-        polls: Optional[List[Dict[str, float]]] = None,
-        experts: Optional[List[Dict[str, float]]] = None,
+        economic_data: dict[str, float] | None = None,
+        polls: list[dict[str, float]] | None = None,
+        experts: list[dict[str, float]] | None = None,
     ) -> DensityForecast:
         """Produce a combined density forecast from all available inputs.
 
@@ -152,8 +149,8 @@ class ElectionModel:
         Returns:
             DensityForecast with combined probability and uncertainty.
         """
-        components: Dict[str, float] = {}
-        weights: Dict[str, float] = {}
+        components: dict[str, float] = {}
+        weights: dict[str, float] = {}
 
         if economic_data is not None:
             components["fundamentals"] = self.fundamental_forecast(economic_data)
@@ -176,9 +173,7 @@ class ElectionModel:
         norm_weights = {k: v / w_sum for k, v in weights.items()}
 
         # Weighted combination
-        combined_prob = sum(
-            components[k] * norm_weights[k] for k in components
-        )
+        combined_prob = sum(components[k] * norm_weights[k] for k in components)
 
         # Uncertainty: wider if components disagree
         if len(components) > 1:
@@ -201,7 +196,7 @@ class ElectionDataIngest:
     - Internal expert survey system
     """
 
-    def fetch_polls(self, race_id: str) -> List[Dict]:
+    def fetch_polls(self, race_id: str) -> list[dict]:
         """Fetch polling data for a specific race.
 
         Args:
@@ -213,7 +208,7 @@ class ElectionDataIngest:
         logger.info("Poll fetch requested for race %s — stub returning empty.", race_id)
         return []
 
-    def fetch_fundamentals(self, race_id: str) -> Dict[str, float]:
+    def fetch_fundamentals(self, race_id: str) -> dict[str, float]:
         """Fetch economic fundamental data relevant to a race.
 
         Args:
@@ -222,9 +217,7 @@ class ElectionDataIngest:
         Returns:
             Dict with gdp_growth, inflation, unemployment_change (defaults).
         """
-        logger.info(
-            "Fundamental fetch requested for race %s — returning defaults.", race_id
-        )
+        logger.info("Fundamental fetch requested for race %s — returning defaults.", race_id)
         return {
             "gdp_growth": 2.0,
             "inflation": 2.5,

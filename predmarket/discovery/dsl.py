@@ -8,7 +8,8 @@ from __future__ import annotations
 
 import ast
 import math
-from typing import Any, Dict, Iterable, List, Sequence, Set
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 import numpy as np
 
@@ -47,11 +48,14 @@ class SafeSignalDSL:
         self.feature_catalog = {str(name) for name in feature_catalog}
 
     @staticmethod
-    def discover_feature_catalog(rows: Sequence[Dict[str, Any]]) -> List[str]:
-        names: Set[str] = set()
+    def discover_feature_catalog(rows: Sequence[dict[str, Any]]) -> list[str]:
+        names: set[str] = set()
         for row in rows:
             for key, value in row.items():
-                if key.endswith("_available_ts") or key in {"feature_available_ts", "_feature_available_ts"}:
+                if key.endswith("_available_ts") or key in {
+                    "feature_available_ts",
+                    "_feature_available_ts",
+                }:
                     continue
                 if SafeSignalDSL._is_forbidden_feature(key):
                     continue
@@ -79,7 +83,7 @@ class SafeSignalDSL:
         tree = self._parse(expression)
         return sum(1 for _ in ast.walk(tree))
 
-    def referenced_features(self, expression: str) -> Set[str]:
+    def referenced_features(self, expression: str) -> set[str]:
         tree = self._parse(expression)
         names = {
             node.id
@@ -93,7 +97,7 @@ class SafeSignalDSL:
                 raise DSLValidationError(f"unknown feature reference: {name}")
         return names
 
-    def validate(self, expression: str, rows: Sequence[Dict[str, Any]]) -> Set[str]:
+    def validate(self, expression: str, rows: Sequence[dict[str, Any]]) -> set[str]:
         features = self.referenced_features(expression)
         for feature in features:
             support = 0
@@ -109,7 +113,7 @@ class SafeSignalDSL:
                 raise DSLValidationError(f"feature has no support: {feature}")
         return features
 
-    def evaluate(self, expression: str, rows: Sequence[Dict[str, Any]]) -> List[float]:
+    def evaluate(self, expression: str, rows: Sequence[dict[str, Any]]) -> list[float]:
         if not rows:
             return []
         self.validate(expression, rows)
@@ -161,7 +165,7 @@ class SafeSignalDSL:
                 raise DSLValidationError("only numeric constants are supported")
         return tree
 
-    def _eval_node(self, node: ast.AST, rows: Sequence[Dict[str, Any]]) -> np.ndarray:
+    def _eval_node(self, node: ast.AST, rows: Sequence[dict[str, Any]]) -> np.ndarray:
         if isinstance(node, ast.Constant):
             return np.full(len(rows), float(node.value), dtype=float)
 
@@ -199,9 +203,7 @@ class SafeSignalDSL:
 
         raise DSLValidationError(f"unsupported syntax: {type(node).__name__}")
 
-    def _apply_function(
-        self, name: str, args: List[np.ndarray], n_rows: int
-    ) -> np.ndarray:
+    def _apply_function(self, name: str, args: list[np.ndarray], n_rows: int) -> np.ndarray:
         if name == "abs":
             self._check_arity(name, args, 1)
             return np.abs(args[0])
@@ -236,7 +238,7 @@ class SafeSignalDSL:
         raise DSLValidationError(f"unsupported function: {name}")
 
     @staticmethod
-    def _check_arity(name: str, args: List[np.ndarray], expected: int) -> None:
+    def _check_arity(name: str, args: list[np.ndarray], expected: int) -> None:
         if len(args) != expected:
             raise DSLValidationError(f"{name} expects {expected} arguments")
 
@@ -267,7 +269,7 @@ class SafeSignalDSL:
         return (values - float(np.mean(values))) / sd
 
     @staticmethod
-    def _validate_feature_as_of(feature: str, row: Dict[str, Any]) -> None:
+    def _validate_feature_as_of(feature: str, row: dict[str, Any]) -> None:
         as_of_ts = float(row.get("as_of_ts", 0.0))
         direct_key = f"{feature}_available_ts"
         available_ts = None

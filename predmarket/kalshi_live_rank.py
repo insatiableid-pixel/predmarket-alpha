@@ -14,10 +14,11 @@ import json
 import logging
 import math
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
 from types import SimpleNamespace
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -26,17 +27,18 @@ from predmarket.discovery.dsl import DSLValidationError, SafeSignalDSL
 from predmarket.kalshi_dataset import (
     KalshiMarketDataClient,
     KalshiResolvedDatasetBuilder,
-    fill_probability,
-    horizon_bucket,
-    infer_resolution_source,
-    infer_series_ticker,
-    liquidity_bucket,
     _bounded_probability,
     _fp,
     _money,
     _stable_hash,
     _timestamp,
+    fill_probability,
+    horizon_bucket,
+    infer_resolution_source,
+    infer_series_ticker,
+    liquidity_bucket,
 )
+from predmarket.kalshi_execution_cost import GENERAL_MAKER_FEE_RATE, kalshi_trade_fee
 from predmarket.store import PointInTimeStore
 
 logger = logging.getLogger("predmarket.kalshi_live_rank")
@@ -46,7 +48,7 @@ logger = logging.getLogger("predmarket.kalshi_live_rank")
 class KalshiLiveRankConfig:
     limit: int = 100
     max_pages: int = 1
-    series_ticker: Optional[str] = None
+    series_ticker: str | None = None
     status: str = "open"
     fetch_orderbooks: bool = False
     fetch_candles: bool = False
@@ -59,18 +61,18 @@ class KalshiLiveRankConfig:
     min_fill_probability: float = 0.20
     min_liquidity_adjusted_edge: float = 0.02
     min_time_to_close_hours: float = 1.0
-    discovery_report_path: Optional[Path] = None
+    discovery_report_path: Path | None = None
 
 
 @dataclass
 class KalshiLivePanel:
-    rows: List[Dict[str, Any]]
-    skipped_markets: List[Dict[str, Any]]
+    rows: list[dict[str, Any]]
+    skipped_markets: list[dict[str, Any]]
 
 
 @dataclass
 class KalshiLiveRankArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
@@ -78,10 +80,10 @@ class KalshiLiveRankArtifacts:
 def build_live_row(
     market: Mapping[str, Any],
     *,
-    orderbook: Optional[Mapping[str, Any]] = None,
-    candlesticks: Optional[Sequence[Mapping[str, Any]]] = None,
-    as_of_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    orderbook: Mapping[str, Any] | None = None,
+    candlesticks: Sequence[Mapping[str, Any]] | None = None,
+    as_of_ts: float | None = None,
+) -> dict[str, Any]:
     """Convert a current Kalshi market payload into discovery-compatible features."""
     ts = float(as_of_ts or time.time())
     ticker = str(market.get("ticker") or market.get("market_id") or "")
@@ -110,7 +112,7 @@ def build_live_row(
     volume_lifetime = _fp(market.get("volume_fp", market.get("volume"))) or 0.0
     quote = _live_quote_features(market, orderbook or {}, candlesticks or [])
 
-    row: Dict[str, Any] = {
+    row: dict[str, Any] = {
         "row_schema_version": 2,
         "venue": "Kalshi",
         "event_id": event_id,
@@ -139,14 +141,20 @@ def build_live_row(
         "created_ts": float(created_ts),
         "as_of_ts": ts,
         "market_age_hours": max((ts - float(created_ts)) / 3600.0, 0.0),
-        "market_age_hours_at_close": max((float(effective_end_ts) - float(created_ts)) / 3600.0, 0.0),
+        "market_age_hours_at_close": max(
+            (float(effective_end_ts) - float(created_ts)) / 3600.0, 0.0
+        ),
         "time_to_close_hours": max(((close_ts or effective_end_ts) - ts) / 3600.0, 0.0),
         "time_to_expiration_hours": max(((expiration_ts or effective_end_ts) - ts) / 3600.0, 0.0),
         "horizon": horizon_bucket(max(float(effective_end_ts) - ts, 0.0)),
         "settlement_timer_hours": float(market.get("settlement_timer_seconds") or 0.0) / 3600.0,
         "can_close_early": 1.0 if bool(market.get("can_close_early")) else 0.0,
-        "has_early_close_condition": 1.0 if str(market.get("early_close_condition") or "").strip() else 0.0,
-        "fractional_trading_enabled": 1.0 if bool(market.get("fractional_trading_enabled")) else 0.0,
+        "has_early_close_condition": 1.0
+        if str(market.get("early_close_condition") or "").strip()
+        else 0.0,
+        "fractional_trading_enabled": 1.0
+        if bool(market.get("fractional_trading_enabled"))
+        else 0.0,
         "liquidity_dollars": liquidity,
         "open_interest": open_interest,
         "volume_24h": volume_24h,
@@ -168,12 +176,12 @@ async def fetch_live_kalshi_panel(
     config: Config,
     rank_config: KalshiLiveRankConfig,
     *,
-    store: Optional[PointInTimeStore] = None,
-    as_of_ts: Optional[float] = None,
+    store: PointInTimeStore | None = None,
+    as_of_ts: float | None = None,
 ) -> KalshiLivePanel:
     ts = float(as_of_ts or time.time())
-    rows: List[Dict[str, Any]] = []
-    skipped: List[Dict[str, Any]] = []
+    rows: list[dict[str, Any]] = []
+    skipped: list[dict[str, Any]] = []
     async with KalshiMarketDataClient(config) as client:
         markets = await client.fetch_markets(
             status=rank_config.status,
@@ -187,7 +195,7 @@ async def fetch_live_kalshi_panel(
                 skipped.append({"reason": "missing_ticker", "market": dict(market)})
                 continue
 
-            orderbook: Dict[str, Any] = {}
+            orderbook: dict[str, Any] = {}
             if rank_config.fetch_orderbooks:
                 try:
                     orderbook = await client.fetch_orderbook(
@@ -204,7 +212,7 @@ async def fetch_live_kalshi_panel(
                     )
                     logger.warning("Kalshi orderbook fetch failed for %s: %s", ticker, exc)
 
-            candles: List[Dict[str, Any]] = []
+            candles: list[dict[str, Any]] = []
             if rank_config.fetch_candles:
                 try:
                     candles = await client.fetch_candlesticks(
@@ -242,8 +250,8 @@ def persist_live_snapshot(
     store: PointInTimeStore,
     row: Mapping[str, Any],
     *,
-    market: Optional[Mapping[str, Any]] = None,
-    orderbook: Optional[Mapping[str, Any]] = None,
+    market: Mapping[str, Any] | None = None,
+    orderbook: Mapping[str, Any] | None = None,
 ) -> None:
     snapshot = SimpleNamespace(
         venue="Kalshi",
@@ -290,8 +298,8 @@ def persist_live_snapshot(
 def load_discovery_report(
     *,
     reports_dir: Path,
-    explicit_path: Optional[Path] = None,
-) -> Tuple[Optional[Dict[str, Any]], Optional[Path]]:
+    explicit_path: Path | None = None,
+) -> tuple[dict[str, Any] | None, Path | None]:
     if explicit_path is not None:
         if not explicit_path.exists():
             return None, explicit_path
@@ -312,10 +320,10 @@ def load_discovery_report(
 def rank_live_rows(
     rows: Sequence[Mapping[str, Any]],
     *,
-    config: Optional[KalshiLiveRankConfig] = None,
-    discovery_report: Optional[Mapping[str, Any]] = None,
-    discovery_report_path: Optional[Path] = None,
-) -> Dict[str, Any]:
+    config: KalshiLiveRankConfig | None = None,
+    discovery_report: Mapping[str, Any] | None = None,
+    discovery_report_path: Path | None = None,
+) -> dict[str, Any]:
     rank_config = config or KalshiLiveRankConfig()
     row_dicts = [dict(row) for row in rows if str(row.get("venue", "")).lower() == "kalshi"]
     hypothesis_scores, score_meta = score_rows_with_hypotheses(row_dicts, discovery_report)
@@ -338,9 +346,7 @@ def rank_live_rows(
         used_hypotheses = model_payload.get("used_hypotheses", [])
         scoring_mode = "hypothesis_edge" if used_hypotheses else "watchlist_vulnerability"
         ranking_score = (
-            liquidity_adjusted_edge + 0.02 * vulnerability
-            if used_hypotheses
-            else vulnerability
+            liquidity_adjusted_edge + 0.02 * vulnerability if used_hypotheses else vulnerability
         )
         blocking_reasons = blocking_reasons_for_row(
             row,
@@ -381,7 +387,9 @@ def rank_live_rows(
                 },
                 "used_hypotheses": used_hypotheses,
                 "blocking_reasons": blocking_reasons,
-                "candidate_status": "RESEARCH_ONLY_PASS" if not blocking_reasons else "RESEARCH_ONLY_BLOCKED",
+                "candidate_status": "RESEARCH_ONLY_PASS"
+                if not blocking_reasons
+                else "RESEARCH_ONLY_BLOCKED",
                 "scoring_mode": scoring_mode,
             }
         )
@@ -419,8 +427,8 @@ def rank_live_rows(
 
 def score_rows_with_hypotheses(
     rows: Sequence[Mapping[str, Any]],
-    discovery_report: Optional[Mapping[str, Any]],
-) -> Tuple[List[Dict[str, Any]], Dict[str, Any]]:
+    discovery_report: Mapping[str, Any] | None,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
     if not rows:
         return [], {"usable_hypotheses": 0, "rejected_hypotheses": []}
     hypotheses = list((discovery_report or {}).get("top_hypotheses", []))
@@ -434,13 +442,15 @@ def score_rows_with_hypotheses(
     dsl = SafeSignalDSL(feature_catalog)
     weighted = np.zeros(len(rows), dtype=float)
     total_weight = np.zeros(len(rows), dtype=float)
-    used_by_row: List[List[Dict[str, Any]]] = [[] for _ in rows]
-    rejected: List[Dict[str, Any]] = []
+    used_by_row: list[list[dict[str, Any]]] = [[] for _ in rows]
+    rejected: list[dict[str, Any]] = []
 
     for hypothesis in hypotheses:
         expression = str(hypothesis.get("expression") or "")
         if not expression:
-            rejected.append({"hypothesis_id": hypothesis.get("hypothesis_id"), "reason": "missing_expression"})
+            rejected.append(
+                {"hypothesis_id": hypothesis.get("hypothesis_id"), "reason": "missing_expression"}
+            )
             continue
         try:
             values = np.asarray(dsl.evaluate(expression, [dict(row) for row in rows]), dtype=float)
@@ -491,7 +501,7 @@ def blocking_reasons_for_row(
     directional_edge: float,
     used_hypotheses: bool,
     config: KalshiLiveRankConfig,
-) -> List[str]:
+) -> list[str]:
     reasons = []
     if not used_hypotheses:
         reasons.append("watchlist_only_no_usable_discovery_hypothesis")
@@ -572,10 +582,10 @@ def render_live_rank_markdown(report: Mapping[str, Any]) -> str:
 def run_kalshi_live_rank(
     store: PointInTimeStore,
     *,
-    app_config: Optional[Config] = None,
-    config: Optional[KalshiLiveRankConfig] = None,
-    rows: Optional[Sequence[Mapping[str, Any]]] = None,
-    reports_dir: Optional[Path] = None,
+    app_config: Config | None = None,
+    config: KalshiLiveRankConfig | None = None,
+    rows: Sequence[Mapping[str, Any]] | None = None,
+    reports_dir: Path | None = None,
 ) -> KalshiLiveRankArtifacts:
     app_config = app_config or load_config()
     rank_config = config or KalshiLiveRankConfig()
@@ -602,9 +612,9 @@ def run_kalshi_live_rank(
     return write_live_rank_report(report, reports_dir=out_dir)
 
 
-def summarize_live_rows(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    def counts(field: str) -> Dict[str, int]:
-        out: Dict[str, int] = {}
+def summarize_live_rows(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    def counts(field: str) -> dict[str, int]:
+        out: dict[str, int] = {}
         for row in rows:
             key = str(row.get(field, "unknown"))
             out[key] = out.get(key, 0) + 1
@@ -655,12 +665,15 @@ def vulnerability_score(row: Mapping[str, Any]) -> float:
 
 def orderbook_to_yes_bids_and_asks(
     orderbook: Mapping[str, Any],
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     features = _orderbook_features(orderbook)
     yes_levels = features.get("yes_levels", [])
     no_levels = features.get("no_levels", [])
     asks = [
-        {"price": round(float(np.clip(1.0 - level["price"], 0.01, 0.99)), 10), "size": level["size"]}
+        {
+            "price": round(float(np.clip(1.0 - level["price"], 0.01, 0.99)), 10),
+            "size": level["size"],
+        }
         for level in no_levels
     ]
     asks.sort(key=lambda level: level["price"])
@@ -679,7 +692,7 @@ def stable_live_row_id(row: Mapping[str, Any]) -> str:
 def stable_live_rank_run_id(
     rows: Sequence[Mapping[str, Any]],
     config: KalshiLiveRankConfig,
-    discovery_report: Optional[Mapping[str, Any]],
+    discovery_report: Mapping[str, Any] | None,
 ) -> str:
     payload = {
         "markets": [row.get("row_id") for row in rows[:1000]],
@@ -693,7 +706,7 @@ def _live_quote_features(
     market: Mapping[str, Any],
     orderbook: Mapping[str, Any],
     candlesticks: Sequence[Mapping[str, Any]],
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     book = _orderbook_features(orderbook)
     latest_candle = _latest_candle(candlesticks)
     candle_price = _candle_price(latest_candle)
@@ -715,14 +728,22 @@ def _live_quote_features(
     if ask < bid:
         ask = bid
     spread = max(ask - bid, 0.0)
-    candle_volume = _fp((latest_candle or {}).get("volume_fp", (latest_candle or {}).get("volume"))) or 0.0
+    candle_volume = (
+        _fp((latest_candle or {}).get("volume_fp", (latest_candle or {}).get("volume"))) or 0.0
+    )
     candle_open_interest = (
-        _fp((latest_candle or {}).get("open_interest_fp", (latest_candle or {}).get("open_interest")))
+        _fp(
+            (latest_candle or {}).get(
+                "open_interest_fp", (latest_candle or {}).get("open_interest")
+            )
+        )
         or _fp(market.get("open_interest_fp", market.get("open_interest")))
         or 0.0
     )
     volume = _fp(market.get("volume_24h_fp", market.get("volume_24h"))) or candle_volume
-    open_interest = _fp(market.get("open_interest_fp", market.get("open_interest"))) or candle_open_interest
+    open_interest = (
+        _fp(market.get("open_interest_fp", market.get("open_interest"))) or candle_open_interest
+    )
     return {
         "market_implied": implied,
         "execution_price": min(ask, 0.99),
@@ -742,29 +763,22 @@ def _live_quote_features(
         "orderbook_no_depth": float(book.get("no_depth", 0.0)),
         "top_yes_bid_size": float(book.get("top_yes_bid_size", 0.0)),
         "top_no_bid_size": float(book.get("top_no_bid_size", 0.0)),
-        "fees": 0.0015,
+        "fees": kalshi_trade_fee(price=implied, fee_rate=GENERAL_MAKER_FEE_RATE),
         "slippage": min(max(spread * 0.25, 0.0), 0.05),
         "fill_probability": fill_probability(spread, volume, open_interest),
         "raw_candlestick_json": json.dumps(dict(latest_candle or {}), sort_keys=True, default=str),
     }
 
 
-def _orderbook_features(orderbook: Mapping[str, Any]) -> Dict[str, Any]:
+def _orderbook_features(orderbook: Mapping[str, Any]) -> dict[str, Any]:
     book = orderbook.get("orderbook_fp") or orderbook.get("orderbook") or orderbook
     if not isinstance(book, Mapping):
         book = {}
     yes_levels = _normalize_book_levels(
-        book.get("yes_dollars")
-        or book.get("yes")
-        or book.get("true")
-        or book.get("bids")
-        or []
+        book.get("yes_dollars") or book.get("yes") or book.get("true") or book.get("bids") or []
     )
     no_levels = _normalize_book_levels(
-        book.get("no_dollars")
-        or book.get("no")
-        or book.get("false")
-        or []
+        book.get("no_dollars") or book.get("no") or book.get("false") or []
     )
     yes_bid = yes_levels[0]["price"] if yes_levels else None
     no_bid = no_levels[0]["price"] if no_levels else None
@@ -785,8 +799,8 @@ def _orderbook_features(orderbook: Mapping[str, Any]) -> Dict[str, Any]:
     }
 
 
-def _normalize_book_levels(levels: Any) -> List[Dict[str, float]]:
-    out: List[Dict[str, float]] = []
+def _normalize_book_levels(levels: Any) -> list[dict[str, float]]:
+    out: list[dict[str, float]] = []
     if not isinstance(levels, Sequence) or isinstance(levels, (str, bytes)):
         return out
     for level in levels:
@@ -800,7 +814,9 @@ def _normalize_book_levels(levels: Any) -> List[Dict[str, float]]:
                 or level.get("no_price")
             )
             size_raw = level.get("size_fp") or level.get("size") or level.get("quantity")
-        elif isinstance(level, Sequence) and not isinstance(level, (str, bytes)) and len(level) >= 2:
+        elif (
+            isinstance(level, Sequence) and not isinstance(level, (str, bytes)) and len(level) >= 2
+        ):
             price_raw = level[0]
             size_raw = level[1]
         price = _money(price_raw)
@@ -831,18 +847,18 @@ def _values_to_probabilities(values: np.ndarray, rows: Sequence[Mapping[str, Any
     return np.clip(baseline + 0.15 * SafeSignalDSL._zscore(values), 0.01, 0.99)
 
 
-def _latest_candle(candlesticks: Sequence[Mapping[str, Any]]) -> Optional[Mapping[str, Any]]:
+def _latest_candle(candlesticks: Sequence[Mapping[str, Any]]) -> Mapping[str, Any] | None:
     valid = [
-        candle
-        for candle in candlesticks
-        if _timestamp(candle.get("end_period_ts")) is not None
+        candle for candle in candlesticks if _timestamp(candle.get("end_period_ts")) is not None
     ]
     if not valid:
         return None
-    return sorted(valid, key=lambda candle: float(_timestamp(candle.get("end_period_ts")) or 0.0))[-1]
+    return sorted(valid, key=lambda candle: float(_timestamp(candle.get("end_period_ts")) or 0.0))[
+        -1
+    ]
 
 
-def _candle_price(candle: Optional[Mapping[str, Any]]) -> Optional[float]:
+def _candle_price(candle: Mapping[str, Any] | None) -> float | None:
     if not candle:
         return None
     price = candle.get("price") or {}
@@ -851,7 +867,7 @@ def _candle_price(candle: Optional[Mapping[str, Any]]) -> Optional[float]:
     return _money(price.get("close_dollars", price.get("close")))
 
 
-def _candle_previous(candle: Optional[Mapping[str, Any]]) -> Optional[float]:
+def _candle_previous(candle: Mapping[str, Any] | None) -> float | None:
     if not candle:
         return None
     price = candle.get("price") or {}
@@ -860,7 +876,7 @@ def _candle_previous(candle: Optional[Mapping[str, Any]]) -> Optional[float]:
     return _money(price.get("previous_dollars", price.get("previous")))
 
 
-def _words(text: str) -> List[str]:
+def _words(text: str) -> list[str]:
     return [word for word in text.replace("/", " ").replace("-", " ").split() if word.strip()]
 
 
@@ -903,14 +919,20 @@ def _has_threshold_terms(text: str) -> bool:
     return any(token in lowered for token in tokens) or any(ch.isdigit() for ch in lowered)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Rank live Kalshi markets for research-only review")
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Rank live Kalshi markets for research-only review"
+    )
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=1)
     parser.add_argument("--series-ticker", default=None)
     parser.add_argument("--status", default="open")
-    parser.add_argument("--orderbooks", action="store_true", help="Attempt per-market orderbook enrichment")
-    parser.add_argument("--candles", action="store_true", help="Attempt per-market candlestick enrichment")
+    parser.add_argument(
+        "--orderbooks", action="store_true", help="Attempt per-market orderbook enrichment"
+    )
+    parser.add_argument(
+        "--candles", action="store_true", help="Attempt per-market candlestick enrichment"
+    )
     parser.add_argument("--orderbook-depth", type=int, default=10)
     parser.add_argument("--candle-lookback-hours", type=int, default=48)
     parser.add_argument("--period-interval", type=int, default=60, choices=[1, 60, 1440])

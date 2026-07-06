@@ -6,34 +6,37 @@ import argparse
 import json
 import math
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence
-
+from typing import Any
 
 DEFAULT_THRESHOLDS = (0.10, 0.075, 0.05, 0.025, 0.02, 0.015, 0.01, 0.005, 0.0)
 
 
 @dataclass(frozen=True)
 class Type2ThresholdSensitivityArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
 
 def build_type2_threshold_sensitivity(
     paper_report: Mapping[str, Any],
-    disposition_report: Optional[Mapping[str, Any]] = None,
+    disposition_report: Mapping[str, Any] | None = None,
     *,
-    paper_matcher_path: Optional[Path] = None,
-    disposition_path: Optional[Path] = None,
+    paper_matcher_path: Path | None = None,
+    disposition_path: Path | None = None,
     thresholds: Sequence[float] = DEFAULT_THRESHOLDS,
-    run_id: Optional[str] = None,
-    created_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    run_id: str | None = None,
+    created_ts: float | None = None,
+) -> dict[str, Any]:
     ts = float(created_ts or time.time())
-    candidates = [_candidate_row(row, idx) for idx, row in enumerate(_rows(paper_report, "candidates"), start=1)]
+    candidates = [
+        _candidate_row(row, idx)
+        for idx, row in enumerate(_rows(paper_report, "candidates"), start=1)
+    ]
     disposition_by_ticker = _disposition_by_ticker(disposition_report or {})
     enriched = [_with_disposition(row, disposition_by_ticker) for row in candidates]
     timing_clean = [
@@ -42,24 +45,32 @@ def build_type2_threshold_sensitivity(
         if row["timing_status"] in {"timing_clean_watch", "timing_clean_review"}
     ]
     positive = [row for row in timing_clean if row["review_only_net_divergence"] > 0.0]
-    sorted_positive = sorted(positive, key=lambda row: row["review_only_net_divergence"], reverse=True)
+    sorted_positive = sorted(
+        positive, key=lambda row: row["review_only_net_divergence"], reverse=True
+    )
     current_threshold = _current_threshold(paper_report)
     max_net = sorted_positive[0]["review_only_net_divergence"] if sorted_positive else 0.0
     gap_to_current = max(0.0, current_threshold - max_net)
     threshold_rows = [
         _threshold_row(threshold, timing_clean)
-        for threshold in sorted({_finite_float(value) for value in thresholds if _finite_float(value) is not None}, reverse=True)
+        for threshold in sorted(
+            {_finite_float(value) for value in thresholds if _finite_float(value) is not None},
+            reverse=True,
+        )
     ]
     status = (
         "threshold_sensitivity_current_threshold_has_candidates"
-        if any(row["threshold"] == current_threshold and row["would_pass_count"] > 0 for row in threshold_rows)
+        if any(
+            row["threshold"] == current_threshold and row["would_pass_count"] > 0
+            for row in threshold_rows
+        )
         else "threshold_sensitivity_no_current_threshold_candidates"
     )
     report = {
         "schema_version": 1,
         "run_id": run_id or f"type2-threshold-sensitivity-{int(ts)}",
         "created_ts": ts,
-        "created_at_utc": datetime.fromtimestamp(ts, timezone.utc).isoformat().replace("+00:00", "Z"),
+        "created_at_utc": datetime.fromtimestamp(ts, UTC).isoformat().replace("+00:00", "Z"),
         "status": status,
         "research_only": True,
         "execution_enabled": False,
@@ -93,8 +104,12 @@ def build_type2_threshold_sensitivity(
                 1 for row in timing_clean if row["review_only_net_divergence"] >= current_threshold
             ),
             "minimum_hypothetical_threshold_for_one_candidate": max_net if max_net > 0.0 else None,
-            "temporal_downgrade_count": sum(1 for row in enriched if row["timing_status"] == "temporal_downgrade"),
-            "manual_timing_unknown_count": sum(1 for row in enriched if row["timing_status"] == "manual_timing_unknown"),
+            "temporal_downgrade_count": sum(
+                1 for row in enriched if row["timing_status"] == "temporal_downgrade"
+            ),
+            "manual_timing_unknown_count": sum(
+                1 for row in enriched if row["timing_status"] == "manual_timing_unknown"
+            ),
         },
         "threshold_grid": threshold_rows,
         "top_candidates": sorted_positive[:10],
@@ -105,9 +120,9 @@ def build_type2_threshold_sensitivity(
 def run_type2_threshold_sensitivity(
     *,
     paper_matcher_json: Path,
-    disposition_json: Optional[Path] = None,
+    disposition_json: Path | None = None,
     output_dir: Path,
-    run_id: Optional[str] = None,
+    run_id: str | None = None,
     thresholds: Sequence[float] = DEFAULT_THRESHOLDS,
 ) -> Type2ThresholdSensitivityArtifacts:
     paper_report = _read_json(paper_matcher_json)
@@ -198,7 +213,7 @@ def render_type2_threshold_sensitivity_markdown(report: Mapping[str, Any]) -> st
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _candidate_row(row: Mapping[str, Any], index: int) -> Dict[str, Any]:
+def _candidate_row(row: Mapping[str, Any], index: int) -> dict[str, Any]:
     return {
         "rank": index,
         "reference_id": row.get("reference_id"),
@@ -211,11 +226,15 @@ def _candidate_row(row: Mapping[str, Any], index: int) -> Dict[str, Any]:
         "raw_divergence": _float_or_zero(row.get("raw_divergence")),
         "review_only_net_divergence": _float_or_zero(row.get("review_only_net_divergence")),
         "threshold": _float_or_zero(row.get("threshold")),
-        "blockers": list(row.get("blockers", [])) if isinstance(row.get("blockers", []), list) else [],
+        "blockers": list(row.get("blockers", []))
+        if isinstance(row.get("blockers", []), list)
+        else [],
     }
 
 
-def _with_disposition(row: Mapping[str, Any], disposition_by_ticker: Mapping[str, Mapping[str, Any]]) -> Dict[str, Any]:
+def _with_disposition(
+    row: Mapping[str, Any], disposition_by_ticker: Mapping[str, Mapping[str, Any]]
+) -> dict[str, Any]:
     out = dict(row)
     disposition = disposition_by_ticker.get(str(row.get("kalshi_ticker") or ""))
     status = str((disposition or {}).get("disposition") or "")
@@ -234,9 +253,15 @@ def _with_disposition(row: Mapping[str, Any], disposition_by_ticker: Mapping[str
     return out
 
 
-def _threshold_row(threshold: float, candidates: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    passing = [row for row in candidates if float(row.get("review_only_net_divergence") or 0.0) >= threshold]
-    max_net = max((float(row.get("review_only_net_divergence") or 0.0) for row in candidates), default=0.0)
+def _threshold_row(threshold: float, candidates: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    passing = [
+        row
+        for row in candidates
+        if float(row.get("review_only_net_divergence") or 0.0) >= threshold
+    ]
+    max_net = max(
+        (float(row.get("review_only_net_divergence") or 0.0) for row in candidates), default=0.0
+    )
     return {
         "threshold": float(threshold),
         "would_pass_count": len(passing),
@@ -258,8 +283,8 @@ def _current_threshold(report: Mapping[str, Any]) -> float:
     return candidate_thresholds[0] if candidate_thresholds else 0.10
 
 
-def _disposition_by_ticker(report: Mapping[str, Any]) -> Dict[str, Mapping[str, Any]]:
-    out: Dict[str, Mapping[str, Any]] = {}
+def _disposition_by_ticker(report: Mapping[str, Any]) -> dict[str, Mapping[str, Any]]:
+    out: dict[str, Mapping[str, Any]] = {}
     for row in _rows(report, "dispositions"):
         ticker = str(row.get("kalshi_ticker") or "")
         if ticker:
@@ -267,20 +292,20 @@ def _disposition_by_ticker(report: Mapping[str, Any]) -> Dict[str, Mapping[str, 
     return out
 
 
-def _rows(report: Mapping[str, Any], key: str) -> List[Mapping[str, Any]]:
+def _rows(report: Mapping[str, Any], key: str) -> list[Mapping[str, Any]]:
     rows = report.get(key)
     if isinstance(rows, list):
         return [row for row in rows if isinstance(row, Mapping)]
     return []
 
 
-def _read_json(path: Optional[Path]) -> Dict[str, Any]:
+def _read_json(path: Path | None) -> dict[str, Any]:
     if path is None:
         return {}
     return json.loads(path.read_text(encoding="utf-8"))
 
 
-def _finite_float(value: Any) -> Optional[float]:
+def _finite_float(value: Any) -> float | None:
     try:
         number = float(value)
     except (TypeError, ValueError):
@@ -300,13 +325,17 @@ def _fmt(value: Any) -> str:
     return f"{number:.4f}"
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Write a review-only Type 2 threshold sensitivity report.")
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Write a review-only Type 2 threshold sensitivity report."
+    )
     parser.add_argument("--paper-matcher-json", required=True)
     parser.add_argument("--disposition-json")
     parser.add_argument("--output-dir", required=True)
     parser.add_argument("--run-id", default="type2-threshold-sensitivity-latest")
-    parser.add_argument("--thresholds", default=",".join(str(value) for value in DEFAULT_THRESHOLDS))
+    parser.add_argument(
+        "--thresholds", default=",".join(str(value) for value in DEFAULT_THRESHOLDS)
+    )
     args = parser.parse_args(list(argv) if argv is not None else None)
     thresholds = [
         value

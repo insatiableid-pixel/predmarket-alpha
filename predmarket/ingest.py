@@ -2,7 +2,9 @@ from __future__ import annotations
 
 import asyncio
 import logging
-from typing import Dict, Any, Optional, List, Callable, Awaitable
+import warnings
+from collections.abc import Awaitable, Callable
+from typing import Any
 
 try:
     import aiohttp
@@ -18,6 +20,7 @@ from predmarket.config import Config
 
 logger = logging.getLogger("predmarket.ingest")
 
+
 class MarketSnapshot:
     def __init__(
         self,
@@ -29,7 +32,7 @@ class MarketSnapshot:
         last_price: float,
         open_interest: float,
         volume_24h: float,
-        line_history: List[float] = None
+        line_history: list[float] = None,
     ):
         self.venue = venue
         self.contract_id = contract_id
@@ -42,18 +45,19 @@ class MarketSnapshot:
         self.volume_24h = volume_24h
         self.line_history = line_history or [last_price]
 
+
 class MarketIngestManager:
     def __init__(
         self,
         config: Config,
-        blocking_call_runner: Optional[Callable[..., Awaitable[Any]]] = None,
+        blocking_call_runner: Callable[..., Awaitable[Any]] | None = None,
     ):
         self.config = config
         self.blocking_call_runner = blocking_call_runner or asyncio.to_thread
-        self.session: Optional[aiohttp.ClientSession] = None
+        self.session: aiohttp.ClientSession | None = None
         self.polymarket_connected = False
         self.kalshi_connected = False
-        self.mock_db: Dict[str, MarketSnapshot] = {}
+        self.mock_db: dict[str, MarketSnapshot] = {}
         self._init_mock_data()
 
     def _init_mock_data(self):
@@ -68,7 +72,7 @@ class MarketIngestManager:
                 last_price=0.585,
                 open_interest=500000.0,
                 volume_24h=120000.0,
-                line_history=[0.52, 0.54, 0.55, 0.57, 0.58, 0.585]
+                line_history=[0.52, 0.54, 0.55, 0.57, 0.58, 0.585],
             ),
             "KL-FED-RATE-2026": MarketSnapshot(
                 venue="Kalshi",
@@ -79,8 +83,8 @@ class MarketIngestManager:
                 last_price=0.425,
                 open_interest=150000.0,
                 volume_24h=35000.0,
-                line_history=[0.48, 0.46, 0.45, 0.44, 0.43, 0.425]
-            )
+                line_history=[0.48, 0.46, 0.45, 0.44, 0.43, 0.425],
+            ),
         }
 
     async def initialize(self):
@@ -89,7 +93,7 @@ class MarketIngestManager:
         else:
             self.session = None
             logger.warning("aiohttp is not installed. Network venue ingestion is disabled.")
-        
+
         # 1. Polymarket Init
         if self.config.venues.polymarket.enabled:
             await self._connect_polymarket()
@@ -116,7 +120,9 @@ class MarketIngestManager:
                     logger.info("Polymarket public market-data connection operational.")
                     self.polymarket_connected = True
                 else:
-                    logger.warning(f"Polymarket API healthcheck returned status {resp.status}. Falling back.")
+                    logger.warning(
+                        f"Polymarket API healthcheck returned status {resp.status}. Falling back."
+                    )
                     self.polymarket_connected = False
         except Exception as e:
             logger.warning(f"Polymarket CLOB connection failed: {e}. Falling back.")
@@ -129,18 +135,27 @@ class MarketIngestManager:
             self.kalshi_connected = False
             return
         if not k_cfg.api_key or not k_cfg.api_secret:
-            logger.warning("Kalshi: KALSHI_API_KEY/SECRET not configured. Running Kalshi in mock/fallback mode.")
+            logger.warning(
+                "Kalshi: KALSHI_API_KEY/SECRET not configured. Running Kalshi in mock/fallback mode."
+            )
             self.kalshi_connected = False
             return
 
         # Attempt to run authentication check against Kalshi API
         try:
+            warnings.warn(
+                "Use KalshiTradingClient from predmarket.kalshi_live_client "
+                "instead of kalshi_python.Configuration. SDK-based auth is "
+                "deprecated and will be removed in a future version.",
+                DeprecationWarning,
+                stacklevel=2,
+            )
             config_kalshi = kalshi_python.Configuration()
             config_kalshi.host = k_cfg.effective_api_url
             config_kalshi.api_key = k_cfg.api_key
             config_kalshi.api_secret = k_cfg.api_secret
             self.kalshi_api = kalshi_python.MarketsApi(kalshi_python.ApiClient(config_kalshi))
-            
+
             # Verify connectivity by performing a test call
             exchange_api = kalshi_python.ExchangeApi(kalshi_python.ApiClient(config_kalshi))
             status = await self.blocking_call_runner(exchange_api.get_exchange_status)
@@ -156,7 +171,7 @@ class MarketIngestManager:
         snapshot = self.mock_db.get(contract_id)
         if not snapshot:
             raise ValueError(f"Unknown contract_id: {contract_id}")
-        
+
         # Real connection update logic
         if snapshot.venue == "Polymarket" and self.polymarket_connected:
             try:
@@ -176,25 +191,27 @@ class MarketIngestManager:
                             snapshot.last_price = snapshot.mid
             except Exception as e:
                 logger.warning(f"Failed to fetch live Polymarket book for {contract_id}: {e}")
-                
+
         elif snapshot.venue == "Kalshi" and self.kalshi_connected:
             try:
                 # Query Kalshi market orderbook
-                book_resp = await self.blocking_call_runner(self.kalshi_api.get_market_orderbook, contract_id)
+                book_resp = await self.blocking_call_runner(
+                    self.kalshi_api.get_market_orderbook, contract_id
+                )
                 book = book_resp.orderbook
                 best_bid_yes = None
                 best_bid_no = None
-                
+
                 if book.true:
                     best_bid_yes = max(level.price for level in book.true)
                 if book.false:
                     best_bid_no = max(level.price for level in book.false)
-                
+
                 if best_bid_yes is not None:
                     snapshot.bid = float(best_bid_yes) / 100.0
                 if best_bid_no is not None:
                     snapshot.ask = float(100 - best_bid_no) / 100.0
-                
+
                 if best_bid_yes is not None or best_bid_no is not None:
                     if snapshot.bid == 0 and snapshot.ask > 0:
                         snapshot.bid = snapshot.ask - 0.01
@@ -202,18 +219,24 @@ class MarketIngestManager:
                         snapshot.ask = snapshot.bid + 0.01
                     snapshot.mid = (snapshot.bid + snapshot.ask) / 2.0
                     snapshot.last_price = snapshot.mid
-                    
-                market_resp = await self.blocking_call_runner(self.kalshi_api.get_market, contract_id)
+
+                market_resp = await self.blocking_call_runner(
+                    self.kalshi_api.get_market, contract_id
+                )
                 market = market_resp.market
                 if market:
-                    snapshot.volume_24h = float(getattr(market, "volume24h", getattr(market, "volume", snapshot.volume_24h)))
-                    snapshot.open_interest = float(getattr(market, "open_interest", snapshot.open_interest))
+                    snapshot.volume_24h = float(
+                        getattr(market, "volume24h", getattr(market, "volume", snapshot.volume_24h))
+                    )
+                    snapshot.open_interest = float(
+                        getattr(market, "open_interest", snapshot.open_interest)
+                    )
             except Exception as e:
                 logger.warning(f"Failed to fetch live Kalshi book for {contract_id}: {e}")
 
         return snapshot
 
-    async def get_all_snapshots(self) -> List[MarketSnapshot]:
+    async def get_all_snapshots(self) -> list[MarketSnapshot]:
         snapshots = []
         for cid in self.mock_db.keys():
             snapshot = await self.get_market_snapshot(cid)
@@ -224,7 +247,7 @@ class MarketIngestManager:
     # Dynamic contract discovery (B5 remediation)
     # ------------------------------------------------------------------
 
-    async def discover_contracts(self) -> List[MarketSnapshot]:
+    async def discover_contracts(self) -> list[MarketSnapshot]:
         """Fetch active markets from connected venues and merge into the snapshot DB.
 
         For each connected venue, queries the venue's market-list endpoint and
@@ -256,8 +279,11 @@ class MarketIngestManager:
                                 venue="Polymarket",
                                 contract_id=cid,
                                 title=question,
-                                bid=bid, ask=ask, last_price=(bid + ask) / 2,
-                                open_interest=0.0, volume_24h=0.0,
+                                bid=bid,
+                                ask=ask,
+                                last_price=(bid + ask) / 2,
+                                open_interest=0.0,
+                                volume_24h=0.0,
                             )
                             self.mock_db[cid] = snap
                             discovered.append(snap)
@@ -283,7 +309,9 @@ class MarketIngestManager:
                         venue="Kalshi",
                         contract_id=ticker,
                         title=title,
-                        bid=last - 0.005, ask=last + 0.005, last_price=last,
+                        bid=last - 0.005,
+                        ask=last + 0.005,
+                        last_price=last,
                         open_interest=float(getattr(m, "open_interest", 0)),
                         volume_24h=float(getattr(m, "volume24h", getattr(m, "volume", 0))),
                     )
@@ -295,8 +323,12 @@ class MarketIngestManager:
                 logger.warning(f"Kalshi contract discovery failed: {e}")
 
         if discovered:
-            logger.info(f"Contract discovery total: {len(discovered)} new contracts merged into snapshot DB")
+            logger.info(
+                f"Contract discovery total: {len(discovered)} new contracts merged into snapshot DB"
+            )
         else:
-            logger.info("Contract discovery: no new contracts found; using existing mock/fallback data")
+            logger.info(
+                "Contract discovery: no new contracts found; using existing mock/fallback data"
+            )
 
         return discovered

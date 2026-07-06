@@ -12,9 +12,7 @@ from __future__ import annotations
 import argparse
 import csv
 import json
-import math
 import sys
-from collections import Counter
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
 from pathlib import Path
@@ -207,17 +205,6 @@ def normalize_label_rows(rows: Sequence[Mapping[str, Any]]) -> tuple[list[dict[s
     return normalized, invalid
 
 
-def independent_contract_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
-    by_ticker: dict[str, dict[str, Any]] = {}
-    for row in rows:
-        ticker = str(row.get("contract_ticker") or "")
-        if not ticker:
-            continue
-        if ticker not in by_ticker or float(row.get("decision_ts") or 0) < float(by_ticker[ticker].get("decision_ts") or 0):
-            by_ticker[ticker] = dict(row)
-    return sorted(by_ticker.values(), key=lambda item: (item["decision_ts"], item["contract_ticker"]))
-
-
 def evaluate_models(
     rows: Sequence[Mapping[str, Any]],
     *,
@@ -262,8 +249,8 @@ def evaluate_proxy_state_directional(
     min_independent_labels: int,
     min_oos_labels: int,
 ) -> dict[str, Any]:
-    scored = [row for row in oos_rows if proxy_state_prediction(row.get("proxy_state")) is not None]
-    wins = sum(1 for row in scored if proxy_state_prediction(row.get("proxy_state")) == row.get("yes_outcome"))
+    scored = [row for row in oos_rows if crypto_prediction_rule(row)[0] is not None]
+    wins = sum(1 for row in scored if crypto_prediction_rule(row)[0] == row.get("yes_outcome"))
     p_value = binomial_survival(wins, len(scored), 0.5) if len(rows) >= min_independent_labels and len(scored) >= min_oos_labels else None
     if len(rows) < min_independent_labels:
         status = "blocked_insufficient_independent_labels"
@@ -510,162 +497,33 @@ def write_csv(report: Mapping[str, Any], path: Path) -> None:
                 writer.writerow({field: row.get(field) for field in CSV_FIELDS})
 
 
-def chronological_split_index(count: int, test_fraction: float) -> int:
-    if count <= 0:
-        return 0
-    test_count = max(1, math.ceil(count * min(max(test_fraction, 0.0), 1.0)))
-    return max(0, count - test_count)
-
-
-def proxy_state_prediction(value: Any) -> int | None:
-    text = str(value or "").lower()
-    if "above" in text:
-        return 1
-    if "below" in text:
-        return 0
-    return None
-
-
-def benjamini_hochberg(indexed_p_values: Sequence[tuple[int, float]]) -> dict[int, float]:
-    ordered = sorted(indexed_p_values, key=lambda item: item[1])
-    count = len(ordered)
-    output: dict[int, float] = {}
-    running = 1.0
-    for rank_from_end, (index, p_value) in enumerate(reversed(ordered), start=1):
-        rank = count - rank_from_end + 1
-        running = min(running, p_value * count / rank)
-        output[index] = running
-    return output
-
-
-def binomial_survival(successes: int, trials: int, probability_null: float) -> float:
-    if trials <= 0 or successes < 0:
-        return 1.0
-    total = 0.0
-    for k in range(successes, trials + 1):
-        total += math.comb(trials, k) * (probability_null**k) * ((1.0 - probability_null) ** (trials - k))
-    return min(max(total, 0.0), 1.0)
-
-
-def outcome_value(value: Any) -> int | None:
-    if isinstance(value, bool):
-        return int(value)
-    number = probability(value)
-    if number is not None:
-        if number >= 0.999:
-            return 1
-        if number <= 0.001:
-            return 0
-    text = str(value or "").strip().lower()
-    if text in {"yes", "true", "win", "1"}:
-        return 1
-    if text in {"no", "false", "loss", "0"}:
-        return 0
-    return None
-
-
-def probability(value: Any) -> float | None:
-    number = optional_float(value)
-    return number if number is not None and 0.0 <= number <= 1.0 else None
-
-
-def optional_float(value: Any) -> float | None:
-    try:
-        if value is None:
-            return None
-        if isinstance(value, str):
-            value = value.strip().rstrip("%")
-            if not value:
-                return None
-        number = float(value)
-    except (TypeError, ValueError):
-        return None
-    return number if math.isfinite(number) else None
-
-
-def timestamp(value: Any) -> float | None:
-    if value is None:
-        return None
-    if isinstance(value, (int, float)):
-        number = float(value)
-        return number if math.isfinite(number) else None
-    text = str(value).strip()
-    if not text:
-        return None
-    try:
-        number = float(text)
-    except ValueError:
-        number = None
-    if number is not None:
-        return number if math.isfinite(number) else None
-    try:
-        parsed = datetime.fromisoformat(text.replace("Z", "+00:00"))
-    except ValueError:
-        return None
-    if parsed.tzinfo is None:
-        parsed = parsed.replace(tzinfo=UTC)
-    return parsed.timestamp()
-
-
-def iso_from_timestamp(value: float | None) -> str | None:
-    if value is None:
-        return None
-    return datetime.fromtimestamp(value, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
-
-
-def counts(values: Sequence[Any]) -> dict[str, int]:
-    counter = Counter(str(value if value is not None else "unknown") for value in values)
-    return dict(sorted(counter.items(), key=lambda item: (-item[1], item[0])))
-
-
-def gate(name: str, status: str, reason: str) -> dict[str, str]:
-    return {"name": name, "status": status, "reason": reason}
-
-
-def safe_research_artifact(value: Any) -> bool:
-    if not isinstance(value, Mapping):
-        return False
-    safety = value.get("safety") if isinstance(value.get("safety"), Mapping) else {}
-    return (
-        value.get("research_only") is True
-        and value.get("execution_enabled") is False
-        and value.get("market_execution") is not True
-        and value.get("account_or_order_paths") is not True
-        and safety.get("market_execution") is False
-        and safety.get("account_or_order_paths") is False
-        and safety.get("database_writes") is False
-    )
-
-
-def safety_flags() -> dict[str, bool]:
-    return {
-        "research_only": True,
-        "public_market_data_calls": False,
-        "authenticated_api_calls": False,
-        "provider_api_calls": False,
-        "paid_calls": False,
-        "database_writes": False,
-        "market_execution": False,
-        "account_or_order_paths": False,
-        "raw_payloads_copied_to_repo": False,
-        "staking_or_sizing_guidance": False,
-    }
+# Import single-sourced helpers from predmarket (replaces local duplicates).
+from predmarket.crypto_family import crypto_prediction_rule  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402
+    benjamini_hochberg,
+    binomial_survival,
+    chronological_split_index,
+    counts,
+    gate,
+    independent_contract_rows,
+    iso_from_timestamp,
+    optional_float,
+    outcome_value,
+    probability,
+    read_json_or_empty,
+    safe_research_artifact,
+    safety_flags,
+    timestamp,
+)
 
 
 def outside_repo(path: Path) -> bool:
+    """Check if *path* is outside the control repo (uses module-level CONTROL_REPO)."""
     try:
         path.expanduser().resolve().relative_to(CONTROL_REPO.resolve())
     except ValueError:
         return True
     return False
-
-
-def read_json_or_empty(path: Path) -> dict[str, Any]:
-    try:
-        raw = json.loads(path.read_text(encoding="utf-8"))
-    except (OSError, json.JSONDecodeError):
-        return {}
-    return raw if isinstance(raw, dict) else {}
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:

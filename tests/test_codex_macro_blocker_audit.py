@@ -2,7 +2,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "codex_macro_blocker_audit.py"
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
@@ -55,11 +54,17 @@ def write_common_inputs(macro: Path, lanes: list[dict]) -> None:
     )
     write_json(
         macro / "latest-kalshi-contract-ev-ledger.json",
-        safe_payload(status="kalshi_ev_ledger_candidates_present_but_not_usable", summary={"usable_row_count": 0}),
+        safe_payload(
+            status="kalshi_ev_ledger_candidates_present_but_not_usable",
+            summary={"usable_row_count": 0},
+        ),
     )
     write_json(
         macro / "latest-kalshi-ev-local-contract-evidence-scout.json",
-        safe_payload(status="local_contract_evidence_blocked_no_nfl_target_snapshot", summary={"ready_target_match_count": 0}),
+        safe_payload(
+            status="local_contract_evidence_blocked_no_nfl_target_snapshot",
+            summary={"ready_target_match_count": 0},
+        ),
     )
     write_json(
         macro / "latest-kalshi-ev-nfl-overlay-assembler.json",
@@ -136,7 +141,9 @@ def test_blocker_audit_fails_generic_missing_input(tmp_path: Path) -> None:
     module = load_blocker_audit_module()
     macro = tmp_path / "macro"
     lanes = exact_lanes()
-    lanes[3]["missing_input"] = "No immediate local unlock from scout; see latest macro decision ranking."
+    lanes[3]["missing_input"] = (
+        "No immediate local unlock from scout; see latest macro decision ranking."
+    )
     write_common_inputs(macro, lanes)
 
     report = module.build_blocker_audit(
@@ -145,7 +152,9 @@ def test_blocker_audit_fails_generic_missing_input(tmp_path: Path) -> None:
     )
 
     assert report["status"] == "macro_blocker_audit_incomplete"
-    nba = next(lane for lane in report["lane_audits"] if lane["repo_id"] == "nba-analytics-platform")
+    nba = next(
+        lane for lane in report["lane_audits"] if lane["repo_id"] == "nba-analytics-platform"
+    )
     assert nba["missing_input_specific"] is False
     assert nba["proof_status"] == "blocked"
 

@@ -14,7 +14,10 @@ from typing import Any
 # Patterns that match common secret formats. Each is replaced with [REDACTED].
 _SECRET_PATTERNS: list[re.Pattern[str]] = [
     # Kalshi-style API keys (hex/alphanumeric, 20+ chars after key/secret label)
-    re.compile(r"(?i)(api[_-]?key|api[_-]?secret|token|password|secret)\s*[=:]\s*['\"]?([A-Za-z0-9_\-]{16,})", re.IGNORECASE),
+    re.compile(
+        r"(?i)(api[_-]?key|api[_-]?secret|token|password|secret)\s*[=:]\s*['\"]?([A-Za-z0-9_\-]{16,})",
+        re.IGNORECASE,
+    ),
     # Bearer tokens
     re.compile(r"(?i)bearer\s+([A-Za-z0-9_\-\.]{20,})"),
     # Generic hex secrets (40+ hex chars, typical of HMAC keys)
@@ -24,11 +27,21 @@ _SECRET_PATTERNS: list[re.Pattern[str]] = [
 ]
 
 # Field names that should always be redacted in structured log dicts.
-_SENSITIVE_KEYS = frozenset({
-    "api_key", "api_secret", "secret", "password", "passwd",
-    "token", "access_token", "refresh_token", "private_key",
-    "kalshi_api_key", "kalshi_api_secret",
-})
+_SENSITIVE_KEYS = frozenset(
+    {
+        "api_key",
+        "api_secret",
+        "secret",
+        "password",
+        "passwd",
+        "token",
+        "access_token",
+        "refresh_token",
+        "private_key",
+        "kalshi_api_key",
+        "kalshi_api_secret",
+    }
+)
 
 
 def redact_value(value: Any) -> Any:

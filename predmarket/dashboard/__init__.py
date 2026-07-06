@@ -19,29 +19,30 @@ Import order is deliberate:
 """
 
 # Standalone – no internal dependencies
-from . import metrics  # noqa: F401  (side-effect: registers Prometheus counters)
-
-# Server layer
-from .server import (  # noqa: F401
-    server,
-    get_staged_orders,
-    approve_order_endpoint,
-    ApprovalRequest,
+# Callbacks – must be imported last so the app object exists
+from . import (
+    callbacks,  # noqa: F401  (side-effect: registers Dash callbacks)
+    metrics,  # noqa: F401  (side-effect: registers Prometheus counters)
 )
+
+# Re-export callback functions that tests import directly
+from .callbacks import update_dashboard_data  # noqa: F401
 
 # Data layer
 from .data import (  # noqa: F401
-    get_db_connection,
-    fetch_performance_metrics,
     approve_staged_order_db,
     fetch_opportunities,
+    fetch_performance_metrics,
+    get_db_connection,
 )
 
 # Layout layer (creates the Dash app bound to the FastAPI server)
 from .layout import app  # noqa: F401
 
-# Callbacks – must be imported last so the app object exists
-from . import callbacks  # noqa: F401  (side-effect: registers Dash callbacks)
-
-# Re-export callback functions that tests import directly
-from .callbacks import update_dashboard_data  # noqa: F401
+# Server layer
+from .server import (  # noqa: F401
+    ApprovalRequest,
+    approve_order_endpoint,
+    get_staged_orders,
+    server,
+)

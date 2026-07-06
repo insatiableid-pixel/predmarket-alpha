@@ -19,31 +19,22 @@ All imports are lazy / behind TYPE_CHECKING to avoid circular dependencies.
 
 import logging
 import time
-from typing import Dict, Any, Optional, TYPE_CHECKING
+from typing import TYPE_CHECKING, Any
 
 import numpy as np
 
 from predmarket.density import (
     DensityForecast,
+    combine_density_forecasts,
     from_point_estimate,
     from_samples,
-    combine_density_forecasts,
 )
 from predmarket.horizons import (
-    ForecastHorizon,
     HorizonSpecificForecaster,
-    HorizonWeightScheduler,
 )
 
 if TYPE_CHECKING:
-    from predmarket.config import Config
-    from predmarket.ensemble import EnsembleForecaster
-    from predmarket.bayesian import BayesianForecaster
-    from predmarket.weight_learner import AdaptiveWeightLearner
-    from predmarket.volatility import VolatilityModel
-    from predmarket.features import FeatureEngineer
-    from predmarket.aggregator import MultiPlatformAggregator
-    from predmarket.baselines import BaselineForecaster
+    pass
 
 logger = logging.getLogger("predmarket.pipeline")
 
@@ -78,13 +69,13 @@ class ForecastingPipeline:
     def __init__(
         self,
         config: Any,
-        ensemble: Optional[Any] = None,
-        bayesian: Optional[Any] = None,
-        weight_learner: Optional[Any] = None,
-        aggregator: Optional[Any] = None,
-        feature_engineer: Optional[Any] = None,
-        volatility_model: Optional[Any] = None,
-        research_registry: Optional[Any] = None,
+        ensemble: Any | None = None,
+        bayesian: Any | None = None,
+        weight_learner: Any | None = None,
+        aggregator: Any | None = None,
+        feature_engineer: Any | None = None,
+        volatility_model: Any | None = None,
+        research_registry: Any | None = None,
     ):
         self.config = config
         self._ensemble = ensemble or self._build_default_ensemble()
@@ -101,14 +92,13 @@ class ForecastingPipeline:
         # Baseline always available
         try:
             from predmarket.baselines import BaselineForecaster
+
             self._baselines = BaselineForecaster()
         except ImportError:
             self._baselines = None
 
         # Horizon forecaster wraps whatever ensemble we have
-        self._horizon_forecaster = HorizonSpecificForecaster(
-            base_forecaster=self._ensemble
-        )
+        self._horizon_forecaster = HorizonSpecificForecaster(base_forecaster=self._ensemble)
 
     def _build_default_ensemble(self) -> Any:
         try:
@@ -133,6 +123,7 @@ class ForecastingPipeline:
         if self._weight_learner is None:
             try:
                 from predmarket.weight_learner import AdaptiveWeightLearner
+
                 self._weight_learner = AdaptiveWeightLearner()
             except ImportError:
                 logger.debug("AdaptiveWeightLearner not available.")
@@ -141,6 +132,7 @@ class ForecastingPipeline:
         if self._volatility_model is None:
             try:
                 from predmarket.volatility import VolatilityModel
+
                 self._volatility_model = VolatilityModel()
             except ImportError:
                 logger.debug("VolatilityModel not available.")
@@ -149,6 +141,7 @@ class ForecastingPipeline:
         if self._aggregator is None:
             try:
                 from predmarket.aggregator import MultiPlatformAggregator
+
                 self._aggregator = MultiPlatformAggregator()
             except ImportError:
                 logger.debug("MultiPlatformAggregator not available.")
@@ -157,6 +150,7 @@ class ForecastingPipeline:
         if self._feature_engineer is None:
             try:
                 from predmarket.features import FeatureEngineer
+
                 self._feature_engineer = FeatureEngineer()
             except ImportError:
                 logger.debug("FeatureEngineer not available.")
@@ -181,8 +175,8 @@ class ForecastingPipeline:
         category: str,
         headline: str = "",
         question: str = "",
-        timestamp: Optional[float] = None,
-    ) -> Dict[str, Any]:
+        timestamp: float | None = None,
+    ) -> dict[str, Any]:
         """Run full pipeline and produce comprehensive forecast.
 
         Steps:
@@ -209,16 +203,18 @@ class ForecastingPipeline:
                 horizon_forecasts, platform_prices.
         """
         ts = timestamp or time.time()
-        all_components: Dict[str, float] = {}
-        all_densities: Dict[str, DensityForecast] = {}
+        all_components: dict[str, float] = {}
+        all_densities: dict[str, DensityForecast] = {}
 
         # --- 1. Run all available forecasters ---
 
         # Ensemble components (if the ensemble has the standard interface)
         try:
             ensemble_result = self._ensemble.generate_ensemble_forecast(
-                snapshot=snapshot, category=category,
-                headline=headline, question=question,
+                snapshot=snapshot,
+                category=category,
+                headline=headline,
+                question=question,
             )
             for comp_name in ["bbn", "base_rate", "nlp", "market_consensus", "time_series"]:
                 if comp_name in ensemble_result.get("predictions", {}):
@@ -242,22 +238,18 @@ class ForecastingPipeline:
             all_components["bayesian"] = 0.5
 
         # Multi-platform aggregator
-        platform_prices: Dict[str, float] = {}
+        platform_prices: dict[str, float] = {}
         if self._aggregator is not None:
             try:
-                agg_result = self._aggregator.aggregate_forecasts(
-                    snapshot.contract_id, category
-                )
+                agg_result = self._aggregator.aggregate_forecasts(snapshot.contract_id, category)
                 all_components["aggregator"] = agg_result.mean
                 all_densities["aggregator"] = agg_result
-                platform_prices = self._aggregator.get_platform_prices(
-                    snapshot.contract_id
-                )
+                platform_prices = self._aggregator.get_platform_prices(snapshot.contract_id)
             except Exception as e:
                 logger.debug("Aggregator failed: %s", e)
 
         # --- 2. Volatility features ---
-        volatility_features: Dict[str, Any] = {}
+        volatility_features: dict[str, Any] = {}
         if self._volatility_model is not None and snapshot.line_history:
             try:
                 vol_result = self._volatility_model.analyze(snapshot.line_history)
@@ -266,7 +258,7 @@ class ForecastingPipeline:
                 logger.debug("Volatility analysis failed: %s", e)
 
         # --- 3. Feature engineering ---
-        engineered_features: Dict[str, float] = {}
+        engineered_features: dict[str, float] = {}
         if self._feature_engineer is not None:
             try:
                 engineered_features = self._feature_engineer.extract_features(
@@ -276,7 +268,7 @@ class ForecastingPipeline:
                 logger.debug("Feature engineering failed: %s", e)
 
         # --- 3b. Research forecaster registry ---
-        research_forecasts: Dict[str, Any] = {}
+        research_forecasts: dict[str, Any] = {}
         if self._research_registry is not None:
             try:
                 from predmarket.contracts import ForecastContext
@@ -336,19 +328,15 @@ class ForecastingPipeline:
         combined_density = combine_density_forecasts(density_list, weights_list)
 
         # --- 6. Horizon forecasts ---
-        horizon_forecasts: Dict[str, DensityForecast] = {}
+        horizon_forecasts: dict[str, DensityForecast] = {}
         try:
-            all_horizons = self._horizon_forecaster.forecast_all_horizons(
-                snapshot, category
-            )
-            horizon_forecasts = {
-                h.value: d for h, d in all_horizons.items()
-            }
+            all_horizons = self._horizon_forecaster.forecast_all_horizons(snapshot, category)
+            horizon_forecasts = {h.value: d for h, d in all_horizons.items()}
         except Exception:
             pass
 
         # --- 7. Baseline comparison ---
-        baseline_comparison: Dict[str, float] = {}
+        baseline_comparison: dict[str, float] = {}
         if self._baselines is not None:
             try:
                 baseline_comparison = self._baselines.compare_all(
@@ -406,7 +394,7 @@ class ForecastingPipeline:
         contract_id: str,
         category: str,
         outcome: int,
-        component_forecasts: Dict[str, float],
+        component_forecasts: dict[str, float],
     ) -> None:
         """Feed resolved outcome back to adaptive components.
 
@@ -445,14 +433,14 @@ class ForecastingPipeline:
     # Status
     # ------------------------------------------------------------------
 
-    def get_status(self) -> Dict[str, Any]:
+    def get_status(self) -> dict[str, Any]:
         """Return current state of all pipeline components.
 
         Returns:
             Dict with component names and their status (weights, observation
             counts, etc.).
         """
-        status: Dict[str, Any] = {}
+        status: dict[str, Any] = {}
 
         if self._weight_learner is not None:
             try:

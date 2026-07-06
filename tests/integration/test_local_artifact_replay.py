@@ -71,13 +71,19 @@ def write_crypto_signal_foundation(module, tmp_path: Path):
     write_json(
         universe,
         safe_artifact(
-            summary={"candidate_count": 100, "model_route_candidate_count": 2, "soft_watch_candidate_count": 98}
+            summary={
+                "candidate_count": 100,
+                "model_route_candidate_count": 2,
+                "soft_watch_candidate_count": 98,
+            }
         ),
     )
     write_json(ledger, safe_artifact(summary={"row_count": 4}))
     write_json(queue, safe_artifact(summary={"queued_row_count": 0}))
     write_json(robustness, safe_artifact(summary={"repeat_positive_row_count": 0}))
-    write_json(registry, safe_artifact(summary={"hypothesis_count": 6, "multiple_testing_family_count": 6}))
+    write_json(
+        registry, safe_artifact(summary={"hypothesis_count": 6, "multiple_testing_family_count": 6})
+    )
     write_json(
         falsification,
         safe_artifact(
@@ -116,7 +122,11 @@ def write_crypto_signal_foundation(module, tmp_path: Path):
         feature,
         safe_artifact(
             status="crypto_proxy_feature_packet_ready",
-            summary={"feature_row_count": 100, "feature_ready_count": 80, "proxy_available_asset_count": 3},
+            summary={
+                "feature_row_count": 100,
+                "feature_ready_count": 80,
+                "proxy_available_asset_count": 3,
+            },
         ),
     )
     return replace(
@@ -241,7 +251,9 @@ class TestSignalFactoryRouting:
 
         assert "blocked" in report["status"]
         # First capability should be blocked
-        universe_cap = [c for c in report["capabilities"] if c["name"] == "kalshi_universe_inventory"][0]
+        universe_cap = [
+            c for c in report["capabilities"] if c["name"] == "kalshi_universe_inventory"
+        ][0]
         assert universe_cap["status"] == "blocked"
 
 

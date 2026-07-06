@@ -1,6 +1,10 @@
 import json
 
-from scripts.codex_macro_unlock_scout import build_unlock_scout, render_unlock_scout_markdown, write_unlock_scout
+from scripts.codex_macro_unlock_scout import (
+    build_unlock_scout,
+    render_unlock_scout_markdown,
+    write_unlock_scout,
+)
 
 
 def _write_json(path, payload):
@@ -35,12 +39,17 @@ def test_unlock_scout_reports_local_inputs_and_blockers(tmp_path):
         },
     )
     _write_json(
-        repo / "docs/codex/artifacts/type2-reference-builder-latest/type2-reference-builder-latest.json",
+        repo
+        / "docs/codex/artifacts/type2-reference-builder-latest/type2-reference-builder-latest.json",
         {"status": "reference_built", "summary": {"market_count": 4}, "research_only": True},
     )
     _write_json(
-        repo / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
-        {"status": "candidate_disposition_all_passes_downgraded", "summary": {"kept_review_candidate": 0}},
+        repo
+        / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
+        {
+            "status": "candidate_disposition_all_passes_downgraded",
+            "summary": {"kept_review_candidate": 0},
+        },
     )
     _write_json(manual / "odds_api/baseball_mlb.json", [])
 
@@ -68,11 +77,13 @@ def test_unlock_scout_reports_predmarket_watch_only_reference(tmp_path):
     manual = tmp_path / "manual_drops"
     _write_json(repo / "docs/codex/macro/latest-decision.json", {"all_lanes_parked": True})
     _write_json(
-        repo / "docs/codex/artifacts/type2-reference-builder-latest/type2-reference-builder-latest.json",
+        repo
+        / "docs/codex/artifacts/type2-reference-builder-latest/type2-reference-builder-latest.json",
         {"status": "reference_built", "summary": {"market_count": 24}, "research_only": True},
     )
     _write_json(
-        repo / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
+        repo
+        / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
         {
             "status": "candidate_disposition_watch_only",
             "summary": {
@@ -204,7 +215,10 @@ def test_unlock_scout_prefers_contract_mapping_work_order_over_probability_queue
     )
 
     predmarket = next(lane for lane in report["lanes"] if lane["repo_id"] == "predmarket-alpha")
-    assert report["kalshi_ev"]["contract_mapping_work_order_status"] == "contract_mapping_work_order_ready"
+    assert (
+        report["kalshi_ev"]["contract_mapping_work_order_status"]
+        == "contract_mapping_work_order_ready"
+    )
     assert predmarket["status"] == "contract_mapping_work_order_ready"
     assert "Exact Kalshi ticker" in predmarket["missing_input"]
     assert "make kalshi-ev-contract-mapping-work-order" in predmarket["next_local_command"]
@@ -283,7 +297,8 @@ def test_unlock_scout_reports_mlb_repeatability_observed(tmp_path):
         },
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_observed_two_clean_packets",
             "review_only": True,
@@ -325,7 +340,8 @@ def test_unlock_scout_reports_mlb_repeatability_ready_for_review(tmp_path):
         },
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_ready_for_research_review",
             "review_only": True,
@@ -367,7 +383,8 @@ def test_unlock_scout_reports_mlb_research_review_same_slate_caveat(tmp_path):
         },
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_ready_for_research_review",
             "review_only": True,
@@ -413,7 +430,8 @@ def test_unlock_scout_reports_mlb_repeatability_blocked_no_clean_packets(tmp_pat
         {"status": "ready_pregame_pair", "ready": True, "blockers": []},
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_blocked_no_clean_packets",
             "review_only": True,
@@ -459,7 +477,8 @@ def test_unlock_scout_reports_mlb_repeatability_no_signal_clean_packets(tmp_path
         {"status": "ready_pregame_pair", "ready": True, "blockers": []},
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_no_signal_clean_packets",
             "review_only": True,
@@ -510,7 +529,8 @@ def test_unlock_scout_reports_mlb_threshold_policy_hold_current(tmp_path):
         {"status": "ready_pregame_pair", "ready": True, "blockers": []},
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
+        mlb
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json",
         {
             "status": "repeatability_no_signal_clean_packets",
             "review_only": True,
@@ -522,7 +542,8 @@ def test_unlock_scout_reports_mlb_threshold_policy_hold_current(tmp_path):
         },
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-threshold-policy-review-latest/type2-threshold-policy-review.json",
+        mlb
+        / "docs/codex/artifacts/type2-threshold-policy-review-latest/type2-threshold-policy-review.json",
         {
             "status": "threshold_policy_hold_current",
             "review_only": True,
@@ -558,7 +579,8 @@ def test_unlock_scout_reports_mlb_settled_validation_no_policy_change(tmp_path):
     _write_json(manual / "odds_api/baseball_mlb_current.json", [])
     _write_json(manual / "kalshi/kalshi_mlb_game_series_latest.json", {"all_scored": []})
     _write_json(
-        mlb / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
+        mlb
+        / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
         {
             "status": "settled_validation_no_policy_change_same_slate",
             "review_only": True,
@@ -594,7 +616,8 @@ def test_unlock_scout_reports_mlb_closing_proxy_insufficient(tmp_path):
     _write_json(manual / "odds_api/baseball_mlb_current.json", [])
     _write_json(manual / "kalshi/kalshi_mlb_game_series_latest.json", {"all_scored": []})
     _write_json(
-        mlb / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
+        mlb
+        / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
         {
             "status": "settled_validation_no_policy_change_same_slate",
             "review_only": True,
@@ -607,7 +630,8 @@ def test_unlock_scout_reports_mlb_closing_proxy_insufficient(tmp_path):
         },
     )
     _write_json(
-        mlb / "docs/codex/artifacts/type2-closing-proxy-validation-latest/type2-closing-proxy-validation.json",
+        mlb
+        / "docs/codex/artifacts/type2-closing-proxy-validation-latest/type2-closing-proxy-validation.json",
         {
             "status": "closing_proxy_same_slate_support_insufficient",
             "review_only": True,

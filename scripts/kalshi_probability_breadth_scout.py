@@ -50,7 +50,13 @@ CSV_FIELDS = [
     "proxy_source_policy",
 ]
 HORIZONS = (1, 3, 6, 12, 24, 72)
-CORE_FAST_ROUTES = {"finance_crypto", "weather"}
+CORE_FAST_ROUTES = {"finance_crypto", "weather", "sports_baseball"}
+SPORTS_BASEBALL_FAST_ROUTE = "sports_baseball_fast_label_route"
+SPORTS_SERIES_PREFIXES = (
+    "KXMLBGAME",
+    "KXKBOGAME",
+    "KXLMBGAME",
+)
 CRYPTO_SERIES_PREFIXES = (
     "KXBTC",
     "KXETH",
@@ -147,8 +153,9 @@ def build_probability_breadth_scout(
     ]
     crypto_fast = [row for row in fast_candidates if is_crypto_proxy_candidate(row)]
     weather_fast = [row for row in fast_candidates if row.get("classification") == "weather"]
+    sports_fast = [row for row in fast_candidates if is_sports_baseball_candidate(row)]
     fast_by_horizon = horizon_counts(candidates)
-    selected_route = select_route(crypto_fast=crypto_fast, weather_fast=weather_fast)
+    selected_route = select_route(crypto_fast=crypto_fast, weather_fast=weather_fast, sports_fast=sports_fast)
     source_plan = build_source_plan(selected_route=selected_route)
     proxy_probe = (
         probe_crypto_proxy_sources(raw_probe_dir=raw_probe_dir, fetch_json=fetch_json)
@@ -163,10 +170,11 @@ def build_probability_breadth_scout(
         selected_route=selected_route,
         crypto_fast_count=len(crypto_fast),
         weather_fast_count=len(weather_fast),
+        sports_fast_count=len(sports_fast),
         available_proxy_count=available_proxy_count,
         probe_public_sources=probe_public_sources,
     )
-    work_order_candidates = build_work_order_candidates(crypto_fast, weather_fast)
+    work_order_candidates = build_work_order_candidates(crypto_fast, weather_fast, sports_fast)
 
     return {
         "schema_version": 1,
@@ -188,9 +196,11 @@ def build_probability_breadth_scout(
             "max_close_hours": max_close_hours,
             "crypto_fast_candidate_count": len(crypto_fast),
             "weather_fast_candidate_count": len(weather_fast),
-            "fast_classification_counts": counts(row.get("classification") for row in fast_candidates),
+            "sports_fast_candidate_count": len(sports_fast),
+            "fast_classification_counts": counts(normalized_classification(row) for row in fast_candidates),
             "fast_by_horizon": fast_by_horizon,
             "crypto_series_counts": counts(row.get("series_ticker") for row in crypto_fast),
+            "sports_series_counts": counts(row.get("series_ticker") for row in sports_fast),
             "selected_route": selected_route,
             "available_proxy_source_count": available_proxy_count,
             "official_source_available_without_auth": False,
@@ -209,9 +219,16 @@ def build_probability_breadth_scout(
     }
 
 
-def select_route(*, crypto_fast: Sequence[Mapping[str, Any]], weather_fast: Sequence[Mapping[str, Any]]) -> str:
+def select_route(
+    *,
+    crypto_fast: Sequence[Mapping[str, Any]],
+    weather_fast: Sequence[Mapping[str, Any]],
+    sports_fast: Sequence[Mapping[str, Any]] | None = None,
+) -> str:
     if crypto_fast:
         return "crypto_proxy_fast_label_route"
+    if sports_fast:
+        return SPORTS_BASEBALL_FAST_ROUTE
     if weather_fast:
         return "weather_fast_reference_route"
     return "no_fast_probability_breadth_route"
@@ -225,6 +242,30 @@ def is_crypto_proxy_candidate(row: Mapping[str, Any]) -> bool:
         return True
     text = f" {row.get('title') or ''} {row.get('subtitle') or ''} ".lower()
     return any(marker in text for marker in CRYPTO_TEXT_MARKERS)
+
+
+def is_sports_baseball_candidate(row: Mapping[str, Any]) -> bool:
+    """Classify Kalshi baseball game-winner contracts as sports candidates.
+
+    Matches KXMLBGAME / KXKBOGAME / KXLMBGAME series tickers (MLB / KBO / LMB
+    game-winner markets).  Explicitly excludes run-line (KXMLBRUN) and player
+    prop (KXMLBPLAYER) variants so the run-line sign-convention bug cannot
+    recur.  This is a pure function of the row's series_ticker.
+    """
+    series = str(row.get("series_ticker") or "").upper()
+    if not any(series.startswith(prefix) for prefix in SPORTS_SERIES_PREFIXES):
+        return False
+    # Exclude run-line and player-prop variants that share the KXMLB prefix.
+    if series.startswith("KXMLBRUN") or series.startswith("KXMLBPLAYER"):
+        return False
+    return True
+
+
+def normalized_classification(row: Mapping[str, Any]) -> str:
+    """Return the effective classification, recognizing sports series tickers."""
+    if is_sports_baseball_candidate(row):
+        return "sports_baseball"
+    return str(row.get("classification") or "unknown")
 
 
 def build_source_plan(*, selected_route: str) -> dict[str, Any]:
@@ -254,6 +295,33 @@ def build_source_plan(*, selected_route: str) -> dict[str, Any]:
             "proxy_policy": (
                 "Proxy exchange prices may be used as model features only. They are not official "
                 "settlement labels and cannot promote hypotheses without settled Kalshi outcomes."
+            ),
+        }
+    if selected_route == SPORTS_BASEBALL_FAST_ROUTE:
+        return {
+            "route": selected_route,
+            "why": (
+                "Baseball game-winner contracts (MLB/KBO/LMB) resolve in hours, each an independent "
+                "binary event, making them the fastest place to collect uncorrelated FDR labels."
+            ),
+            "official_settlement_source": "official game result (league box score)",
+            "official_settlement_method": (
+                "Kalshi baseball game-winner contracts settle from the official game result "
+                "(league box score: statsapi feed/live final for MLB, ESPN final for KBO/LMB)."
+            ),
+            "official_source_availability": "public_official_source",
+            "official_source_docs": [
+                "https://statsapi.mlb.com/api/v1.1/game/{gamePk}/feed/live",
+                "https://site.api.espn.com/apis/site/v2/sports/baseball/{league}/scoreboard",
+            ],
+            "proxy_feature_sources": [
+                "MLB Stats API (statsapi.mlb.com, keyless)",
+                "ESPN hidden API (site.api.espn.com, keyless)",
+            ],
+            "proxy_policy": (
+                "Proxy feeds (MLB Stats API, ESPN) may be used as model features only. "
+                "They are not official settlement labels and cannot promote hypotheses "
+                "without settled Kalshi outcomes."
             ),
         }
     if selected_route == "weather_fast_reference_route":
@@ -373,6 +441,7 @@ def scout_status(
     selected_route: str,
     crypto_fast_count: int,
     weather_fast_count: int,
+    sports_fast_count: int = 0,
     available_proxy_count: int,
     probe_public_sources: bool,
 ) -> str:
@@ -384,6 +453,8 @@ def scout_status(
         if available_proxy_count > 0:
             return "probability_breadth_scout_ready_crypto_proxy_feature_route"
         return "probability_breadth_scout_ready_crypto_route_needs_proxy_probe"
+    if selected_route == SPORTS_BASEBALL_FAST_ROUTE and sports_fast_count > 0:
+        return "probability_breadth_scout_ready_sports_baseball_route"
     if selected_route == "weather_fast_reference_route" and weather_fast_count > 0:
         return "probability_breadth_scout_ready_weather_reference_route"
     return "probability_breadth_scout_blocked_no_fast_route"
@@ -392,12 +463,30 @@ def scout_status(
 def build_work_order_candidates(
     crypto_fast: Sequence[Mapping[str, Any]],
     weather_fast: Sequence[Mapping[str, Any]],
+    sports_fast: Sequence[Mapping[str, Any]] | None = None,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for source_route, items in (
-        ("crypto_proxy_fast_label_route", crypto_fast),
-        ("weather_fast_reference_route", weather_fast),
-    ):
+    route_groups: list[tuple[str, Sequence[Mapping[str, Any]], str, str]] = [
+        (
+            "crypto_proxy_fast_label_route",
+            crypto_fast,
+            "CF Benchmarks RTI",
+            "proxy_feature_only_not_official_label",
+        ),
+        (
+            SPORTS_BASEBALL_FAST_ROUTE,
+            sports_fast or [],
+            "official game result (league box score)",
+            "proxy_feature_only_not_official_label",
+        ),
+        (
+            "weather_fast_reference_route",
+            weather_fast,
+            "market-specific official weather source",
+            "contract_specific_source_audit_required",
+        ),
+    ]
+    for source_route, items, settlement_source, proxy_policy in route_groups:
         for idx, row in enumerate(
             sorted(
                 items,
@@ -412,16 +501,8 @@ def build_work_order_candidates(
             compact = compact_candidate(row)
             compact["rank"] = idx
             compact["source_route"] = source_route
-            compact["official_settlement_source"] = (
-                "CF Benchmarks RTI"
-                if source_route == "crypto_proxy_fast_label_route"
-                else "market-specific official weather source"
-            )
-            compact["proxy_source_policy"] = (
-                "proxy_feature_only_not_official_label"
-                if source_route == "crypto_proxy_fast_label_route"
-                else "contract_specific_source_audit_required"
-            )
+            compact["official_settlement_source"] = settlement_source
+            compact["proxy_source_policy"] = proxy_policy
             rows.append(compact)
     return rows
 
@@ -467,6 +548,18 @@ def next_action(status: str) -> dict[str, str]:
             ),
             "stop_condition": (
                 "Stop before treating proxy prices as official labels, computing usable EV, sizing, execution, "
+                "or account/order paths."
+            ),
+        }
+    if status == "probability_breadth_scout_ready_sports_baseball_route":
+        return {
+            "name": "kalshi_sports_proxy_feature_packet",
+            "why": (
+                "Baseball game-winner contracts are a fast-settling route with keyless feature sources; "
+                "build feature packets while keeping official game results as the settlement source."
+            ),
+            "stop_condition": (
+                "Stop before treating proxy feeds as official labels, computing usable EV, sizing, execution, "
                 "or account/order paths."
             ),
         }
@@ -529,6 +622,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Fast candidates: `{summary.get('fast_candidate_count')}`",
         f"- Crypto fast candidates: `{summary.get('crypto_fast_candidate_count')}`",
         f"- Weather fast candidates: `{summary.get('weather_fast_candidate_count')}`",
+        f"- Sports fast candidates: `{summary.get('sports_fast_candidate_count')}`",
         f"- Selected route: `{summary.get('selected_route')}`",
         "",
         "## Learned",

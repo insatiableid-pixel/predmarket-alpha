@@ -12,7 +12,7 @@ All forecasters produce both point estimates and DensityForecast objects.
 """
 
 import logging
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 import numpy as np
 
@@ -38,16 +38,24 @@ class FeatureEngineer:
 
     # Ordered feature names — must match extract_features() output
     FEATURE_NAMES = [
-        "lag_1", "lag_2", "lag_3", "lag_4", "lag_5",
-        "rolling_mean_3", "rolling_mean_5",
-        "rolling_std_3", "rolling_std_5",
-        "momentum_1", "momentum_3",
+        "lag_1",
+        "lag_2",
+        "lag_3",
+        "lag_4",
+        "lag_5",
+        "rolling_mean_3",
+        "rolling_mean_5",
+        "rolling_std_3",
+        "rolling_std_5",
+        "momentum_1",
+        "momentum_3",
         "rsi_5",
-        "price_vs_ma3", "price_vs_ma5",
+        "price_vs_ma3",
+        "price_vs_ma5",
         "trend_slope_5",
     ]
 
-    def extract_features(self, line_history: List[float]) -> Dict[str, float]:
+    def extract_features(self, line_history: list[float]) -> dict[str, float]:
         """Extract features from a price history.
 
         Args:
@@ -132,7 +140,7 @@ class FeatureEngineer:
             "trend_slope_5": slope,
         }
 
-    def extract_vector(self, line_history: List[float]) -> np.ndarray:
+    def extract_vector(self, line_history: list[float]) -> np.ndarray:
         """Extract feature vector (ordered array) for ML consumption.
 
         Args:
@@ -162,10 +170,10 @@ class XGBoostForecaster:
         self.max_lags = max_lags
         self._engineer = FeatureEngineer()
         self._model = None
-        self._residuals: List[float] = []
+        self._residuals: list[float] = []
         self._is_fitted = False
 
-    def fit(self, histories: List[List[float]], outcomes: List[float]) -> None:
+    def fit(self, histories: list[list[float]], outcomes: list[float]) -> None:
         """Train XGBoost on feature matrices from multiple price histories.
 
         Each history produces one training example: features from the history
@@ -176,16 +184,22 @@ class XGBoostForecaster:
             outcomes: List of target probabilities (0-1).
         """
         if len(histories) != len(outcomes):
-            raise ValueError(f"histories ({len(histories)}) and outcomes ({len(outcomes)}) must have same length")
+            raise ValueError(
+                f"histories ({len(histories)}) and outcomes ({len(outcomes)}) must have same length"
+            )
 
         if len(histories) == 0:
-            logger.warning("XGBoostForecaster.fit() called with empty data — model remains unfitted.")
+            logger.warning(
+                "XGBoostForecaster.fit() called with empty data — model remains unfitted."
+            )
             return
 
         try:
             import xgboost as xgb
         except ImportError:
-            logger.warning("xgboost not installed — XGBoostForecaster cannot fit. Install with: pip install xgboost")
+            logger.warning(
+                "xgboost not installed — XGBoostForecaster cannot fit. Install with: pip install xgboost"
+            )
             return
 
         X_list = []
@@ -221,10 +235,12 @@ class XGBoostForecaster:
         self._residuals = (y - predictions).tolist()
 
         self._is_fitted = True
-        logger.info(f"XGBoostForecaster fitted on {len(X_list)} samples, "
-                     f"mean abs residual: {np.mean(np.abs(self._residuals)):.4f}")
+        logger.info(
+            f"XGBoostForecaster fitted on {len(X_list)} samples, "
+            f"mean abs residual: {np.mean(np.abs(self._residuals)):.4f}"
+        )
 
-    def forecast(self, line_history: List[float]) -> float:
+    def forecast(self, line_history: list[float]) -> float:
         """Produce a single point forecast.
 
         Args:
@@ -241,8 +257,9 @@ class XGBoostForecaster:
         pred = float(self._model.predict(features)[0])
         return float(np.clip(pred, 0.01, 0.99))
 
-    def forecast_density(self, line_history: List[float],
-                         n_bootstrap: int = 200) -> DensityForecast:
+    def forecast_density(
+        self, line_history: list[float], n_bootstrap: int = 200
+    ) -> DensityForecast:
         """Produce a density forecast via bootstrap residual resampling.
 
         Generates multiple predictions by adding randomly resampled residuals
@@ -285,11 +302,11 @@ class BaggedForecaster:
         n_bootstrap: Number of bootstrap rounds for density estimation.
     """
 
-    def __init__(self, forecasters: List[Any], n_bootstrap: int = 10):
+    def __init__(self, forecasters: list[Any], n_bootstrap: int = 10):
         self.forecasters = forecasters
         self.n_bootstrap = n_bootstrap
 
-    def forecast(self, line_history: List[float]) -> float:
+    def forecast(self, line_history: list[float]) -> float:
         """Average point forecast across all constituent forecasters.
 
         Args:
@@ -311,7 +328,7 @@ class BaggedForecaster:
 
         return float(np.mean(preds))
 
-    def forecast_density(self, line_history: List[float]) -> DensityForecast:
+    def forecast_density(self, line_history: list[float]) -> DensityForecast:
         """Produce density forecast by pooling constituent density forecasts.
 
         Collects density forecasts from each constituent and combines them

@@ -5,19 +5,19 @@ implementation is functional and that density/forecast outputs are
 well-formed.
 """
 
-import pytest
-import numpy as np
 import time
+
+import numpy as np
 
 # ---------------------------------------------------------------------------
 # density.py
 # ---------------------------------------------------------------------------
 from predmarket.density import (
     DensityForecast,
-    combine_density_forecasts,
     brier_score_density,
-    crps_score,
     calibration_coverage,
+    combine_density_forecasts,
+    crps_score,
     from_point_estimate,
 )
 
@@ -62,19 +62,24 @@ class TestDensityForecast:
 # baselines.py
 # ---------------------------------------------------------------------------
 from predmarket.baselines import (
-    NaiveBaseline,
-    HistoricalMeanBaseline,
     AlwaysFiftyBaseline,
     BaselineEnsemble,
+    HistoricalMeanBaseline,
+    NaiveBaseline,
 )
 from predmarket.ingest import MarketSnapshot
 
 
 def _make_snapshot(mid=0.55, history=None):
     return MarketSnapshot(
-        venue="Test", contract_id="TEST-1", title="Test contract",
-        bid=mid - 0.005, ask=mid + 0.005, last_price=mid,
-        open_interest=50000.0, volume_24h=10000.0,
+        venue="Test",
+        contract_id="TEST-1",
+        title="Test contract",
+        bid=mid - 0.005,
+        ask=mid + 0.005,
+        last_price=mid,
+        open_interest=50000.0,
+        volume_24h=10000.0,
         line_history=history or [0.50, 0.52, 0.53, 0.54, mid],
     )
 
@@ -179,7 +184,7 @@ class TestWeightLearner:
 # ---------------------------------------------------------------------------
 # bayesian.py
 # ---------------------------------------------------------------------------
-from predmarket.bayesian import BetaPosterior, HierarchicalEventModel, BayesianForecaster
+from predmarket.bayesian import BayesianForecaster, BetaPosterior, HierarchicalEventModel
 
 
 class TestBayesian:
@@ -223,7 +228,7 @@ class TestBayesian:
 # ---------------------------------------------------------------------------
 # ml_timeseries.py
 # ---------------------------------------------------------------------------
-from predmarket.ml_timeseries import FeatureEngineer, XGBoostForecaster, BaggedForecaster
+from predmarket.ml_timeseries import BaggedForecaster, FeatureEngineer, XGBoostForecaster
 
 
 class TestMLTimeseries:
@@ -251,7 +256,8 @@ class TestMLTimeseries:
         assert isinstance(df, DensityForecast)
 
     def test_bagged_forecaster(self):
-        from predmarket.baselines import NaiveBaseline, HistoricalMeanBaseline
+        from predmarket.baselines import HistoricalMeanBaseline, NaiveBaseline
+
         bf = BaggedForecaster([NaiveBaseline(), HistoricalMeanBaseline()])
         snap = _make_snapshot(mid=0.6)
         f = bf.forecast(snap.line_history)
@@ -261,7 +267,7 @@ class TestMLTimeseries:
 # ---------------------------------------------------------------------------
 # aggregator.py
 # ---------------------------------------------------------------------------
-from predmarket.aggregator import PlatformAggregator, ExternalForecast
+from predmarket.aggregator import ExternalForecast, PlatformAggregator
 
 
 class TestAggregator:
@@ -328,32 +334,52 @@ class TestBacktester:
         history = []
         now = time.time()
         for i in range(60):
-            history.append({
-                "timestamp": now - (60 - i) * 86400,
-                "contract_id": "CON-1",
-                "model_prob": 0.6 + 0.01 * (i % 5),
-                "market_implied": 0.55,
-                "category": "political",
-                "status": "READY",
-                "outcome": 1 if i % 3 == 0 else 0,
-            })
+            history.append(
+                {
+                    "timestamp": now - (60 - i) * 86400,
+                    "contract_id": "CON-1",
+                    "model_prob": 0.6 + 0.01 * (i % 5),
+                    "market_implied": 0.55,
+                    "category": "political",
+                    "status": "READY",
+                    "outcome": 1 if i % 3 == 0 else 0,
+                }
+            )
         bt = Backtester(history)
         results = bt.run_walk_forward(train_window=20, test_window=5, step=5)
         assert len(results) > 0
         assert results[0].brier_mean >= 0
 
     def test_rolling_brier(self):
-        history = [{"timestamp": i * 100, "contract_id": "C", "model_prob": 0.7,
-                     "market_implied": 0.5, "category": "econ", "status": "READY", "outcome": 1}
-                    for i in range(30)]
+        history = [
+            {
+                "timestamp": i * 100,
+                "contract_id": "C",
+                "model_prob": 0.7,
+                "market_implied": 0.5,
+                "category": "econ",
+                "status": "READY",
+                "outcome": 1,
+            }
+            for i in range(30)
+        ]
         bt = Backtester(history)
         rb = bt.compute_rolling_brier(window=10)
         assert len(rb) > 0
 
     def test_summary(self):
-        history = [{"timestamp": i, "contract_id": "C", "model_prob": 0.6,
-                     "market_implied": 0.5, "category": "econ", "status": "READY", "outcome": 1}
-                    for i in range(20)]
+        history = [
+            {
+                "timestamp": i,
+                "contract_id": "C",
+                "model_prob": 0.6,
+                "market_implied": 0.5,
+                "category": "econ",
+                "status": "READY",
+                "outcome": 1,
+            }
+            for i in range(20)
+        ]
         bt = Backtester(history)
         s = bt.summary()
         assert isinstance(s, str)
@@ -363,43 +389,63 @@ class TestBacktester:
 # ---------------------------------------------------------------------------
 # judgment.py
 # ---------------------------------------------------------------------------
-from predmarket.judgment import StructuredJudgmentProtocol, JudgmentResponse, JudgmentTracker
+from predmarket.judgment import JudgmentResponse, JudgmentTracker, StructuredJudgmentProtocol
 
 
 class TestJudgment:
     def test_create_request(self):
         sjp = StructuredJudgmentProtocol()
-        req = sjp.create_judgment_request({
-            "contract_id": "CON-1", "model_prob": 0.8, "market_implied": 0.5,
-            "category": "political", "venue": "Polymarket", "edge": 0.3,
-        })
+        req = sjp.create_judgment_request(
+            {
+                "contract_id": "CON-1",
+                "model_prob": 0.8,
+                "market_implied": 0.5,
+                "category": "political",
+                "venue": "Polymarket",
+                "edge": 0.3,
+            }
+        )
         assert len(req.structured_questions) > 0
 
     def test_validate_response(self):
         sjp = StructuredJudgmentProtocol()
         resp = JudgmentResponse(
-            contract_id="CON-1", approved=True, confidence=0.8,
+            contract_id="CON-1",
+            approved=True,
+            confidence=0.8,
             reasoning="Model shows consistent edge over 30 days.",
             concerns=["Liquidity may be insufficient"],
-            override_probability=None, analyst_id="A1", timestamp=time.time(),
+            override_probability=None,
+            analyst_id="A1",
+            timestamp=time.time(),
         )
         assert sjp.validate_response(resp) is True
 
     def test_invalid_response_empty_reasoning(self):
         sjp = StructuredJudgmentProtocol()
         resp = JudgmentResponse(
-            contract_id="CON-1", approved=True, confidence=0.8,
-            reasoning="", concerns=[], override_probability=None,
-            analyst_id="A1", timestamp=time.time(),
+            contract_id="CON-1",
+            approved=True,
+            confidence=0.8,
+            reasoning="",
+            concerns=[],
+            override_probability=None,
+            analyst_id="A1",
+            timestamp=time.time(),
         )
         assert sjp.validate_response(resp) is False
 
     def test_judgment_tracker(self, tmp_path):
         jt = JudgmentTracker(db_path=str(tmp_path / "judgment.db"))
         resp = JudgmentResponse(
-            contract_id="CON-1", approved=True, confidence=0.8,
-            reasoning="Good edge", concerns=[], override_probability=None,
-            analyst_id="A1", timestamp=time.time(),
+            contract_id="CON-1",
+            approved=True,
+            confidence=0.8,
+            reasoning="Good edge",
+            concerns=[],
+            override_probability=None,
+            analyst_id="A1",
+            timestamp=time.time(),
         )
         jt.record(resp, actual_outcome=1)
         cal = jt.get_analyst_calibration("A1")
@@ -415,6 +461,7 @@ from predmarket.horizons import ForecastHorizon, HorizonSpecificForecaster, Hori
 class TestHorizons:
     def test_horizon_forecast(self):
         from predmarket.baselines import NaiveBaseline
+
         hf = HorizonSpecificForecaster(NaiveBaseline())
         snap = _make_snapshot(mid=0.6)
         df = hf.forecast_with_horizon(snap, "political", ForecastHorizon.SHORT)
@@ -426,6 +473,7 @@ class TestHorizons:
 
     def test_all_horizons(self):
         from predmarket.baselines import NaiveBaseline
+
         hf = HorizonSpecificForecaster(NaiveBaseline())
         results = hf.forecast_all_horizons(_make_snapshot(), "political")
         assert len(results) == 4
@@ -448,9 +496,13 @@ from predmarket.elections import ElectionModel
 class TestElections:
     def test_fundamental_forecast(self):
         em = ElectionModel()
-        prob = em.fundamental_forecast({
-            "gdp_growth": 2.5, "inflation": 2.0, "unemployment_change": -0.5,
-        })
+        prob = em.fundamental_forecast(
+            {
+                "gdp_growth": 2.5,
+                "inflation": 2.0,
+                "unemployment_change": -0.5,
+            }
+        )
         assert 0.0 < prob < 1.0
 
     def test_polling_aggregate(self):
@@ -482,7 +534,7 @@ class TestElections:
 # ---------------------------------------------------------------------------
 # diffusion.py
 # ---------------------------------------------------------------------------
-from predmarket.diffusion import LogisticGrowthModel, BassDiffusionModel, MarketLiquidityModel
+from predmarket.diffusion import LogisticGrowthModel, MarketLiquidityModel
 
 
 class TestDiffusion:
@@ -513,8 +565,8 @@ class TestDiffusion:
 # ---------------------------------------------------------------------------
 # forecasting_pipeline.py
 # ---------------------------------------------------------------------------
-from predmarket.forecasting_pipeline import ForecastingPipeline
 from predmarket.config import load_config
+from predmarket.forecasting_pipeline import ForecastingPipeline
 
 
 class TestForecastingPipeline:

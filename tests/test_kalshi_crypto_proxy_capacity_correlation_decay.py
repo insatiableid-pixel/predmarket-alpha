@@ -5,11 +5,17 @@ import json
 import sys
 from pathlib import Path
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_capacity_correlation_decay.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "scripts"
+    / "kalshi_crypto_proxy_capacity_correlation_decay.py"
+)
 
 
 def load_ccd_module():
-    spec = importlib.util.spec_from_file_location("kalshi_crypto_proxy_capacity_correlation_decay", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_crypto_proxy_capacity_correlation_decay", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -95,7 +101,10 @@ def test_ask_levels_derive_yes_and_no_asks_from_opposing_bids() -> None:
 
 def test_select_current_candidates_round_robins_clusters_before_truncating() -> None:
     module = load_ccd_module()
-    rows = [feature_row(f"KXBNB-26JUL0201-B{strike}", asset="BNB") for strike in (100, 105, 110, 115, 120)] + [
+    rows = [
+        feature_row(f"KXBNB-26JUL0201-B{strike}", asset="BNB")
+        for strike in (100, 105, 110, 115, 120)
+    ] + [
         feature_row("KXETH-26JUL0201-B100", asset="ETH"),
         feature_row("KXSOL-26JUL0201-B100", asset="SOL", contract_family="above"),
     ]
@@ -118,7 +127,10 @@ def test_build_ccd_uses_diversified_candidates_under_ticker_cap(tmp_path: Path) 
     module = load_ccd_module()
     feature_path = tmp_path / "feature.json"
     replay_path = tmp_path / "replay.json"
-    rows = [feature_row(f"KXBNB-26JUL0201-B{strike}", asset="BNB") for strike in (100, 105, 110, 115, 120)] + [
+    rows = [
+        feature_row(f"KXBNB-26JUL0201-B{strike}", asset="BNB")
+        for strike in (100, 105, 110, 115, 120)
+    ] + [
         feature_row("KXETH-26JUL0201-B100", asset="ETH"),
         feature_row("KXSOL-26JUL0201-B100", asset="SOL", contract_family="above"),
     ]
@@ -152,7 +164,9 @@ def test_build_ccd_ready_when_depth_cluster_and_decay_pass(tmp_path: Path) -> No
         feature_path,
         feature_packet(
             feature_row("KXBTC-26JUL0201-B100", asset="BTC"),
-            feature_row("KXETH-26JUL0201-B200", asset="ETH", proxy_state="proxy_below_range_not_label"),
+            feature_row(
+                "KXETH-26JUL0201-B200", asset="ETH", proxy_state="proxy_below_range_not_label"
+            ),
         ),
     )
     write_json(replay_path, replay_payload(probability=0.8))
@@ -208,7 +222,10 @@ def test_build_ccd_blocks_concentrated_positive_depth(tmp_path: Path) -> None:
         max_cluster_share=0.35,
     )
 
-    assert report["status"] == "crypto_proxy_capacity_correlation_decay_blocked_correlation_concentration"
+    assert (
+        report["status"]
+        == "crypto_proxy_capacity_correlation_decay_blocked_correlation_concentration"
+    )
     assert report["summary"]["capacity_status"] == "capacity_depth_positive"
     assert report["summary"]["largest_correlation_cluster_share"] == 1.0
     assert report["next_action"]["name"] == "kalshi_crypto_proxy_correlation_cluster_control"
@@ -219,7 +236,9 @@ def test_build_ccd_blocks_decay_when_replay_decay_is_not_surviving(tmp_path: Pat
     feature_path = tmp_path / "feature.json"
     replay_path = tmp_path / "replay.json"
     write_json(feature_path, feature_packet(feature_row("KXBTC-26JUL0201-B100")))
-    write_json(replay_path, replay_payload(probability=0.8, decay_status="recent_bucket_worse_than_random"))
+    write_json(
+        replay_path, replay_payload(probability=0.8, decay_status="recent_bucket_worse_than_random")
+    )
 
     report = module.build_crypto_proxy_capacity_correlation_decay(
         feature_packet_path=feature_path,

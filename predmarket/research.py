@@ -11,8 +11,9 @@ import json
 import statistics
 import time
 import uuid
+from collections.abc import Iterable, Sequence
 from dataclasses import asdict, dataclass, field
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -70,9 +71,7 @@ def deflated_sharpe_ratio(
     sr = annualized_sharpe(arr, periods_per_year=periods_per_year)
     skew = float(((arr - arr.mean()) ** 3).mean() / max(arr.std() ** 3, 1e-12))
     kurt = float(((arr - arr.mean()) ** 4).mean() / max(arr.std() ** 4, 1e-12))
-    trial_penalty = statistics.NormalDist().inv_cdf(
-        1.0 - 1.0 / max(float(n_trials), 2.0)
-    )
+    trial_penalty = statistics.NormalDist().inv_cdf(1.0 - 1.0 / max(float(n_trials), 2.0))
     sr_star = trial_penalty / np.sqrt(max(len(arr) - 1, 1))
     denom = np.sqrt(max(1.0 - skew * sr + ((kurt - 1.0) / 4.0) * sr**2, 1e-9))
     z = (sr - sr_star) * np.sqrt(len(arr) - 1) / denom
@@ -91,8 +90,8 @@ def probability_of_backtest_overfitting(
     """
     if not trial_returns:
         return 1.0
-    train_scores: List[float] = []
-    test_scores: List[float] = []
+    train_scores: list[float] = []
+    test_scores: list[float] = []
     for series in trial_returns:
         arr = np.asarray(series, dtype=float)
         if len(arr) < 4:
@@ -118,7 +117,7 @@ class ResearchBacktestConfig:
     purge_size: int = 0
     embargo_size: int = 0
     expanding: bool = True
-    bucket_fields: List[str] = field(
+    bucket_fields: list[str] = field(
         default_factory=lambda: ["domain", "horizon", "venue", "liquidity_bucket"]
     )
     n_strategy_trials: int = 1
@@ -127,8 +126,8 @@ class ResearchBacktestConfig:
 @dataclass
 class PromotionDecision:
     status: str
-    reasons: List[str]
-    metrics: Dict[str, Any]
+    reasons: list[str]
+    metrics: dict[str, Any]
 
     @property
     def promoted(self) -> bool:
@@ -138,14 +137,14 @@ class PromotionDecision:
 @dataclass
 class ExperimentReport:
     run_id: str
-    config: Dict[str, Any]
+    config: dict[str, Any]
     created_ts: float
-    metrics: Dict[str, Any]
-    bucket_metrics: Dict[str, Dict[str, Any]]
+    metrics: dict[str, Any]
+    bucket_metrics: dict[str, dict[str, Any]]
     promotion: PromotionDecision
     code_version: str = ""
 
-    def to_dict(self) -> Dict[str, Any]:
+    def to_dict(self) -> dict[str, Any]:
         payload = asdict(self)
         payload["promotion"] = asdict(self.promotion)
         return payload
@@ -168,16 +167,14 @@ class PromotionGate:
         self.max_ece = max_ece
         self.min_dsr = min_dsr
         self.max_pbo = max_pbo
-        self.max_major_bucket_brier_underperformance = (
-            max_major_bucket_brier_underperformance
-        )
+        self.max_major_bucket_brier_underperformance = max_major_bucket_brier_underperformance
 
     def evaluate(
         self,
-        metrics: Dict[str, Any],
-        bucket_metrics: Optional[Dict[str, Dict[str, Any]]] = None,
+        metrics: dict[str, Any],
+        bucket_metrics: dict[str, dict[str, Any]] | None = None,
     ) -> PromotionDecision:
-        reasons: List[str] = []
+        reasons: list[str] = []
         n = int(metrics.get("n", 0))
         if n < self.min_resolved_forecasts:
             reasons.append(f"sample_size<{self.min_resolved_forecasts}")
@@ -185,16 +182,12 @@ class PromotionGate:
         model_brier = float(metrics.get("brier", 1.0))
         baseline_brier = float(metrics.get("baseline_brier", 1.0))
         rel_improvement = (
-            (baseline_brier - model_brier) / baseline_brier
-            if baseline_brier > 0
-            else -1.0
+            (baseline_brier - model_brier) / baseline_brier if baseline_brier > 0 else -1.0
         )
         if rel_improvement < self.min_relative_brier_improvement:
             reasons.append("relative_brier_improvement<5pct")
 
-        if float(metrics.get("log_score", 1e9)) > float(
-            metrics.get("baseline_log_score", -1e9)
-        ):
+        if float(metrics.get("log_score", 1e9)) > float(metrics.get("baseline_log_score", -1e9)):
             reasons.append("log_score_worse_than_baseline")
 
         if float(metrics.get("ece", 1.0)) > self.max_ece:
@@ -210,9 +203,7 @@ class PromotionGate:
             bucket_n = int(values.get("n", 0))
             if bucket_n == 0:
                 continue
-            underperf = float(values.get("brier", 1.0)) - float(
-                values.get("baseline_brier", 1.0)
-            )
+            underperf = float(values.get("brier", 1.0)) - float(values.get("baseline_brier", 1.0))
             if underperf > self.max_major_bucket_brier_underperformance:
                 reasons.append(f"bucket_underperforms:{bucket}")
 
@@ -229,7 +220,7 @@ class ResearchBacktester:
     def __init__(
         self,
         store: Any = None,
-        promotion_gate: Optional[PromotionGate] = None,
+        promotion_gate: PromotionGate | None = None,
         code_version: str = "",
     ):
         self.store = store
@@ -238,8 +229,8 @@ class ResearchBacktester:
 
     def walk_forward_splits(
         self, n_rows: int, config: ResearchBacktestConfig
-    ) -> List[Tuple[np.ndarray, np.ndarray]]:
-        splits: List[Tuple[np.ndarray, np.ndarray]] = []
+    ) -> list[tuple[np.ndarray, np.ndarray]]:
+        splits: list[tuple[np.ndarray, np.ndarray]] = []
         start_train = 0
         train_end = config.min_train_size
         while True:
@@ -250,7 +241,9 @@ class ResearchBacktester:
             if config.expanding:
                 train_idx = np.arange(start_train, train_end)
             else:
-                train_idx = np.arange(max(start_train, train_end - config.min_train_size), train_end)
+                train_idx = np.arange(
+                    max(start_train, train_end - config.min_train_size), train_end
+                )
             test_idx = np.arange(test_start, test_end)
             splits.append((train_idx, test_idx))
             train_end += config.step_size + config.embargo_size
@@ -259,7 +252,7 @@ class ResearchBacktester:
     def run_experiment(
         self,
         config: ResearchBacktestConfig,
-        rows: Optional[List[Dict[str, Any]]] = None,
+        rows: list[dict[str, Any]] | None = None,
     ) -> ExperimentReport:
         if rows is None:
             rows = self._load_resolved_rows()
@@ -287,7 +280,7 @@ class ResearchBacktester:
             )
         return report
 
-    def _load_resolved_rows(self) -> List[Dict[str, Any]]:
+    def _load_resolved_rows(self) -> list[dict[str, Any]]:
         if self.store is None:
             return []
         rows = self.store._fetchall(
@@ -315,8 +308,8 @@ class ResearchBacktester:
         ]
 
     def _score_rows(
-        self, rows: List[Dict[str, Any]], config: ResearchBacktestConfig
-    ) -> Dict[str, Any]:
+        self, rows: list[dict[str, Any]], config: ResearchBacktestConfig
+    ) -> dict[str, Any]:
         if not rows:
             return {
                 "n": 0,
@@ -349,7 +342,9 @@ class ResearchBacktester:
             "log_score": log_score(model, outcomes),
             "baseline_log_score": log_score(baseline, outcomes),
             "ece": expected_calibration_error(model, outcomes),
-            "crps_proxy": float(np.mean(list(quantile_losses.values()))) if quantile_losses else 0.0,
+            "crps_proxy": float(np.mean(list(quantile_losses.values())))
+            if quantile_losses
+            else 0.0,
             "pinball": quantile_losses,
             "execution_return": float(np.sum(returns)),
             "sharpe": annualized_sharpe(returns),
@@ -363,9 +358,9 @@ class ResearchBacktester:
         }
 
     def _score_buckets(
-        self, rows: List[Dict[str, Any]], config: ResearchBacktestConfig
-    ) -> Dict[str, Dict[str, Any]]:
-        buckets: Dict[str, List[Dict[str, Any]]] = {}
+        self, rows: list[dict[str, Any]], config: ResearchBacktestConfig
+    ) -> dict[str, dict[str, Any]]:
+        buckets: dict[str, list[dict[str, Any]]] = {}
         for row in rows:
             parts = []
             for field_name in config.bucket_fields:
@@ -376,14 +371,15 @@ class ResearchBacktester:
                 parts.append(str(row.get("bucket", "default")))
             buckets.setdefault("|".join(parts), []).append(row)
         return {
-            bucket: self._score_rows(bucket_rows, config)
-            for bucket, bucket_rows in buckets.items()
+            bucket: self._score_rows(bucket_rows, config) for bucket, bucket_rows in buckets.items()
         }
 
     @staticmethod
-    def _execution_return(row: Dict[str, Any]) -> float:
+    def _execution_return(row: dict[str, Any]) -> float:
         p = float(row.get("p_model", row.get("model_prob", 0.5)))
-        price = float(row.get("execution_price", row.get("market_implied", row.get("p_baseline", 0.5))))
+        price = float(
+            row.get("execution_price", row.get("market_implied", row.get("p_baseline", 0.5)))
+        )
         fee = float(row.get("fee", row.get("fees", 0.0)))
         slippage = float(row.get("slippage", 0.0))
         fill_probability = float(row.get("fill_probability", 1.0))
@@ -392,9 +388,7 @@ class ResearchBacktester:
         return stake * fill_probability * edge
 
     @staticmethod
-    def _trial_return_matrix(
-        rows: List[Dict[str, Any]], n_trials: int
-    ) -> List[List[float]]:
+    def _trial_return_matrix(rows: list[dict[str, Any]], n_trials: int) -> list[list[float]]:
         base = [ResearchBacktester._execution_return(row) for row in rows]
         trials = [base]
         for trial_idx in range(1, max(n_trials, 1)):
@@ -403,13 +397,11 @@ class ResearchBacktester:
         return trials
 
     @staticmethod
-    def _quantile_losses(
-        rows: List[Dict[str, Any]], outcomes: List[float]
-    ) -> Dict[float, float]:
+    def _quantile_losses(rows: list[dict[str, Any]], outcomes: list[float]) -> dict[float, float]:
         levels: set[float] = set()
         for row in rows:
             levels.update(float(k) for k in (row.get("quantiles") or {}).keys())
-        losses: Dict[float, float] = {}
+        losses: dict[float, float] = {}
         for level in sorted(levels):
             preds = [
                 (row.get("quantiles") or {}).get(level)

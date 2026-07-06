@@ -20,23 +20,25 @@ class FakeKalshiClient:
 
 
 def test_capture_kalshi_market_snapshot_records_counts_and_errors():
-    snapshot = asyncio.run(capture_kalshi_market_snapshot(
-        series_tickers=("KXMLBGAME", "KXMLBTOTAL"),
-        delay_seconds=0,
-        created_ts=1_800_000_000.0,
-        client=FakeKalshiClient(
-            {
-                "KXMLBGAME": [
-                    {
-                        "ticker": "KXMLBGAME-26JUN291905ABCXYZ-ABC",
-                        "event_ticker": "KXMLBGAME-26JUN291905ABCXYZ",
-                        "title": "ABC vs XYZ Winner?",
-                    }
-                ],
-                "KXMLBTOTAL": RuntimeError("rate limited"),
-            }
-        ),
-    ))
+    snapshot = asyncio.run(
+        capture_kalshi_market_snapshot(
+            series_tickers=("KXMLBGAME", "KXMLBTOTAL"),
+            delay_seconds=0,
+            created_ts=1_800_000_000.0,
+            client=FakeKalshiClient(
+                {
+                    "KXMLBGAME": [
+                        {
+                            "ticker": "KXMLBGAME-26JUN291905ABCXYZ-ABC",
+                            "event_ticker": "KXMLBGAME-26JUN291905ABCXYZ",
+                            "title": "ABC vs XYZ Winner?",
+                        }
+                    ],
+                    "KXMLBTOTAL": RuntimeError("rate limited"),
+                }
+            ),
+        )
+    )
 
     assert snapshot["research_only"] is True
     assert snapshot["execution_enabled"] is False
@@ -78,6 +80,31 @@ def test_write_capture_artifacts_writes_snapshot_latest_and_report(tmp_path):
     assert artifacts.report_json_path.exists()
     assert artifacts.report_markdown_path.exists()
     assert json.loads(artifacts.latest_path.read_text())["market_count"] == 1
+
+
+def test_write_capture_artifacts_uses_series_specific_snapshot_prefix(tmp_path):
+    snapshot = {
+        "created_at_utc": "2026-07-05T23:00:00Z",
+        "research_only": True,
+        "execution_enabled": False,
+        "safety": {"account_or_order_paths": False},
+        "market_count": 1,
+        "series_tickers": ["KXNFLGAME"],
+        "series_counts": {"KXNFLGAME": 1},
+        "series_errors": {},
+        "all_scored": [{"ticker": "KXNFLGAME-26SEP13ARILAC-ARI"}],
+    }
+
+    artifacts = write_capture_artifacts(
+        snapshot,
+        output_dir=tmp_path / "kalshi",
+        latest_path=tmp_path / "kalshi" / "latest.json",
+        report_dir=tmp_path / "reports",
+        run_id="unit",
+    )
+
+    assert artifacts.snapshot_path.name.startswith("kalshi_nfl_game_series_")
+    assert "mlb" not in artifacts.snapshot_path.name
 
 
 def test_capture_report_markdown_keeps_guardrails():

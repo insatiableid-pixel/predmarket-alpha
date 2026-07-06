@@ -23,7 +23,6 @@ import os
 from enum import Enum
 from pathlib import Path
 
-
 _FLAGS_FILE = Path(__file__).resolve().parents[1] / "config" / "feature_flags.json"
 
 

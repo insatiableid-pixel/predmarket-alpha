@@ -5,11 +5,17 @@ import json
 import sys
 from pathlib import Path
 
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_correlation_cluster_control.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1]
+    / "scripts"
+    / "kalshi_crypto_proxy_correlation_cluster_control.py"
+)
 
 
 def load_cluster_control_module():
-    spec = importlib.util.spec_from_file_location("kalshi_crypto_proxy_correlation_cluster_control", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_crypto_proxy_correlation_cluster_control", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -77,7 +83,9 @@ def test_cluster_control_blocks_single_cluster_under_max_share(tmp_path: Path) -
     write_json(
         ccd_path,
         ccd_payload(
-            capacity_row("KXBNB-26JUL0205-B400", cluster="BNB|range|2026-07-02T05:00Z", asset="BNB", cost=90),
+            capacity_row(
+                "KXBNB-26JUL0205-B400", cluster="BNB|range|2026-07-02T05:00Z", asset="BNB", cost=90
+            ),
             capacity_row(
                 "KXBNB-26JUL0205-B410",
                 cluster="BNB|range|2026-07-02T05:00Z",
@@ -94,7 +102,9 @@ def test_cluster_control_blocks_single_cluster_under_max_share(tmp_path: Path) -
         max_cluster_share=0.35,
     )
 
-    assert report["status"] == "crypto_proxy_correlation_cluster_control_blocked_insufficient_clusters"
+    assert (
+        report["status"] == "crypto_proxy_correlation_cluster_control_blocked_insufficient_clusters"
+    )
     assert report["summary"]["positive_cluster_count"] == 1
     assert report["summary"]["required_positive_cluster_count"] == 3
     assert report["summary"]["largest_positive_cluster_share"] == 1.0
@@ -112,9 +122,15 @@ def test_cluster_control_ready_with_three_balanced_clusters(tmp_path: Path) -> N
     write_json(
         ccd_path,
         ccd_payload(
-            capacity_row("KXBTC-26JUL0205-B100", cluster="BTC|range|2026-07-02T05:00Z", asset="BTC", cost=100),
-            capacity_row("KXETH-26JUL0205-B100", cluster="ETH|range|2026-07-02T05:00Z", asset="ETH", cost=100),
-            capacity_row("KXSOL-26JUL0205-B100", cluster="SOL|range|2026-07-02T05:00Z", asset="SOL", cost=100),
+            capacity_row(
+                "KXBTC-26JUL0205-B100", cluster="BTC|range|2026-07-02T05:00Z", asset="BTC", cost=100
+            ),
+            capacity_row(
+                "KXETH-26JUL0205-B100", cluster="ETH|range|2026-07-02T05:00Z", asset="ETH", cost=100
+            ),
+            capacity_row(
+                "KXSOL-26JUL0205-B100", cluster="SOL|range|2026-07-02T05:00Z", asset="SOL", cost=100
+            ),
         ),
     )
 
@@ -139,7 +155,9 @@ def test_cluster_control_blocks_upstream_invalid_ccd(tmp_path: Path) -> None:
     write_json(
         ccd_path,
         ccd_payload(
-            capacity_row("KXBTC-26JUL0205-B100", cluster="BTC|range|2026-07-02T05:00Z", asset="BTC", cost=100),
+            capacity_row(
+                "KXBTC-26JUL0205-B100", cluster="BTC|range|2026-07-02T05:00Z", asset="BTC", cost=100
+            ),
             capacity_status="capacity_depth_blocked",
         ),
     )

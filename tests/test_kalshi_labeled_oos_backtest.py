@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_labeled_oos_backtest.py"
 SCHEMA_PATH = (
     Path(__file__).resolve().parents[1]
@@ -61,7 +60,11 @@ def registry_payload(*hypothesis_ids: str):
                 "model_route": "nfl_quant_glm51_greenfield",
                 "feature_family": "calibrated_probability_decay",
                 "multiple_testing_family": f"unit::{hypothesis_id}",
-                "safety": {"research_only": True, "market_execution": False, "account_or_order_paths": False},
+                "safety": {
+                    "research_only": True,
+                    "market_execution": False,
+                    "account_or_order_paths": False,
+                },
             }
             for hypothesis_id in hypothesis_ids
         ],
@@ -101,7 +104,10 @@ def test_backtest_blocks_when_labels_are_missing(tmp_path: Path) -> None:
     assert report["status"] == "labeled_oos_backtest_blocked_missing_labeled_observations"
     assert report["summary"]["valid_observation_count"] == 0
     assert report["summary"]["blocked_hypothesis_count"] == 1
-    assert report["falsification_gate"]["status"] == "falsification_gate_blocked_missing_labeled_oos_evidence"
+    assert (
+        report["falsification_gate"]["status"]
+        == "falsification_gate_blocked_missing_labeled_oos_evidence"
+    )
     assert report["safety"]["market_execution"] is False
 
 
@@ -116,7 +122,11 @@ def test_backtest_ignores_unsafe_label_packets(tmp_path: Path) -> None:
             "research_only": True,
             "execution_enabled": True,
             "rows": [observation("hyp_0000000000000001", 0)],
-            "safety": {"market_execution": True, "account_or_order_paths": True, "database_writes": False},
+            "safety": {
+                "market_execution": True,
+                "account_or_order_paths": True,
+                "database_writes": False,
+            },
         },
     )
 

@@ -4,8 +4,9 @@ import importlib.util
 import json
 from pathlib import Path
 
-
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_feature_packet.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_feature_packet.py"
+)
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
@@ -94,7 +95,9 @@ def fake_fetch(url: str):
     return list(reversed(candles))
 
 
-def test_crypto_proxy_feature_packet_builds_contract_keyed_rows_without_ev_or_labels(tmp_path: Path) -> None:
+def test_crypto_proxy_feature_packet_builds_contract_keyed_rows_without_ev_or_labels(
+    tmp_path: Path,
+) -> None:
     module = load_packet_module()
     universe_path = tmp_path / "universe.json"
     breadth_path = tmp_path / "breadth.json"
@@ -153,7 +156,10 @@ def test_crypto_proxy_feature_packet_skips_closed_contracts(tmp_path: Path) -> N
     breadth_path = tmp_path / "breadth.json"
     raw_path = tmp_path / "raw_universe.json"
     write_json(universe_path, safe_artifact(candidates=[candidate()]))
-    write_json(breadth_path, safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"))
+    write_json(
+        breadth_path,
+        safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"),
+    )
     write_json(raw_path, {"markets": [raw_market()]})
 
     report = module.build_crypto_proxy_feature_packet(
@@ -168,7 +174,9 @@ def test_crypto_proxy_feature_packet_skips_closed_contracts(tmp_path: Path) -> N
     assert report["summary"]["feature_row_count"] == 0
 
 
-def test_crypto_proxy_feature_packet_skips_finance_rows_without_configured_crypto_asset(tmp_path: Path) -> None:
+def test_crypto_proxy_feature_packet_skips_finance_rows_without_configured_crypto_asset(
+    tmp_path: Path,
+) -> None:
     module = load_packet_module()
     universe_path = tmp_path / "universe.json"
     breadth_path = tmp_path / "breadth.json"
@@ -193,7 +201,10 @@ def test_crypto_proxy_feature_packet_skips_finance_rows_without_configured_crypt
         expected_expiration_time="2026-07-02T00:30:00Z",
     )
     write_json(universe_path, safe_artifact(candidates=[candidate(), gas_candidate]))
-    write_json(breadth_path, safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"))
+    write_json(
+        breadth_path,
+        safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"),
+    )
     write_json(raw_path, {"markets": [raw_market(), gas_raw]})
 
     report = module.build_crypto_proxy_feature_packet(
@@ -218,7 +229,10 @@ def test_crypto_proxy_feature_packet_writes_latest_artifacts(tmp_path: Path) -> 
     breadth_path = tmp_path / "breadth.json"
     raw_path = tmp_path / "raw_universe.json"
     write_json(universe_path, safe_artifact(candidates=[candidate()]))
-    write_json(breadth_path, safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"))
+    write_json(
+        breadth_path,
+        safe_artifact(status="probability_breadth_scout_ready_crypto_proxy_feature_route"),
+    )
     write_json(raw_path, {"markets": [raw_market()]})
     report = module.build_crypto_proxy_feature_packet(
         universe_scan_path=universe_path,

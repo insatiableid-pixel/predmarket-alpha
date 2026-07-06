@@ -22,6 +22,27 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+# Family registry companion module (same directory).
+SCRIPTS_DIR = Path(__file__).resolve().parent
+if str(SCRIPTS_DIR) not in sys.path:
+    sys.path.insert(0, str(SCRIPTS_DIR))
+from kalshi_signal_factory_families import (  # noqa: E402
+    CRYPTO_FAMILY_CAPABILITY_NAMES,
+    CRYPTO_PROXY_FAMILY_ID,
+    PASSIVE_LIQUIDITY_FAMILY_ID,
+    SPORTS_BASEBALL_FAMILY_ID,
+    SPORTS_BASEBALL_NEXT_TRANCHES,
+    WEATHER_PROXY_FAMILY_ID,
+    WEATHER_PROXY_NEXT_TRANCHES,
+    build_passive_liquidity_capabilities,
+    build_sports_baseball_capabilities,
+    build_weather_proxy_capabilities,
+    compute_passive_liquidity_status,
+    compute_sports_baseball_status,
+    compute_weather_proxy_status,
+    select_leading_family,
+)
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 DEFAULT_EV_LEDGER_PATH = MACRO_DIR / "latest-kalshi-contract-ev-ledger.json"
@@ -29,11 +50,21 @@ DEFAULT_REVIEW_QUEUE_PATH = MACRO_DIR / "latest-kalshi-ev-review-queue.json"
 DEFAULT_ROBUSTNESS_PATH = MACRO_DIR / "latest-kalshi-ev-queue-robustness.json"
 DEFAULT_HYPOTHESIS_REGISTRY_PATH = MACRO_DIR / "latest-kalshi-hypothesis-registry.json"
 DEFAULT_FALSIFICATION_GATE_PATH = MACRO_DIR / "latest-kalshi-falsification-gate.json"
-DEFAULT_LABELED_OBSERVATION_BUILDER_PATH = MACRO_DIR / "latest-kalshi-labeled-observation-builder.json"
+DEFAULT_LABELED_OBSERVATION_BUILDER_PATH = (
+    MACRO_DIR / "latest-kalshi-labeled-observation-builder.json"
+)
 DEFAULT_LABELED_OOS_BACKTEST_PATH = MACRO_DIR / "latest-kalshi-labeled-oos-backtest.json"
 DEFAULT_PROBABILITY_BREADTH_SCOUT_PATH = MACRO_DIR / "latest-kalshi-probability-breadth-scout.json"
-DEFAULT_CRYPTO_PROXY_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-crypto-proxy-feature-packet.json"
-DEFAULT_CRYPTO_PROXY_OBSERVATION_LOOP_PATH = MACRO_DIR / "latest-kalshi-crypto-proxy-observation-loop.json"
+DEFAULT_GHOST_LISTING_DEPTH_DIAGNOSTIC_PATH = (
+    MACRO_DIR / "latest-kalshi-ghost-listing-depth-diagnostic.json"
+)
+DEFAULT_SPORTS_STACK_SEQUENCING_PATH = MACRO_DIR / "latest-kalshi-sports-stack-sequencing.json"
+DEFAULT_CRYPTO_PROXY_FEATURE_PACKET_PATH = (
+    MACRO_DIR / "latest-kalshi-crypto-proxy-feature-packet.json"
+)
+DEFAULT_CRYPTO_PROXY_OBSERVATION_LOOP_PATH = (
+    MACRO_DIR / "latest-kalshi-crypto-proxy-observation-loop.json"
+)
 DEFAULT_CRYPTO_PROXY_MODEL_FALSIFICATION_PATH = (
     MACRO_DIR / "latest-kalshi-crypto-proxy-feature-model-falsification.json"
 )
@@ -45,6 +76,42 @@ DEFAULT_CRYPTO_PROXY_CAPACITY_CORRELATION_DECAY_PATH = (
 )
 DEFAULT_CRYPTO_PROXY_CORRELATION_CLUSTER_CONTROL_PATH = (
     MACRO_DIR / "latest-kalshi-crypto-proxy-correlation-cluster-control.json"
+)
+DEFAULT_SPORTS_PROXY_FEATURE_PACKET_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-feature-packet.json"
+)
+DEFAULT_SPORTS_PROXY_OBSERVATION_LOOP_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-observation-loop.json"
+)
+DEFAULT_SPORTS_PROXY_MODEL_FALSIFICATION_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-feature-model-falsification.json"
+)
+DEFAULT_SPORTS_PROXY_RESEARCH_CANDIDATE_REPLAY_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-research-candidate-replay.json"
+)
+DEFAULT_SPORTS_PROXY_CAPACITY_CORRELATION_DECAY_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-capacity-correlation-decay.json"
+)
+DEFAULT_SPORTS_PROXY_CORRELATION_CLUSTER_CONTROL_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-proxy-correlation-cluster-control.json"
+)
+DEFAULT_WEATHER_PROXY_FEATURE_PACKET_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-feature-packet.json"
+)
+DEFAULT_WEATHER_PROXY_OBSERVATION_LOOP_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-observation-loop.json"
+)
+DEFAULT_WEATHER_PROXY_MODEL_FALSIFICATION_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-feature-model-falsification.json"
+)
+DEFAULT_WEATHER_PROXY_RESEARCH_CANDIDATE_REPLAY_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-research-candidate-replay.json"
+)
+DEFAULT_WEATHER_PROXY_CAPACITY_CORRELATION_DECAY_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-capacity-correlation-decay.json"
+)
+DEFAULT_WEATHER_PROXY_CORRELATION_CLUSTER_CONTROL_PATH = (
+    MACRO_DIR / "latest-kalshi-weather-proxy-correlation-cluster-control.json"
 )
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-signal-factory-status-latest"
 
@@ -190,12 +257,34 @@ class Artifacts:
     labeled_observation_builder_path: Path
     labeled_oos_backtest_path: Path
     probability_breadth_scout_path: Path
+    ghost_listing_depth_diagnostic_path: Path
+    sports_stack_sequencing_path: Path
     crypto_proxy_feature_packet_path: Path
     crypto_proxy_observation_loop_path: Path
     crypto_proxy_model_falsification_path: Path
     crypto_proxy_research_candidate_replay_path: Path
     crypto_proxy_capacity_correlation_decay_path: Path
     crypto_proxy_correlation_cluster_control_path: Path
+    sports_proxy_feature_packet_path: Path
+    sports_proxy_observation_loop_path: Path
+    sports_proxy_model_falsification_path: Path
+    sports_proxy_research_candidate_replay_path: Path
+    sports_proxy_capacity_correlation_decay_path: Path
+    sports_proxy_correlation_cluster_control_path: Path
+    weather_proxy_feature_packet_path: Path
+    weather_proxy_observation_loop_path: Path
+    weather_proxy_model_falsification_path: Path
+    weather_proxy_research_candidate_replay_path: Path
+    weather_proxy_capacity_correlation_decay_path: Path
+    weather_proxy_correlation_cluster_control_path: Path
+
+    # ── Passive liquidity provision artifacts ──────────────────────
+    passive_liquidity_feature_packet_path: Path
+    passive_liquidity_observation_loop_path: Path
+    passive_liquidity_model_falsification_path: Path
+    passive_liquidity_research_candidate_replay_path: Path
+    passive_liquidity_capacity_correlation_decay_path: Path
+    passive_liquidity_correlation_cluster_control_path: Path
 
     @classmethod
     def isolated(cls, base: Path) -> Artifacts:
@@ -214,12 +303,36 @@ class Artifacts:
             labeled_observation_builder_path=base / "missing-builder.json",
             labeled_oos_backtest_path=base / "missing-oos.json",
             probability_breadth_scout_path=base / "missing-breadth.json",
+            ghost_listing_depth_diagnostic_path=base / "missing-ghost-depth.json",
+            sports_stack_sequencing_path=base / "missing-sports-stack-sequencing.json",
             crypto_proxy_feature_packet_path=base / "missing-crypto-feature.json",
             crypto_proxy_observation_loop_path=base / "missing-crypto-observation.json",
             crypto_proxy_model_falsification_path=base / "missing-crypto-model.json",
             crypto_proxy_research_candidate_replay_path=base / "missing-crypto-replay.json",
             crypto_proxy_capacity_correlation_decay_path=base / "missing-crypto-ccd.json",
-            crypto_proxy_correlation_cluster_control_path=base / "missing-crypto-cluster-control.json",
+            crypto_proxy_correlation_cluster_control_path=base
+            / "missing-crypto-cluster-control.json",
+            sports_proxy_feature_packet_path=base / "missing-sports-feature.json",
+            sports_proxy_observation_loop_path=base / "missing-sports-observation.json",
+            sports_proxy_model_falsification_path=base / "missing-sports-model.json",
+            sports_proxy_research_candidate_replay_path=base / "missing-sports-replay.json",
+            sports_proxy_capacity_correlation_decay_path=base / "missing-sports-ccd.json",
+            sports_proxy_correlation_cluster_control_path=base
+            / "missing-sports-cluster-control.json",
+            weather_proxy_feature_packet_path=base / "missing-weather-feature.json",
+            weather_proxy_observation_loop_path=base / "missing-weather-observation.json",
+            weather_proxy_model_falsification_path=base / "missing-weather-model.json",
+            weather_proxy_research_candidate_replay_path=base / "missing-weather-replay.json",
+            weather_proxy_capacity_correlation_decay_path=base / "missing-weather-ccd.json",
+            weather_proxy_correlation_cluster_control_path=base
+            / "missing-weather-cluster-control.json",
+            passive_liquidity_feature_packet_path=base / "missing-pl-feature.json",
+            passive_liquidity_observation_loop_path=base / "missing-pl-observation.json",
+            passive_liquidity_model_falsification_path=base / "missing-pl-model.json",
+            passive_liquidity_research_candidate_replay_path=base / "missing-pl-replay.json",
+            passive_liquidity_capacity_correlation_decay_path=base / "missing-pl-ccd.json",
+            passive_liquidity_correlation_cluster_control_path=base
+            / "missing-pl-cluster-control.json",
         )
 
     @classmethod
@@ -232,11 +345,19 @@ class Artifacts:
             robustness_path=macro_dir / "latest-kalshi-ev-queue-robustness.json",
             hypothesis_registry_path=macro_dir / "latest-kalshi-hypothesis-registry.json",
             falsification_gate_path=macro_dir / "latest-kalshi-falsification-gate.json",
-            labeled_observation_builder_path=macro_dir / "latest-kalshi-labeled-observation-builder.json",
+            labeled_observation_builder_path=macro_dir
+            / "latest-kalshi-labeled-observation-builder.json",
             labeled_oos_backtest_path=macro_dir / "latest-kalshi-labeled-oos-backtest.json",
-            probability_breadth_scout_path=macro_dir / "latest-kalshi-probability-breadth-scout.json",
-            crypto_proxy_feature_packet_path=macro_dir / "latest-kalshi-crypto-proxy-feature-packet.json",
-            crypto_proxy_observation_loop_path=macro_dir / "latest-kalshi-crypto-proxy-observation-loop.json",
+            probability_breadth_scout_path=macro_dir
+            / "latest-kalshi-probability-breadth-scout.json",
+            ghost_listing_depth_diagnostic_path=(
+                macro_dir / "latest-kalshi-ghost-listing-depth-diagnostic.json"
+            ),
+            sports_stack_sequencing_path=macro_dir / "latest-kalshi-sports-stack-sequencing.json",
+            crypto_proxy_feature_packet_path=macro_dir
+            / "latest-kalshi-crypto-proxy-feature-packet.json",
+            crypto_proxy_observation_loop_path=macro_dir
+            / "latest-kalshi-crypto-proxy-observation-loop.json",
             crypto_proxy_model_falsification_path=macro_dir
             / "latest-kalshi-crypto-proxy-feature-model-falsification.json",
             crypto_proxy_research_candidate_replay_path=macro_dir
@@ -245,6 +366,51 @@ class Artifacts:
             / "latest-kalshi-crypto-proxy-capacity-correlation-decay.json",
             crypto_proxy_correlation_cluster_control_path=(
                 macro_dir / "latest-kalshi-crypto-proxy-correlation-cluster-control.json"
+            ),
+            sports_proxy_feature_packet_path=macro_dir
+            / "latest-kalshi-sports-proxy-feature-packet.json",
+            sports_proxy_observation_loop_path=macro_dir
+            / "latest-kalshi-sports-proxy-observation-loop.json",
+            sports_proxy_model_falsification_path=(
+                macro_dir / "latest-kalshi-sports-proxy-feature-model-falsification.json"
+            ),
+            sports_proxy_research_candidate_replay_path=(
+                macro_dir / "latest-kalshi-sports-proxy-research-candidate-replay.json"
+            ),
+            sports_proxy_capacity_correlation_decay_path=(
+                macro_dir / "latest-kalshi-sports-proxy-capacity-correlation-decay.json"
+            ),
+            sports_proxy_correlation_cluster_control_path=(
+                macro_dir / "latest-kalshi-sports-proxy-correlation-cluster-control.json"
+            ),
+            weather_proxy_feature_packet_path=macro_dir
+            / "latest-kalshi-weather-proxy-feature-packet.json",
+            weather_proxy_observation_loop_path=macro_dir
+            / "latest-kalshi-weather-proxy-observation-loop.json",
+            weather_proxy_model_falsification_path=(
+                macro_dir / "latest-kalshi-weather-proxy-feature-model-falsification.json"
+            ),
+            weather_proxy_research_candidate_replay_path=(
+                macro_dir / "latest-kalshi-weather-proxy-research-candidate-replay.json"
+            ),
+            weather_proxy_capacity_correlation_decay_path=(
+                macro_dir / "latest-kalshi-weather-proxy-capacity-correlation-decay.json"
+            ),
+            weather_proxy_correlation_cluster_control_path=(
+                macro_dir / "latest-kalshi-weather-proxy-correlation-cluster-control.json"
+            ),
+            passive_liquidity_feature_packet_path=macro_dir
+            / "latest-kalshi-passive-liquidity-provision-feature-packet.json",
+            passive_liquidity_observation_loop_path=macro_dir
+            / "latest-kalshi-passive-liquidity-provision-observation-loop.json",
+            passive_liquidity_model_falsification_path=macro_dir
+            / "latest-kalshi-passive-liquidity-provision-feature-model-falsification.json",
+            passive_liquidity_research_candidate_replay_path=macro_dir
+            / "latest-kalshi-passive-liquidity-provision-research-candidate-replay.json",
+            passive_liquidity_capacity_correlation_decay_path=macro_dir
+            / "latest-kalshi-passive-liquidity-provision-capacity-correlation-decay.json",
+            passive_liquidity_correlation_cluster_control_path=(
+                macro_dir / "latest-kalshi-passive-liquidity-provision-correlation-cluster-control.json"
             ),
         )
 
@@ -267,13 +433,53 @@ def build_signal_factory_status(
     observation_builder = read_json_or_empty(artifacts.labeled_observation_builder_path)
     labeled_oos = read_json_or_empty(artifacts.labeled_oos_backtest_path)
     probability_breadth_scout = read_json_or_empty(artifacts.probability_breadth_scout_path)
+    ghost_listing_depth_diagnostic = read_json_or_empty(
+        artifacts.ghost_listing_depth_diagnostic_path
+    )
+    sports_stack_sequencing = read_json_or_empty(artifacts.sports_stack_sequencing_path)
     crypto_proxy_feature_packet = read_json_or_empty(artifacts.crypto_proxy_feature_packet_path)
     crypto_proxy_observation_loop = read_json_or_empty(artifacts.crypto_proxy_observation_loop_path)
-    crypto_proxy_model_falsification = read_json_or_empty(artifacts.crypto_proxy_model_falsification_path)
-    crypto_proxy_research_candidate_replay = read_json_or_empty(artifacts.crypto_proxy_research_candidate_replay_path)
-    crypto_proxy_capacity_correlation_decay = read_json_or_empty(artifacts.crypto_proxy_capacity_correlation_decay_path)
+    crypto_proxy_model_falsification = read_json_or_empty(
+        artifacts.crypto_proxy_model_falsification_path
+    )
+    crypto_proxy_research_candidate_replay = read_json_or_empty(
+        artifacts.crypto_proxy_research_candidate_replay_path
+    )
+    crypto_proxy_capacity_correlation_decay = read_json_or_empty(
+        artifacts.crypto_proxy_capacity_correlation_decay_path
+    )
     crypto_proxy_correlation_cluster_control = read_json_or_empty(
         artifacts.crypto_proxy_correlation_cluster_control_path
+    )
+    sports_proxy_feature_packet = read_json_or_empty(artifacts.sports_proxy_feature_packet_path)
+    sports_proxy_observation_loop = read_json_or_empty(artifacts.sports_proxy_observation_loop_path)
+    weather_proxy_feature_packet = read_json_or_empty(artifacts.weather_proxy_feature_packet_path)
+    weather_proxy_observation_loop = read_json_or_empty(
+        artifacts.weather_proxy_observation_loop_path
+    )
+    weather_proxy_model_falsification = read_json_or_empty(
+        artifacts.weather_proxy_model_falsification_path
+    )
+    weather_proxy_research_candidate_replay = read_json_or_empty(
+        artifacts.weather_proxy_research_candidate_replay_path
+    )
+    weather_proxy_capacity_correlation_decay = read_json_or_empty(
+        artifacts.weather_proxy_capacity_correlation_decay_path
+    )
+    weather_proxy_correlation_cluster_control = read_json_or_empty(
+        artifacts.weather_proxy_correlation_cluster_control_path
+    )
+    sports_proxy_model_falsification = read_json_or_empty(
+        artifacts.sports_proxy_model_falsification_path
+    )
+    sports_proxy_research_candidate_replay = read_json_or_empty(
+        artifacts.sports_proxy_research_candidate_replay_path
+    )
+    sports_proxy_capacity_correlation_decay = read_json_or_empty(
+        artifacts.sports_proxy_capacity_correlation_decay_path
+    )
+    sports_proxy_correlation_cluster_control = read_json_or_empty(
+        artifacts.sports_proxy_correlation_cluster_control_path
     )
 
     universe_summary = summary(universe)
@@ -284,17 +490,31 @@ def build_signal_factory_status(
     observation_builder_summary = summary(observation_builder)
     labeled_oos_summary = summary(labeled_oos)
     probability_breadth_summary = summary(probability_breadth_scout)
+    ghost_listing_depth_summary = summary(ghost_listing_depth_diagnostic)
+    sports_stack_summary = summary(sports_stack_sequencing)
     crypto_proxy_feature_summary = summary(crypto_proxy_feature_packet)
     crypto_proxy_observation_summary = summary(crypto_proxy_observation_loop)
     crypto_proxy_model_summary = summary(crypto_proxy_model_falsification)
     crypto_proxy_replay_summary = summary(crypto_proxy_research_candidate_replay)
     crypto_proxy_ccd_summary = summary(crypto_proxy_capacity_correlation_decay)
     crypto_proxy_cluster_summary = summary(crypto_proxy_correlation_cluster_control)
+    sports_proxy_feature_summary = summary(sports_proxy_feature_packet)
+    sports_proxy_observation_summary = summary(sports_proxy_observation_loop)
+    sports_proxy_model_summary = summary(sports_proxy_model_falsification)
+    sports_proxy_replay_summary = summary(sports_proxy_research_candidate_replay)
+    sports_proxy_ccd_summary = summary(sports_proxy_capacity_correlation_decay)
+    sports_proxy_cluster_summary = summary(sports_proxy_correlation_cluster_control)
     falsification_summary = gate_summary(falsification_gate)
-    registry_ready = safe_research_artifact(registry) and int(registry_summary.get("hypothesis_count") or 0) > 0
+    registry_ready = (
+        safe_research_artifact(registry) and int(registry_summary.get("hypothesis_count") or 0) > 0
+    )
     falsification_status = str(falsification_gate.get("status") or "")
-    falsification_present = safe_research_artifact(falsification_gate) and bool(falsification_status)
-    falsification_blocked = not falsification_present or falsification_status.startswith("falsification_gate_blocked")
+    falsification_present = safe_research_artifact(falsification_gate) and bool(
+        falsification_status
+    )
+    falsification_blocked = not falsification_present or falsification_status.startswith(
+        "falsification_gate_blocked"
+    )
     labeled_oos_present = safe_research_artifact(labeled_oos) and bool(labeled_oos.get("status"))
     labeled_oos_status = str(labeled_oos.get("status") or "")
     observation_builder_present = safe_research_artifact(observation_builder) and bool(
@@ -310,14 +530,33 @@ def build_signal_factory_status(
         "probability_breadth_scout_ready_crypto_route_needs_proxy_probe",
         "probability_breadth_scout_ready_weather_reference_route",
     }
+    ghost_listing_depth_present = safe_research_artifact(ghost_listing_depth_diagnostic) and bool(
+        ghost_listing_depth_diagnostic.get("status")
+    )
+    ghost_listing_depth_status = str(ghost_listing_depth_diagnostic.get("status") or "")
+    ghost_listing_depth_ready = (
+        ghost_listing_depth_status == "ghost_listing_depth_diagnostic_current_depth_ready"
+        and ghost_listing_depth_summary.get("cap_i_lock_allowed") is True
+    )
+    sports_stack_present = safe_research_artifact(sports_stack_sequencing) and bool(
+        sports_stack_sequencing.get("status")
+    )
+    sports_stack_status = str(sports_stack_sequencing.get("status") or "")
+    sports_stack_ready = (
+        sports_stack_status == "sports_stack_sequencing_ready_current_depth_passed"
+        and sports_stack_summary.get("cap_i_lock_allowed") is True
+    )
+    sports_stack_cap_i_blocked = (
+        sports_stack_status == "sports_stack_sequencing_ready_cap_i_lock_blocked"
+    )
     crypto_proxy_feature_present = safe_research_artifact(crypto_proxy_feature_packet) and bool(
         crypto_proxy_feature_packet.get("status")
     )
     crypto_proxy_feature_status = str(crypto_proxy_feature_packet.get("status") or "")
     crypto_proxy_feature_ready = crypto_proxy_feature_status == "crypto_proxy_feature_packet_ready"
-    crypto_proxy_observation_present = safe_research_artifact(crypto_proxy_observation_loop) and bool(
-        crypto_proxy_observation_loop.get("status")
-    )
+    crypto_proxy_observation_present = safe_research_artifact(
+        crypto_proxy_observation_loop
+    ) and bool(crypto_proxy_observation_loop.get("status"))
     crypto_proxy_observation_status = str(crypto_proxy_observation_loop.get("status") or "")
     crypto_proxy_observation_label_ready = (
         crypto_proxy_observation_status == "crypto_proxy_observation_loop_label_rows_ready"
@@ -339,27 +578,216 @@ def build_signal_factory_status(
         "crypto_proxy_feature_model_falsification_ready_no_research_candidates",
         "crypto_proxy_feature_model_falsification_ready_with_research_candidates",
     }
-    crypto_proxy_replay_present = safe_research_artifact(crypto_proxy_research_candidate_replay) and bool(
-        crypto_proxy_research_candidate_replay.get("status")
-    )
+    crypto_proxy_replay_present = safe_research_artifact(
+        crypto_proxy_research_candidate_replay
+    ) and bool(crypto_proxy_research_candidate_replay.get("status"))
     crypto_proxy_replay_status = str(crypto_proxy_research_candidate_replay.get("status") or "")
     crypto_proxy_replay_ready = crypto_proxy_replay_status in {
         "crypto_proxy_research_candidate_replay_blocked_predeployment_gates",
         "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay",
         "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows",
     }
-    crypto_proxy_ccd_present = safe_research_artifact(crypto_proxy_capacity_correlation_decay) and bool(
-        crypto_proxy_capacity_correlation_decay.get("status")
-    )
+    crypto_proxy_ccd_present = safe_research_artifact(
+        crypto_proxy_capacity_correlation_decay
+    ) and bool(crypto_proxy_capacity_correlation_decay.get("status"))
     crypto_proxy_ccd_status = str(crypto_proxy_capacity_correlation_decay.get("status") or "")
-    crypto_proxy_cluster_present = safe_research_artifact_present(crypto_proxy_correlation_cluster_control)
+    crypto_proxy_cluster_present = safe_research_artifact_present(
+        crypto_proxy_correlation_cluster_control
+    )
     crypto_proxy_cluster_status = str(crypto_proxy_correlation_cluster_control.get("status") or "")
+    sports_proxy_feature_present = safe_research_artifact(sports_proxy_feature_packet) and bool(
+        sports_proxy_feature_packet.get("status")
+    )
+    sports_proxy_feature_status = str(sports_proxy_feature_packet.get("status") or "")
+    sports_proxy_observation_present = safe_research_artifact(
+        sports_proxy_observation_loop
+    ) and bool(sports_proxy_observation_loop.get("status"))
+    sports_proxy_observation_status = str(sports_proxy_observation_loop.get("status") or "")
+    sports_proxy_model_present = safe_research_artifact(sports_proxy_model_falsification) and bool(
+        sports_proxy_model_falsification.get("status")
+    )
+    sports_proxy_model_status = str(sports_proxy_model_falsification.get("status") or "")
+    sports_proxy_replay_present = safe_research_artifact(
+        sports_proxy_research_candidate_replay
+    ) and bool(sports_proxy_research_candidate_replay.get("status"))
+    sports_proxy_replay_status = str(sports_proxy_research_candidate_replay.get("status") or "")
+    sports_proxy_ccd_present = safe_research_artifact(
+        sports_proxy_capacity_correlation_decay
+    ) and bool(sports_proxy_capacity_correlation_decay.get("status"))
+    sports_proxy_ccd_status = str(sports_proxy_capacity_correlation_decay.get("status") or "")
+    sports_proxy_cluster_present = safe_research_artifact(
+        sports_proxy_correlation_cluster_control
+    ) and bool(sports_proxy_correlation_cluster_control.get("status"))
+    sports_proxy_cluster_status = str(sports_proxy_correlation_cluster_control.get("status") or "")
+    weather_proxy_feature_summary = summary(weather_proxy_feature_packet)
+    weather_proxy_observation_summary = summary(weather_proxy_observation_loop)
+    weather_proxy_model_summary = summary(weather_proxy_model_falsification)
+    weather_proxy_replay_summary = summary(weather_proxy_research_candidate_replay)
+    weather_proxy_ccd_summary = summary(weather_proxy_capacity_correlation_decay)
+    weather_proxy_cluster_summary = summary(weather_proxy_correlation_cluster_control)
+    weather_proxy_feature_present = safe_research_artifact(weather_proxy_feature_packet) and bool(
+        weather_proxy_feature_packet.get("status")
+    )
+    weather_proxy_feature_status = str(weather_proxy_feature_packet.get("status") or "")
+    weather_proxy_observation_present = safe_research_artifact(
+        weather_proxy_observation_loop
+    ) and bool(weather_proxy_observation_loop.get("status"))
+    weather_proxy_observation_status = str(weather_proxy_observation_loop.get("status") or "")
+    weather_proxy_model_present = safe_research_artifact(
+        weather_proxy_model_falsification
+    ) and bool(weather_proxy_model_falsification.get("status"))
+    weather_proxy_model_status = str(weather_proxy_model_falsification.get("status") or "")
+    weather_proxy_replay_present = safe_research_artifact(
+        weather_proxy_research_candidate_replay
+    ) and bool(weather_proxy_research_candidate_replay.get("status"))
+    weather_proxy_replay_status = str(weather_proxy_research_candidate_replay.get("status") or "")
+    weather_proxy_ccd_present = safe_research_artifact(
+        weather_proxy_capacity_correlation_decay
+    ) and bool(weather_proxy_capacity_correlation_decay.get("status"))
+    weather_proxy_ccd_status = str(weather_proxy_capacity_correlation_decay.get("status") or "")
+    weather_proxy_cluster_present = safe_research_artifact(
+        weather_proxy_correlation_cluster_control
+    ) and bool(weather_proxy_correlation_cluster_control.get("status"))
+    weather_proxy_cluster_status = str(
+        weather_proxy_correlation_cluster_control.get("status") or ""
+    )
+    weather_capabilities = build_weather_proxy_capabilities(
+        feature_present=weather_proxy_feature_present,
+        feature_status=weather_proxy_feature_status,
+        feature_summary=weather_proxy_feature_summary,
+        observation_present=weather_proxy_observation_present,
+        observation_status=weather_proxy_observation_status,
+        observation_summary=weather_proxy_observation_summary,
+        probability_breadth_present=probability_breadth_present,
+        probability_breadth_status=probability_breadth_status,
+        model_present=weather_proxy_model_present,
+        model_status=weather_proxy_model_status,
+        model_summary=weather_proxy_model_summary,
+        replay_present=weather_proxy_replay_present,
+        replay_status=weather_proxy_replay_status,
+        replay_summary=weather_proxy_replay_summary,
+        ccd_present=weather_proxy_ccd_present,
+        ccd_status=weather_proxy_ccd_status,
+        ccd_summary=weather_proxy_ccd_summary,
+        cluster_present=weather_proxy_cluster_present,
+        cluster_status=weather_proxy_cluster_status,
+        cluster_summary=weather_proxy_cluster_summary,
+    )
+    passive_liquidity_feature_packet = read_json_or_empty(
+        artifacts.passive_liquidity_feature_packet_path
+    )
+    passive_liquidity_observation_loop = read_json_or_empty(
+        artifacts.passive_liquidity_observation_loop_path
+    )
+    passive_liquidity_model_falsification = read_json_or_empty(
+        artifacts.passive_liquidity_model_falsification_path
+    )
+    passive_liquidity_research_candidate_replay = read_json_or_empty(
+        artifacts.passive_liquidity_research_candidate_replay_path
+    )
+    passive_liquidity_capacity_correlation_decay = read_json_or_empty(
+        artifacts.passive_liquidity_capacity_correlation_decay_path
+    )
+    passive_liquidity_correlation_cluster_control = read_json_or_empty(
+        artifacts.passive_liquidity_correlation_cluster_control_path
+    )
+    passive_liquidity_feature_summary = summary(passive_liquidity_feature_packet)
+    passive_liquidity_observation_summary = summary(passive_liquidity_observation_loop)
+    passive_liquidity_model_summary = summary(passive_liquidity_model_falsification)
+    passive_liquidity_replay_summary = summary(passive_liquidity_research_candidate_replay)
+    passive_liquidity_ccd_summary = summary(passive_liquidity_capacity_correlation_decay)
+    passive_liquidity_cluster_summary = summary(passive_liquidity_correlation_cluster_control)
+    passive_liquidity_feature_present = safe_research_artifact(
+        passive_liquidity_feature_packet
+    ) and bool(passive_liquidity_feature_packet.get("status"))
+    passive_liquidity_feature_status = str(passive_liquidity_feature_packet.get("status") or "")
+    passive_liquidity_observation_present = safe_research_artifact(
+        passive_liquidity_observation_loop
+    ) and bool(passive_liquidity_observation_loop.get("status"))
+    passive_liquidity_observation_status = str(
+        passive_liquidity_observation_loop.get("status") or ""
+    )
+    passive_liquidity_model_present = safe_research_artifact(
+        passive_liquidity_model_falsification
+    ) and bool(passive_liquidity_model_falsification.get("status"))
+    passive_liquidity_model_status = str(
+        passive_liquidity_model_falsification.get("status") or ""
+    )
+    passive_liquidity_replay_present = safe_research_artifact(
+        passive_liquidity_research_candidate_replay
+    ) and bool(passive_liquidity_research_candidate_replay.get("status"))
+    passive_liquidity_replay_status = str(
+        passive_liquidity_research_candidate_replay.get("status") or ""
+    )
+    passive_liquidity_ccd_present = safe_research_artifact(
+        passive_liquidity_capacity_correlation_decay
+    ) and bool(passive_liquidity_capacity_correlation_decay.get("status"))
+    passive_liquidity_ccd_status = str(
+        passive_liquidity_capacity_correlation_decay.get("status") or ""
+    )
+    passive_liquidity_cluster_present = safe_research_artifact(
+        passive_liquidity_correlation_cluster_control
+    ) and bool(passive_liquidity_correlation_cluster_control.get("status"))
+    passive_liquidity_cluster_status = str(
+        passive_liquidity_correlation_cluster_control.get("status") or ""
+    )
+    passive_liquidity_capabilities = build_passive_liquidity_capabilities(
+        feature_present=passive_liquidity_feature_present,
+        feature_status=passive_liquidity_feature_status,
+        feature_summary=passive_liquidity_feature_summary,
+        observation_present=passive_liquidity_observation_present,
+        observation_status=passive_liquidity_observation_status,
+        observation_summary=passive_liquidity_observation_summary,
+        model_present=passive_liquidity_model_present,
+        model_status=passive_liquidity_model_status,
+        model_summary=passive_liquidity_model_summary,
+        replay_present=passive_liquidity_replay_present,
+        replay_status=passive_liquidity_replay_status,
+        replay_summary=passive_liquidity_replay_summary,
+        ccd_present=passive_liquidity_ccd_present,
+        ccd_status=passive_liquidity_ccd_status,
+        ccd_summary=passive_liquidity_ccd_summary,
+        cluster_present=passive_liquidity_cluster_present,
+        cluster_status=passive_liquidity_cluster_status,
+        cluster_summary=passive_liquidity_cluster_summary,
+    )
+    passive_liquidity_status = compute_passive_liquidity_status(
+        feature_present=passive_liquidity_feature_present,
+        feature_status=passive_liquidity_feature_status,
+        observation_present=passive_liquidity_observation_present,
+        observation_status=passive_liquidity_observation_status,
+        model_present=passive_liquidity_model_present,
+        model_status=passive_liquidity_model_status,
+        replay_present=passive_liquidity_replay_present,
+        replay_status=passive_liquidity_replay_status,
+        ccd_present=passive_liquidity_ccd_present,
+        ccd_status=passive_liquidity_ccd_status,
+        cluster_present=passive_liquidity_cluster_present,
+        cluster_status=passive_liquidity_cluster_status,
+    )
+    weather_status = compute_weather_proxy_status(
+        feature_present=weather_proxy_feature_present,
+        feature_status=weather_proxy_feature_status,
+        observation_present=weather_proxy_observation_present,
+        observation_status=weather_proxy_observation_status,
+        probability_breadth_status=probability_breadth_status,
+        probability_breadth_present=probability_breadth_present,
+        model_present=weather_proxy_model_present,
+        model_status=weather_proxy_model_status,
+        replay_present=weather_proxy_replay_present,
+        replay_status=weather_proxy_replay_status,
+        ccd_present=weather_proxy_ccd_present,
+        ccd_status=weather_proxy_ccd_status,
+        cluster_present=weather_proxy_cluster_present,
+        cluster_status=weather_proxy_cluster_status,
+    )
 
     capabilities = [
         capability(
             "kalshi_universe_inventory",
             "pass"
-            if safe_research_artifact(universe) and int(universe_summary.get("candidate_count") or 0) > 0
+            if safe_research_artifact(universe)
+            and int(universe_summary.get("candidate_count") or 0) > 0
             else "blocked",
             (
                 f"{universe_summary.get('candidate_count')} public-market candidates in the configured window."
@@ -377,7 +805,9 @@ def build_signal_factory_status(
         ),
         capability(
             "contract_ev_ledger",
-            "pass" if safe_research_artifact(ledger) and int(ledger_summary.get("row_count") or 0) > 0 else "blocked",
+            "pass"
+            if safe_research_artifact(ledger) and int(ledger_summary.get("row_count") or 0) > 0
+            else "blocked",
             (
                 f"{ledger_summary.get('row_count')} contract EV row(s); "
                 f"{ledger_summary.get('usable_row_count')} currently pass legacy research gates."
@@ -431,7 +861,9 @@ def build_signal_factory_status(
         ),
         capability(
             "calibrated_probability_feeds",
-            "warn" if int(ledger_summary.get("calibrated_probability_overlay_row_count") or 0) > 0 else "blocked",
+            "warn"
+            if int(ledger_summary.get("calibrated_probability_overlay_row_count") or 0) > 0
+            else "blocked",
             (
                 f"{ledger_summary.get('calibrated_probability_overlay_row_count')} calibrated probability overlay row(s), "
                 "but no central probability decay/falsification registry."
@@ -439,7 +871,9 @@ def build_signal_factory_status(
         ),
         capability(
             "probability_breadth_scout",
-            "pass" if probability_breadth_ready else ("warn" if probability_breadth_present else "blocked"),
+            "pass"
+            if probability_breadth_ready
+            else ("warn" if probability_breadth_present else "blocked"),
             (
                 f"Probability breadth scout status is `{probability_breadth_status}` with "
                 f"{probability_breadth_summary.get('crypto_fast_candidate_count', 0)} fast crypto candidate(s), "
@@ -450,8 +884,38 @@ def build_signal_factory_status(
             ),
         ),
         capability(
+            "ghost_listing_depth_diagnostic",
+            "pass"
+            if ghost_listing_depth_ready
+            else ("warn" if ghost_listing_depth_present else "blocked"),
+            (
+                f"Ghost-listing depth diagnostic status is `{ghost_listing_depth_status}` with "
+                f"{ghost_listing_depth_summary.get('selected_candidate_count', 0)} selected candidate(s), "
+                f"{ghost_listing_depth_summary.get('orderbook_count', 0)} current orderbook(s), "
+                f"positive-depth fraction `{ghost_listing_depth_summary.get('positive_depth_fraction')}`, "
+                f"and cap_i lock allowed `{ghost_listing_depth_summary.get('cap_i_lock_allowed')}`."
+                if ghost_listing_depth_present
+                else "No current-depth ghost-listing diagnostic exists; cap_i must remain unlocked."
+            ),
+        ),
+        capability(
+            "sports_stack_sequencing",
+            "pass" if sports_stack_ready else ("warn" if sports_stack_present else "blocked"),
+            (
+                f"Sports stack sequencing status is `{sports_stack_status}` with "
+                f"{sports_stack_summary.get('near_term_active_candidate_count', 0)} near-term sports candidate(s), "
+                f"top surface `{sports_stack_summary.get('top_surface')}`, "
+                f"recommended order `{sports_stack_summary.get('recommended_order')}`, and "
+                f"cap_i lock state `{sports_stack_summary.get('cap_i_lock_state')}`."
+                if sports_stack_present
+                else "No sports stack sequencing artifact exists for World Cup/MLB/ATP ordering."
+            ),
+        ),
+        capability(
             "crypto_proxy_feature_packet",
-            "pass" if crypto_proxy_feature_ready else ("warn" if crypto_proxy_feature_present else "blocked"),
+            "pass"
+            if crypto_proxy_feature_ready
+            else ("warn" if crypto_proxy_feature_present else "blocked"),
             (
                 f"Crypto proxy feature packet status is `{crypto_proxy_feature_status}` with "
                 f"{crypto_proxy_feature_summary.get('feature_row_count', 0)} feature row(s), "
@@ -479,7 +943,11 @@ def build_signal_factory_status(
             "crypto_proxy_feature_model_falsification",
             "pass"
             if crypto_proxy_model_ready
-            else ("warn" if crypto_proxy_model_insufficient else ("warn" if crypto_proxy_model_present else "blocked")),
+            else (
+                "warn"
+                if crypto_proxy_model_insufficient
+                else ("warn" if crypto_proxy_model_present else "blocked")
+            ),
             (
                 f"Crypto proxy model falsification status is `{crypto_proxy_model_status}` with "
                 f"{crypto_proxy_model_summary.get('independent_contract_label_count', 0)} independent label(s), "
@@ -491,7 +959,9 @@ def build_signal_factory_status(
         ),
         capability(
             "crypto_proxy_research_candidate_replay",
-            "pass" if crypto_proxy_replay_ready else ("warn" if crypto_proxy_replay_present else "blocked"),
+            "pass"
+            if crypto_proxy_replay_ready
+            else ("warn" if crypto_proxy_replay_present else "blocked"),
             (
                 f"Crypto proxy research-candidate replay status is `{crypto_proxy_replay_status}` with "
                 f"{crypto_proxy_replay_summary.get('replay_row_count', 0)} replay row(s), "
@@ -505,7 +975,8 @@ def build_signal_factory_status(
         capability(
             "crypto_proxy_capacity_correlation_decay",
             "pass"
-            if crypto_proxy_ccd_status == "crypto_proxy_capacity_correlation_decay_ready_for_paper_overlay"
+            if crypto_proxy_ccd_status
+            == "crypto_proxy_capacity_correlation_decay_ready_for_paper_overlay"
             else ("warn" if crypto_proxy_ccd_present else "blocked"),
             (
                 f"Crypto proxy capacity/correlation/decay status is `{crypto_proxy_ccd_status}` with "
@@ -525,7 +996,9 @@ def build_signal_factory_status(
         ),
         capability(
             "capacity_model",
-            "pass" if crypto_proxy_ccd_summary.get("capacity_status") == "capacity_depth_positive" else "blocked",
+            "pass"
+            if crypto_proxy_ccd_summary.get("capacity_status") == "capacity_depth_positive"
+            else "blocked",
             (
                 f"Crypto proxy capacity depth status is `{crypto_proxy_ccd_summary.get('capacity_status')}` with "
                 f"{crypto_proxy_ccd_summary.get('positive_depth_contracts', 0)} positive-depth contract(s)."
@@ -536,7 +1009,8 @@ def build_signal_factory_status(
         capability(
             "correlation_model",
             "pass"
-            if crypto_proxy_cluster_status == "crypto_proxy_correlation_cluster_control_ready_for_paper_overlay"
+            if crypto_proxy_cluster_status
+            == "crypto_proxy_correlation_cluster_control_ready_for_paper_overlay"
             else "blocked",
             (
                 f"Crypto proxy cluster-control status is `{crypto_proxy_cluster_status}`; "
@@ -572,7 +1046,8 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
     )
     if crypto_proxy_chain_context_ready and crypto_proxy_gate_signal_status:
         status = crypto_proxy_gate_signal_status
@@ -580,47 +1055,58 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_blocked_predeployment_gates"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_blocked_predeployment_gates"
     ):
         status = "signal_factory_crypto_proxy_replay_blocked_predeployment_gates"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay"
     ):
         status = "signal_factory_crypto_proxy_replay_ready_paper_overlay"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows"
     ):
         status = "signal_factory_crypto_proxy_replay_no_positive_cost_adjusted_rows"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and crypto_proxy_model_status == "crypto_proxy_feature_model_falsification_ready_with_research_candidates"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and crypto_proxy_model_status
+        == "crypto_proxy_feature_model_falsification_ready_with_research_candidates"
     ):
         status = "signal_factory_crypto_proxy_feature_model_research_candidates"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and crypto_proxy_model_status == "crypto_proxy_feature_model_falsification_ready_no_research_candidates"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and crypto_proxy_model_status
+        == "crypto_proxy_feature_model_falsification_ready_no_research_candidates"
     ):
         status = "signal_factory_crypto_proxy_feature_model_no_research_candidates"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
         and crypto_proxy_model_insufficient
     ):
         status = "signal_factory_crypto_proxy_feature_model_insufficient_labels"
@@ -628,7 +1114,8 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
         and crypto_proxy_observation_label_ready
     ):
         status = "signal_factory_crypto_proxy_labels_ready"
@@ -636,7 +1123,8 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
         and crypto_proxy_observation_waiting
     ):
         status = "signal_factory_crypto_proxy_observations_waiting_settlement"
@@ -644,7 +1132,8 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
         and crypto_proxy_feature_status == "crypto_proxy_feature_packet_ready"
     ):
         status = "signal_factory_crypto_proxy_feature_packet_ready"
@@ -652,15 +1141,18 @@ def build_signal_factory_status(
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
-        and probability_breadth_status == "probability_breadth_scout_ready_crypto_proxy_feature_route"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and probability_breadth_status
+        == "probability_breadth_scout_ready_crypto_proxy_feature_route"
     ):
         status = "signal_factory_probability_breadth_scout_ready_crypto_proxy_route"
     elif (
         universe_ready
         and registry_ready
         and labeled_oos_status == "labeled_oos_backtest_blocked_missing_labeled_observations"
-        and observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement"
+        and observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
     ):
         status = "signal_factory_oos_pending_observations_waiting_settlement"
     elif (
@@ -690,17 +1182,157 @@ def build_signal_factory_status(
         status = "signal_factory_oos_backtest_ready_research_promotions_present"
     elif universe_ready and registry_ready and falsification_blocked:
         status = "signal_factory_hypothesis_registry_ready_falsification_blocked_missing_labeled_oos_evidence"
-    elif universe_ready and gate_by_name(capabilities, "fdr_controlled_falsification_gate")["status"] == "blocked":
+    elif (
+        universe_ready
+        and gate_by_name(capabilities, "fdr_controlled_falsification_gate")["status"] == "blocked"
+    ):
         status = "signal_factory_foundation_ready_falsification_missing"
     elif universe_ready:
         status = "signal_factory_foundation_ready"
     else:
         status = "signal_factory_blocked_missing_universe_inventory"
 
+    # --- Family-aware assembly (additive; crypto status preserved) ---
+    crypto_status = status
+    sports_capabilities = build_sports_baseball_capabilities(
+        feature_present=sports_proxy_feature_present,
+        feature_status=sports_proxy_feature_status,
+        feature_summary=sports_proxy_feature_summary,
+        observation_present=sports_proxy_observation_present,
+        observation_status=sports_proxy_observation_status,
+        observation_summary=sports_proxy_observation_summary,
+        model_present=sports_proxy_model_present,
+        model_status=sports_proxy_model_status,
+        model_summary=sports_proxy_model_summary,
+        replay_present=sports_proxy_replay_present,
+        replay_status=sports_proxy_replay_status,
+        replay_summary=sports_proxy_replay_summary,
+        ccd_present=sports_proxy_ccd_present,
+        ccd_status=sports_proxy_ccd_status,
+        ccd_summary=sports_proxy_ccd_summary,
+        cluster_present=sports_proxy_cluster_present,
+        cluster_status=sports_proxy_cluster_status,
+        cluster_summary=sports_proxy_cluster_summary,
+    )
+    sports_status = compute_sports_baseball_status(
+        feature_present=sports_proxy_feature_present,
+        feature_status=sports_proxy_feature_status,
+        observation_present=sports_proxy_observation_present,
+        observation_status=sports_proxy_observation_status,
+        probability_breadth_status=probability_breadth_status,
+        probability_breadth_present=probability_breadth_present,
+        model_present=sports_proxy_model_present,
+        model_status=sports_proxy_model_status,
+        replay_present=sports_proxy_replay_present,
+        replay_status=sports_proxy_replay_status,
+        ccd_present=sports_proxy_ccd_present,
+        ccd_status=sports_proxy_ccd_status,
+        cluster_present=sports_proxy_cluster_present,
+        cluster_status=sports_proxy_cluster_status,
+    )
+    sports_stack_capabilities = [
+        capability(
+            "sports_stack_sequencing",
+            "pass" if sports_stack_ready else ("warn" if sports_stack_present else "blocked"),
+            (
+                f"Sports stack sequencing status is `{sports_stack_status}` with "
+                f"{sports_stack_summary.get('near_term_active_candidate_count', 0)} near-term candidate(s), "
+                f"top surface `{sports_stack_summary.get('top_surface')}`, and "
+                f"cap_i lock state `{sports_stack_summary.get('cap_i_lock_state')}`."
+                if sports_stack_present
+                else "No sports stack sequencing artifact exists."
+            ),
+        ),
+        capability(
+            "sports_stack_current_depth",
+            "pass"
+            if ghost_listing_depth_ready
+            else ("warn" if ghost_listing_depth_present else "blocked"),
+            (
+                f"Current-depth status is `{ghost_listing_depth_status}` with "
+                f"{ghost_listing_depth_summary.get('orderbook_count', 0)} orderbook(s) and "
+                f"positive-depth fraction `{ghost_listing_depth_summary.get('positive_depth_fraction')}`."
+                if ghost_listing_depth_present
+                else "No current-depth diagnostic exists."
+            ),
+        ),
+    ]
+    sports_capabilities.extend(sports_stack_capabilities)
+    if sports_stack_ready:
+        sports_status = "signal_factory_sports_stack_sequencing_ready_current_depth_passed"
+    elif sports_stack_cap_i_blocked:
+        sports_status = "signal_factory_sports_stack_sequencing_ready_cap_i_lock_blocked"
+
+    # Pre-existing: favorite_longshot_status is not computed in this function yet;
+    # default to empty string so the family registry handles defaults.
+    favorite_longshot_status = ""
+
+    top_level_status, selected_family_id, selection_reason = select_leading_family(
+        crypto_status=crypto_status,
+        sports_status=sports_status,
+        weather_status=weather_status,
+        favorite_longshot_status=favorite_longshot_status,
+        passive_liquidity_status=passive_liquidity_status,
+    )
+    status = top_level_status
+    crypto_family_caps = [
+        cap for cap in capabilities if cap["name"] in CRYPTO_FAMILY_CAPABILITY_NAMES
+    ]
+    crypto_gate_counts = count_statuses(crypto_family_caps)
+    sports_gate_counts = count_statuses(sports_capabilities)
+    weather_gate_counts = count_statuses(weather_capabilities)
+    passive_liquidity_gate_counts = count_statuses(passive_liquidity_capabilities)
+    families = {
+        CRYPTO_PROXY_FAMILY_ID: {
+            "family_id": CRYPTO_PROXY_FAMILY_ID,
+            "capabilities": crypto_family_caps,
+            "status": crypto_status,
+            "capability_gate_counts": crypto_gate_counts,
+        },
+        SPORTS_BASEBALL_FAMILY_ID: {
+            "family_id": SPORTS_BASEBALL_FAMILY_ID,
+            "capabilities": sports_capabilities,
+            "status": sports_status,
+            "capability_gate_counts": sports_gate_counts,
+        },
+        WEATHER_PROXY_FAMILY_ID: {
+            "family_id": WEATHER_PROXY_FAMILY_ID,
+            "capabilities": weather_capabilities,
+            "status": weather_status,
+            "capability_gate_counts": weather_gate_counts,
+        },
+        PASSIVE_LIQUIDITY_FAMILY_ID: {
+            "family_id": PASSIVE_LIQUIDITY_FAMILY_ID,
+            "capabilities": passive_liquidity_capabilities,
+            "status": passive_liquidity_status,
+            "capability_gate_counts": passive_liquidity_gate_counts,
+        },
+    }
+    if (
+        selected_family_id == SPORTS_BASEBALL_FAMILY_ID
+        and top_level_status in SPORTS_BASEBALL_NEXT_TRANCHES
+    ):
+        report_next_tranche = SPORTS_BASEBALL_NEXT_TRANCHES[top_level_status]
+    elif (
+        selected_family_id == WEATHER_PROXY_FAMILY_ID
+        and top_level_status in WEATHER_PROXY_NEXT_TRANCHES
+    ):
+        report_next_tranche = WEATHER_PROXY_NEXT_TRANCHES[top_level_status]
+    else:
+        report_next_tranche = None
+
     return {
         "schema_version": 1,
         "generated_utc": generated_utc or utc_now(),
         "status": status,
+        "status_selection": {
+            "selected_family": selected_family_id,
+            "reason": selection_reason,
+            "crypto_proxy_status": crypto_status,
+            "sports_baseball_status": sports_status,
+            "weather_proxy_status": weather_status,
+            "passive_liquidity_provision_status": passive_liquidity_status,
+        },
         "north_star": "Extract and exploit mispricings in Kalshi event contracts before the crowd corrects them.",
         "research_only": True,
         "execution_enabled": False,
@@ -725,21 +1357,37 @@ def build_signal_factory_status(
             "review_queue_row_count": queue_summary.get("queued_row_count", 0),
             "repeat_positive_row_count": robustness_summary.get("repeat_positive_row_count", 0),
             "hypothesis_count": registry_summary.get("hypothesis_count", 0),
-            "candidate_unvalidated_hypothesis_count": registry_summary.get("candidate_unvalidated_count", 0),
-            "multiple_testing_family_count": registry_summary.get("multiple_testing_family_count", 0),
+            "candidate_unvalidated_hypothesis_count": registry_summary.get(
+                "candidate_unvalidated_count", 0
+            ),
+            "multiple_testing_family_count": registry_summary.get(
+                "multiple_testing_family_count", 0
+            ),
             "falsification_status": falsification_status or None,
-            "blocked_by_falsification_count": registry_summary.get("blocked_by_falsification_count", 0),
+            "blocked_by_falsification_count": registry_summary.get(
+                "blocked_by_falsification_count", 0
+            ),
             "labeled_observation_builder_status": observation_builder_status or None,
-            "labeled_observation_pending_count": observation_builder_summary.get("total_pending_row_count", 0),
-            "labeled_observation_label_row_count": observation_builder_summary.get("label_row_count", 0),
+            "labeled_observation_pending_count": observation_builder_summary.get(
+                "total_pending_row_count", 0
+            ),
+            "labeled_observation_label_row_count": observation_builder_summary.get(
+                "label_row_count", 0
+            ),
             "labeled_oos_backtest_status": labeled_oos_status or None,
-            "labeled_oos_valid_observation_count": labeled_oos_summary.get("valid_observation_count", 0),
-            "labeled_oos_testable_hypothesis_count": labeled_oos_summary.get("testable_hypothesis_count", 0),
+            "labeled_oos_valid_observation_count": labeled_oos_summary.get(
+                "valid_observation_count", 0
+            ),
+            "labeled_oos_testable_hypothesis_count": labeled_oos_summary.get(
+                "testable_hypothesis_count", 0
+            ),
             "labeled_oos_promoted_research_hypothesis_count": labeled_oos_summary.get(
                 "promoted_research_hypothesis_count", 0
             ),
             "probability_breadth_scout_status": probability_breadth_status or None,
-            "probability_breadth_fast_candidate_count": probability_breadth_summary.get("fast_candidate_count", 0),
+            "probability_breadth_fast_candidate_count": probability_breadth_summary.get(
+                "fast_candidate_count", 0
+            ),
             "probability_breadth_crypto_fast_candidate_count": probability_breadth_summary.get(
                 "crypto_fast_candidate_count", 0
             ),
@@ -750,16 +1398,43 @@ def build_signal_factory_status(
                 "available_proxy_source_count", 0
             ),
             "probability_breadth_selected_route": probability_breadth_summary.get("selected_route"),
+            "ghost_listing_depth_diagnostic_status": ghost_listing_depth_status or None,
+            "ghost_listing_depth_orderbook_count": ghost_listing_depth_summary.get(
+                "orderbook_count", 0
+            ),
+            "ghost_listing_depth_positive_depth_fraction": ghost_listing_depth_summary.get(
+                "positive_depth_fraction"
+            ),
+            "ghost_listing_depth_cap_i_lock_allowed": ghost_listing_depth_summary.get(
+                "cap_i_lock_allowed"
+            ),
+            "sports_stack_sequencing_status": sports_stack_status or None,
+            "sports_stack_near_term_active_candidate_count": sports_stack_summary.get(
+                "near_term_active_candidate_count", 0
+            ),
+            "sports_stack_recommended_order": sports_stack_summary.get("recommended_order", []),
+            "sports_stack_top_surface": sports_stack_summary.get("top_surface"),
+            "sports_stack_cap_i_lock_state": sports_stack_summary.get("cap_i_lock_state"),
             "crypto_proxy_feature_packet_status": crypto_proxy_feature_status or None,
-            "crypto_proxy_feature_row_count": crypto_proxy_feature_summary.get("feature_row_count", 0),
-            "crypto_proxy_feature_ready_count": crypto_proxy_feature_summary.get("feature_ready_count", 0),
-            "crypto_proxy_feature_asset_counts": crypto_proxy_feature_summary.get("asset_counts", {}),
+            "crypto_proxy_feature_row_count": crypto_proxy_feature_summary.get(
+                "feature_row_count", 0
+            ),
+            "crypto_proxy_feature_ready_count": crypto_proxy_feature_summary.get(
+                "feature_ready_count", 0
+            ),
+            "crypto_proxy_feature_asset_counts": crypto_proxy_feature_summary.get(
+                "asset_counts", {}
+            ),
             "crypto_proxy_observation_loop_status": crypto_proxy_observation_status or None,
             "crypto_proxy_observation_total_count": crypto_proxy_observation_summary.get(
                 "total_observation_row_count", 0
             ),
-            "crypto_proxy_observation_new_count": crypto_proxy_observation_summary.get("new_observation_row_count", 0),
-            "crypto_proxy_observation_label_count": crypto_proxy_observation_summary.get("label_row_count", 0),
+            "crypto_proxy_observation_new_count": crypto_proxy_observation_summary.get(
+                "new_observation_row_count", 0
+            ),
+            "crypto_proxy_observation_label_count": crypto_proxy_observation_summary.get(
+                "label_row_count", 0
+            ),
             "crypto_proxy_model_falsification_status": crypto_proxy_model_status or None,
             "crypto_proxy_model_independent_label_count": crypto_proxy_model_summary.get(
                 "independent_contract_label_count", 0
@@ -778,15 +1453,25 @@ def build_signal_factory_status(
             "crypto_proxy_replay_conservative_calibrated_side_probability": crypto_proxy_replay_summary.get(
                 "conservative_calibrated_side_probability"
             ),
-            "crypto_proxy_replay_usable_row_count": crypto_proxy_replay_summary.get("usable_row_count", 0),
+            "crypto_proxy_replay_usable_row_count": crypto_proxy_replay_summary.get(
+                "usable_row_count", 0
+            ),
             "crypto_proxy_capacity_correlation_decay_status": crypto_proxy_ccd_status or None,
-            "crypto_proxy_ccd_candidate_row_count": crypto_proxy_ccd_summary.get("candidate_row_count", 0),
+            "crypto_proxy_ccd_candidate_row_count": crypto_proxy_ccd_summary.get(
+                "candidate_row_count", 0
+            ),
             "crypto_proxy_ccd_orderbook_count": crypto_proxy_ccd_summary.get("orderbook_count", 0),
-            "crypto_proxy_ccd_positive_depth_contracts": crypto_proxy_ccd_summary.get("positive_depth_contracts", 0),
-            "crypto_proxy_ccd_largest_cluster_share": crypto_proxy_ccd_summary.get("largest_correlation_cluster_share"),
+            "crypto_proxy_ccd_positive_depth_contracts": crypto_proxy_ccd_summary.get(
+                "positive_depth_contracts", 0
+            ),
+            "crypto_proxy_ccd_largest_cluster_share": crypto_proxy_ccd_summary.get(
+                "largest_correlation_cluster_share"
+            ),
             "crypto_proxy_ccd_decay_status": crypto_proxy_ccd_summary.get("decay_status"),
             "crypto_proxy_correlation_cluster_control_status": crypto_proxy_cluster_status or None,
-            "crypto_proxy_cluster_positive_count": crypto_proxy_cluster_summary.get("positive_cluster_count", 0),
+            "crypto_proxy_cluster_positive_count": crypto_proxy_cluster_summary.get(
+                "positive_cluster_count", 0
+            ),
             "crypto_proxy_cluster_required_positive_count": crypto_proxy_cluster_summary.get(
                 "required_positive_cluster_count", 0
             ),
@@ -796,9 +1481,35 @@ def build_signal_factory_status(
             "crypto_proxy_cluster_largest_controlled_share": crypto_proxy_cluster_summary.get(
                 "largest_controlled_cluster_share"
             ),
+            "sports_baseball_feature_packet_status": sports_proxy_feature_status or None,
+            "sports_baseball_feature_row_count": sports_proxy_feature_summary.get(
+                "feature_row_count", 0
+            ),
+            "sports_baseball_observation_loop_status": sports_proxy_observation_status or None,
+            "sports_baseball_observation_total_count": sports_proxy_observation_summary.get(
+                "total_observation_row_count", 0
+            ),
+            "sports_baseball_observation_label_count": sports_proxy_observation_summary.get(
+                "label_row_count", 0
+            ),
             "capability_gate_counts": gate_counts,
+            "families": {
+                CRYPTO_PROXY_FAMILY_ID: {
+                    "status": crypto_status,
+                    "capability_gate_counts": crypto_gate_counts,
+                },
+                SPORTS_BASEBALL_FAMILY_ID: {
+                    "status": sports_status,
+                    "capability_gate_counts": sports_gate_counts,
+                },
+                WEATHER_PROXY_FAMILY_ID: {
+                    "status": weather_status,
+                    "capability_gate_counts": weather_gate_counts,
+                },
+            },
         },
         "capabilities": capabilities,
+        "families": families,
         "inputs": {
             "universe_scan_path": str(artifacts.universe_scan_path),
             "ev_ledger_path": str(artifacts.ev_ledger_path),
@@ -809,16 +1520,30 @@ def build_signal_factory_status(
             "labeled_observation_builder_path": str(artifacts.labeled_observation_builder_path),
             "labeled_oos_backtest_path": str(artifacts.labeled_oos_backtest_path),
             "probability_breadth_scout_path": str(artifacts.probability_breadth_scout_path),
+            "ghost_listing_depth_diagnostic_path": str(
+                artifacts.ghost_listing_depth_diagnostic_path
+            ),
+            "sports_stack_sequencing_path": str(artifacts.sports_stack_sequencing_path),
             "crypto_proxy_feature_packet_path": str(artifacts.crypto_proxy_feature_packet_path),
             "crypto_proxy_observation_loop_path": str(artifacts.crypto_proxy_observation_loop_path),
-            "crypto_proxy_model_falsification_path": str(artifacts.crypto_proxy_model_falsification_path),
-            "crypto_proxy_research_candidate_replay_path": str(artifacts.crypto_proxy_research_candidate_replay_path),
-            "crypto_proxy_capacity_correlation_decay_path": str(artifacts.crypto_proxy_capacity_correlation_decay_path),
+            "crypto_proxy_model_falsification_path": str(
+                artifacts.crypto_proxy_model_falsification_path
+            ),
+            "crypto_proxy_research_candidate_replay_path": str(
+                artifacts.crypto_proxy_research_candidate_replay_path
+            ),
+            "crypto_proxy_capacity_correlation_decay_path": str(
+                artifacts.crypto_proxy_capacity_correlation_decay_path
+            ),
             "crypto_proxy_correlation_cluster_control_path": str(
                 artifacts.crypto_proxy_correlation_cluster_control_path
             ),
+            "sports_proxy_feature_packet_path": str(artifacts.sports_proxy_feature_packet_path),
+            "sports_proxy_observation_loop_path": str(artifacts.sports_proxy_observation_loop_path),
         },
-        "next_tranche": next_tranche(
+        "next_tranche": report_next_tranche
+        if report_next_tranche is not None
+        else next_tranche(
             registry_ready=registry_ready,
             falsification_blocked=falsification_blocked,
             observation_builder_status=observation_builder_status,
@@ -830,7 +1555,9 @@ def build_signal_factory_status(
             crypto_proxy_replay_status=crypto_proxy_replay_status,
             crypto_proxy_ccd_status=crypto_proxy_ccd_status,
             crypto_proxy_cluster_status=crypto_proxy_cluster_status,
-            crypto_proxy_ccd_capacity_status=str(crypto_proxy_ccd_summary.get("capacity_status") or ""),
+            crypto_proxy_ccd_capacity_status=str(
+                crypto_proxy_ccd_summary.get("capacity_status") or ""
+            ),
             crypto_proxy_ccd_decay_status=str(crypto_proxy_ccd_summary.get("decay_status") or ""),
         ),
         "safety": {
@@ -883,11 +1610,18 @@ def crypto_proxy_gate_status(
     ccd_summary: Mapping[str, Any],
 ) -> str | None:
     if cluster_status == "crypto_proxy_correlation_cluster_control_blocked_upstream_ccd":
+        if (
+            ccd_status == "crypto_proxy_capacity_correlation_decay_blocked_no_current_candidates"
+            or ccd_summary.get("candidate_row_count") == 0
+        ):
+            return "signal_factory_crypto_proxy_current_candidates_missing"
         if ccd_summary.get("capacity_status") != "capacity_depth_positive":
             return "signal_factory_crypto_proxy_capacity_depth_blocked"
         if ccd_summary.get("decay_status") != "decay_survival_pass":
             return "signal_factory_crypto_proxy_decay_survival_blocked"
-    return CLUSTER_CONTROL_SIGNAL_STATUSES.get(cluster_status) or CCD_SIGNAL_STATUSES.get(ccd_status)
+    return CLUSTER_CONTROL_SIGNAL_STATUSES.get(cluster_status) or CCD_SIGNAL_STATUSES.get(
+        ccd_status
+    )
 
 
 def gate_by_name(capabilities: Sequence[Mapping[str, Any]], name: str) -> Mapping[str, Any]:
@@ -939,7 +1673,10 @@ def next_tranche(
         return cluster_tranche
     if crypto_proxy_ccd_status in CCD_NEXT_TRANCHES:
         return CCD_NEXT_TRANCHES[crypto_proxy_ccd_status]
-    if crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_blocked_predeployment_gates":
+    if (
+        crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_blocked_predeployment_gates"
+    ):
         return {
             "name": "kalshi_crypto_proxy_capacity_correlation_decay",
             "why": (
@@ -950,13 +1687,19 @@ def next_tranche(
                 "Stop before sizing, execution, account/order paths, or treating positive replay rows as deployable."
             ),
         }
-    if crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay":
+    if (
+        crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_ready_for_paper_probability_overlay"
+    ):
         return {
             "name": "kalshi_crypto_proxy_paper_probability_overlay",
             "why": "Replay gates are research-ready; the next step is a paper-only probability overlay and decay monitor.",
             "stop_condition": "Stop before real positions, execution, account/order paths, or staking guidance.",
         }
-    if crypto_proxy_replay_status == "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows":
+    if (
+        crypto_proxy_replay_status
+        == "crypto_proxy_research_candidate_replay_ready_no_positive_cost_adjusted_rows"
+    ):
         return {
             "name": "kalshi_crypto_proxy_signal_family_rotation",
             "why": "The current research candidate did not survive conservative all-in cost replay.",
@@ -978,13 +1721,19 @@ def next_tranche(
                 "or creating EV/sizing/execution claims."
             ),
         }
-    if crypto_proxy_model_status == "crypto_proxy_feature_model_falsification_ready_with_research_candidates":
+    if (
+        crypto_proxy_model_status
+        == "crypto_proxy_feature_model_falsification_ready_with_research_candidates"
+    ):
         return {
             "name": "kalshi_crypto_proxy_research_candidate_replay",
             "why": "A crypto proxy feature family survived OOS/FDR as a research candidate; the next gate is conservative probability preflight plus all-in cost replay.",
             "stop_condition": "Stop before sizing or execution until all-in costs, capacity, correlation, and kill-switch gates exist.",
         }
-    if crypto_proxy_model_status == "crypto_proxy_feature_model_falsification_ready_no_research_candidates":
+    if (
+        crypto_proxy_model_status
+        == "crypto_proxy_feature_model_falsification_ready_no_research_candidates"
+    ):
         return {
             "name": "kalshi_crypto_proxy_signal_family_rotation",
             "why": "No crypto proxy feature family survived the falsification gate; rotate to new registered feature families.",
@@ -1043,7 +1792,10 @@ def next_tranche(
                 "execution, or account/order paths."
             ),
         }
-    if probability_breadth_status == "probability_breadth_scout_ready_crypto_route_needs_proxy_probe":
+    if (
+        probability_breadth_status
+        == "probability_breadth_scout_ready_crypto_route_needs_proxy_probe"
+    ):
         return {
             "name": "kalshi_crypto_proxy_source_probe",
             "why": "Fast-settling crypto dominates the universe, but public proxy-source availability is not recorded yet.",
@@ -1055,7 +1807,10 @@ def next_tranche(
             "why": "A settled, time-safe label packet exists; the falsification harness should score it before any capacity or sizing work.",
             "stop_condition": "Stop before sizing, execution, or account/order paths; research promotion still requires FDR-controlled OOS survival.",
         }
-    if observation_builder_status == "labeled_observation_builder_pending_observations_waiting_settlement":
+    if (
+        observation_builder_status
+        == "labeled_observation_builder_pending_observations_waiting_settlement"
+    ):
         return {
             "name": "kalshi_probability_breadth_while_oos_observations_settle",
             "why": "Model-backed pending observations exist, but none have settled labels yet; the useful work is expanding calibrated probability coverage and keeping settlement capture ready.",
@@ -1118,9 +1873,13 @@ def cluster_control_next_tranche(
 ) -> dict[str, str] | None:
     if cluster_status == "crypto_proxy_correlation_cluster_control_blocked_upstream_ccd":
         if ccd_capacity_status != "capacity_depth_positive":
-            return CCD_NEXT_TRANCHES["crypto_proxy_capacity_correlation_decay_blocked_capacity_depth"]
+            return CCD_NEXT_TRANCHES[
+                "crypto_proxy_capacity_correlation_decay_blocked_capacity_depth"
+            ]
         if ccd_decay_status != "decay_survival_pass":
-            return CCD_NEXT_TRANCHES["crypto_proxy_capacity_correlation_decay_blocked_decay_survival"]
+            return CCD_NEXT_TRANCHES[
+                "crypto_proxy_capacity_correlation_decay_blocked_decay_survival"
+            ]
     return CLUSTER_CONTROL_NEXT_TRANCHES.get(cluster_status)
 
 
@@ -1142,7 +1901,9 @@ def write_signal_factory_status(
         "markdown_path": str(markdown_path),
     }
     target_latest_dir = latest_dir or MACRO_DIR
-    should_write_latest = path_is_within(out_dir, MACRO_DIR) if write_latest is None else write_latest
+    should_write_latest = (
+        path_is_within(out_dir, MACRO_DIR) if write_latest is None else write_latest
+    )
     if should_write_latest:
         target_latest_dir.mkdir(parents=True, exist_ok=True)
         latest_json = target_latest_dir / "latest-kalshi-signal-factory-status.json"
@@ -1173,8 +1934,12 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     ]
     for item in report.get("capabilities", []):
         if isinstance(item, Mapping):
-            lines.append(f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |")
-    next_tranche = report.get("next_tranche") if isinstance(report.get("next_tranche"), Mapping) else {}
+            lines.append(
+                f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |"
+            )
+    next_tranche = (
+        report.get("next_tranche") if isinstance(report.get("next_tranche"), Mapping) else {}
+    )
     lines.extend(
         [
             "",
@@ -1208,12 +1973,7 @@ def safe_research_artifact_present(value: Mapping[str, Any]) -> bool:
     return safe_research_artifact(value) and bool(value.get("status"))
 
 
-def path_is_within(path: Path, root: Path) -> bool:
-    try:
-        path.resolve().relative_to(root.resolve())
-    except (OSError, ValueError):
-        return False
-    return True
+from predmarket.shared_helpers import path_is_within  # noqa: E402
 
 
 def summary(value: Any) -> dict[str, Any]:
@@ -1236,15 +1996,39 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--ev-ledger-path", type=Path, default=DEFAULT_EV_LEDGER_PATH)
     parser.add_argument("--review-queue-path", type=Path, default=DEFAULT_REVIEW_QUEUE_PATH)
     parser.add_argument("--robustness-path", type=Path, default=DEFAULT_ROBUSTNESS_PATH)
-    parser.add_argument("--hypothesis-registry-path", type=Path, default=DEFAULT_HYPOTHESIS_REGISTRY_PATH)
-    parser.add_argument("--falsification-gate-path", type=Path, default=DEFAULT_FALSIFICATION_GATE_PATH)
     parser.add_argument(
-        "--labeled-observation-builder-path", type=Path, default=DEFAULT_LABELED_OBSERVATION_BUILDER_PATH
+        "--hypothesis-registry-path", type=Path, default=DEFAULT_HYPOTHESIS_REGISTRY_PATH
     )
-    parser.add_argument("--labeled-oos-backtest-path", type=Path, default=DEFAULT_LABELED_OOS_BACKTEST_PATH)
-    parser.add_argument("--probability-breadth-scout-path", type=Path, default=DEFAULT_PROBABILITY_BREADTH_SCOUT_PATH)
     parser.add_argument(
-        "--crypto-proxy-feature-packet-path", type=Path, default=DEFAULT_CRYPTO_PROXY_FEATURE_PACKET_PATH
+        "--falsification-gate-path", type=Path, default=DEFAULT_FALSIFICATION_GATE_PATH
+    )
+    parser.add_argument(
+        "--labeled-observation-builder-path",
+        type=Path,
+        default=DEFAULT_LABELED_OBSERVATION_BUILDER_PATH,
+    )
+    parser.add_argument(
+        "--labeled-oos-backtest-path", type=Path, default=DEFAULT_LABELED_OOS_BACKTEST_PATH
+    )
+    parser.add_argument(
+        "--probability-breadth-scout-path",
+        type=Path,
+        default=DEFAULT_PROBABILITY_BREADTH_SCOUT_PATH,
+    )
+    parser.add_argument(
+        "--ghost-listing-depth-diagnostic-path",
+        type=Path,
+        default=DEFAULT_GHOST_LISTING_DEPTH_DIAGNOSTIC_PATH,
+    )
+    parser.add_argument(
+        "--sports-stack-sequencing-path",
+        type=Path,
+        default=DEFAULT_SPORTS_STACK_SEQUENCING_PATH,
+    )
+    parser.add_argument(
+        "--crypto-proxy-feature-packet-path",
+        type=Path,
+        default=DEFAULT_CRYPTO_PROXY_FEATURE_PACKET_PATH,
     )
     parser.add_argument(
         "--crypto-proxy-observation-loop-path",
@@ -1271,6 +2055,96 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=Path,
         default=DEFAULT_CRYPTO_PROXY_CORRELATION_CLUSTER_CONTROL_PATH,
     )
+    parser.add_argument(
+        "--sports-proxy-feature-packet-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_FEATURE_PACKET_PATH,
+    )
+    parser.add_argument(
+        "--sports-proxy-observation-loop-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_OBSERVATION_LOOP_PATH,
+    )
+    parser.add_argument(
+        "--sports-proxy-model-falsification-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_MODEL_FALSIFICATION_PATH,
+    )
+    parser.add_argument(
+        "--sports-proxy-research-candidate-replay-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_RESEARCH_CANDIDATE_REPLAY_PATH,
+    )
+    parser.add_argument(
+        "--sports-proxy-capacity-correlation-decay-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_CAPACITY_CORRELATION_DECAY_PATH,
+    )
+    parser.add_argument(
+        "--sports-proxy-correlation-cluster-control-path",
+        type=Path,
+        default=DEFAULT_SPORTS_PROXY_CORRELATION_CLUSTER_CONTROL_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-feature-packet-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_FEATURE_PACKET_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-observation-loop-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_OBSERVATION_LOOP_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-model-falsification-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_MODEL_FALSIFICATION_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-research-candidate-replay-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_RESEARCH_CANDIDATE_REPLAY_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-capacity-correlation-decay-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_CAPACITY_CORRELATION_DECAY_PATH,
+    )
+    parser.add_argument(
+        "--weather-proxy-correlation-cluster-control-path",
+        type=Path,
+        default=DEFAULT_WEATHER_PROXY_CORRELATION_CLUSTER_CONTROL_PATH,
+    )
+    parser.add_argument(
+        "--passive-liquidity-feature-packet-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_feature_packet_path,
+    )
+    parser.add_argument(
+        "--passive-liquidity-observation-loop-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_observation_loop_path,
+    )
+    parser.add_argument(
+        "--passive-liquidity-model-falsification-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_model_falsification_path,
+    )
+    parser.add_argument(
+        "--passive-liquidity-research-candidate-replay-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_research_candidate_replay_path,
+    )
+    parser.add_argument(
+        "--passive-liquidity-capacity-correlation-decay-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_capacity_correlation_decay_path,
+    )
+    parser.add_argument(
+        "--passive-liquidity-correlation-cluster-control-path",
+        type=Path,
+        default=Artifacts.isolated(Path("/tmp")).passive_liquidity_correlation_cluster_control_path,
+    )
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--write", action="store_true")
     return parser.parse_args(argv)
@@ -1288,12 +2162,32 @@ def main(argv: Sequence[str] | None = None) -> int:
         labeled_observation_builder_path=args.labeled_observation_builder_path,
         labeled_oos_backtest_path=args.labeled_oos_backtest_path,
         probability_breadth_scout_path=args.probability_breadth_scout_path,
+        ghost_listing_depth_diagnostic_path=args.ghost_listing_depth_diagnostic_path,
+        sports_stack_sequencing_path=args.sports_stack_sequencing_path,
         crypto_proxy_feature_packet_path=args.crypto_proxy_feature_packet_path,
         crypto_proxy_observation_loop_path=args.crypto_proxy_observation_loop_path,
         crypto_proxy_model_falsification_path=args.crypto_proxy_model_falsification_path,
         crypto_proxy_research_candidate_replay_path=args.crypto_proxy_research_candidate_replay_path,
         crypto_proxy_capacity_correlation_decay_path=args.crypto_proxy_capacity_correlation_decay_path,
         crypto_proxy_correlation_cluster_control_path=args.crypto_proxy_correlation_cluster_control_path,
+        sports_proxy_feature_packet_path=args.sports_proxy_feature_packet_path,
+        sports_proxy_observation_loop_path=args.sports_proxy_observation_loop_path,
+        sports_proxy_model_falsification_path=args.sports_proxy_model_falsification_path,
+        sports_proxy_research_candidate_replay_path=args.sports_proxy_research_candidate_replay_path,
+        sports_proxy_capacity_correlation_decay_path=args.sports_proxy_capacity_correlation_decay_path,
+        sports_proxy_correlation_cluster_control_path=args.sports_proxy_correlation_cluster_control_path,
+        weather_proxy_feature_packet_path=args.weather_proxy_feature_packet_path,
+        weather_proxy_observation_loop_path=args.weather_proxy_observation_loop_path,
+        weather_proxy_model_falsification_path=args.weather_proxy_model_falsification_path,
+        weather_proxy_research_candidate_replay_path=args.weather_proxy_research_candidate_replay_path,
+        weather_proxy_capacity_correlation_decay_path=args.weather_proxy_capacity_correlation_decay_path,
+        weather_proxy_correlation_cluster_control_path=args.weather_proxy_correlation_cluster_control_path,
+        passive_liquidity_feature_packet_path=args.passive_liquidity_feature_packet_path,
+        passive_liquidity_observation_loop_path=args.passive_liquidity_observation_loop_path,
+        passive_liquidity_model_falsification_path=args.passive_liquidity_model_falsification_path,
+        passive_liquidity_research_candidate_replay_path=args.passive_liquidity_research_candidate_replay_path,
+        passive_liquidity_capacity_correlation_decay_path=args.passive_liquidity_capacity_correlation_decay_path,
+        passive_liquidity_correlation_cluster_control_path=args.passive_liquidity_correlation_cluster_control_path,
     )
     report = build_signal_factory_status(artifacts=artifacts)
     if args.write:

@@ -7,12 +7,12 @@ shape and JSON payloads so forecasts remain reproducible.
 
 from __future__ import annotations
 
-import json
 import hashlib
+import json
 import sqlite3
 import time
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from predmarket.contracts import ForecastRecord, SourceDocument
 
@@ -54,7 +54,7 @@ class PointInTimeStore:
         cur = self._conn.execute(sql, params)
         return cur.fetchone()
 
-    def _fetchall(self, sql: str, params: tuple[Any, ...] = ()) -> List[Any]:
+    def _fetchall(self, sql: str, params: tuple[Any, ...] = ()) -> list[Any]:
         cur = self._conn.execute(sql, params)
         return cur.fetchall()
 
@@ -256,9 +256,9 @@ class PointInTimeStore:
     def write_market_snapshot(
         self,
         snapshot: Any,
-        event_id: Optional[str] = None,
-        raw_payload: Optional[Dict[str, Any]] = None,
-        as_of_ts: Optional[float] = None,
+        event_id: str | None = None,
+        raw_payload: dict[str, Any] | None = None,
+        as_of_ts: float | None = None,
     ) -> None:
         ts = float(as_of_ts or time.time())
         market_id = getattr(snapshot, "contract_id", "")
@@ -296,10 +296,10 @@ class PointInTimeStore:
     def write_orderbook(
         self,
         market_id: str,
-        bids: List[Dict[str, Any]],
-        asks: List[Dict[str, Any]],
+        bids: list[dict[str, Any]],
+        asks: list[dict[str, Any]],
         as_of_ts: float,
-        raw_payload: Optional[Dict[str, Any]] = None,
+        raw_payload: dict[str, Any] | None = None,
     ) -> None:
         self._execute(
             "INSERT OR REPLACE INTO orderbooks VALUES (?, ?, ?, ?, ?)",
@@ -355,7 +355,7 @@ class PointInTimeStore:
             ),
         )
 
-    def write_density_samples(self, samples_ref: str, samples: List[float]) -> Path:
+    def write_density_samples(self, samples_ref: str, samples: list[float]) -> Path:
         """Persist posterior/density samples addressed by ForecastRecord ref."""
         safe_ref = "".join(ch for ch in samples_ref if ch.isalnum() or ch in ("-", "_"))
         out_path = self.samples_dir / f"{safe_ref}.json"
@@ -363,7 +363,7 @@ class PointInTimeStore:
             json.dump([float(sample) for sample in samples], f)
         return out_path
 
-    def load_density_samples(self, samples_ref: str) -> List[float]:
+    def load_density_samples(self, samples_ref: str) -> list[float]:
         safe_ref = "".join(ch for ch in samples_ref if ch.isalnum() or ch in ("-", "_"))
         path = self.samples_dir / f"{safe_ref}.json"
         if not path.exists():
@@ -377,7 +377,7 @@ class PointInTimeStore:
         outcome: int,
         resolved_ts: float,
         source: str,
-        raw_payload: Optional[Dict[str, Any]] = None,
+        raw_payload: dict[str, Any] | None = None,
     ) -> None:
         self._execute(
             "INSERT OR REPLACE INTO outcomes VALUES (?, ?, ?, ?, ?)",
@@ -390,14 +390,16 @@ class PointInTimeStore:
             ),
         )
 
-    def write_kalshi_resolved_rows(self, rows: List[Dict[str, Any]]) -> None:
+    def write_kalshi_resolved_rows(self, rows: list[dict[str, Any]]) -> None:
         """Persist discovery-ready Kalshi resolved rows."""
         for row in rows:
             row_id = str(row.get("row_id") or self._stable_row_id(row))
             payload = dict(row)
             payload["row_id"] = row_id
             feature_hash = hashlib.sha256(
-                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode(
+                    "utf-8"
+                )
             ).hexdigest()
             self._execute(
                 """
@@ -419,10 +421,10 @@ class PointInTimeStore:
     def load_kalshi_resolved_rows(
         self,
         *,
-        market_id: Optional[str] = None,
-        min_as_of_ts: Optional[float] = None,
-        max_as_of_ts: Optional[float] = None,
-    ) -> List[Dict[str, Any]]:
+        market_id: str | None = None,
+        min_as_of_ts: float | None = None,
+        max_as_of_ts: float | None = None,
+    ) -> list[dict[str, Any]]:
         """Load persisted Kalshi rows for discovery/backtesting."""
         sql = """
             SELECT row_json
@@ -442,7 +444,7 @@ class PointInTimeStore:
         sql += " ORDER BY as_of_ts, market_id, row_json"
         return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
 
-    def write_kalshi_paper_intents(self, intents: List[Dict[str, Any]]) -> None:
+    def write_kalshi_paper_intents(self, intents: list[dict[str, Any]]) -> None:
         """Persist research-only paper trade intents."""
         for intent in intents:
             payload = dict(intent)
@@ -469,10 +471,10 @@ class PointInTimeStore:
     def load_kalshi_paper_intents(
         self,
         *,
-        status: Optional[str] = None,
-        market_id: Optional[str] = None,
-        source_run_id: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
+        status: str | None = None,
+        market_id: str | None = None,
+        source_run_id: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Load research-only paper trade intents."""
         sql = """
             SELECT payload_json
@@ -492,7 +494,7 @@ class PointInTimeStore:
         sql += " ORDER BY created_ts, intent_id"
         return [json.loads(row[0] or "{}") for row in self._fetchall(sql, tuple(params))]
 
-    def write_kalshi_paper_event(self, payload: Dict[str, Any]) -> None:
+    def write_kalshi_paper_event(self, payload: dict[str, Any]) -> None:
         """Append a research-only paper ledger event."""
         event_payload = dict(payload)
         event_type = str(event_payload.get("status", "UNKNOWN"))
@@ -505,7 +507,9 @@ class PointInTimeStore:
             (
                 event_id,
                 str(event_payload.get("intent_id", "")),
-                float(event_payload.get("settled_ts", event_payload.get("created_ts", time.time()))),
+                float(
+                    event_payload.get("settled_ts", event_payload.get("created_ts", time.time()))
+                ),
                 event_type,
                 json.dumps(event_payload, sort_keys=True, default=str),
             ),
@@ -514,9 +518,9 @@ class PointInTimeStore:
     def load_kalshi_paper_events(
         self,
         *,
-        intent_id: Optional[str] = None,
-        event_type: Optional[str] = None,
-    ) -> List[Dict[str, Any]]:
+        intent_id: str | None = None,
+        event_type: str | None = None,
+    ) -> list[dict[str, Any]]:
         """Load append-only research-only paper ledger events."""
         sql = """
             SELECT paper_event_id, created_ts, event_type, payload_json
@@ -543,8 +547,8 @@ class PointInTimeStore:
     def write_experiment_run(
         self,
         run_id: str,
-        config: Dict[str, Any],
-        report: Dict[str, Any],
+        config: dict[str, Any],
+        report: dict[str, Any],
         code_version: str,
         status: str,
     ) -> None:
@@ -563,8 +567,8 @@ class PointInTimeStore:
     def write_discovery_run(
         self,
         run_id: str,
-        config: Dict[str, Any],
-        report: Dict[str, Any],
+        config: dict[str, Any],
+        report: dict[str, Any],
         status: str,
     ) -> None:
         self._execute(
@@ -612,7 +616,7 @@ class PointInTimeStore:
         source_artifact_id: str,
         target_artifact_id: str,
         edge_type: str,
-        payload: Optional[Dict[str, Any]] = None,
+        payload: dict[str, Any] | None = None,
     ) -> None:
         edge_payload = payload or {}
         base = json.dumps(
@@ -686,7 +690,7 @@ class PointInTimeStore:
             ),
         )
 
-    def load_discovery_run(self, run_id: str) -> Optional[Dict[str, Any]]:
+    def load_discovery_run(self, run_id: str) -> dict[str, Any] | None:
         row = self._fetchone(
             """
             SELECT run_id, created_ts, config_json, report_json, status
@@ -706,8 +710,8 @@ class PointInTimeStore:
         }
 
     def load_discovery_artifacts(
-        self, run_id: str, status: Optional[str] = None
-    ) -> List[Dict[str, Any]]:
+        self, run_id: str, status: str | None = None
+    ) -> list[dict[str, Any]]:
         sql = """
             SELECT artifact_id, run_id, trajectory_id, artifact_type, created_ts,
                    status, payload_json, reasons_json, parent_ids_json
@@ -735,7 +739,7 @@ class PointInTimeStore:
             for row in rows
         ]
 
-    def load_discovery_edges(self, run_id: str) -> List[Dict[str, Any]]:
+    def load_discovery_edges(self, run_id: str) -> list[dict[str, Any]]:
         rows = self._fetchall(
             """
             SELECT edge_id, run_id, source_artifact_id, target_artifact_id,
@@ -759,7 +763,7 @@ class PointInTimeStore:
             for row in rows
         ]
 
-    def load_discovery_transitions(self, run_id: str) -> List[Dict[str, Any]]:
+    def load_discovery_transitions(self, run_id: str) -> list[dict[str, Any]]:
         rows = self._fetchall(
             """
             SELECT transition_id, run_id, trajectory_id, from_hypothesis_ids_json,
@@ -787,7 +791,7 @@ class PointInTimeStore:
             for row in rows
         ]
 
-    def load_discovery_trajectory_summaries(self, run_id: str) -> List[Dict[str, Any]]:
+    def load_discovery_trajectory_summaries(self, run_id: str) -> list[dict[str, Any]]:
         rows = self._fetchall(
             """
             SELECT summary_json
@@ -800,7 +804,7 @@ class PointInTimeStore:
         return [json.loads(row[0] or "{}") for row in rows]
 
     @staticmethod
-    def _discovery_payload(value: Any) -> Dict[str, Any]:
+    def _discovery_payload(value: Any) -> dict[str, Any]:
         if hasattr(value, "to_dict"):
             return value.to_dict()
         if isinstance(value, dict):
@@ -808,47 +812,62 @@ class PointInTimeStore:
         raise TypeError("discovery payload must be a dict or expose to_dict()")
 
     @staticmethod
-    def _stable_row_id(row: Dict[str, Any]) -> str:
+    def _stable_row_id(row: dict[str, Any]) -> str:
         payload = {
             "market_id": row.get("market_id"),
             "as_of_ts": row.get("as_of_ts"),
             "outcome": row.get("outcome"),
             "schema": row.get("row_schema_version", 1),
         }
-        return "kalshi-row-" + hashlib.sha256(
-            json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
-        ).hexdigest()[:20]
+        return (
+            "kalshi-row-"
+            + hashlib.sha256(
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode(
+                    "utf-8"
+                )
+            ).hexdigest()[:20]
+        )
 
     @staticmethod
-    def _stable_paper_intent_id(intent: Dict[str, Any]) -> str:
+    def _stable_paper_intent_id(intent: dict[str, Any]) -> str:
         payload = {
             "market_id": intent.get("market_id"),
             "side": intent.get("side"),
             "source_run_id": intent.get("source_run_id"),
             "as_of_ts": intent.get("as_of_ts"),
         }
-        return "kalshi-paper-" + hashlib.sha256(
-            json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
-        ).hexdigest()[:20]
+        return (
+            "kalshi-paper-"
+            + hashlib.sha256(
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode(
+                    "utf-8"
+                )
+            ).hexdigest()[:20]
+        )
 
     @staticmethod
-    def _stable_paper_event_id(payload: Dict[str, Any]) -> str:
+    def _stable_paper_event_id(payload: dict[str, Any]) -> str:
         event_payload = {
             "intent_id": payload.get("intent_id"),
             "status": payload.get("status"),
             "created_ts": payload.get("created_ts"),
             "settled_ts": payload.get("settled_ts"),
             "payload_hash": hashlib.sha256(
-                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
+                json.dumps(payload, sort_keys=True, separators=(",", ":"), default=str).encode(
+                    "utf-8"
+                )
             ).hexdigest(),
         }
-        return "kalshi-paper-event-" + hashlib.sha256(
-            json.dumps(event_payload, sort_keys=True, separators=(",", ":"), default=str).encode("utf-8")
-        ).hexdigest()[:20]
+        return (
+            "kalshi-paper-event-"
+            + hashlib.sha256(
+                json.dumps(
+                    event_payload, sort_keys=True, separators=(",", ":"), default=str
+                ).encode("utf-8")
+            ).hexdigest()[:20]
+        )
 
-    def load_context(
-        self, event_id: str, market_id: str, as_of_ts: float
-    ) -> Dict[str, Any]:
+    def load_context(self, event_id: str, market_id: str, as_of_ts: float) -> dict[str, Any]:
         """Load only records that were known at or before as_of_ts."""
         snap = self._fetchone(
             """
@@ -903,7 +922,7 @@ class PointInTimeStore:
             ],
         }
 
-    def export_table_parquet(self, table_name: str) -> Optional[Path]:
+    def export_table_parquet(self, table_name: str) -> Path | None:
         """Export a table to Parquet when the active backend supports it."""
         if self.backend != "duckdb":
             return None

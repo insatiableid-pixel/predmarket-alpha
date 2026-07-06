@@ -11,7 +11,7 @@ market is costly.
 """
 
 import logging
-from typing import Dict, Any, List, Optional, Tuple
+from typing import Any
 
 import numpy as np
 from scipy.optimize import curve_fit
@@ -49,9 +49,9 @@ class LogisticGrowthModel:
 
     def fit(
         self,
-        time_points: List[float],
-        values: List[float],
-        p0: Optional[Tuple[float, float, float]] = None,
+        time_points: list[float],
+        values: list[float],
+        p0: tuple[float, float, float] | None = None,
     ) -> None:
         """Fit logistic curve to observed data.
 
@@ -79,14 +79,14 @@ class LogisticGrowthModel:
 
         try:
             bounds = ([0, 0, -np.inf], [np.inf, np.inf, np.inf])
-            params, _ = curve_fit(
-                self._logistic, t, y, p0=p0, bounds=bounds, maxfev=10000
-            )
+            params, _ = curve_fit(self._logistic, t, y, p0=p0, bounds=bounds, maxfev=10000)
             self.L, self.k, self.t0 = float(params[0]), float(params[1]), float(params[2])
             self._fitted = True
             logger.info(
                 "Logistic model fitted: L=%.2f, k=%.4f, t0=%.2f",
-                self.L, self.k, self.t0,
+                self.L,
+                self.k,
+                self.t0,
             )
         except RuntimeError as e:
             logger.warning("Logistic curve fit failed: %s", e)
@@ -174,9 +174,9 @@ class BassDiffusionModel:
 
     def fit(
         self,
-        time_points: List[float],
-        adopters: List[float],
-        p0: Optional[Tuple[float, float, float]] = None,
+        time_points: list[float],
+        adopters: list[float],
+        p0: tuple[float, float, float] | None = None,
     ) -> None:
         """Fit Bass model to cumulative adoption data.
 
@@ -202,9 +202,7 @@ class BassDiffusionModel:
 
         try:
             bounds = ([0, 0, 0], [1, 1, np.inf])
-            params, _ = curve_fit(
-                self._bass_cumulative, t, y, p0=p0, bounds=bounds, maxfev=10000
-            )
+            params, _ = curve_fit(self._bass_cumulative, t, y, p0=p0, bounds=bounds, maxfev=10000)
             self.p, self.q, self.M = (
                 float(params[0]),
                 float(params[1]),
@@ -213,7 +211,9 @@ class BassDiffusionModel:
             self._fitted = True
             logger.info(
                 "Bass model fitted: p=%.4f, q=%.4f, M=%.2f",
-                self.p, self.q, self.M,
+                self.p,
+                self.q,
+                self.M,
             )
         except RuntimeError as e:
             logger.warning("Bass model fit failed: %s", e)
@@ -226,11 +226,9 @@ class BassDiffusionModel:
         """Predict cumulative adopters at time t."""
         if not self._fitted:
             return 0.0
-        return float(
-            self._bass_cumulative(np.array([t]), self.p, self.q, self.M)[0]
-        )
+        return float(self._bass_cumulative(np.array([t]), self.p, self.q, self.M)[0])
 
-    def get_params(self) -> Dict[str, float]:
+    def get_params(self) -> dict[str, float]:
         """Return fitted parameters."""
         return {"p": self.p, "q": self.q, "M": self.M}
 
@@ -251,14 +249,12 @@ class MarketLiquidityModel:
     """
 
     # Lifecycle stages based on percent of saturation
-    _STAGE_EARLY = (0.0, 0.2)     # Early adopter phase
-    _STAGE_GROWTH = (0.2, 0.5)    # Rapid growth
-    _STAGE_MATURE = (0.5, 0.8)    # Mature, stable liquidity
-    _STAGE_DECLINING = (0.8, 1.5) # Past peak or approaching ceiling
+    _STAGE_EARLY = (0.0, 0.2)  # Early adopter phase
+    _STAGE_GROWTH = (0.2, 0.5)  # Rapid growth
+    _STAGE_MATURE = (0.5, 0.8)  # Mature, stable liquidity
+    _STAGE_DECLINING = (0.8, 1.5)  # Past peak or approaching ceiling
 
-    def estimate_liquidity_trajectory(
-        self, historical_oi: List[float]
-    ) -> Dict[str, Any]:
+    def estimate_liquidity_trajectory(self, historical_oi: list[float]) -> dict[str, Any]:
         """Fit logistic model to open interest history and classify lifecycle stage.
 
         Args:
