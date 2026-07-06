@@ -34,6 +34,8 @@ import hashlib
 import json
 import math
 import sys
+import time
+import urllib.error
 import urllib.parse
 import urllib.request
 from collections import Counter
@@ -428,10 +430,33 @@ def observation_due_summary(
     }
 
 
-def fetch_json_url(url: str) -> dict[str, Any]:
-    with urllib.request.urlopen(url, timeout=30) as response:
-        payload = json.load(response)
-    return payload if isinstance(payload, dict) else {}
+def fetch_json_url(
+    url: str,
+    *,
+    max_attempts: int = 5,
+    sleep_fn: Any = time.sleep,
+) -> dict[str, Any]:
+    attempts = max(1, int(max_attempts))
+    for attempt in range(1, attempts + 1):
+        try:
+            with urllib.request.urlopen(url, timeout=30) as response:
+                payload = json.load(response)
+            return payload if isinstance(payload, dict) else {}
+        except urllib.error.HTTPError as exc:
+            if exc.code != 429 or attempt >= attempts:
+                raise
+            sleep_fn(retry_after_seconds(exc, attempt=attempt))
+    return {}
+
+
+def retry_after_seconds(exc: urllib.error.HTTPError, *, attempt: int) -> float:
+    header = exc.headers.get("Retry-After") if exc.headers else None
+    if header:
+        try:
+            return max(0.0, min(float(header), 30.0))
+        except ValueError:
+            pass
+    return min(2.0 * (2 ** max(0, attempt - 1)), 30.0)
 
 
 def feature_observations(

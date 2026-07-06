@@ -18,7 +18,9 @@ Key sports-specific differences from crypto (asserted below):
 from __future__ import annotations
 
 import importlib.util
+import io
 import json
+import urllib.error
 from pathlib import Path
 
 SCRIPT_PATH = (
@@ -41,6 +43,14 @@ def load_loop_module():
 def write_json(path: Path, payload: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload), encoding="utf-8")
+
+
+class _JsonResponse(io.BytesIO):
+    def __enter__(self):
+        return self
+
+    def __exit__(self, exc_type, exc, tb):
+        return False
 
 
 # --------------------------------------------------------------------------
@@ -197,6 +207,30 @@ def test_sports_proxy_observation_loop_records_ready_feature_rows_without_ev_or_
     assert report["safety"]["account_or_order_paths"] is False
     assert report["safety"]["database_writes"] is False
     assert report["safety"]["staking_or_sizing_guidance"] is False
+
+
+def test_fetch_json_url_retries_once_after_public_rate_limit(monkeypatch) -> None:
+    module = load_loop_module()
+    calls = {"count": 0}
+
+    def fake_urlopen(url: str, timeout: int):
+        calls["count"] += 1
+        if calls["count"] == 1:
+            raise urllib.error.HTTPError(
+                url,
+                429,
+                "Too Many Requests",
+                {"Retry-After": "0"},
+                None,
+            )
+        return _JsonResponse(json.dumps({"markets": []}).encode("utf-8"))
+
+    monkeypatch.setattr(module.urllib.request, "urlopen", fake_urlopen)
+
+    assert module.fetch_json_url("https://example.test/markets", sleep_fn=lambda _: None) == {
+        "markets": []
+    }
+    assert calls["count"] == 2
 
 
 def test_sports_proxy_observation_loop_only_snapshots_ready_feature_rows(tmp_path: Path) -> None:

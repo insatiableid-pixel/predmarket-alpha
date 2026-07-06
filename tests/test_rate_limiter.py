@@ -137,12 +137,15 @@ class TestTokenBucketConcurrency:
         """Large sequential batch with invariant checks."""
         bucket = TokenBucket(rate=1000.0, burst=200.0)
         consumed = 0
+        started = time.monotonic()
         for _ in range(200):
             await bucket.consume(1.0)
             consumed += 1
+        elapsed = time.monotonic() - started
         assert consumed == 200
-        # Bucket should be empty now
-        assert bucket.available_tokens <= 1.0
+        # The loop is not instantaneous; allow real refill that accrued while
+        # the sequential batch ran.
+        assert bucket.available_tokens <= max(1.0, elapsed * bucket.rate + 0.25)
 
 
 # ---------------------------------------------------------------------------
