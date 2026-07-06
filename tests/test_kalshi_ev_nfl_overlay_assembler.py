@@ -4,12 +4,7 @@ import importlib.util
 import json
 from pathlib import Path
 
-
-SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "scripts"
-    / "kalshi_ev_nfl_overlay_assembler.py"
-)
+SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_ev_nfl_overlay_assembler.py"
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
@@ -167,7 +162,10 @@ def test_nfl_overlay_assembler_writes_safe_overlay_pair_from_ready_match(tmp_pat
     )
 
     assert rerun["outputs"]["mapping_overlay_path"] == report["outputs"]["mapping_overlay_path"]
-    assert rerun["outputs"]["probability_overlay_path"] == report["outputs"]["probability_overlay_path"]
+    assert (
+        rerun["outputs"]["probability_overlay_path"]
+        == report["outputs"]["probability_overlay_path"]
+    )
     assert len(list((tmp_path / "manual/contract_mappings").glob("*.json"))) == 1
     assert len(list((tmp_path / "manual/probabilities").glob("*.json"))) == 1
 

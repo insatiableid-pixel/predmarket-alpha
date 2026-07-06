@@ -3,9 +3,8 @@
 from __future__ import annotations
 
 import os
-import time
-from datetime import datetime, timezone
-from typing import Any, Dict, List, Optional
+from datetime import UTC, datetime
+from typing import Any
 
 import numpy as np
 from pydantic import BaseModel, Field
@@ -22,10 +21,10 @@ class LLMForecastOutput(BaseModel):
     base_rate_anchor: float = Field(ge=0.0, le=1.0)
     market_price_anchor: float = Field(ge=0.0, le=1.0)
     reasoning: str
-    key_factors: List[str] = Field(default_factory=list)
-    downside_factors: List[str] = Field(default_factory=list)
-    cruxes: List[str] = Field(default_factory=list)
-    citations: List[str] = Field(default_factory=list)
+    key_factors: list[str] = Field(default_factory=list)
+    downside_factors: list[str] = Field(default_factory=list)
+    cruxes: list[str] = Field(default_factory=list)
+    citations: list[str] = Field(default_factory=list)
 
 
 class LLMProbabilityCalibrator:
@@ -84,9 +83,7 @@ class BaseRateResearchForecaster:
         context.validate_point_in_time()
         prob, ref_name, n = self.base_rates.get_base_rate(context.category)
         uncertainty = max(0.04, min(0.35, 1.0 / np.sqrt(max(n, 1))))
-        samples = np.clip(
-            np.random.default_rng(23).normal(prob, uncertainty, 501), 0.0, 1.0
-        )
+        samples = np.clip(np.random.default_rng(23).normal(prob, uncertainty, 501), 0.0, 1.0)
         return ForecastDistribution.from_samples(
             samples.tolist(),
             method=self.name,
@@ -119,7 +116,9 @@ class FoundationTimeSeriesForecaster:
     def forecast(self, context: ForecastContext) -> ForecastDistribution:
         context.validate_point_in_time()
         history = context.market_history or getattr(context.snapshot, "line_history", [])
-        values = np.asarray(history if history else [getattr(context.snapshot, "mid", 0.5)], dtype=float)
+        values = np.asarray(
+            history if history else [getattr(context.snapshot, "mid", 0.5)], dtype=float
+        )
         values = np.clip(values[np.isfinite(values)], 0.0, 1.0)
         if len(values) == 0:
             values = np.asarray([0.5])
@@ -165,9 +164,9 @@ class LLMEvidenceForecaster:
     def __init__(
         self,
         api_key_env: str = "OPENAI_API_KEY",
-        model: Optional[str] = None,
-        client: Optional[Any] = None,
-        calibrator: Optional[LLMProbabilityCalibrator] = None,
+        model: str | None = None,
+        client: Any | None = None,
+        calibrator: LLMProbabilityCalibrator | None = None,
         max_documents: int = 8,
     ):
         self.api_key_env = api_key_env
@@ -196,9 +195,7 @@ class LLMEvidenceForecaster:
             return self._distribution_from_output(parsed, context)
         except Exception as exc:
             fallback = self._heuristic_forecast(context)
-            fallback.status_flags.extend(
-                ["LLM_API_FAILED", type(exc).__name__, "RESEARCH_ONLY"]
-            )
+            fallback.status_flags.extend(["LLM_API_FAILED", type(exc).__name__, "RESEARCH_ONLY"])
             fallback.status_flags = sorted(set(fallback.status_flags))
             return fallback
 
@@ -249,14 +246,12 @@ class LLMEvidenceForecaster:
     def _user_prompt(self, context: ForecastContext) -> str:
         snap = context.snapshot
         base_rate, base_ref, n = self.base_rates.get_base_rate(context.category)
-        as_of = datetime.fromtimestamp(context.as_of_ts, tz=timezone.utc).isoformat()
+        as_of = datetime.fromtimestamp(context.as_of_ts, tz=UTC).isoformat()
         history = list(context.market_history or getattr(snap, "line_history", []) or [])
         docs = context.source_documents[: self.max_documents]
         doc_lines = []
         for doc in docs:
-            published = datetime.fromtimestamp(
-                doc.published_ts, tz=timezone.utc
-            ).isoformat()
+            published = datetime.fromtimestamp(doc.published_ts, tz=UTC).isoformat()
             excerpt = " ".join(doc.text.split())[:900]
             doc_lines.append(
                 f"- id={doc.source_id} source={doc.source} published={published} "
@@ -331,7 +326,7 @@ class LLMEvidenceForecaster:
 
     def _heuristic_forecast(self, context: ForecastContext) -> ForecastDistribution:
         docs = context.source_documents[: self.max_documents]
-        refs: List[str] = []
+        refs: list[str] = []
         positive = {"pass", "approve", "win", "surge", "beat", "agreement", "resolve"}
         negative = {"fail", "reject", "lose", "delay", "block", "miss", "veto"}
         score = 0
@@ -356,20 +351,20 @@ class LLMEvidenceForecaster:
 
 class ForecasterRegistry:
     def __init__(self):
-        self._forecasters: Dict[str, object] = {}
+        self._forecasters: dict[str, object] = {}
 
     def register(self, forecaster: object) -> None:
-        name = getattr(forecaster, "name")
+        name = forecaster.name
         self._forecasters[name] = forecaster
 
-    def forecast_all(self, context: ForecastContext) -> Dict[str, ForecastDistribution]:
+    def forecast_all(self, context: ForecastContext) -> dict[str, ForecastDistribution]:
         results = {}
         for name, forecaster in self._forecasters.items():
             results[name] = forecaster.forecast(context)
         return results
 
     @classmethod
-    def default(cls) -> "ForecasterRegistry":
+    def default(cls) -> ForecasterRegistry:
         registry = cls()
         registry.register(MarketBaselineForecaster())
         registry.register(BaseRateResearchForecaster())

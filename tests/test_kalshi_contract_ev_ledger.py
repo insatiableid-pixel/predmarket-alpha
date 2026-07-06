@@ -5,7 +5,7 @@ import json
 from pathlib import Path
 from typing import Any
 
-from predmarket.kalshi_execution_cost import kalshi_trade_fee
+from predmarket.kalshi_execution_cost import GENERAL_MAKER_FEE_RATE, kalshi_trade_fee
 
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_contract_ev_ledger.py"
 SCHEMA_PATH = (
@@ -191,6 +191,46 @@ def make_ev_ledger_fixture(tmp_path: Path) -> dict[str, Any]:
             "dispositions": predmarket_dispositions,
         },
     )
+    write_json(
+        predmarket_repo / "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.json",
+        {
+            "schema_version": 1,
+            "status": "sports_proxy_feature_packet_ready",
+            "research_only": True,
+            "execution_enabled": False,
+            "market_execution": False,
+            "account_or_order_paths": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "feature_rows": [
+                {
+                    "contract_ticker": "KXMLBGAME-26JUL041910NYYBOS-NYY",
+                    "event_ticker": "KXMLBGAME-26JUL041910NYYBOS",
+                    "series_ticker": "KXMLBGAME",
+                    "league": "MLB",
+                    "selected_code": "NYY",
+                    "title": "New York Yankees vs Boston Red Sox Winner?",
+                    "feature_status": "sports_proxy_features_ready",
+                    "yes_ask": 0.55,
+                    "yes_bid": 0.54,
+                    "win_probability": 0.57,
+                }
+            ],
+        },
+    )
+    term_records.append(
+        {
+            "ticker": "KXMLBGAME-26JUL041910NYYBOS-NYY",
+            "event_ticker": "KXMLBGAME-26JUL041910NYYBOS",
+            "rules_primary": (
+                "KXMLBGAME-26JUL041910NYYBOS-NYY market resolves to Yes if New York Yankees win "
+                "under official Kalshi rules."
+            ),
+        }
+    )
 
     mlb_ticker = "KXMLBGAME-26JUL04MLBHOMEAWAY-HOME"
     term_records.append(
@@ -281,6 +321,37 @@ def make_ev_ledger_fixture(tmp_path: Path) -> dict[str, Any]:
                 }
             ]
         ),
+    )
+    write_json(
+        atp_repo / "data/kalshi/matches-2026-07-03.json",
+        {
+            "captured_at": "2026-07-03T19:31:02Z",
+            "source": "kalshi_public_api",
+            "series_ticker": "KXATPMATCH",
+            "status_filter": "open",
+            "n_matches": 1,
+            "matches": [
+                {
+                    "player_a": "Carlos Alcaraz",
+                    "player_b": "Matteo Berrettini",
+                    "kalshi_price_a": 0.62,
+                    "kalshi_price_b": 0.39,
+                    "kalshi_market_id_a": "KXATPMATCH-26JUL05ALCBER-ALC",
+                    "kalshi_market_id_b": "KXATPMATCH-26JUL05ALCBER-BER",
+                    "surface": "Grass",
+                    "best_of": 5,
+                    "tourney_name": "Wimbledon",
+                    "tourney_level": "G",
+                    "_kalshi_event_ticker": "KXATPMATCH-26JUL05ALCBER",
+                    "_yes_bid_a": 0.61,
+                    "_yes_bid_b": 0.38,
+                    "_yes_ask_a": 0.62,
+                    "_yes_ask_b": 0.39,
+                    "_close_time_a": "2026-07-05T16:00:00Z",
+                    "_close_time_b": "2026-07-05T16:00:00Z",
+                }
+            ],
+        },
     )
 
     return {
@@ -408,6 +479,8 @@ def test_ledger_rows_use_contract_break_even_math(tmp_path: Path) -> None:
             assert row["resolution_rule_source"] in {
                 "inferred_from_kalshi_ticker_and_title",
                 "inferred_from_mlb_type2_evidence",
+                "inferred_from_atp_kalshi_match_snapshot",
+                "inferred_from_current_sports_feature_packet",
             }
             assert row["resolution_rule_status"] == "inferred_unverified_official_terms"
             assert row["resolution_rule_source_artifact"] is None
@@ -418,7 +491,7 @@ def test_ledger_rows_use_contract_break_even_math(tmp_path: Path) -> None:
             )
         assert row["kalshi_payout_multiple"] is None
         assert row["payout_multiple"] is None
-        expected_fee = kalshi_trade_fee(price=row["display_price"])
+        expected_fee = kalshi_trade_fee(price=row["display_price"], fee_rate=GENERAL_MAKER_FEE_RATE)
         assert abs(row["fee_estimate"] - expected_fee) < 1e-12
         assert abs(row["all_in_cost"] - (row["display_price"] + expected_fee)) < 1e-12
         assert row["cost_basis_source"] is not None
@@ -516,15 +589,266 @@ def test_ticket_payout_multiplier_blocks_probability_that_only_beats_display_pri
     assert any("does not clear execution cost basis" in reason for reason in row["gate_reasons"])
 
 
+def test_sports_ccd_projection_row_is_blocked_by_consensus_doctrine(tmp_path: Path) -> None:
+    ledger_mod = load_ledger_module()
+    source = write_json(tmp_path / "cluster.json", {"status": "unit"})
+
+    row = ledger_mod.sports_ccd_paper_overlay_ev_row(
+        repo_id="predmarket-alpha",
+        source_artifact=source,
+        source_row_index=0,
+        capacity={
+            "contract_ticker": "KXMLBGAME-26JUL031605STLCHC-STL",
+            "event_ticker": "KXMLBGAME-26JUL031605STLCHC",
+            "league": "MLB",
+            "predicted_side": "yes",
+            "best_all_in_break_even_probability": 0.40,
+            "conservative_calibrated_side_probability": 0.60,
+            "controlled_depth_cost": 12.0,
+            "controlled_depth_contracts": 30.0,
+            "correlation_cluster_key": "MLB|KXMLBGAME-26JUL031605STLCHC|2026-07-03T23:05Z",
+            "close_time": "2026-07-03T23:05:00Z",
+        },
+        official_terms={
+            "KXMLBGAME-26JUL031605STLCHC-STL": {
+                "resolution_rule": "Official Kalshi MLB game-winner terms.",
+                "source_artifact": str(source),
+                "source_sha256": "abc",
+            }
+        },
+    )
+
+    assert row["usable"] is False
+    assert row["family_id"] == "mlb"
+    assert row["capacity_gate_status"] == "pass"
+    assert row["correlation_cluster_gate_status"] == "pass"
+    assert row["decay_gate_status"] == "decay_survival_pass"
+    assert row["source_gate_status"] == "blocked"
+    assert row["sports_probability_source_gate_status"] == (
+        "blocked_projection_model_not_consensus"
+    )
+    assert any(
+        "timestamp-matched multi-book no-vig consensus" in reason for reason in row["gate_reasons"]
+    )
+    assert row["capacity_estimate"] == 12.0
+    assert abs(row["expected_value_per_contract"] - 0.2) < 1e-12
+
+
+def test_near_resolution_flow_replay_ready_promotes_usable_ev_row(tmp_path: Path) -> None:
+    ledger_mod = load_ledger_module()
+    predmarket_repo = tmp_path / "repos" / "predmarket-alpha"
+    active_universe = write_json(
+        tmp_path / "macro" / "active-universe.json",
+        {
+            "repos": [
+                {
+                    "repo_id": "predmarket-alpha",
+                    "path": str(predmarket_repo),
+                }
+            ]
+        },
+    )
+    write_json(
+        predmarket_repo
+        / "docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json",
+        {
+            "research_only": True,
+            "execution_enabled": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "candidates": [],
+        },
+    )
+    write_json(
+        predmarket_repo
+        / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json",
+        {
+            "research_only": True,
+            "execution_enabled": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "dispositions": [],
+        },
+    )
+    contract_ticker = "KXFLOWGAME-26JUL04AAA-BBB-BBB"
+    flow_path = (
+        predmarket_repo / "docs/codex/macro/latest-kalshi-near-resolution-flow-replay-gates.json"
+    )
+    write_json(
+        flow_path,
+        {
+            "schema_version": 1,
+            "status": "near_resolution_flow_replay_gates_ready_for_ev_ledger_promotion",
+            "research_only": True,
+            "execution_enabled": False,
+            "market_execution": False,
+            "account_or_order_paths": False,
+            "summary": {
+                "evidence_status": "near_resolution_informed_flow_research_candidates_ready",
+                "selected_replay_model_id": "flow_depth_imbalance_settlement_directional",
+                "conservative_calibrated_side_probability": 0.72,
+                "candidate_oos_label_count": 60,
+                "candidate_oos_correct_count": 51,
+                "candidate_q_value": 0.0000000308,
+                "decay_status": "recent_bucket_not_worse_than_random",
+                "decay_bucket_count": 4,
+                "controlled_cluster_costs": {
+                    "flow|cluster|2026-07-04T20:00Z": 25.0,
+                },
+            },
+            "capacity_rows": [
+                {
+                    "contract_ticker": contract_ticker,
+                    "event_ticker": "KXFLOWGAME-26JUL04AAA-BBB",
+                    "series_ticker": "KXFLOWGAME",
+                    "sport_surface": "unit_sport",
+                    "side": "yes",
+                    "gate_status": "pass",
+                    "selected_side_executable_price": 0.40,
+                    "all_in_cost": 0.42,
+                    "fee_estimate": 0.02,
+                    "conservative_calibrated_side_probability": 0.72,
+                    "expected_value_per_contract": 0.30,
+                    "positive_depth_cost": 50.0,
+                    "positive_depth_contracts": 125.0,
+                    "correlation_cluster_key": "flow|cluster|2026-07-04T20:00Z",
+                    "close_time": "2026-07-04T20:00:00Z",
+                    "decision_time": "2026-07-04T19:55:00Z",
+                    "predicted_outcome": 1,
+                }
+            ],
+            "safety": {
+                "research_only": True,
+                "execution_enabled": False,
+                "provider_api_calls": False,
+                "paid_calls": False,
+                "database_writes": False,
+                "market_execution": False,
+                "account_or_order_paths": False,
+            },
+        },
+    )
+    terms_dir = tmp_path / "terms"
+    write_json(
+        terms_dir / "kalshi_scored_flow.json",
+        {
+            "markets": [
+                {
+                    "ticker": contract_ticker,
+                    "event_ticker": "KXFLOWGAME-26JUL04AAA-BBB",
+                    "rules_primary": "If BBB wins, this market resolves to Yes.",
+                }
+            ]
+        },
+    )
+
+    ledger = ledger_mod.build_ledger(
+        active_universe_path=active_universe,
+        official_terms_paths=[terms_dir],
+        calibrated_probability_paths=[],
+        contract_mapping_paths=[],
+        generated_utc="2026-07-04T20:01:00Z",
+    )
+
+    flow_rows = [
+        row
+        for row in ledger["rows"]
+        if row.get("market_type") == "sports_microstructure_near_resolution_flow"
+    ]
+    assert len(flow_rows) == 1
+    row = flow_rows[0]
+    assert row["usable"] is True
+    assert row["family_id"] == "microstructure_informed_flow"
+    assert row["model_id"] == "flow_depth_imbalance_settlement_directional"
+    assert row["capacity_gate_status"] == "pass"
+    assert row["correlation_cluster_gate_status"] == "pass"
+    assert row["decay_gate_status"] == "decay_survival_pass"
+    assert row["capacity_estimate"] == 25.0
+    assert row["controlled_capacity_contracts"] == 62.5
+    assert row["expected_value_per_contract"] == 0.3
+    assert row["gate_status"] == "pass"
+
+
+def test_near_resolution_flow_replay_not_ready_does_not_promote_ev_rows(
+    tmp_path: Path,
+) -> None:
+    ledger_mod = load_ledger_module()
+    predmarket_repo = tmp_path / "repos" / "predmarket-alpha"
+    active_universe = write_json(
+        tmp_path / "macro" / "active-universe.json",
+        {"repos": [{"repo_id": "predmarket-alpha", "path": str(predmarket_repo)}]},
+    )
+    write_json(
+        predmarket_repo
+        / "docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json",
+        {
+            "research_only": True,
+            "execution_enabled": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "candidates": [],
+        },
+    )
+    write_json(
+        predmarket_repo / "docs/codex/macro/latest-kalshi-near-resolution-flow-replay-gates.json",
+        {
+            "status": "near_resolution_flow_replay_gates_blocked_decay_survival",
+            "research_only": True,
+            "execution_enabled": False,
+            "market_execution": False,
+            "account_or_order_paths": False,
+            "capacity_rows": [
+                {
+                    "contract_ticker": "KXFLOWGAME-26JUL04AAA-BBB-BBB",
+                    "side": "yes",
+                    "gate_status": "pass",
+                }
+            ],
+            "safety": {
+                "research_only": True,
+                "execution_enabled": False,
+                "provider_api_calls": False,
+                "paid_calls": False,
+                "database_writes": False,
+                "market_execution": False,
+                "account_or_order_paths": False,
+            },
+        },
+    )
+
+    ledger = ledger_mod.build_ledger(
+        active_universe_path=active_universe,
+        official_terms_paths=[],
+        calibrated_probability_paths=[],
+        contract_mapping_paths=[],
+        generated_utc="2026-07-04T20:01:00Z",
+    )
+
+    assert not [
+        row
+        for row in ledger["rows"]
+        if row.get("market_type") == "sports_microstructure_near_resolution_flow"
+    ]
+
+
 def test_gross_ticket_payout_uses_official_fee_estimate_when_fee_missing() -> None:
     ledger_mod = load_ledger_module()
 
     row = make_example_ev_row(ledger_mod, calibrated_probability=0.76)
 
     gross = 1.0 / 1.34
-    fee = kalshi_trade_fee(price=gross)
+    fee = kalshi_trade_fee(price=gross, fee_rate=GENERAL_MAKER_FEE_RATE)
     assert abs(row["break_even_probability"] - (gross + fee)) < 1e-12
-    assert row["fee_source"] == "kalshi_official_taker_fee_estimate"
+    assert row["fee_source"] == "kalshi_official_maker_fee_estimate"
     assert row["gate_status"] == "pass"
     assert row["usable"] is True
 
@@ -540,7 +864,7 @@ def test_missing_payout_multiple_does_not_block_executable_price_ev() -> None:
 
     assert row["display_price"] == 0.71
     assert row["displayed_price_break_even_probability"] == 0.71
-    expected_fee = kalshi_trade_fee(price=0.71)
+    expected_fee = kalshi_trade_fee(price=0.71, fee_rate=GENERAL_MAKER_FEE_RATE)
     assert abs(row["all_in_break_even_probability"] - (0.71 + expected_fee)) < 1e-12
     assert row["payout_implied_break_even_probability"] is None
     assert abs(row["break_even_probability"] - (0.71 + expected_fee)) < 1e-12
@@ -1332,15 +1656,64 @@ def test_payout_multiple_parser_accepts_ticket_formats() -> None:
     assert ledger_mod.extract_kalshi_payout_multiple({"payout_multiple": 0.71}) is None
 
 
-def test_atp_feed_is_read_only_and_blocked() -> None:
+def test_atp_match_snapshot_routes_exact_contract_rows_but_blocks_usability(tmp_path: Path) -> None:
     ledger_mod = load_ledger_module()
 
-    ledger = ledger_mod.build_ledger(max_rows_per_repo=1, generated_utc="2026-07-01T00:00:00Z")
+    ledger = build_fixture_ledger(ledger_mod, tmp_path)
     atp = next(feed for feed in ledger["repo_feeds"] if feed["repo_id"] == "atp-oracle")
+    rows = [row for row in ledger["rows"] if row["source_repo_id"] == "atp-oracle"]
 
-    assert atp["status"] == "blocked_read_only_atp_no_kalshi_ev_rows"
-    assert atp["row_count"] == 0
-    assert any("read-only" in blocker for blocker in atp["blockers"])
+    assert atp["status"] == "atp_kalshi_match_snapshot_rows_blocked_not_usable"
+    assert atp["row_count"] == 2
+    assert {row["contract_ticker"] for row in rows} == {
+        "KXATPMATCH-26JUL05ALCBER-ALC",
+        "KXATPMATCH-26JUL05ALCBER-BER",
+    }
+    assert all(row["market_type"] == "sports_tennis_kalshi_match_snapshot" for row in rows)
+    assert all(row["side"] == "yes" for row in rows)
+    assert all(row["usable"] is False for row in rows)
+    assert all(row["gate_status"] == "blocked" for row in rows)
+    assert all(
+        "ATP match snapshot is market observation input, not a model probability"
+        in row["gate_reasons"]
+        for row in rows
+    )
+    assert atp["ev_readiness"]["contract_mapping_status"] == "exact_kalshi_contract_rows_present"
+    assert (
+        atp["ev_readiness"]["calibrated_probability_status"]
+        == "missing_calibrated_contract_probability"
+    )
+
+
+def test_current_sports_feature_packet_routes_mlb_game_rows_but_blocks_usability(
+    tmp_path: Path,
+) -> None:
+    ledger_mod = load_ledger_module()
+
+    ledger = build_fixture_ledger(ledger_mod, tmp_path)
+    rows = [
+        row
+        for row in ledger["rows"]
+        if row["market_type"] == "sports_baseball_current_game_feature_packet"
+    ]
+
+    assert len(rows) == 1
+    row = rows[0]
+    assert row["source_repo_id"] == "predmarket-alpha"
+    assert row["contract_ticker"] == "KXMLBGAME-26JUL041910NYYBOS-NYY"
+    assert row["side"] == "yes"
+    assert row["display_price"] == 0.55
+    assert row["reference_probability"] == 0.57
+    assert (
+        row["reference_probability_source"]
+        == "sports_proxy_strength_reference_not_calibrated_probability"
+    )
+    assert row["gate_status"] == "blocked"
+    assert row["usable"] is False
+    assert (
+        "sports feature packet is feature-only and not a validated probability overlay"
+        in row["gate_reasons"]
+    )
 
 
 def test_makefile_exposes_kalshi_ev_ledger_target() -> None:

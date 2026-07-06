@@ -45,3 +45,28 @@ portfolio:
     line_movement_threshold_pct: 0.05 # 5 percentage points shift
     line_movement_window_mins: 30   # 30-minute window for SHARP-MOVE
     covariance_update_frequency_mins: 60
+
+kalshi_live:
+  execution_mode: "disabled"        # disabled | demo | live
+  execution_strategy: "maker_first" # maker_first | taker_cross | taker_if_decay_justifies
+  max_open_exposure_usd: 250.0
+  max_per_contract_usd: 25.0
+  max_per_family_usd: 100.0
+  max_per_cluster_usd: 50.0
+  max_daily_gross_buy_usd: 100.0
+  max_daily_loss_usd: 50.0
+  no_new_entry_seconds: 300
+  passive_order_ttl_seconds: 180
+  passive_price_improvement: 0.01
+  unreconciled_order_timeout_seconds: 60
+  max_orders_per_run: 5
+  rate_limits:
+    public_rate: 30.0
+    public_burst: 60.0
+    auth_rate: 10.0
+    auth_burst: 20.0
+  jurisdiction:
+    restricted_states: []           # Updatable via make kalshi-jurisdiction-refresh
+    stale_threshold_hours: 24
+    source_url: null                # Optional URL for Kalshi agreement restricted-states list
+    unknown_state_policy: "restrict" # restrict | allow (fail-closed default)

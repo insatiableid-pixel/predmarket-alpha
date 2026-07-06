@@ -11,12 +11,10 @@ Replaces the toy BBN in ensemble.py with proper posterior inference that:
 """
 
 import logging
-import time
-from typing import Dict, Tuple, Optional, List
 
 import numpy as np
 
-from predmarket.density import DensityForecast, from_point_estimate, combine_density_forecasts
+from predmarket.density import DensityForecast, combine_density_forecasts, from_point_estimate
 
 logger = logging.getLogger("predmarket.bayesian")
 
@@ -89,7 +87,7 @@ class BetaPosterior:
         a, b = self.alpha, self.beta
         return (a * b) / ((a + b) ** 2 * (a + b + 1))
 
-    def credible_interval(self, level: float = 0.9) -> Tuple[float, float]:
+    def credible_interval(self, level: float = 0.9) -> tuple[float, float]:
         """Equal-tailed credible interval.
 
         Args:
@@ -100,6 +98,7 @@ class BetaPosterior:
         """
         tail = (1.0 - level) / 2.0
         from scipy.stats import beta as beta_dist
+
         lower = float(beta_dist.ppf(tail, self.alpha, self.beta))
         upper = float(beta_dist.ppf(1.0 - tail, self.alpha, self.beta))
         return lower, upper
@@ -138,11 +137,11 @@ class HierarchicalEventModel:
     """
 
     def __init__(self, default_alpha: float = 1.0, default_beta: float = 1.0):
-        self._posteriors: Dict[str, Dict[str, BetaPosterior]] = {}
+        self._posteriors: dict[str, dict[str, BetaPosterior]] = {}
         self._default_alpha = default_alpha
         self._default_beta = default_beta
 
-    def _key(self, category: str, contract_id: str) -> Tuple[str, str]:
+    def _key(self, category: str, contract_id: str) -> tuple[str, str]:
         return (category, contract_id)
 
     def get_posterior(self, category: str, contract_id: str) -> BetaPosterior:
@@ -163,8 +162,7 @@ class HierarchicalEventModel:
             )
         return self._posteriors[category][contract_id]
 
-    def update(self, category: str, contract_id: str, outcome: int,
-               weight: float = 1.0) -> None:
+    def update(self, category: str, contract_id: str, outcome: int, weight: float = 1.0) -> None:
         """Update the posterior for a specific contract with an observed outcome.
 
         Args:
@@ -176,7 +174,7 @@ class HierarchicalEventModel:
         post = self.get_posterior(category, contract_id)
         post.update(outcome, weight)
 
-    def _category_prior(self, category: str) -> Tuple[float, float]:
+    def _category_prior(self, category: str) -> tuple[float, float]:
         """Estimate category-level hyperprior from all contracts in the category.
 
         Returns the mean alpha and beta across all contracts, or the default
@@ -200,8 +198,9 @@ class HierarchicalEventModel:
         mean_beta = sum(p.beta for p in posteriors) / len(posteriors)
         return mean_alpha, mean_beta
 
-    def get_shrinkage_estimate(self, category: str, contract_id: str,
-                               shrinkage_weight: float = 0.3) -> float:
+    def get_shrinkage_estimate(
+        self, category: str, contract_id: str, shrinkage_weight: float = 0.3
+    ) -> float:
         """Hierarchical shrinkage estimate for a contract.
 
         Blends the individual contract posterior with the category-level prior.
@@ -228,11 +227,13 @@ class HierarchicalEventModel:
 
         # Shrinkage decreases with more observations
         effective_shrinkage = shrinkage_weight / (1.0 + post._n_updates)
-        blended = (1.0 - effective_shrinkage) * individual_mean + effective_shrinkage * category_mean
+        blended = (
+            1.0 - effective_shrinkage
+        ) * individual_mean + effective_shrinkage * category_mean
 
         return float(np.clip(blended, 0.001, 0.999))
 
-    def get_contracts_for_category(self, category: str) -> List[str]:
+    def get_contracts_for_category(self, category: str) -> list[str]:
         """Return all contract IDs registered under a category."""
         if category not in self._posteriors:
             return []
@@ -259,7 +260,7 @@ class BayesianForecaster:
 
     def __init__(
         self,
-        model: Optional[HierarchicalEventModel] = None,
+        model: HierarchicalEventModel | None = None,
         posterior_weight: float = 0.50,
         nlp_weight: float = 0.25,
         base_rate_weight: float = 0.25,
@@ -308,8 +309,12 @@ class BayesianForecaster:
             density_posterior = post.to_density_forecast(n_samples=n_samples)
         else:
             # Cold start: use shrinkage estimate with moderate uncertainty
-            uncertainty = max(0.1, 1.0 / (1.0 + len(self.model.get_contracts_for_category(category))))
-            density_posterior = from_point_estimate(shrinkage_est, uncertainty=uncertainty, n_samples=n_samples)
+            uncertainty = max(
+                0.1, 1.0 / (1.0 + len(self.model.get_contracts_for_category(category)))
+            )
+            density_posterior = from_point_estimate(
+                shrinkage_est, uncertainty=uncertainty, n_samples=n_samples
+            )
 
         # Component 2: NLP signal as density
         nlp_uncertainty = 0.15  # NLP is somewhat noisy
@@ -360,8 +365,9 @@ class BayesianForecaster:
             n_samples=n_samples,
         )
 
-    def update_outcome(self, category: str, contract_id: str,
-                       outcome: int, weight: float = 1.0) -> None:
+    def update_outcome(
+        self, category: str, contract_id: str, outcome: int, weight: float = 1.0
+    ) -> None:
         """Convenience method to update the model with a resolved outcome.
 
         Args:

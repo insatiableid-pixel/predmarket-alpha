@@ -6,8 +6,9 @@ import argparse
 import json
 import tempfile
 import time
+from collections.abc import Sequence
 from pathlib import Path
-from typing import Any, Dict, Optional, Sequence
+from typing import Any
 
 from predmarket.config import Config, GlobalConfig, VenuesConfig
 from predmarket.kalshi_live_rank import KalshiLiveRankConfig, build_live_row, rank_live_rows
@@ -20,7 +21,7 @@ from predmarket.kalshi_research_cycle import (
 from predmarket.store import PointInTimeStore
 
 
-def build_smoke_rank_report(*, as_of_ts: Optional[float] = None) -> Dict[str, Any]:
+def build_smoke_rank_report(*, as_of_ts: float | None = None) -> dict[str, Any]:
     ts = float(as_of_ts or time.time())
     row = build_live_row(
         _smoke_market(ts),
@@ -53,10 +54,10 @@ def build_smoke_rank_report(*, as_of_ts: Optional[float] = None) -> Dict[str, An
 
 def run_kalshi_research_smoke(
     *,
-    data_dir: Optional[Path] = None,
-    reports_dir: Optional[Path] = None,
-    as_of_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    data_dir: Path | None = None,
+    reports_dir: Path | None = None,
+    as_of_ts: float | None = None,
+) -> dict[str, Any]:
     root = Path(data_dir) if data_dir else Path(tempfile.mkdtemp(prefix="kalshi-research-smoke-"))
     out_dir = Path(reports_dir) if reports_dir else root / "reports"
     venues = VenuesConfig()
@@ -110,7 +111,7 @@ def run_kalshi_research_smoke(
     }
 
 
-def _smoke_market(ts: float) -> Dict[str, Any]:
+def _smoke_market(ts: float) -> dict[str, Any]:
     close_ts = ts + 5 * 24 * 3600
     return {
         "ticker": "KXSMOKE-26JUN-TARGET",
@@ -139,7 +140,7 @@ def _smoke_market(ts: float) -> Dict[str, Any]:
     }
 
 
-def _smoke_orderbook() -> Dict[str, Any]:
+def _smoke_orderbook() -> dict[str, Any]:
     return {
         "orderbook_fp": {
             "yes_dollars": [["0.4200", "100.00"], ["0.3900", "200.00"]],
@@ -152,7 +153,7 @@ def _iso_ts(ts: float) -> str:
     return time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ts))
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run an offline Kalshi research desk smoke test")
     parser.add_argument("--data-dir", default=None)
     parser.add_argument("--reports-dir", default=None)

@@ -10,17 +10,15 @@ Usage:
 """
 
 import logging
-import math
-from dataclasses import dataclass, field
-from typing import List, Dict, Tuple, Optional, Any
+from dataclasses import dataclass
+from typing import Any
 
 import numpy as np
 
 from predmarket.density import (
-    DensityForecast,
-    from_point_estimate,
-    crps_score_fast,
     brier_score,
+    crps_score_fast,
+    from_point_estimate,
 )
 
 logger = logging.getLogger("predmarket.backtester")
@@ -79,12 +77,10 @@ class Backtester:
 
     def __init__(
         self,
-        forecast_history: List[Dict[str, Any]],
-        equity_history: Optional[List[float]] = None,
+        forecast_history: list[dict[str, Any]],
+        equity_history: list[float] | None = None,
     ):
-        self.forecasts = sorted(
-            forecast_history, key=lambda x: x.get("timestamp", 0)
-        )
+        self.forecasts = sorted(forecast_history, key=lambda x: x.get("timestamp", 0))
         self.equity_history = equity_history or []
 
     # ------------------------------------------------------------------
@@ -96,7 +92,7 @@ class Backtester:
         train_window: int = 30,
         test_window: int = 7,
         step: int = 1,
-    ) -> List[BacktestResult]:
+    ) -> list[BacktestResult]:
         """Split forecast history chronologically and evaluate each test window.
 
         Args:
@@ -110,14 +106,13 @@ class Backtester:
         resolved = [f for f in self.forecasts if f.get("outcome") is not None]
         if len(resolved) < train_window + test_window:
             logger.warning(
-                "Insufficient resolved forecasts for walk-forward: %d resolved, "
-                "need at least %d.",
+                "Insufficient resolved forecasts for walk-forward: %d resolved, need at least %d.",
                 len(resolved),
                 train_window + test_window,
             )
             return []
 
-        results: List[BacktestResult] = []
+        results: list[BacktestResult] = []
         n = len(resolved)
 
         for start in range(train_window, n - test_window + 1, step):
@@ -132,9 +127,7 @@ class Backtester:
     # Rolling metrics
     # ------------------------------------------------------------------
 
-    def compute_rolling_brier(
-        self, window: int = 20
-    ) -> List[Tuple[float, float]]:
+    def compute_rolling_brier(self, window: int = 20) -> list[tuple[float, float]]:
         """Compute rolling Brier score over resolved forecasts.
 
         Returns:
@@ -144,18 +137,15 @@ class Backtester:
         if len(resolved) < window:
             return []
 
-        pairs: List[Tuple[float, float]] = []
+        pairs: list[tuple[float, float]] = []
         for i in range(window, len(resolved) + 1):
             batch = resolved[i - window : i]
-            scores = [
-                brier_score(f["model_prob"], f["outcome"])
-                for f in batch
-            ]
+            scores = [brier_score(f["model_prob"], f["outcome"]) for f in batch]
             ts = batch[-1].get("timestamp", 0)
             pairs.append((ts, float(np.mean(scores))))
         return pairs
 
-    def compute_cumulative_pnl(self) -> List[Tuple[float, float]]:
+    def compute_cumulative_pnl(self) -> list[tuple[float, float]]:
         """Simulate cumulative PnL using resolved outcomes.
 
         Assumes a fixed $100 notional per trade. A correct YES prediction
@@ -169,7 +159,7 @@ class Backtester:
         if not resolved:
             return []
 
-        pairs: List[Tuple[float, float]] = []
+        pairs: list[tuple[float, float]] = []
         cum_pnl = 0.0
         for f in resolved:
             outcome = f["outcome"]
@@ -197,9 +187,7 @@ class Backtester:
     # Baseline comparison
     # ------------------------------------------------------------------
 
-    def compare_to_baselines(
-        self, baselines: Dict[str, List[float]]
-    ) -> Dict[str, BacktestResult]:
+    def compare_to_baselines(self, baselines: dict[str, list[float]]) -> dict[str, BacktestResult]:
         """Compare model forecasts against baseline forecasts.
 
         Args:
@@ -210,7 +198,7 @@ class Backtester:
             Dict mapping baseline name to its BacktestResult.
         """
         resolved = [f for f in self.forecasts if f.get("outcome") is not None]
-        results: Dict[str, BacktestResult] = {}
+        results: dict[str, BacktestResult] = {}
 
         for name, probs in baselines.items():
             n = min(len(resolved), len(probs))
@@ -256,7 +244,9 @@ class Backtester:
         baselines = {
             "random_walk": [resolved[i].get("market_implied", 0.5) for i in range(n)],
             "always_50": [0.5] * n,
-            "historical_mean": [float(np.mean([r["outcome"] for r in resolved[: i + 1]])) for i in range(n)],
+            "historical_mean": [
+                float(np.mean([r["outcome"] for r in resolved[: i + 1]])) for i in range(n)
+            ],
         }
         comparisons = self.compare_to_baselines(baselines)
         lines.append("")
@@ -270,12 +260,12 @@ class Backtester:
     # Internal helpers
     # ------------------------------------------------------------------
 
-    def _evaluate_window(self, window: List[Dict[str, Any]]) -> BacktestResult:
+    def _evaluate_window(self, window: list[dict[str, Any]]) -> BacktestResult:
         """Evaluate a slice of resolved forecasts."""
-        briers: List[float] = []
-        crpss: List[float] = []
-        log_scores: List[float] = []
-        pnls: List[float] = []
+        briers: list[float] = []
+        crpss: list[float] = []
+        log_scores: list[float] = []
+        pnls: list[float] = []
         hits = 0
 
         for f in window:
@@ -335,7 +325,7 @@ class Backtester:
         )
 
     @staticmethod
-    def _calibration_error(forecasts: List[Dict[str, Any]], n_bins: int = 5) -> float:
+    def _calibration_error(forecasts: list[dict[str, Any]], n_bins: int = 5) -> float:
         """Compute mean absolute calibration error across bins."""
         if not forecasts:
             return 0.0

@@ -1,12 +1,12 @@
-import os
-import time
+import fcntl
+import hashlib
 import json
 import sqlite3
-import hashlib
-import fcntl
 import threading
+import time
 from pathlib import Path
-from typing import Dict, Any, List, Optional
+from typing import Any
+
 
 class AuditLogger:
     """
@@ -22,7 +22,7 @@ class AuditLogger:
     safety.
     """
 
-    def __init__(self, data_dir: Optional[str] = None):
+    def __init__(self, data_dir: str | None = None):
         if data_dir is None:
             data_dir = str(Path(__file__).resolve().parents[1] / "data")
         self.data_dir = Path(data_dir)
@@ -52,14 +52,14 @@ class AuditLogger:
         # Seed hash if chain is empty
         return row[0] if row else "0000000000000000000000000000000000000000000000000000000000000000"
 
-    def _compute_hash(self, payload: Dict[str, Any], prev_hash: str) -> str:
+    def _compute_hash(self, payload: dict[str, Any], prev_hash: str) -> str:
         serialized = json.dumps(payload, sort_keys=True)
         hasher = hashlib.sha256()
         hasher.update(prev_hash.encode("utf-8"))
         hasher.update(serialized.encode("utf-8"))
         return hasher.hexdigest()
 
-    def _append_jsonl(self, log_entry: Dict[str, Any]):
+    def _append_jsonl(self, log_entry: dict[str, Any]):
         """Thread-safe and process-safe JSONL append using fcntl file locking."""
         with open(self.jsonl_path, "a") as f:
             fcntl.flock(f, fcntl.LOCK_EX)
@@ -80,8 +80,8 @@ class AuditLogger:
         market_implied: float,
         net_edge: float,
         status: str,
-        details: Optional[str] = None,
-        outcome: Optional[int] = None
+        details: str | None = None,
+        outcome: int | None = None,
     ) -> str:
         timestamp = time.time()
         payload = {
@@ -98,24 +98,41 @@ class AuditLogger:
             "net_edge": net_edge,
             "status": status,
             "details": details or "",
-            "outcome": outcome
+            "outcome": outcome,
         }
-        
+
         prev_hash = self._get_last_hash()
         entry_hash = self._compute_hash(payload, prev_hash)
-        
+
         # Write to SQLite (pooled connection, thread-safe)
         with self._lock:
             cursor = self._conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO audit_trail (
                     timestamp, event_type, venue, contract, category, side, size, price,
                     model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                timestamp, "TRADE_INTENT", venue, contract, category, side, size, price,
-                model_prob, market_implied, net_edge, status, details or "", prev_hash, entry_hash, outcome
-            ))
+            """,
+                (
+                    timestamp,
+                    "TRADE_INTENT",
+                    venue,
+                    contract,
+                    category,
+                    side,
+                    size,
+                    price,
+                    model_prob,
+                    market_implied,
+                    net_edge,
+                    status,
+                    details or "",
+                    prev_hash,
+                    entry_hash,
+                    outcome,
+                ),
+            )
             self._conn.commit()
 
         # Write to JSONL (file-locked)
@@ -142,24 +159,41 @@ class AuditLogger:
             "net_edge": 0.0,
             "status": "INFO",
             "details": details,
-            "outcome": None
+            "outcome": None,
         }
-        
+
         prev_hash = self._get_last_hash()
         entry_hash = self._compute_hash(payload, prev_hash)
-        
+
         # Write to SQLite (pooled connection, thread-safe)
         with self._lock:
             cursor = self._conn.cursor()
-            cursor.execute("""
+            cursor.execute(
+                """
                 INSERT INTO audit_trail (
                     timestamp, event_type, venue, contract, category, side, size, price,
                     model_prob, market_implied, net_edge, status, details, prev_hash, entry_hash, outcome
                 ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-            """, (
-                timestamp, event_type, "", "", "", "", 0.0, 0.0,
-                0.0, 0.0, 0.0, "INFO", details, prev_hash, entry_hash, None
-            ))
+            """,
+                (
+                    timestamp,
+                    event_type,
+                    "",
+                    "",
+                    "",
+                    "",
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    "INFO",
+                    details,
+                    prev_hash,
+                    entry_hash,
+                    None,
+                ),
+            )
             self._conn.commit()
 
         # Write to JSONL (file-locked)
@@ -176,17 +210,17 @@ class AuditLogger:
             cursor = self._conn.cursor()
             cursor.execute(
                 "INSERT INTO equity_history (timestamp, total_equity) VALUES (?, ?)",
-                (timestamp, total_equity)
+                (timestamp, total_equity),
             )
             self._conn.commit()
 
-    def get_equity_history(self, since_seconds: float) -> List[Dict[str, Any]]:
+    def get_equity_history(self, since_seconds: float) -> list[dict[str, Any]]:
         limit_time = time.time() - since_seconds
         with self._lock:
             cursor = self._conn.cursor()
             cursor.execute(
                 "SELECT timestamp, total_equity FROM equity_history WHERE timestamp >= ? ORDER BY timestamp ASC",
-                (limit_time,)
+                (limit_time,),
             )
             rows = cursor.fetchall()
         return [{"timestamp": r[0], "total_equity": r[1]} for r in rows]
@@ -203,8 +237,26 @@ class AuditLogger:
 
         expected_prev_hash = "0000000000000000000000000000000000000000000000000000000000000000"
         for row in rows:
-            row_id, ts, event_type, venue, contract, category, side, size, price, mp, mi, ne, status, details, p_hash, e_hash, outcome = row
-            
+            (
+                row_id,
+                ts,
+                event_type,
+                venue,
+                contract,
+                category,
+                side,
+                size,
+                price,
+                mp,
+                mi,
+                ne,
+                status,
+                details,
+                p_hash,
+                e_hash,
+                outcome,
+            ) = row
+
             # Reconstruct payload
             payload = {
                 "timestamp": ts,
@@ -220,22 +272,22 @@ class AuditLogger:
                 "net_edge": ne,
                 "status": status,
                 "details": details,
-                "outcome": outcome
+                "outcome": outcome,
             }
-            
+
             # Check link in chain
             if p_hash != expected_prev_hash:
                 return False
-            
+
             calculated_hash = self._compute_hash(payload, p_hash)
             if e_hash != calculated_hash:
                 return False
-            
+
             expected_prev_hash = e_hash
-        
+
         return True
 
-    def save_opportunities(self, slate: List[Dict[str, Any]]):
+    def save_opportunities(self, slate: list[dict[str, Any]]):
         timestamp = time.time()
         with self._lock:
             cursor = self._conn.cursor()
@@ -244,24 +296,27 @@ class AuditLogger:
                 raw_edge = item["model_prob"] - item["market_implied"]
                 tx_cost = 0.01
                 net_edge = raw_edge - tx_cost
-                cursor.execute("""
+                cursor.execute(
+                    """
                     INSERT OR REPLACE INTO opportunities (
                         contract_id, timestamp, venue, title, category, model_prob, market_implied, edge, status
                     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
-                """, (
-                    item["contract_id"],
-                    timestamp,
-                    item.get("venue", "Polymarket"),
-                    item["title"],
-                    item["category"],
-                    item["model_prob"],
-                    item["market_implied"],
-                    net_edge,
-                    item["status"]
-                ))
+                """,
+                    (
+                        item["contract_id"],
+                        timestamp,
+                        item.get("venue", "Polymarket"),
+                        item["title"],
+                        item["category"],
+                        item["model_prob"],
+                        item["market_implied"],
+                        net_edge,
+                        item["status"],
+                    ),
+                )
             self._conn.commit()
 
-    def get_opportunities(self) -> List[Dict[str, Any]]:
+    def get_opportunities(self) -> list[dict[str, Any]]:
         with self._lock:
             cursor = self._conn.cursor()
             cursor.execute("""
@@ -269,14 +324,17 @@ class AuditLogger:
                 FROM opportunities ORDER BY timestamp DESC
             """)
             rows = cursor.fetchall()
-        return [{
-            "contract_id": r[0],
-            "timestamp": r[1],
-            "venue": r[2],
-            "title": r[3],
-            "category": r[4],
-            "model_prob": r[5],
-            "market_implied": r[6],
-            "edge": r[7],
-            "status": r[8]
-        } for r in rows]
+        return [
+            {
+                "contract_id": r[0],
+                "timestamp": r[1],
+                "venue": r[2],
+                "title": r[3],
+                "category": r[4],
+                "model_prob": r[5],
+                "market_implied": r[6],
+                "edge": r[7],
+                "status": r[8],
+            }
+            for r in rows
+        ]

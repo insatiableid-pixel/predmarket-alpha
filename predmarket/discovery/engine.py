@@ -6,8 +6,8 @@ import hashlib
 import json
 import random
 import time
-from dataclasses import asdict
-from typing import Any, Dict, Iterable, List, Optional, Sequence, Set
+from collections.abc import Iterable, Sequence
+from typing import Any
 
 from predmarket.discovery.agents import (
     EvolutionAgent,
@@ -29,7 +29,6 @@ from predmarket.discovery.puct import PUCTSearch
 from predmarket.experiments import ExperimentProposal, ExperimentQueue
 from predmarket.research import PromotionGate, ResearchBacktester
 
-
 TRAJECTORY_FOCI = [
     "market_microstructure",
     "semantic_event_identity",
@@ -45,9 +44,9 @@ class AgenticSignalDiscoveryEngine:
     def __init__(
         self,
         store: Any = None,
-        backtester: Optional[ResearchBacktester] = None,
-        promotion_gate: Optional[PromotionGate] = None,
-        experiment_queue: Optional[ExperimentQueue] = None,
+        backtester: ResearchBacktester | None = None,
+        promotion_gate: PromotionGate | None = None,
+        experiment_queue: ExperimentQueue | None = None,
     ):
         self.store = store
         self.promotion_gate = promotion_gate or PromotionGate()
@@ -63,23 +62,27 @@ class AgenticSignalDiscoveryEngine:
 
     def run(
         self,
-        config: Optional[AgenticDiscoveryConfig],
-        rows: Sequence[Dict[str, Any]],
-        feature_catalog: Optional[Iterable[str]] = None,
+        config: AgenticDiscoveryConfig | None,
+        rows: Sequence[dict[str, Any]],
+        feature_catalog: Iterable[str] | None = None,
     ) -> DiscoveryRunReport:
         config = config or AgenticDiscoveryConfig()
-        ordered_rows = sorted([dict(row) for row in rows], key=lambda row: float(row.get("as_of_ts", 0.0)))
-        features = sorted(set(feature_catalog or SafeSignalDSL.discover_feature_catalog(ordered_rows)))
+        ordered_rows = sorted(
+            [dict(row) for row in rows], key=lambda row: float(row.get("as_of_ts", 0.0))
+        )
+        features = sorted(
+            set(feature_catalog or SafeSignalDSL.discover_feature_catalog(ordered_rows))
+        )
         dsl = SafeSignalDSL(features)
         run_id = self._run_id(config, ordered_rows, features)
 
-        all_artifacts: List[DiscoveryArtifact] = []
-        all_evaluations: Dict[str, CandidateEvaluation] = {}
-        all_rejections: List[Dict[str, Any]] = []
-        all_puct_rows: List[Dict[str, Any]] = []
-        accepted_transitions: List[DiscoveryTransition] = []
-        trajectory_reports: List[TrajectoryReport] = []
-        occurrence_by_expression: Dict[str, Set[str]] = {}
+        all_artifacts: list[DiscoveryArtifact] = []
+        all_evaluations: dict[str, CandidateEvaluation] = {}
+        all_rejections: list[dict[str, Any]] = []
+        all_puct_rows: list[dict[str, Any]] = []
+        accepted_transitions: list[DiscoveryTransition] = []
+        trajectory_reports: list[TrajectoryReport] = []
+        occurrence_by_expression: dict[str, set[str]] = {}
 
         for trajectory_idx in range(config.n_trajectories):
             focus = TRAJECTORY_FOCI[trajectory_idx % len(TRAJECTORY_FOCI)]
@@ -91,12 +94,12 @@ class AgenticSignalDiscoveryEngine:
             ranking_agent = RankingAgent(dsl, self.backtester, config)
             evolution_agent = EvolutionAgent(dsl, rng, config)
             puct = PUCTSearch(config.puct_c, seed)
-            seen_canonicals: Set[str] = set()
-            accepted_ids: List[str] = []
-            rejected_ids: List[str] = []
-            evaluations: Dict[str, CandidateEvaluation] = {}
-            accepted_hypotheses: Dict[str, SignalHypothesis] = {}
-            trajectory_artifacts: List[DiscoveryArtifact] = []
+            seen_canonicals: set[str] = set()
+            accepted_ids: list[str] = []
+            rejected_ids: list[str] = []
+            evaluations: dict[str, CandidateEvaluation] = {}
+            accepted_hypotheses: dict[str, SignalHypothesis] = {}
+            trajectory_artifacts: list[DiscoveryArtifact] = []
 
             proposals = hypothesis_agent.propose(
                 focus,
@@ -207,7 +210,9 @@ class AgenticSignalDiscoveryEngine:
                 hypotheses_tested=len(evaluations),
                 accepted_ids=accepted_ids,
                 rejected_ids=rejected_ids,
-                top_hypothesis_ids=[evaluation.hypothesis.hypothesis_id for evaluation in ranked[: config.top_k]],
+                top_hypothesis_ids=[
+                    evaluation.hypothesis.hypothesis_id for evaluation in ranked[: config.top_k]
+                ],
                 summary=(
                     f"{focus} tested {len(evaluations)} candidates; "
                     f"accepted {len(accepted_ids)} and rejected {len(rejected_ids)}."
@@ -250,15 +255,15 @@ class AgenticSignalDiscoveryEngine:
         run_id: str,
         trajectory_id: str,
         hypothesis: SignalHypothesis,
-        rows: Sequence[Dict[str, Any]],
-        seen_canonicals: Set[str],
+        rows: Sequence[dict[str, Any]],
+        seen_canonicals: set[str],
         reflection_agent: ReflectionAgent,
         puct: PUCTSearch,
-        accepted_ids: List[str],
-        rejected_ids: List[str],
-        accepted_hypotheses: Dict[str, SignalHypothesis],
-        trajectory_artifacts: List[DiscoveryArtifact],
-        all_rejections: List[Dict[str, Any]],
+        accepted_ids: list[str],
+        rejected_ids: list[str],
+        accepted_hypotheses: dict[str, SignalHypothesis],
+        trajectory_artifacts: list[DiscoveryArtifact],
+        all_rejections: list[dict[str, Any]],
     ) -> bool:
         result = reflection_agent.reflect(hypothesis, rows, seen_canonicals)
         status = "ACCEPTED" if result.accepted else "REJECTED"
@@ -291,10 +296,10 @@ class AgenticSignalDiscoveryEngine:
 
     def _submit_top_candidates(
         self, run_id: str, evaluations: Sequence[CandidateEvaluation]
-    ) -> List[str]:
+    ) -> list[str]:
         if self.experiment_queue is None:
             return []
-        proposal_ids: List[str] = []
+        proposal_ids: list[str] = []
         for evaluation in evaluations:
             status = evaluation.promotion.get("status", "RESEARCH_ONLY")
             proposal = ExperimentProposal(
@@ -316,15 +321,12 @@ class AgenticSignalDiscoveryEngine:
 
     @staticmethod
     def _ranked_evaluations(
-        evaluations: Dict[str, CandidateEvaluation]
-    ) -> List[CandidateEvaluation]:
+        evaluations: dict[str, CandidateEvaluation],
+    ) -> list[CandidateEvaluation]:
         if not evaluations:
             return []
         elo = RankingAgent.compute_elo(
-            {
-                hypothesis_id: evaluation.reward
-                for hypothesis_id, evaluation in evaluations.items()
-            }
+            {hypothesis_id: evaluation.reward for hypothesis_id, evaluation in evaluations.items()}
         )
         for hypothesis_id, rating in elo.items():
             evaluations[hypothesis_id].elo = rating
@@ -341,10 +343,10 @@ class AgenticSignalDiscoveryEngine:
     @staticmethod
     def _robust_ids(
         evaluations: Sequence[CandidateEvaluation],
-        occurrence_by_expression: Dict[str, Set[str]],
+        occurrence_by_expression: dict[str, set[str]],
         dsl: SafeSignalDSL,
-    ) -> List[str]:
-        robust: List[str] = []
+    ) -> list[str]:
+        robust: list[str] = []
         for evaluation in evaluations:
             try:
                 canonical = dsl.canonicalize(evaluation.hypothesis.expression)
@@ -362,10 +364,10 @@ class AgenticSignalDiscoveryEngine:
         run_id: str,
         trajectory_id: str,
         artifact_type: str,
-        payload: Dict[str, Any],
+        payload: dict[str, Any],
         status: str = "RECORDED",
-        reasons: Optional[List[str]] = None,
-        parent_ids: Optional[List[str]] = None,
+        reasons: list[str] | None = None,
+        parent_ids: list[str] | None = None,
     ) -> DiscoveryArtifact:
         base = json.dumps(
             {
@@ -393,7 +395,7 @@ class AgenticSignalDiscoveryEngine:
     @staticmethod
     def _run_id(
         config: AgenticDiscoveryConfig,
-        rows: Sequence[Dict[str, Any]],
+        rows: Sequence[dict[str, Any]],
         feature_catalog: Sequence[str],
     ) -> str:
         row_fingerprint = [

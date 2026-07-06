@@ -33,9 +33,11 @@ CSV_FIELDS = [
     "classification",
     "model_route",
     "feature_family",
+    "primary_metric",
     "candidate_count",
     "multiple_testing_family",
     "target_contract_class",
+    "acceptance_criteria",
     "blocked_reason",
 ]
 
@@ -65,7 +67,55 @@ FEATURE_FAMILIES: tuple[tuple[str, str, str], ...] = (
         "external reference data exists",
         "Simple-rule markets with public external references have measurable crowd miscalibration.",
     ),
+    (
+        "near_resolution_informed_flow",
+        "settles within",
+        "Near-resolution order flow and quote movement contain informed lead-lag structure.",
+    ),
+    (
+        "passive_liquidity_provision",
+        "liquidity",
+        "Passive quotes can earn positive net maker-fill EV after fees and adverse selection.",
+    ),
 )
+
+DEFAULT_ACCEPTANCE_POLICY = {
+    "primary_metric": "cost_aware_directional_oos_edge",
+    "acceptance_criteria": (
+        "Positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate "
+        "sample size, and no failed safety gates."
+    ),
+    "promotion_rule": (
+        "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, "
+        "adequate sample size, and no failed safety gates."
+    ),
+}
+FEATURE_FAMILY_ACCEPTANCE_POLICIES = {
+    "near_resolution_informed_flow": {
+        "primary_metric": "pre_close_flow_lead_lag_survival",
+        "acceptance_criteria": (
+            "OOS/FDR evidence that pre-close order flow or quote imbalance predicts later price "
+            "movement or settlement after fees and stale-source filters; not the generic "
+            "directional-signal bar."
+        ),
+        "promotion_rule": (
+            "Requires time-safe flow snapshots, OOS survival, FDR-controlled significance, "
+            "adverse-selection/cost adjustment, and current-depth support."
+        ),
+    },
+    "passive_liquidity_provision": {
+        "primary_metric": "maker_fill_net_ev_after_adverse_selection",
+        "acceptance_criteria": (
+            "OOS/FDR evidence that passive resting quotes produce positive maker-fill EV after "
+            "fees, non-fill, timeout, and adverse-selection costs; not the generic directional "
+            "signal bar."
+        ),
+        "promotion_rule": (
+            "Requires fill/no-fill labels, queue/timeout simulation, adverse-selection adjustment, "
+            "FDR control, current-depth support, and live-mode kill-switch compatibility."
+        ),
+    },
+}
 
 
 def utc_now() -> str:
@@ -269,6 +319,7 @@ def hypothesis(
     multiple_testing_family: str,
     external_data_requirements: Sequence[str],
 ) -> dict[str, Any]:
+    policy = acceptance_policy(feature_family)
     material = json.dumps(
         {
             "source": source,
@@ -295,12 +346,14 @@ def hypothesis(
         "target_contract_class": target_contract_class,
         "market_universe_filter": dict(market_universe_filter),
         "signal_definition": signal_definition,
+        "primary_metric": policy["primary_metric"],
+        "acceptance_criteria": policy["acceptance_criteria"],
         "null_hypothesis": "After costs and time-safe validation, the signal has zero or negative expected value versus the Kalshi executable break-even.",
         "training_window_policy": "Use only observations timestamped before the validation decision point.",
         "validation_window_policy": "Use walk-forward or purged out-of-sample windows with no label overlap.",
         "cost_model": "All-in executable Kalshi break-even from the contract EV ledger, including known fees/slippage where available.",
         "multiple_testing_family": multiple_testing_family,
-        "promotion_rule": "Requires positive OOS edge after all-in costs, FDR-adjusted q-value below threshold, adequate sample size, and no failed safety gates.",
+        "promotion_rule": policy["promotion_rule"],
         "retirement_rule": "Retire after repeated OOS failure, vanished capacity, or decay below cost-aware threshold.",
         "external_data_requirements": list(external_data_requirements),
         "example_contracts": list(examples),
@@ -334,6 +387,10 @@ def hypothesis(
     }
 
 
+def acceptance_policy(feature_family: str) -> dict[str, str]:
+    return dict(FEATURE_FAMILY_ACCEPTANCE_POLICIES.get(feature_family, DEFAULT_ACCEPTANCE_POLICY))
+
+
 def build_falsification_gate(
     hypotheses: Sequence[Mapping[str, Any]],
     *,
@@ -346,17 +403,23 @@ def build_falsification_gate(
         {
             "name": "universe_inventory_safe",
             "status": "pass" if universe_safe else "blocked",
-            "reason": "Universe inventory is research-only and available." if universe_safe else "Universe inventory is missing or unsafe.",
+            "reason": "Universe inventory is research-only and available."
+            if universe_safe
+            else "Universe inventory is missing or unsafe.",
         },
         {
             "name": "hypothesis_registry_nonempty",
             "status": "pass" if hypotheses else "blocked",
-            "reason": f"{len(hypotheses)} hypothesis candidate(s) generated." if hypotheses else "No hypotheses generated.",
+            "reason": f"{len(hypotheses)} hypothesis candidate(s) generated."
+            if hypotheses
+            else "No hypotheses generated.",
         },
         {
             "name": "contract_ev_cost_surface_available",
             "status": "pass" if ledger_safe else "warn",
-            "reason": "EV ledger is available for all-in break-even costs." if ledger_safe else "EV ledger is missing; costs must be supplied before testing.",
+            "reason": "EV ledger is available for all-in break-even costs."
+            if ledger_safe
+            else "EV ledger is missing; costs must be supplied before testing.",
         },
         {
             "name": "labeled_oos_evidence_available",
@@ -429,7 +492,9 @@ def registry_summary(
         "candidate_unvalidated_count": by_status["candidate_unvalidated"],
         "promoted_hypothesis_count": 0,
         "rejected_hypothesis_count": 0,
-        "blocked_by_falsification_count": int(falsification_gate.get("blocked_hypothesis_count") or 0),
+        "blocked_by_falsification_count": int(
+            falsification_gate.get("blocked_hypothesis_count") or 0
+        ),
         "multiple_testing_family_count": len([family for family in families if family]),
         "by_status": dict(sorted(by_status.items())),
         "by_route": dict(sorted(by_route.items())),
@@ -481,16 +546,36 @@ def external_requirements(classification: str) -> list[str]:
         "all-in execution cost estimates or verified ticket costs",
     ]
     extra = {
-        "mlb": ["game/prop model probabilities generated before close", "official settled game results"],
-        "nfl": ["game/prop model probabilities generated before close", "official settled game results"],
-        "nba": ["game/prop model probabilities generated before close", "official settled game results"],
-        "atp": ["match model probabilities generated before close", "official settled match results"],
-        "weather": ["station/location official weather observations", "forecast snapshots available before close"],
+        "mlb": [
+            "game/prop model probabilities generated before close",
+            "official settled game results",
+        ],
+        "nfl": [
+            "game/prop model probabilities generated before close",
+            "official settled game results",
+        ],
+        "nba": [
+            "game/prop model probabilities generated before close",
+            "official settled game results",
+        ],
+        "atp": [
+            "match model probabilities generated before close",
+            "official settled match results",
+        ],
+        "weather": [
+            "station/location official weather observations",
+            "forecast snapshots available before close",
+        ],
         "macro_econ": ["release calendar timestamps", "official economic release values"],
         "finance_crypto": ["reference asset price snapshots", "official settlement source values"],
-        "politics_policy": ["official resolution source timeline", "timestamped public polling/news features"],
+        "politics_policy": [
+            "official resolution source timeline",
+            "timestamped public polling/news features",
+        ],
     }
-    return base + extra.get(classification, ["explicit external reference source selected before testing"])
+    return base + extra.get(
+        classification, ["explicit external reference source selected before testing"]
+    )
 
 
 def infer_classification_from_market_type(market_type: str, source_repo: str) -> str:
@@ -552,7 +637,9 @@ def sha256_or_none(path: Path) -> str | None:
     return digest.hexdigest()
 
 
-def write_hypothesis_registry(report: Mapping[str, Any], out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, str]:
+def write_hypothesis_registry(
+    report: Mapping[str, Any], out_dir: Path = DEFAULT_OUT_DIR
+) -> dict[str, str]:
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "kalshi-hypothesis-registry.json"
     markdown_path = out_dir / "kalshi-hypothesis-registry.md"
@@ -561,7 +648,11 @@ def write_hypothesis_registry(report: Mapping[str, Any], out_dir: Path = DEFAULT
     gate_markdown_path = out_dir / "kalshi-falsification-gate.md"
 
     registry_text = json.dumps(report, indent=2, sort_keys=True, default=str) + "\n"
-    gate = report.get("falsification_gate") if isinstance(report.get("falsification_gate"), Mapping) else {}
+    gate = (
+        report.get("falsification_gate")
+        if isinstance(report.get("falsification_gate"), Mapping)
+        else {}
+    )
     gate_text = json.dumps(gate, indent=2, sort_keys=True, default=str) + "\n"
 
     json_path.write_text(registry_text, encoding="utf-8")
@@ -647,7 +738,9 @@ def render_gate_markdown(gate: Mapping[str, Any]) -> str:
     ]
     for item in gate.get("gates", []):
         if isinstance(item, Mapping):
-            lines.append(f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |")
+            lines.append(
+                f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |"
+            )
     lines.extend(
         [
             "",

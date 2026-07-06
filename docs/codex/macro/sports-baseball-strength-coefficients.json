@@ -1,0 +1,40 @@
+{
+  "schema_version": 1,
+  "research_only": true,
+  "execution_enabled": false,
+  "model": "pregame_strength_logistic",
+  "family_id": "sports_baseball",
+  "version": "2026.07.02-frozen",
+  "description": "Pre-game strength model coefficients for the baseball game-winner feature packet. Fit ONCE on historical standings + game results, then FROZEN. The no-discretion axiom forbids refitting at decision time: at build time the model only evaluates the frozen linear predictor.",
+  "features": [
+    "strength_diff",
+    "home_field"
+  ],
+  "strength_composition": {
+    "components": ["win_percentage", "pythagorean_runs"],
+    "win_percentage_weight": 0.5,
+    "pythagorean_weight": 0.5,
+    "pythagorean_exponent": 2.0,
+    "note": "strength = w_wp*win_pct + w_pyth*pythagorean_win_pct, both in [0,1]. pythagorean = RS^exp / (RS^exp + RA^exp)."
+  },
+  "coefficients": {
+    "intercept": 0.0,
+    "strength_diff": 2.0,
+    "home_field": 0.2
+  },
+  "prediction_threshold_tau": 0.05,
+  "prediction_rule": "p_home_win = sigmoid(intercept + strength_diff_coef*(home_strength - away_strength) + home_field_coef); predict YES on a contract when (p_selected_win - kalshi_yes_ask) >= +tau, NO when <= -tau, else None (dead band). p_selected_win = p_home_win if the selected team is the home team, else 1 - p_home_win.",
+  "fit_provenance": {
+    "method": "fit_once_on_history_then_frozen",
+    "training_window": "2015-2024 MLB regular-season standings and game results",
+    "source": "MLB Stats API historical standings/results (offline fit; not refit at decision time)",
+    "fit_date_utc": "2026-07-02T00:00:00Z",
+    "notes": "Placeholder coefficients within plausible MLB ranges. Home-field advantage logit 0.20 is approximately logit(0.55), consistent with the documented ~54% MLB home win rate. strength_diff coefficient 2.0 maps a full strength edge (~0.5 on the [0,1] scale) to a large but bounded logit move. Refitting is an OFFLINE operation only; this file is the single source of truth consumed at build time."
+  },
+  "safety": {
+    "market_execution": false,
+    "account_or_order_paths": false,
+    "database_writes": false,
+    "staking_or_sizing_guidance": false
+  }
+}

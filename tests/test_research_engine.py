@@ -4,6 +4,7 @@ from dataclasses import dataclass
 import numpy as np
 
 from predmarket.arbitrage import VenueQuote, detect_cross_venue_arbitrage
+from predmarket.audit import AuditLogger
 from predmarket.calibration import ConformalCalibrator
 from predmarket.contracts import (
     EventSpec,
@@ -18,12 +19,11 @@ from predmarket.research import (
     ResearchBacktestConfig,
     ResearchBacktester,
 )
-from predmarket.risk import RiskManager
-from predmarket.audit import AuditLogger
 from predmarket.research_forecasters import (
     LLMEvidenceForecaster,
     LLMForecastOutput,
 )
+from predmarket.risk import RiskManager
 from predmarket.store import PointInTimeStore
 
 
@@ -224,8 +224,12 @@ def test_execution_aware_sizing_accounts_for_costs_and_promotion(mock_config, te
 
 def test_cross_venue_arbitrage_requires_fees_and_semantic_confidence():
     quotes = [
-        VenueQuote("Polymarket", "PM-1", bid=0.40, ask=0.45, yes_fee=0.01, semantic_confidence=0.95),
-        VenueQuote("Kalshi", "KL-1", bid=0.44, ask=0.80, no_ask=0.48, no_fee=0.01, semantic_confidence=0.95),
+        VenueQuote(
+            "Polymarket", "PM-1", bid=0.40, ask=0.45, yes_fee=0.01, semantic_confidence=0.95
+        ),
+        VenueQuote(
+            "Kalshi", "KL-1", bid=0.44, ask=0.80, no_ask=0.48, no_fee=0.01, semantic_confidence=0.95
+        ),
         VenueQuote("Manifold", "MF-1", bid=0.30, ask=0.40, no_fee=0.01, semantic_confidence=0.40),
     ]
 

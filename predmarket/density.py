@@ -7,9 +7,9 @@ The existing ensemble outputs a single float `model_prob`. This module wraps
 that into a full probabilistic forecast with uncertainty quantification.
 """
 
-import numpy as np
 from dataclasses import dataclass, field
-from typing import List, Optional
+
+import numpy as np
 
 
 @dataclass
@@ -47,7 +47,7 @@ def from_point_estimate(
     point_estimate: float,
     uncertainty: float = 0.1,
     n_samples: int = 1000,
-    rng: Optional[np.random.Generator] = None,
+    rng: np.random.Generator | None = None,
 ) -> DensityForecast:
     """Create a DensityForecast from a point estimate by sampling Beta distribution.
 
@@ -93,8 +93,8 @@ def from_samples(samples: np.ndarray) -> DensityForecast:
 
 
 def combine_density_forecasts(
-    density_list: List[DensityForecast],
-    weights: Optional[List[float]] = None,
+    density_list: list[DensityForecast],
+    weights: list[float] | None = None,
 ) -> DensityForecast:
     """Combine multiple density forecasts via linear opinion pool.
 
@@ -249,8 +249,8 @@ def crps_score_fast(forecast: DensityForecast, outcome: float) -> float:
 
 
 def calibration_coverage(
-    forecasts: List[DensityForecast],
-    outcomes: List[float],
+    forecasts: list[DensityForecast],
+    outcomes: list[float],
     nominal_level: float = 0.9,
 ) -> float:
     """Compute the empirical coverage of prediction intervals.
@@ -287,8 +287,8 @@ def calibration_coverage(
 
 
 def pit_histogram(
-    forecasts: List[DensityForecast],
-    outcomes: List[float],
+    forecasts: list[DensityForecast],
+    outcomes: list[float],
     n_bins: int = 10,
 ) -> np.ndarray:
     """Compute Probability Integral Transform histogram for calibration assessment.

@@ -26,14 +26,25 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.feature_flags import FeatureFlag, is_enabled  # noqa: E402
-from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
+from predmarket.kalshi_execution_cost import (  # noqa: E402
+    kalshi_net_fee,
+    normalize_kalshi_execution_cost,
+)
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 ACTIVE_UNIVERSE_PATH = MACRO_DIR / "active-universe.json"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-contract-ev-ledger-latest"
 DEFAULT_OVERLAY_PREFLIGHT_OUT_DIR = MACRO_DIR / "kalshi-ev-overlay-preflight-latest"
 DEFAULT_CALIBRATION_WORK_ORDER_OUT_DIR = MACRO_DIR / "kalshi-ev-calibration-work-order-latest"
-DEFAULT_CONTRACT_MAPPING_WORK_ORDER_OUT_DIR = MACRO_DIR / "kalshi-ev-contract-mapping-work-order-latest"
+DEFAULT_CONTRACT_MAPPING_WORK_ORDER_OUT_DIR = (
+    MACRO_DIR / "kalshi-ev-contract-mapping-work-order-latest"
+)
+NEAR_RESOLUTION_FLOW_REPLAY_RELATIVE_PATH = Path(
+    "docs/codex/macro/latest-kalshi-near-resolution-flow-replay-gates.json"
+)
+DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH = (
+    MACRO_DIR / "latest-kalshi-near-resolution-flow-replay-gates.json"
+)
 DEFAULT_NFL_FAIR_LINE_REVIEW_PATH = (
     Path("/home/mrwatson/projects/nfl_quant_glm51_greenfield")
     / "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"
@@ -46,6 +57,11 @@ DEFAULT_NFL_HISTORICAL_LINE_VALIDATION_PATH = (
     Path("/home/mrwatson/projects/nfl_quant_glm51_greenfield")
     / "docs/codex/artifacts/nfl-historical-line-validation-latest/historical-line-validation-summary.json"
 )
+SPORTS_PROJECTION_MODEL_BLOCKER = (
+    "sports projection or strength-model probability is not the primary sports model; "
+    "require timestamp-matched multi-book no-vig consensus or a separately registered "
+    "microstructure, decay, or price-bucket-bias family"
+)
 
 LEDGER_SCHEMA_VERSION = 1
 DEFAULT_BINARY_PAYOUT = 1.0
@@ -57,9 +73,7 @@ OFFICIAL_TERMS_SNAPSHOT_PATHS = (
 CALIBRATED_PROBABILITY_OVERLAY_PATHS = (
     Path("/home/mrwatson/manual_drops/kalshi_ev_probabilities"),
 )
-CONTRACT_MAPPING_OVERLAY_PATHS = (
-    Path("/home/mrwatson/manual_drops/kalshi_ev_contract_mappings"),
-)
+CONTRACT_MAPPING_OVERLAY_PATHS = (Path("/home/mrwatson/manual_drops/kalshi_ev_contract_mappings"),)
 OFFICIAL_TERMS_FILENAME_PREFIXES = (
     "kalshi_mlb_game_series",
     "kalshi_scored",
@@ -179,13 +193,15 @@ def build_ledger(
             break_even = row.get("all_in_break_even_probability")
             ticker = row.get("contract_ticker", "")
             if cal_prob is not None and break_even is not None:
-                overlay_cross_checks.append({
-                    "contract_ticker": ticker,
-                    "calibrated_probability": cal_prob,
-                    "break_even_probability": break_even,
-                    "margin": float(cal_prob) - float(break_even),
-                    "overlay_confirms_edge": float(cal_prob) > float(break_even),
-                })
+                overlay_cross_checks.append(
+                    {
+                        "contract_ticker": ticker,
+                        "calibrated_probability": cal_prob,
+                        "break_even_probability": break_even,
+                        "margin": float(cal_prob) - float(break_even),
+                        "overlay_confirms_edge": float(cal_prob) > float(break_even),
+                    }
+                )
 
     return {
         "schema_version": LEDGER_SCHEMA_VERSION,
@@ -219,7 +235,9 @@ def build_ledger(
             "blocked_row_reason_counts": gate_reason_counts(rows),
             "top_blocked_row_reasons": top_gate_reasons(rows),
             "calibrated_probability_overlay_row_count": len(calibrated_probabilities),
-            "contract_mapping_overlay_row_count": sum(len(rows) for rows in contract_mappings.values()),
+            "contract_mapping_overlay_row_count": sum(
+                len(rows) for rows in contract_mappings.values()
+            ),
         },
         "contract_math": {
             "contract_price_break_even_probability": "executable_price",
@@ -318,8 +336,14 @@ def adapt_repo(
                 "No executable Kalshi contract price, side, or resolution mapping is available.",
             ],
             source_artifacts=[
-                str(repo_path / "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"),
-                str(repo_path / "docs/codex/artifacts/nfl-consensus-market-latest/consensus-market-reference.json"),
+                str(
+                    repo_path
+                    / "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"
+                ),
+                str(
+                    repo_path
+                    / "docs/codex/artifacts/nfl-consensus-market-latest/consensus-market-reference.json"
+                ),
             ],
             ev_readiness={
                 "contract_mapping_status": "missing_exact_kalshi_contract_mapping",
@@ -352,7 +376,10 @@ def adapt_repo(
                 "No executable Kalshi contract price, side, or calibrated contract probability is available.",
             ],
             source_artifacts=[
-                str(repo_path / "docs/codex/artifacts/nba-market-claim-gate-latest/nba-market-claim-gate.json")
+                str(
+                    repo_path
+                    / "docs/codex/artifacts/nba-market-claim-gate-latest/nba-market-claim-gate.json"
+                )
             ],
             ev_readiness={
                 "contract_mapping_status": "missing_exact_kalshi_contract_mapping",
@@ -376,6 +403,15 @@ def adapt_repo(
         )
         if mapped is not None:
             return mapped
+        snapshot = adapt_atp_match_snapshot(
+            repo_id=repo_id,
+            repo_path=repo_path,
+            max_rows=max_rows,
+            official_terms=official_terms,
+            calibrated_probabilities=calibrated_probabilities,
+        )
+        if snapshot is not None:
+            return snapshot
         return blocked_feed(
             repo_id=repo_id,
             repo_path=repo_path,
@@ -385,7 +421,10 @@ def adapt_repo(
                 "ATP diagnostics are not yet mapped to executable Kalshi tickers with calibrated probabilities.",
             ],
             source_artifacts=[
-                str(repo_path / "docs/codex/artifacts/type2-g1g2-diagnostic-latest/type2-g1g2-diagnostic.json"),
+                str(
+                    repo_path
+                    / "docs/codex/artifacts/type2-g1g2-diagnostic-latest/type2-g1g2-diagnostic.json"
+                ),
                 str(repo_path / "docs/codex/artifacts/type2-readiness-latest/type2-readiness.json"),
             ],
             ev_readiness={
@@ -419,7 +458,10 @@ def adapt_predmarket(
     calibrated_probabilities: dict[tuple[str, str], CalibratedProbability],
     contract_mappings: list[ContractMapping],
 ) -> dict[str, Any]:
-    matcher_path = repo_path / "docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json"
+    matcher_path = (
+        repo_path
+        / "docs/codex/artifacts/type2-paper-matcher-latest/type2-paper-matcher-latest.json"
+    )
     disposition_path = (
         repo_path
         / "docs/codex/artifacts/type2-candidate-disposition-latest/type2-candidate-disposition-latest.json"
@@ -465,7 +507,9 @@ def adapt_predmarket(
                 source_row_index=index,
                 contract_ticker=contract_ticker,
                 event_ticker=str(candidate.get("event_ticker") or ""),
-                market_ticker=str(candidate.get("event_ticker") or candidate.get("kalshi_ticker") or ""),
+                market_ticker=str(
+                    candidate.get("event_ticker") or candidate.get("kalshi_ticker") or ""
+                ),
                 side="yes",
                 selection=predmarket_selection(candidate),
                 market_type="mlb_type2_predmarket_reference",
@@ -503,6 +547,34 @@ def adapt_predmarket(
                 resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
             )
         )
+    rows.extend(
+        adapt_current_sports_feature_rows(
+            repo_id=repo_id,
+            repo_path=repo_path,
+            max_rows=max_rows,
+            official_terms=official_terms,
+            calibrated_probabilities=calibrated_probabilities,
+            source_row_offset=len(rows),
+        )
+    )
+    rows.extend(
+        adapt_sports_ccd_paper_overlay_rows(
+            repo_id=repo_id,
+            repo_path=repo_path,
+            max_rows=max_rows,
+            official_terms=official_terms,
+            source_row_offset=len(rows),
+        )
+    )
+    rows.extend(
+        adapt_near_resolution_flow_ev_rows(
+            repo_id=repo_id,
+            repo_path=repo_path,
+            max_rows=max_rows,
+            official_terms=official_terms,
+            source_row_offset=len(rows),
+        )
+    )
     return rows_feed(
         repo_id=repo_id,
         repo_path=repo_path,
@@ -512,8 +584,510 @@ def adapt_predmarket(
         source_artifacts=[
             str(matcher_path),
             str(disposition_path),
+            str(repo_path / "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.json"),
+            str(
+                repo_path
+                / "docs/codex/macro/latest-kalshi-sports-proxy-capacity-correlation-decay.json"
+            ),
+            str(
+                repo_path
+                / "docs/codex/macro/latest-kalshi-sports-proxy-correlation-cluster-control.json"
+            ),
+            str(DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH),
             *resolution_source_artifacts(rows),
         ],
+    )
+
+
+def adapt_current_sports_feature_rows(
+    *,
+    repo_id: str,
+    repo_path: Path,
+    max_rows: int,
+    official_terms: dict[str, OfficialKalshiTerms],
+    calibrated_probabilities: dict[tuple[str, str], CalibratedProbability],
+    source_row_offset: int = 0,
+) -> list[dict[str, Any]]:
+    packet_path = repo_path / "docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.json"
+    packet = read_json_or_none(packet_path)
+    if not safe_local_feature_packet(packet):
+        return []
+    feature_rows = packet.get("feature_rows") if isinstance(packet, dict) else None
+    if not isinstance(feature_rows, list):
+        return []
+    rows: list[dict[str, Any]] = []
+    for index, feature in enumerate(feature_rows[:max_rows]):
+        if not isinstance(feature, dict):
+            continue
+        if str(feature.get("series_ticker") or "").upper() not in {
+            "KXMLBGAME",
+            "KXKBOGAME",
+            "KXLMBGAME",
+        }:
+            continue
+        rows.append(
+            current_sports_feature_ev_row(
+                repo_id=repo_id,
+                source_artifact=packet_path,
+                source_row_index=source_row_offset + index,
+                feature=feature,
+                official_terms=official_terms,
+                calibrated_probabilities=calibrated_probabilities,
+            )
+        )
+    return rows
+
+
+def current_sports_feature_ev_row(
+    *,
+    repo_id: str,
+    source_artifact: Path,
+    source_row_index: int,
+    feature: dict[str, Any],
+    official_terms: dict[str, OfficialKalshiTerms],
+    calibrated_probabilities: dict[tuple[str, str], CalibratedProbability],
+) -> dict[str, Any]:
+    contract_ticker = str(feature.get("contract_ticker") or "").strip()
+    resolution = resolution_rule_fields(
+        contract_ticker=contract_ticker,
+        inferred_rule=current_sports_resolution_rule(feature),
+        inferred_source="inferred_from_current_sports_feature_packet",
+        official_terms=official_terms,
+    )
+    probability = calibrated_probability_fields(
+        contract_ticker=contract_ticker,
+        side="yes",
+        calibrated_probabilities=calibrated_probabilities,
+    )
+    reasons = probability_adjusted_gate_reasons(
+        [
+            "calibrated contract probability is missing",
+            "sports feature packet is feature-only and not a validated probability overlay",
+            "sports falsification, replay, capacity, correlation, and decay gates have not passed for this row",
+        ],
+        probability,
+    )
+    ask = optional_float(feature.get("yes_ask"))
+    bid = optional_float(feature.get("yes_bid"))
+    return make_ev_row(
+        source_repo_id=repo_id,
+        source_artifact=source_artifact,
+        source_row_index=source_row_index,
+        contract_ticker=contract_ticker,
+        event_ticker=str(feature.get("event_ticker") or event_from_contract(contract_ticker)),
+        market_ticker=str(feature.get("event_ticker") or event_from_contract(contract_ticker)),
+        side="yes",
+        selection=str(feature.get("selected_code") or ""),
+        market_type="sports_baseball_current_game_feature_packet",
+        title=str(feature.get("title") or ""),
+        resolution_rule=resolution["resolution_rule"] or "",
+        resolution_rule_source=resolution["resolution_rule_source"] or "",
+        resolution_rule_status=resolution["resolution_rule_status"] or "",
+        display_price=ask,
+        display_price_source="sports_feature_packet_yes_ask",
+        executable_price_source="sports_feature_packet_yes_ask",
+        fee_estimate=None,
+        slippage_buffer=None,
+        explicit_all_in_cost=None,
+        all_in_payout_multiple=None,
+        kalshi_payout_multiple=None,
+        calibrated_probability=probability["calibrated_probability"],
+        calibrated_probability_source=probability["calibrated_probability_source"],
+        calibration_status=probability["calibration_status"],
+        calibrated_probability_source_artifact=probability["source_artifact"],
+        calibrated_probability_source_sha256=probability["source_sha256"],
+        reference_probability=optional_float(feature.get("win_probability")),
+        reference_probability_source="sports_proxy_strength_reference_not_calibrated_probability",
+        probability_uncertainty=probability["probability_uncertainty"],
+        kalshi_bid=bid,
+        kalshi_ask=ask,
+        kalshi_midpoint=midpoint(bid, ask),
+        gate_status="blocked",
+        gate_reasons=reasons,
+        review_status=str(feature.get("feature_status") or ""),
+        timing_status=str(feature.get("feature_status") or "unknown"),
+        mapping_confidence="exact_contract_ticker_from_current_sports_feature_packet",
+        resolution_rule_source_artifact=resolution["resolution_rule_source_artifact"],
+        resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
+    )
+
+
+def adapt_sports_ccd_paper_overlay_rows(
+    *,
+    repo_id: str,
+    repo_path: Path,
+    max_rows: int,
+    official_terms: dict[str, OfficialKalshiTerms],
+    source_row_offset: int = 0,
+) -> list[dict[str, Any]]:
+    ccd_path = (
+        repo_path / "docs/codex/macro/latest-kalshi-sports-proxy-capacity-correlation-decay.json"
+    )
+    cluster_path = (
+        repo_path / "docs/codex/macro/latest-kalshi-sports-proxy-correlation-cluster-control.json"
+    )
+    ccd = read_json_or_none(ccd_path)
+    cluster = read_json_or_none(cluster_path)
+    if not safe_research_report(ccd) or not safe_research_report(cluster):
+        return []
+    if ccd.get("status") != "sports_proxy_capacity_correlation_decay_ready_for_paper_overlay":
+        return []
+    if cluster.get("status") != "sports_proxy_correlation_cluster_control_ready_for_paper_overlay":
+        return []
+    controlled_rows = [
+        row
+        for row in cluster.get("controlled_rows", [])
+        if isinstance(row, dict)
+        and row.get("gate_status") == "pass"
+        and optional_float(row.get("controlled_depth_cost")) is not None
+        and float(row.get("controlled_depth_cost") or 0.0) > 0.0
+    ]
+    rows: list[dict[str, Any]] = []
+    for index, capacity in enumerate(controlled_rows[:max_rows]):
+        rows.append(
+            sports_ccd_paper_overlay_ev_row(
+                repo_id=repo_id,
+                source_artifact=cluster_path,
+                source_row_index=source_row_offset + index,
+                capacity=capacity,
+                official_terms=official_terms,
+            )
+        )
+    return rows
+
+
+def sports_ccd_paper_overlay_ev_row(
+    *,
+    repo_id: str,
+    source_artifact: Path,
+    source_row_index: int,
+    capacity: dict[str, Any],
+    official_terms: dict[str, OfficialKalshiTerms],
+) -> dict[str, Any]:
+    contract_ticker = str(capacity.get("contract_ticker") or "").strip()
+    side = str(capacity.get("predicted_side") or "yes").lower()
+    calibrated_probability = optional_float(
+        capacity.get("conservative_calibrated_side_probability")
+    )
+    all_in_cost = optional_float(capacity.get("best_all_in_break_even_probability"))
+    resolution = resolution_rule_fields(
+        contract_ticker=contract_ticker,
+        inferred_rule=current_sports_resolution_rule(capacity),
+        inferred_source="inferred_from_sports_ccd_capacity_row",
+        official_terms=official_terms,
+    )
+    row = make_ev_row(
+        source_repo_id=repo_id,
+        source_artifact=source_artifact,
+        source_row_index=source_row_index,
+        contract_ticker=contract_ticker,
+        event_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        market_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        side=side,
+        selection=side,
+        market_type="sports_baseball_ccd_paper_overlay",
+        title=str(capacity.get("title") or ""),
+        resolution_rule=resolution["resolution_rule"] or "",
+        resolution_rule_source=resolution["resolution_rule_source"] or "",
+        resolution_rule_status=resolution["resolution_rule_status"] or "",
+        display_price=all_in_cost,
+        display_price_source="sports_ccd_best_all_in_break_even_probability",
+        executable_price_source="sports_ccd_best_all_in_break_even_probability",
+        fee_estimate=None,
+        slippage_buffer=None,
+        explicit_all_in_cost=all_in_cost,
+        all_in_payout_multiple=None,
+        kalshi_payout_multiple=None,
+        calibrated_probability=calibrated_probability,
+        calibrated_probability_source="sports_proxy_fdr_wilson_replay_ccd",
+        calibration_status="validated_calibrated_probability",
+        calibrated_probability_source_artifact=str(source_artifact),
+        calibrated_probability_source_sha256=sha256_file(source_artifact),
+        reference_probability=calibrated_probability,
+        reference_probability_source="sports_proxy_conservative_calibrated_side_probability",
+        probability_uncertainty=None,
+        kalshi_bid=None,
+        kalshi_ask=all_in_cost,
+        kalshi_midpoint=all_in_cost,
+        gate_status="blocked",
+        gate_reasons=[SPORTS_PROJECTION_MODEL_BLOCKER],
+        review_status="sports_projection_probability_demoted_by_consensus_policy",
+        timing_status="pregame_clean",
+        mapping_confidence="exact_contract_ticker_from_sports_ccd",
+        resolution_rule_source_artifact=resolution["resolution_rule_source_artifact"],
+        resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
+    )
+    row.update(
+        {
+            "family_id": "mlb",
+            "model_id": "sports_proxy_fdr_wilson_replay_ccd",
+            "signal_formula_key": "sports_proxy_strength_win_probability",
+            "capacity_estimate": json_float(optional_float(capacity.get("controlled_depth_cost"))),
+            "capacity_gate_status": "pass",
+            "correlation_cluster_gate_status": "pass",
+            "decay_gate_status": "decay_survival_pass",
+            "decay_status": "decay_survival_pass",
+            "sports_probability_source_gate_status": "blocked_projection_model_not_consensus",
+            "correlation_cluster_key": capacity.get("correlation_cluster_key"),
+            "close_time": capacity.get("close_time"),
+            "controlled_capacity_cost": json_float(
+                optional_float(capacity.get("controlled_depth_cost"))
+            ),
+            "controlled_capacity_contracts": json_float(
+                optional_float(capacity.get("controlled_depth_contracts"))
+            ),
+        }
+    )
+    return row
+
+
+def adapt_near_resolution_flow_ev_rows(
+    *,
+    repo_id: str,
+    repo_path: Path,
+    max_rows: int,
+    official_terms: dict[str, OfficialKalshiTerms],
+    source_row_offset: int = 0,
+) -> list[dict[str, Any]]:
+    replay_path = repo_path / NEAR_RESOLUTION_FLOW_REPLAY_RELATIVE_PATH
+    if not replay_path.exists():
+        try:
+            is_control_repo = repo_path.resolve() == CONTROL_REPO.resolve()
+        except OSError:
+            is_control_repo = False
+        if not is_control_repo:
+            return []
+        replay_path = DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH
+    replay = read_json_or_none(replay_path)
+    if not safe_research_report(replay):
+        return []
+    if replay.get("status") != "near_resolution_flow_replay_gates_ready_for_ev_ledger_promotion":
+        return []
+    summary = replay.get("summary") if isinstance(replay.get("summary"), dict) else {}
+    controlled_costs = {
+        str(key): optional_float(value) or 0.0
+        for key, value in (
+            summary.get("controlled_cluster_costs")
+            if isinstance(summary.get("controlled_cluster_costs"), dict)
+            else {}
+        ).items()
+    }
+    capacity_rows = [
+        row
+        for row in replay.get("capacity_rows", [])
+        if isinstance(row, dict) and row.get("gate_status") == "pass"
+    ]
+    cluster_raw_costs: dict[str, float] = {}
+    for row in capacity_rows:
+        cluster_key = str(row.get("correlation_cluster_key") or "unknown")
+        cluster_raw_costs[cluster_key] = cluster_raw_costs.get(cluster_key, 0.0) + max(
+            0.0, optional_float(row.get("positive_depth_cost")) or 0.0
+        )
+    rows: list[dict[str, Any]] = []
+    for index, capacity in enumerate(capacity_rows[:max_rows]):
+        rows.append(
+            near_resolution_flow_ev_row(
+                repo_id=repo_id,
+                source_artifact=replay_path,
+                source_row_index=source_row_offset + index,
+                capacity=capacity,
+                summary=summary,
+                controlled_cluster_costs=controlled_costs,
+                cluster_raw_costs=cluster_raw_costs,
+                official_terms=official_terms,
+            )
+        )
+    return rows
+
+
+def near_resolution_flow_ev_row(
+    *,
+    repo_id: str,
+    source_artifact: Path,
+    source_row_index: int,
+    capacity: dict[str, Any],
+    summary: dict[str, Any],
+    controlled_cluster_costs: dict[str, float],
+    cluster_raw_costs: dict[str, float],
+    official_terms: dict[str, OfficialKalshiTerms],
+) -> dict[str, Any]:
+    contract_ticker = str(capacity.get("contract_ticker") or "").strip()
+    side = normalize_side(capacity.get("side"))
+    all_in_cost = optional_float(capacity.get("all_in_cost"))
+    calibrated_probability = optional_float(
+        capacity.get("conservative_calibrated_side_probability")
+    )
+    if calibrated_probability is None:
+        calibrated_probability = optional_float(
+            summary.get("conservative_calibrated_side_probability")
+        )
+    cluster_key = str(capacity.get("correlation_cluster_key") or "")
+    raw_capacity = max(0.0, optional_float(capacity.get("positive_depth_cost")) or 0.0)
+    controlled_capacity = pro_rata_controlled_capacity(
+        cluster_key=cluster_key,
+        raw_capacity=raw_capacity,
+        controlled_cluster_costs=controlled_cluster_costs,
+        cluster_raw_costs=cluster_raw_costs,
+    )
+    resolution = resolution_rule_fields(
+        contract_ticker=contract_ticker,
+        inferred_rule=near_resolution_flow_resolution_rule(capacity),
+        inferred_source="inferred_from_near_resolution_flow_replay_gate",
+        official_terms=official_terms,
+    )
+    row = make_ev_row(
+        source_repo_id=repo_id,
+        source_artifact=source_artifact,
+        source_row_index=source_row_index,
+        contract_ticker=contract_ticker,
+        event_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        market_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        side=side,
+        selection=side,
+        market_type="sports_microstructure_near_resolution_flow",
+        title=str(capacity.get("title") or ""),
+        resolution_rule=resolution["resolution_rule"] or "",
+        resolution_rule_source=resolution["resolution_rule_source"] or "",
+        resolution_rule_status=resolution["resolution_rule_status"] or "",
+        display_price=optional_float(capacity.get("selected_side_executable_price")),
+        display_price_source="near_resolution_flow_selected_side_executable_price",
+        executable_price_source="near_resolution_flow_selected_side_executable_price",
+        fee_estimate=optional_float(capacity.get("fee_estimate")),
+        slippage_buffer=None,
+        explicit_all_in_cost=all_in_cost,
+        all_in_payout_multiple=None,
+        kalshi_payout_multiple=None,
+        calibrated_probability=calibrated_probability,
+        calibrated_probability_source="near_resolution_flow_fdr_wilson_replay_ccd",
+        calibration_status="validated_calibrated_probability",
+        calibrated_probability_source_artifact=str(source_artifact),
+        calibrated_probability_source_sha256=sha256_file(source_artifact),
+        reference_probability=optional_float(capacity.get("selected_side_executable_price")),
+        reference_probability_source="kalshi_current_selected_side_quote",
+        probability_uncertainty=None,
+        kalshi_bid=None,
+        kalshi_ask=optional_float(capacity.get("selected_side_executable_price")),
+        kalshi_midpoint=optional_float(capacity.get("selected_side_executable_price")),
+        gate_status="pass",
+        gate_reasons=[],
+        review_status=str(summary.get("evidence_status") or "near_resolution_flow_passed"),
+        timing_status="pregame_clean",
+        mapping_confidence="exact_contract_ticker_from_near_resolution_flow_replay",
+        resolution_rule_source_artifact=resolution["resolution_rule_source_artifact"],
+        resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
+    )
+    row.update(
+        {
+            "family_id": "microstructure_informed_flow",
+            "model_id": str(
+                capacity.get("model_id")
+                or summary.get("selected_replay_model_id")
+                or "flow_depth_imbalance_settlement_directional"
+            ),
+            "signal_formula_key": "depth_imbalance_yes_abs_gt_0_25",  # gitleaks:allow
+            "capacity_estimate": json_float(controlled_capacity),
+            "capacity_gate_status": "pass" if controlled_capacity > 0.0 else "blocked",
+            "correlation_cluster_gate_status": "pass",
+            "decay_gate_status": "decay_survival_pass",
+            "decay_status": str(summary.get("decay_status") or "decay_survival_pass"),
+            "correlation_cluster_key": cluster_key,
+            "cluster_key": cluster_key,
+            "close_time": capacity.get("close_time"),
+            "decision_time": capacity.get("decision_time"),
+            "predicted_outcome": capacity.get("predicted_outcome"),
+            "controlled_capacity_cost": json_float(controlled_capacity),
+            "raw_capacity_cost": json_float(raw_capacity),
+            "controlled_capacity_contracts": json_float(
+                pro_rata_contract_capacity(
+                    raw_contracts=optional_float(capacity.get("positive_depth_contracts")) or 0.0,
+                    raw_capacity=raw_capacity,
+                    controlled_capacity=controlled_capacity,
+                )
+            ),
+            "candidate_oos_label_count": summary.get("candidate_oos_label_count"),
+            "candidate_oos_correct_count": summary.get("candidate_oos_correct_count"),
+            "candidate_q_value": summary.get("candidate_q_value"),
+            "decay_bucket_count": summary.get("decay_bucket_count"),
+            "current_observation_age_seconds": capacity.get("current_observation_age_seconds"),
+        }
+    )
+    return row
+
+
+def pro_rata_controlled_capacity(
+    *,
+    cluster_key: str,
+    raw_capacity: float,
+    controlled_cluster_costs: dict[str, float],
+    cluster_raw_costs: dict[str, float],
+) -> float:
+    if raw_capacity <= 0.0:
+        return 0.0
+    controlled_cluster = controlled_cluster_costs.get(cluster_key)
+    if controlled_cluster is None:
+        return raw_capacity
+    raw_cluster = cluster_raw_costs.get(cluster_key, 0.0)
+    if raw_cluster <= 0.0:
+        return 0.0
+    return max(0.0, min(raw_capacity, raw_capacity * controlled_cluster / raw_cluster))
+
+
+def pro_rata_contract_capacity(
+    *, raw_contracts: float, raw_capacity: float, controlled_capacity: float
+) -> float:
+    if raw_contracts <= 0.0 or raw_capacity <= 0.0 or controlled_capacity <= 0.0:
+        return 0.0
+    return max(0.0, raw_contracts * controlled_capacity / raw_capacity)
+
+
+def near_resolution_flow_resolution_rule(capacity: dict[str, Any]) -> str:
+    contract = str(capacity.get("contract_ticker") or "unknown contract")
+    event = str(capacity.get("event_ticker") or event_from_contract(contract))
+    surface = str(capacity.get("sport_surface") or "sports")
+    side = normalize_side(capacity.get("side")) or "unknown"
+    return (
+        f"{side.upper()} resolves according to official Kalshi contract terms for {contract}; "
+        f"event={event}; surface={surface}; signal=near-resolution order-book depth imbalance."
+    )
+
+
+def safe_research_report(report: dict[str, Any] | None) -> bool:
+    if not isinstance(report, dict):
+        return False
+    safety = report.get("safety") if isinstance(report.get("safety"), dict) else {}
+    return (
+        report.get("research_only") is True
+        and report.get("execution_enabled") is False
+        and report.get("market_execution") is False
+        and report.get("account_or_order_paths") is False
+        and safety.get("market_execution") is False
+        and safety.get("account_or_order_paths") is False
+        and safety.get("database_writes") is False
+    )
+
+
+def safe_local_feature_packet(packet: dict[str, Any] | None) -> bool:
+    if not isinstance(packet, dict):
+        return False
+    safety = packet.get("safety") if isinstance(packet.get("safety"), dict) else {}
+    return (
+        packet.get("research_only") is True
+        and packet.get("execution_enabled") is False
+        and packet.get("market_execution") is False
+        and packet.get("account_or_order_paths") is False
+        and safety.get("account_or_order_paths") is False
+        and safety.get("market_execution") is False
+    )
+
+
+def current_sports_resolution_rule(feature: dict[str, Any]) -> str:
+    contract = str(feature.get("contract_ticker") or "unknown contract")
+    event = str(feature.get("event_ticker") or event_from_contract(contract))
+    selection = str(feature.get("selected_code") or "unknown")
+    league = str(feature.get("league") or "unknown league")
+    return (
+        f"YES resolves according to official Kalshi contract terms for {contract}; "
+        f"event={event}; league={league}; selected_team={selection}; market=game winner."
     )
 
 
@@ -527,8 +1101,14 @@ def adapt_mlb(
     contract_mappings: list[ContractMapping],
 ) -> dict[str, Any]:
     evidence_path = latest_mlb_type2_evidence(repo_path)
-    repeatability_path = repo_path / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json"
-    settled_path = repo_path / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json"
+    repeatability_path = (
+        repo_path
+        / "docs/codex/artifacts/type2-repeatability-ledger-latest/type2-repeatability-ledger.json"
+    )
+    settled_path = (
+        repo_path
+        / "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json"
+    )
     evidence = read_json_or_none(evidence_path) if evidence_path else None
     if not evidence:
         return blocked_feed(
@@ -566,7 +1146,9 @@ def adapt_mlb(
                 source_row_index=index,
                 contract_ticker=contract_ticker,
                 event_ticker=event_from_contract(contract_ticker),
-                market_ticker=str(candidate.get("game_id") or candidate.get("exchange_market_id") or ""),
+                market_ticker=str(
+                    candidate.get("game_id") or candidate.get("exchange_market_id") or ""
+                ),
                 side="yes",
                 selection=str(candidate.get("selection") or ""),
                 market_type=str(candidate.get("market") or "unknown"),
@@ -619,6 +1201,167 @@ def adapt_mlb(
     )
 
 
+def adapt_atp_match_snapshot(
+    *,
+    repo_id: str,
+    repo_path: Path,
+    max_rows: int,
+    official_terms: dict[str, OfficialKalshiTerms],
+    calibrated_probabilities: dict[tuple[str, str], CalibratedProbability],
+) -> dict[str, Any] | None:
+    snapshot_path = latest_atp_match_snapshot(repo_path)
+    if snapshot_path is None:
+        return None
+    payload = read_json_or_none(snapshot_path)
+    matches = payload.get("matches") if isinstance(payload, dict) else None
+    if not isinstance(matches, list):
+        return None
+    rows: list[dict[str, Any]] = []
+    for index, match in enumerate(matches[:max_rows]):
+        if not isinstance(match, dict):
+            continue
+        rows.extend(
+            atp_match_rows(
+                repo_id=repo_id,
+                source_artifact=snapshot_path,
+                source_row_index=index,
+                match=match,
+                official_terms=official_terms,
+                calibrated_probabilities=calibrated_probabilities,
+            )
+        )
+    if not rows:
+        return None
+    return rows_feed(
+        repo_id=repo_id,
+        repo_path=repo_path,
+        rows=rows,
+        status=feed_status(rows, "atp_kalshi_match_snapshot"),
+        blockers=[
+            "ATP match snapshot supplies exact Kalshi tickers and quotes only; usable EV still requires calibrated contract probabilities.",
+            "Fresh ATP forward-OOS survival, official terms verification, and decay evidence remain required before sizing.",
+        ],
+        source_artifacts=[
+            str(snapshot_path),
+            str(repo_path / "docs/codex/artifacts/kalshi-forward-oos-latest/report.json"),
+            *resolution_source_artifacts(rows),
+        ],
+    )
+
+
+def atp_match_rows(
+    *,
+    repo_id: str,
+    source_artifact: Path,
+    source_row_index: int,
+    match: dict[str, Any],
+    official_terms: dict[str, OfficialKalshiTerms],
+    calibrated_probabilities: dict[tuple[str, str], CalibratedProbability],
+) -> list[dict[str, Any]]:
+    rows: list[dict[str, Any]] = []
+    for suffix in ("a", "b"):
+        contract_ticker = str(match.get(f"kalshi_market_id_{suffix}") or "").strip()
+        if not contract_ticker:
+            continue
+        player = str(match.get(f"player_{suffix}") or "").strip()
+        opponent_suffix = "b" if suffix == "a" else "a"
+        opponent = str(match.get(f"player_{opponent_suffix}") or "").strip()
+        price = optional_float(match.get(f"_yes_ask_{suffix}"))
+        if price is None:
+            price = optional_float(match.get(f"kalshi_price_{suffix}"))
+        bid = optional_float(match.get(f"_yes_bid_{suffix}"))
+        event_ticker = str(
+            match.get("_kalshi_event_ticker") or event_from_contract(contract_ticker)
+        )
+        resolution = resolution_rule_fields(
+            contract_ticker=contract_ticker,
+            inferred_rule=atp_resolution_rule(
+                match, contract_ticker=contract_ticker, selection=player
+            ),
+            inferred_source="inferred_from_atp_kalshi_match_snapshot",
+            official_terms=official_terms,
+        )
+        probability = calibrated_probability_fields(
+            contract_ticker=contract_ticker,
+            side="yes",
+            calibrated_probabilities=calibrated_probabilities,
+        )
+        reasons = probability_adjusted_gate_reasons(
+            [
+                "calibrated contract probability is missing",
+                "ATP forward-OOS survival is not yet sufficient for autonomous EV",
+                "ATP match snapshot is market observation input, not a model probability",
+            ],
+            probability,
+        )
+        rows.append(
+            make_ev_row(
+                source_repo_id=repo_id,
+                source_artifact=source_artifact,
+                source_row_index=source_row_index * 2 + (0 if suffix == "a" else 1),
+                contract_ticker=contract_ticker,
+                event_ticker=event_ticker,
+                market_ticker=event_ticker,
+                side="yes",
+                selection=player,
+                market_type="sports_tennis_kalshi_match_snapshot",
+                title=atp_match_title(match, player=player, opponent=opponent),
+                resolution_rule=resolution["resolution_rule"] or "",
+                resolution_rule_source=resolution["resolution_rule_source"] or "",
+                resolution_rule_status=resolution["resolution_rule_status"] or "",
+                display_price=price,
+                display_price_source=f"atp_oracle_kalshi_snapshot_yes_ask_{suffix}",
+                executable_price_source=f"atp_oracle_kalshi_snapshot_yes_ask_{suffix}",
+                fee_estimate=None,
+                slippage_buffer=None,
+                explicit_all_in_cost=None,
+                all_in_payout_multiple=None,
+                kalshi_payout_multiple=None,
+                calibrated_probability=probability["calibrated_probability"],
+                calibrated_probability_source=probability["calibrated_probability_source"],
+                calibration_status=probability["calibration_status"],
+                calibrated_probability_source_artifact=probability["source_artifact"],
+                calibrated_probability_source_sha256=probability["source_sha256"],
+                reference_probability=price,
+                reference_probability_source="kalshi_market_ask_reference_not_model_probability",
+                probability_uncertainty=probability["probability_uncertainty"],
+                kalshi_bid=bid,
+                kalshi_ask=price,
+                kalshi_midpoint=midpoint(bid, price),
+                gate_status="blocked",
+                gate_reasons=reasons,
+                review_status=str(match.get("tourney_name") or "atp_match_snapshot"),
+                timing_status="pregame_unknown",
+                mapping_confidence="exact_kalshi_market_id_from_atp_snapshot",
+                resolution_rule_source_artifact=resolution["resolution_rule_source_artifact"],
+                resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
+            )
+        )
+    return rows
+
+
+def atp_match_title(match: dict[str, Any], *, player: str, opponent: str) -> str:
+    tournament = str(match.get("tourney_name") or "ATP match").strip()
+    round_name = str(match.get("round") or "").strip()
+    base = f"{player or 'Unknown player'} vs {opponent or 'unknown opponent'}"
+    return f"{base} winner ({tournament}{', ' + round_name if round_name else ''})"
+
+
+def atp_resolution_rule(match: dict[str, Any], *, contract_ticker: str, selection: str) -> str:
+    event = str(match.get("_kalshi_event_ticker") or event_from_contract(contract_ticker))
+    tournament = str(match.get("tourney_name") or "unknown tournament")
+    return (
+        f"YES resolves according to official Kalshi contract terms for {contract_ticker}; "
+        f"selection={selection or 'unknown'}; event={event}; tournament={tournament}."
+    )
+
+
+def midpoint(bid: float | None, ask: float | None) -> float | None:
+    if bid is None or ask is None:
+        return None
+    return round((bid + ask) / 2, 6)
+
+
 def adapt_contract_mapping_overlay(
     *,
     repo_id: str,
@@ -649,18 +1392,28 @@ def adapt_contract_mapping_overlay(
                 source_artifact=source_artifact,
                 source_row_index=int(mapping.get("source_row_index") or index),
                 contract_ticker=contract_ticker,
-                event_ticker=str(mapping.get("event_ticker") or event_from_contract(contract_ticker)),
-                market_ticker=str(mapping.get("market_ticker") or mapping.get("event_ticker") or contract_ticker),
+                event_ticker=str(
+                    mapping.get("event_ticker") or event_from_contract(contract_ticker)
+                ),
+                market_ticker=str(
+                    mapping.get("market_ticker") or mapping.get("event_ticker") or contract_ticker
+                ),
                 side=side,
                 selection=str(mapping.get("selection") or contract_selection(contract_ticker)),
                 market_type=str(mapping.get("market_type") or "contract_mapping_overlay"),
                 title=str(mapping.get("title") or ""),
                 resolution_rule=str(mapping.get("resolution_rule") or ""),
-                resolution_rule_source=str(mapping.get("resolution_rule_source") or "local_contract_mapping_overlay"),
+                resolution_rule_source=str(
+                    mapping.get("resolution_rule_source") or "local_contract_mapping_overlay"
+                ),
                 resolution_rule_status=str(mapping.get("resolution_rule_status") or ""),
                 display_price=overlay_display_price(mapping),
-                display_price_source=str(mapping.get("display_price_source") or "contract_mapping_overlay"),
-                executable_price_source=str(mapping.get("executable_price_source") or "contract_mapping_overlay"),
+                display_price_source=str(
+                    mapping.get("display_price_source") or "contract_mapping_overlay"
+                ),
+                executable_price_source=str(
+                    mapping.get("executable_price_source") or "contract_mapping_overlay"
+                ),
                 fee_estimate=optional_float(mapping.get("fee_estimate")),
                 slippage_buffer=optional_float(mapping.get("slippage_buffer")),
                 explicit_all_in_cost=extract_explicit_all_in_cost(mapping),
@@ -698,7 +1451,9 @@ def adapt_contract_mapping_overlay(
     )
 
 
-def predmarket_gate(candidate: dict[str, Any], disposition: dict[str, Any]) -> tuple[str, list[str]]:
+def predmarket_gate(
+    candidate: dict[str, Any], disposition: dict[str, Any]
+) -> tuple[str, list[str]]:
     reasons = [
         "probability source is sportsbook no-vig reference, not a calibrated platform model",
         "calibrated contract probability is missing",
@@ -829,9 +1584,7 @@ def make_ev_row(
         else None
     )
     effective_hold = (
-        break_even - display_price
-        if break_even is not None and display_price is not None
-        else None
+        break_even - display_price if break_even is not None and display_price is not None else None
     )
     edge = (
         calibrated_probability - break_even
@@ -844,6 +1597,15 @@ def make_ev_row(
         else None
     )
     expected_roi = safe_divide(expected_value, all_in_cost)
+    net_fee_value = (
+        kalshi_net_fee(
+            price=display_price if display_price is not None else 0.0,
+            fee_mode=execution_cost.fee_mode,
+            ticker=contract_ticker or event_ticker or market_ticker,
+        )
+        if display_price is not None and 0.0 < display_price < 1.0
+        else None
+    )
     automatic_reasons = automatic_ev_gate_reasons(
         all_in_break_even=break_even,
         calibrated_probability=calibrated_probability,
@@ -898,6 +1660,7 @@ def make_ev_row(
         "fee_source": execution_cost.fee_source,
         "fee_rate": json_float(execution_cost.fee_rate),
         "fee_mode": execution_cost.fee_mode,
+        "net_fee": json_float(net_fee_value),
         "slippage_buffer": json_float(slippage_buffer),
         "all_in_cost": json_float(all_in_cost),
         "gross_execution_cost": json_float(execution_cost.gross_execution_cost),
@@ -911,11 +1674,19 @@ def make_ev_row(
             all_in_payout_multiple=all_in_payout_multiple,
             kalshi_payout_multiple=kalshi_payout_multiple,
         ),
-        "contract_price_break_even_probability": json_float(execution_cost.contract_price_break_even),
-        "displayed_price_break_even_probability": json_float(execution_cost.display_price_break_even),
+        "contract_price_break_even_probability": json_float(
+            execution_cost.contract_price_break_even
+        ),
+        "displayed_price_break_even_probability": json_float(
+            execution_cost.display_price_break_even
+        ),
         "all_in_break_even_probability": json_float(break_even),
-        "payout_implied_break_even_probability": json_float(execution_cost.payout_implied_break_even),
-        "gross_payout_implied_break_even_probability": json_float(execution_cost.gross_payout_break_even),
+        "payout_implied_break_even_probability": json_float(
+            execution_cost.payout_implied_break_even
+        ),
+        "gross_payout_implied_break_even_probability": json_float(
+            execution_cost.gross_payout_break_even
+        ),
         "fee_inclusive_payout_implied_break_even_probability": json_float(
             execution_cost.fee_inclusive_payout_break_even
         ),
@@ -984,7 +1755,9 @@ def ev_gate_status(
     edge: float | None,
     expected_value: float | None,
 ) -> str:
-    normalized = input_gate_status if input_gate_status in {"pass", "warn", "blocked", "fail"} else "blocked"
+    normalized = (
+        input_gate_status if input_gate_status in {"pass", "warn", "blocked", "fail"} else "blocked"
+    )
     if normalized in {"blocked", "fail"}:
         return normalized
     hard_blockers = {
@@ -995,7 +1768,9 @@ def ev_gate_status(
     }
     if any(reason in hard_blockers for reason in automatic_reasons):
         return "blocked"
-    if any(str(reason).startswith("calibrated probability status is ") for reason in automatic_reasons):
+    if any(
+        str(reason).startswith("calibrated probability status is ") for reason in automatic_reasons
+    ):
         return "blocked"
     if edge is None or expected_value is None or edge <= 0.0 or expected_value <= 0.0:
         return "warn"
@@ -1163,7 +1938,15 @@ def default_blocked_ev_readiness(repo_id: str) -> dict[str, Any]:
 
 def latest_mlb_type2_evidence(repo_path: Path) -> Path | None:
     artifact_root = repo_path / "docs/codex/artifacts"
-    paths = sorted(artifact_root.glob("*/type2-evidence.json"), key=lambda p: (p.stat().st_mtime, str(p)))
+    paths = sorted(
+        artifact_root.glob("*/type2-evidence.json"), key=lambda p: (p.stat().st_mtime, str(p))
+    )
+    return paths[-1] if paths else None
+
+
+def latest_atp_match_snapshot(repo_path: Path) -> Path | None:
+    snapshot_root = repo_path / "data/kalshi"
+    paths = sorted(snapshot_root.glob("matches-*.json"), key=lambda p: (p.stat().st_mtime, str(p)))
     return paths[-1] if paths else None
 
 
@@ -1519,9 +2302,7 @@ def build_overlay_preflight(
     )
     mapping_source_paths = {str(row.get("source_artifact") or "") for row in mapping_rows}
     overlay_rows = [
-        row
-        for row in ledger.get("rows", [])
-        if row.get("source_artifact") in mapping_source_paths
+        row for row in ledger.get("rows", []) if row.get("source_artifact") in mapping_source_paths
     ]
     usable_overlay_rows = [row for row in overlay_rows if row.get("usable") is True]
     gates = overlay_preflight_gates(
@@ -1561,8 +2342,7 @@ def build_overlay_preflight(
         },
         "gates": gates,
         "joined_keys": [
-            {"contract_ticker": ticker, "side": side}
-            for ticker, side in joined_keys[:100]
+            {"contract_ticker": ticker, "side": side} for ticker, side in joined_keys[:100]
         ],
         "source_artifacts": {
             "contract_mapping_files": [str(path) for path in mapping_files],
@@ -1644,7 +2424,9 @@ def build_calibration_work_order(
             "direct_pass_ready_candidate_count": len(direct_pass_ready),
             "source_gated_candidate_count": len(candidates) - len(direct_pass_ready),
             "verified_terms_candidate_count": sum(
-                1 for row in candidates if row.get("resolution_rule_status") == "verified_official_terms"
+                1
+                for row in candidates
+                if row.get("resolution_rule_status") == "verified_official_terms"
             ),
             "non_temporal_mismatch_candidate_count": sum(
                 1 for row in candidates if not temporal_mismatch_status(row.get("timing_status"))
@@ -1862,11 +2644,17 @@ def build_contract_mapping_work_order(
             "source_repo_id": "nfl_quant_glm51_greenfield",
             "source_artifact": str(nfl_fair_line_path),
             "source_sha256": sha256_file(nfl_fair_line_path),
-            "model_row_count": len((fair_line or {}).get("rows") or []) if isinstance(fair_line, dict) else 0,
+            "model_row_count": len((fair_line or {}).get("rows") or [])
+            if isinstance(fair_line, dict)
+            else 0,
             "selected_contract_side_count": len(selected),
             "validation_artifact_count": len(validation_artifacts),
-            "selected_home_side_count": sum(1 for row in selected if row.get("team_role") == "home"),
-            "selected_away_side_count": sum(1 for row in selected if row.get("team_role") == "away"),
+            "selected_home_side_count": sum(
+                1 for row in selected if row.get("team_role") == "home"
+            ),
+            "selected_away_side_count": sum(
+                1 for row in selected if row.get("team_role") == "away"
+            ),
         },
         "selection_policy": {
             "purpose": (
@@ -1991,11 +2779,7 @@ def nfl_contract_mapping_candidates(
         for role, team, opponent, probability, market_probability in sides:
             if probability is None or not team or not opponent:
                 continue
-            delta = (
-                probability - market_probability
-                if market_probability is not None
-                else None
-            )
+            delta = probability - market_probability if market_probability is not None else None
             rows.append(
                 {
                     "source_repo_id": "nfl_quant_glm51_greenfield",
@@ -2173,7 +2957,9 @@ def overlay_preflight_next_action(
         )
     if not joined_count:
         return "Fix overlay contract_ticker/side keys so mapping and probability rows join exactly."
-    return "Joined overlay rows exist but are not usable; inspect row gate reasons in the EV ledger."
+    return (
+        "Joined overlay rows exist but are not usable; inspect row gate reasons in the EV ledger."
+    )
 
 
 def mapping_confidence(candidate: dict[str, Any]) -> str:
@@ -2230,7 +3016,9 @@ def next_action(feeds: list[dict[str, Any]], rows: list[dict[str, Any]]) -> str:
             "the official fee model supplies the default fee estimate."
         )
     missing = ", ".join(feed["repo_id"] for feed in feeds if feed.get("row_count") == 0)
-    return f"No repo emits usable Kalshi contract EV rows yet. Build contract mappings for: {missing}."
+    return (
+        f"No repo emits usable Kalshi contract EV rows yet. Build contract mappings for: {missing}."
+    )
 
 
 def write_ledger(ledger: dict[str, Any], out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, str]:
@@ -2286,7 +3074,8 @@ def write_calibration_work_order(
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     md_path.write_text(render_calibration_work_order_markdown(report), encoding="utf-8")
     template_path.write_text(
-        json.dumps(report.get("probability_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(report.get("probability_overlay_template") or {}, indent=2, sort_keys=True)
+        + "\n",
         encoding="utf-8",
     )
     MACRO_DIR.mkdir(parents=True, exist_ok=True)
@@ -2296,7 +3085,8 @@ def write_calibration_work_order(
     latest_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     latest_md.write_text(render_calibration_work_order_markdown(report), encoding="utf-8")
     latest_template.write_text(
-        json.dumps(report.get("probability_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(report.get("probability_overlay_template") or {}, indent=2, sort_keys=True)
+        + "\n",
         encoding="utf-8",
     )
     return {
@@ -2321,26 +3111,36 @@ def write_contract_mapping_work_order(
     json_path.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     md_path.write_text(render_contract_mapping_work_order_markdown(report), encoding="utf-8")
     mapping_template_path.write_text(
-        json.dumps(report.get("contract_mapping_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(report.get("contract_mapping_overlay_template") or {}, indent=2, sort_keys=True)
+        + "\n",
         encoding="utf-8",
     )
     probability_template_path.write_text(
-        json.dumps(report.get("calibrated_probability_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(
+            report.get("calibrated_probability_overlay_template") or {}, indent=2, sort_keys=True
+        )
+        + "\n",
         encoding="utf-8",
     )
     MACRO_DIR.mkdir(parents=True, exist_ok=True)
     latest_json = MACRO_DIR / "latest-kalshi-ev-contract-mapping-work-order.json"
     latest_md = MACRO_DIR / "latest-kalshi-ev-contract-mapping-work-order.md"
     latest_mapping_template = MACRO_DIR / "latest-kalshi-ev-contract-mapping-template.json"
-    latest_probability_template = MACRO_DIR / "latest-kalshi-ev-contract-mapped-probability-template.json"
+    latest_probability_template = (
+        MACRO_DIR / "latest-kalshi-ev-contract-mapped-probability-template.json"
+    )
     latest_json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
     latest_md.write_text(render_contract_mapping_work_order_markdown(report), encoding="utf-8")
     latest_mapping_template.write_text(
-        json.dumps(report.get("contract_mapping_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(report.get("contract_mapping_overlay_template") or {}, indent=2, sort_keys=True)
+        + "\n",
         encoding="utf-8",
     )
     latest_probability_template.write_text(
-        json.dumps(report.get("calibrated_probability_overlay_template") or {}, indent=2, sort_keys=True) + "\n",
+        json.dumps(
+            report.get("calibrated_probability_overlay_template") or {}, indent=2, sort_keys=True
+        )
+        + "\n",
         encoding="utf-8",
     )
     return {
@@ -2402,7 +3202,9 @@ def render_markdown(ledger: dict[str, Any]) -> str:
                 f"gates={readiness.get('row_gate_status')}",
             ]
         )
-        next_input = str(readiness.get("exact_next_input") or "; ".join(feed.get("blockers") or ""))[:260]
+        next_input = str(
+            readiness.get("exact_next_input") or "; ".join(feed.get("blockers") or "")
+        )[:260]
         lines.append(
             f"| `{feed.get('repo_id')}` | `{feed.get('status')}` | "
             f"{feed.get('row_count')} | {feed.get('usable_row_count')} | {readiness_text} | {next_input} |"
@@ -2777,7 +3579,9 @@ def parse_args(argv: list[str]) -> argparse.Namespace:
     parser.add_argument("--calibration-work-order", action="store_true")
     parser.add_argument("--contract-mapping-work-order", action="store_true")
     parser.add_argument("--work-order-limit", type=int, default=25)
-    parser.add_argument("--nfl-fair-line-review-path", type=Path, default=DEFAULT_NFL_FAIR_LINE_REVIEW_PATH)
+    parser.add_argument(
+        "--nfl-fair-line-review-path", type=Path, default=DEFAULT_NFL_FAIR_LINE_REVIEW_PATH
+    )
     parser.add_argument("--nfl-validation-path", type=Path, action="append")
     parser.add_argument("--contract-mapping-path", type=Path, action="append")
     parser.add_argument("--calibrated-probability-path", type=Path, action="append")

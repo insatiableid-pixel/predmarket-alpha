@@ -25,6 +25,8 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import benjamini_hochberg, binomial_survival  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_REGISTRY_PATH = MACRO_DIR / "latest-kalshi-hypothesis-registry.json"
 DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_labels")
@@ -302,11 +304,11 @@ def evaluate_hypotheses(
         evaluations.append(evaluation)
 
     q_values = benjamini_hochberg(
-        {
-            row["hypothesis_id"]: row["p_value"]
+        [
+            (row["hypothesis_id"], row["p_value"])
             for row in testable
             if row.get("p_value") is not None
-        }
+        ]
     )
     for evaluation in evaluations:
         hypothesis_id = evaluation["hypothesis_id"]
@@ -378,7 +380,7 @@ def score_oos_rows(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "brier": brier,
         "baseline_brier": baseline_brier,
         "brier_improvement": baseline_brier - brier,
-        "p_value": binomial_survival(wins, n, p=0.5),
+        "p_value": binomial_survival(wins, n, 0.5),
         "mean_expected_edge": mean(row.get("expected_edge") for row in rows),
         "mean_realized_pnl_per_contract": mean(row.get("realized_pnl_per_contract") for row in rows),
     }
@@ -504,42 +506,6 @@ def next_action(status: str) -> dict[str, str]:
         "why": "Backtest evidence exists; the next gate is capacity/correlation only after research promotions survive.",
         "stop_condition": "Stop before sizing, execution, or account/order paths.",
     }
-
-
-def benjamini_hochberg(p_values: Mapping[str, float]) -> dict[str, float]:
-    items = sorted((key, float(value)) for key, value in p_values.items())
-    if not items:
-        return {}
-    ordered = sorted(items, key=lambda item: item[1])
-    m = len(ordered)
-    adjusted: dict[str, float] = {}
-    running = 1.0
-    for rank, (key, p_value) in reversed(list(enumerate(ordered, start=1))):
-        running = min(running, p_value * m / rank)
-        adjusted[key] = min(running, 1.0)
-    return adjusted
-
-
-def binomial_survival(k: int, n: int, *, p: float) -> float:
-    if n <= 0:
-        return 1.0
-    if k <= 0:
-        return 1.0
-    if k > n:
-        return 0.0
-    log_p = math.log(p)
-    log_q = math.log(1.0 - p)
-    total = 0.0
-    for i in range(k, n + 1):
-        log_term = (
-            math.lgamma(n + 1)
-            - math.lgamma(i + 1)
-            - math.lgamma(n - i + 1)
-            + i * log_p
-            + (n - i) * log_q
-        )
-        total += math.exp(log_term)
-    return min(max(total, 0.0), 1.0)
 
 
 def probability(value: Any) -> float | None:

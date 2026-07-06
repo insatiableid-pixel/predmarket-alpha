@@ -6,6 +6,12 @@ This file defines the small local JSON reference needed before predmarket can co
 
 The reference is a derived handoff file. It is not a raw provider dump.
 
+For sports EV discovery, the preferred north-star intake is now the stricter
+multi-book consensus file validated by `make kalshi-sports-consensus-preflight`.
+The older Type 2 reference path is retained for characterization and legacy
+manual research review, but a single sportsbook row is not treated as a sharp
+consensus model.
+
 ## Where To Put It
 
 Preferred location outside the repo:
@@ -63,6 +69,8 @@ Supported odds payloads:
 
 ```bash
 cd /home/mrwatson/projects/predmarket-alpha
+make kalshi-sports-consensus-refresh
+make kalshi-sports-consensus-preflight KALSHI_SPORTS_CONSENSUS_JSON=/home/mrwatson/manual_drops/predmarket/sports-no-vig-consensus.json
 make type2-reference-preflight TYPE2_SPORTSBOOK_JSON=/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json
 make type2-paper-matcher TYPE2_SPORTSBOOK_JSON=/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json
 make macro-status
@@ -70,3 +78,8 @@ python3 scripts/codex_macro_router.py route --write
 ```
 
 Stop if the preflight does not report `reference_ready`.
+
+Stop if the consensus preflight does not report
+`sports_consensus_preflight_ready` or
+`sports_consensus_preflight_ready_with_rejected_rows`; blocked consensus rows
+must not be promoted as sports probabilities.

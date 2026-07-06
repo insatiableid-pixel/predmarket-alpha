@@ -12,17 +12,18 @@ import hashlib
 import json
 import math
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any
 
 from predmarket.feature_flags import FeatureFlag, is_enabled
 
 
 @dataclass(frozen=True)
 class Type2PaperMatcherArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
@@ -55,7 +56,7 @@ def implied_probability_from_odds(price: Any) -> float:
     raise ValueError("Unsupported odds payload")
 
 
-def no_vig_midpoint_from_reference(reference: Mapping[str, Any]) -> Dict[str, float]:
+def no_vig_midpoint_from_reference(reference: Mapping[str, Any]) -> dict[str, float]:
     """Return no-vig YES/NO midpoint probabilities from a two-outcome reference."""
     yes_payload = _side_payload(reference, "yes")
     no_payload = _side_payload(reference, "no")
@@ -79,21 +80,21 @@ def no_vig_midpoint_from_reference(reference: Mapping[str, Any]) -> Dict[str, fl
 
 def build_type2_paper_match_report(
     kalshi_payload: Mapping[str, Any],
-    sportsbook_payload: Optional[Mapping[str, Any]],
+    sportsbook_payload: Mapping[str, Any] | None,
     *,
-    kalshi_path: Optional[Path] = None,
-    sportsbook_path: Optional[Path] = None,
-    run_id: Optional[str] = None,
+    kalshi_path: Path | None = None,
+    sportsbook_path: Path | None = None,
+    run_id: str | None = None,
     min_net_divergence: float = 0.10,
     uncertainty_buffer: float = 0.0,
-    created_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    created_ts: float | None = None,
+) -> dict[str, Any]:
     ts = float(created_ts or time.time())
     rows = _kalshi_rows(kalshi_payload)
     row_by_ticker = _index_kalshi_rows(rows)
     references = _sportsbook_references(sportsbook_payload)
-    candidates: List[Dict[str, Any]] = []
-    blockers: List[Dict[str, Any]] = []
+    candidates: list[dict[str, Any]] = []
+    blockers: list[dict[str, Any]] = []
 
     if sportsbook_payload is None:
         blockers.append(
@@ -121,7 +122,7 @@ def build_type2_paper_match_report(
     # When enabled, run a secondary pass at half the divergence threshold to catch
     # smaller mispricings that would be filtered in the standard batch pass.
     real_time_enabled = is_enabled(FeatureFlag.TYPE2_REAL_TIME_MATCHER)
-    enhanced_candidates: List[Dict[str, Any]] = []
+    enhanced_candidates: list[dict[str, Any]] = []
     if real_time_enabled and references:
         enhanced_threshold = min_net_divergence / 2.0
         for reference in references:
@@ -145,7 +146,7 @@ def build_type2_paper_match_report(
             uncertainty_buffer=uncertainty_buffer,
         ),
         "created_ts": ts,
-        "created_at_utc": datetime.fromtimestamp(ts, timezone.utc).isoformat().replace("+00:00", "Z"),
+        "created_at_utc": datetime.fromtimestamp(ts, UTC).isoformat().replace("+00:00", "Z"),
         "status": report_status,
         "research_only": True,
         "execution_enabled": False,
@@ -187,9 +188,9 @@ def build_type2_paper_match_report(
 def run_type2_paper_matcher(
     *,
     kalshi_json: Path,
-    sportsbook_json: Optional[Path] = None,
+    sportsbook_json: Path | None = None,
     output_dir: Path,
-    run_id: Optional[str] = None,
+    run_id: str | None = None,
     min_net_divergence: float = 0.10,
     uncertainty_buffer: float = 0.0,
 ) -> Type2PaperMatcherArtifacts:
@@ -284,8 +285,8 @@ def _candidate_from_reference(
     row_by_ticker: Mapping[str, Mapping[str, Any]],
     min_net_divergence: float,
     uncertainty_buffer: float,
-) -> Tuple[Optional[Dict[str, Any]], List[Dict[str, Any]]]:
-    blockers: List[Dict[str, Any]] = []
+) -> tuple[dict[str, Any] | None, list[dict[str, Any]]]:
+    blockers: list[dict[str, Any]] = []
     kalshi_ticker = str(
         reference.get("kalshi_ticker")
         or reference.get("ticker")
@@ -294,10 +295,22 @@ def _candidate_from_reference(
     ).strip()
     reference_id = str(reference.get("reference_id") or kalshi_ticker or "unknown")
     if not kalshi_ticker:
-        return None, [{"reference_id": reference_id, "reason": "missing_explicit_kalshi_ticker", "detail": "Reference row has no kalshi_ticker."}]
+        return None, [
+            {
+                "reference_id": reference_id,
+                "reason": "missing_explicit_kalshi_ticker",
+                "detail": "Reference row has no kalshi_ticker.",
+            }
+        ]
     kalshi_row = row_by_ticker.get(kalshi_ticker)
     if kalshi_row is None:
-        return None, [{"reference_id": reference_id, "reason": "kalshi_ticker_not_found", "detail": kalshi_ticker}]
+        return None, [
+            {
+                "reference_id": reference_id,
+                "reason": "kalshi_ticker_not_found",
+                "detail": kalshi_ticker,
+            }
+        ]
 
     quote, quote_blockers = _kalshi_quote(kalshi_row)
     blockers.extend(
@@ -324,7 +337,11 @@ def _candidate_from_reference(
                 "kalshi_ticker": kalshi_ticker,
                 "title": kalshi_row.get("title"),
                 "review_status": "REVIEW_ONLY_BLOCKED",
-                "blockers": [blocker["reason"] for blocker in blockers if blocker.get("reference_id") == reference_id],
+                "blockers": [
+                    blocker["reason"]
+                    for blocker in blockers
+                    if blocker.get("reference_id") == reference_id
+                ],
             },
             blockers,
         )
@@ -332,9 +349,7 @@ def _candidate_from_reference(
     raw_divergence = abs(quote["midpoint"] - sportsbook["no_vig_yes"])
     net_divergence = raw_divergence - quote["half_spread"] - float(uncertainty_buffer)
     review_status = (
-        "REVIEW_ONLY_PASS"
-        if net_divergence >= float(min_net_divergence)
-        else "REVIEW_ONLY_WATCH"
+        "REVIEW_ONLY_PASS" if net_divergence >= float(min_net_divergence) else "REVIEW_ONLY_WATCH"
     )
     return (
         {
@@ -362,11 +377,13 @@ def _candidate_from_reference(
     )
 
 
-def _kalshi_quote(row: Mapping[str, Any]) -> Tuple[Optional[Dict[str, float]], List[Dict[str, str]]]:
+def _kalshi_quote(row: Mapping[str, Any]) -> tuple[dict[str, float] | None, list[dict[str, str]]]:
     bid = _optional_float(row.get("bid", row.get("yes_bid", row.get("yes_bid_dollars"))))
     ask = _optional_float(row.get("ask", row.get("yes_ask", row.get("yes_ask_dollars"))))
     if bid is None or ask is None:
-        return None, [{"reason": "missing_kalshi_bid_ask", "detail": "Kalshi row must include bid and ask."}]
+        return None, [
+            {"reason": "missing_kalshi_bid_ask", "detail": "Kalshi row must include bid and ask."}
+        ]
     if bid < 0.0 or ask > 1.0 or ask < bid:
         return None, [{"reason": "invalid_kalshi_bid_ask", "detail": f"bid={bid}, ask={ask}"}]
     midpoint = (bid + ask) / 2.0
@@ -382,14 +399,22 @@ def _side_payload(reference: Mapping[str, Any], side: str) -> Any:
     payload = reference.get(side)
     if payload is not None:
         return payload
-    for suffix in ("implied_probability", "probability", "prob", "american", "american_odds", "decimal", "decimal_odds"):
+    for suffix in (
+        "implied_probability",
+        "probability",
+        "prob",
+        "american",
+        "american_odds",
+        "decimal",
+        "decimal_odds",
+    ):
         key = f"{side}_{suffix}"
         if key in reference:
             return {suffix: reference[key]}
     raise ValueError(f"Missing {side.upper()} odds")
 
 
-def _kalshi_rows(payload: Mapping[str, Any]) -> List[Dict[str, Any]]:
+def _kalshi_rows(payload: Mapping[str, Any]) -> list[dict[str, Any]]:
     if isinstance(payload, list):
         return [dict(row) for row in payload if isinstance(row, Mapping)]
     for key in ("all_scored", "markets", "rows", "top_50"):
@@ -399,8 +424,8 @@ def _kalshi_rows(payload: Mapping[str, Any]) -> List[Dict[str, Any]]:
     return []
 
 
-def _index_kalshi_rows(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Mapping[str, Any]]:
-    out: Dict[str, Mapping[str, Any]] = {}
+def _index_kalshi_rows(rows: Sequence[Mapping[str, Any]]) -> dict[str, Mapping[str, Any]]:
+    out: dict[str, Mapping[str, Any]] = {}
     for row in rows:
         for key in ("ticker", "market_id"):
             value = str(row.get(key) or "").strip()
@@ -409,7 +434,7 @@ def _index_kalshi_rows(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Mapping[s
     return out
 
 
-def _sportsbook_references(payload: Optional[Mapping[str, Any]]) -> List[Dict[str, Any]]:
+def _sportsbook_references(payload: Mapping[str, Any] | None) -> list[dict[str, Any]]:
     if payload is None:
         return []
     if isinstance(payload, list):
@@ -421,8 +446,8 @@ def _sportsbook_references(payload: Optional[Mapping[str, Any]]) -> List[Dict[st
     return []
 
 
-def _status_counts(candidates: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def _status_counts(candidates: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
     for candidate in candidates:
         status = str(candidate.get("review_status") or "unknown")
         counts[status] = counts.get(status, 0) + 1
@@ -432,7 +457,7 @@ def _status_counts(candidates: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
 def _report_status(
     candidates: Sequence[Mapping[str, Any]],
     blockers: Sequence[Mapping[str, Any]],
-    sportsbook_payload: Optional[Mapping[str, Any]],
+    sportsbook_payload: Mapping[str, Any] | None,
 ) -> str:
     if sportsbook_payload is None:
         return "blocked_missing_sportsbook_reference"
@@ -458,11 +483,13 @@ def _stable_run_id(
         "min_net_divergence": min_net_divergence,
         "uncertainty_buffer": uncertainty_buffer,
     }
-    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()[:12]
+    digest = hashlib.sha256(json.dumps(payload, sort_keys=True, default=str).encode()).hexdigest()[
+        :12
+    ]
     return f"type2-paper-matcher-{digest}"
 
 
-def _read_json(path: Optional[Path]) -> Mapping[str, Any]:
+def _read_json(path: Path | None) -> Mapping[str, Any]:
     if path is None:
         return {}
     with path.open("r", encoding="utf-8") as f:
@@ -474,7 +501,7 @@ def _read_json(path: Optional[Path]) -> Mapping[str, Any]:
     raise ValueError(f"Expected JSON object or list in {path}")
 
 
-def _optional_float(value: Any) -> Optional[float]:
+def _optional_float(value: Any) -> float | None:
     if value is None:
         return None
     try:
@@ -486,8 +513,10 @@ def _optional_float(value: Any) -> Optional[float]:
     return out
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Run the paper-only Type 2 Kalshi sportsbook matcher.")
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Run the paper-only Type 2 Kalshi sportsbook matcher."
+    )
     parser.add_argument("--kalshi-json", default="data/kalshi_scored_refined_2026-06-16.json")
     parser.add_argument("--sportsbook-json", default=None)
     parser.add_argument("--output-dir", default="docs/codex/artifacts/type2-paper-matcher-latest")

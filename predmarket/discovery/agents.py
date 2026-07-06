@@ -5,8 +5,9 @@ from __future__ import annotations
 import hashlib
 import math
 import random
+from collections.abc import Iterable, Sequence
 from dataclasses import asdict
-from typing import Any, Dict, Iterable, List, Sequence, Set, Tuple
+from typing import Any
 
 import numpy as np
 
@@ -22,7 +23,6 @@ from predmarket.research import (
     ResearchBacktestConfig,
     ResearchBacktester,
 )
-
 
 FOCUS_PRIORS = {
     "market_microstructure": (
@@ -106,12 +106,12 @@ class HypothesisAgent:
         self,
         focus: str,
         feature_catalog: Sequence[str],
-        rows: Sequence[Dict[str, Any]],
+        rows: Sequence[dict[str, Any]],
         limit: int,
-    ) -> List[SignalHypothesis]:
+    ) -> list[SignalHypothesis]:
         del rows
         ordered = self._ordered_features(focus, feature_catalog)
-        expressions: List[Tuple[str, str, float]] = []
+        expressions: list[tuple[str, str, float]] = []
         baseline = "p_baseline" if "p_baseline" in feature_catalog else None
         if baseline is None and "market_implied" in feature_catalog:
             baseline = "market_implied"
@@ -156,8 +156,8 @@ class HypothesisAgent:
                 )
             )
 
-        hypotheses: List[SignalHypothesis] = []
-        seen: Set[str] = set()
+        hypotheses: list[SignalHypothesis] = []
+        seen: set[str] = set()
         for expression, rationale, prior in expressions:
             if expression in seen:
                 continue
@@ -182,7 +182,7 @@ class HypothesisAgent:
                 break
         return hypotheses
 
-    def _ordered_features(self, focus: str, feature_catalog: Sequence[str]) -> List[str]:
+    def _ordered_features(self, focus: str, feature_catalog: Sequence[str]) -> list[str]:
         keywords = FOCUS_PRIORS.get(focus, ())
         scored = []
         for feature in feature_catalog:
@@ -200,7 +200,7 @@ class HypothesisAgent:
         return float(np.clip(base + boost + jitter, 0.05, 0.98))
 
     @staticmethod
-    def _feature_pairs(features: Sequence[str]) -> List[Tuple[str, str]]:
+    def _feature_pairs(features: Sequence[str]) -> list[tuple[str, str]]:
         pairs = []
         for idx, left in enumerate(features):
             for right in features[idx + 1 :]:
@@ -218,10 +218,10 @@ class ReflectionAgent:
     def reflect(
         self,
         hypothesis: SignalHypothesis,
-        rows: Sequence[Dict[str, Any]],
-        seen_canonicals: Set[str],
+        rows: Sequence[dict[str, Any]],
+        seen_canonicals: set[str],
     ) -> ReflectionResult:
-        reasons: List[str] = []
+        reasons: list[str] = []
         if not rows:
             reasons.append("no_rows")
         if not any("outcome" in row for row in rows):
@@ -234,14 +234,18 @@ class ReflectionAgent:
             if self.dsl.complexity(hypothesis.expression) > self.config.max_complexity:
                 reasons.append("complexity_exceeds_limit")
             features = self.dsl.validate(hypothesis.expression, rows)
-            support = min(
-                sum(
-                    1
-                    for row in rows
-                    if feature in row and isinstance(row.get(feature), (int, float, bool))
+            support = (
+                min(
+                    sum(
+                        1
+                        for row in rows
+                        if feature in row and isinstance(row.get(feature), (int, float, bool))
+                    )
+                    for feature in features
                 )
-                for feature in features
-            ) if features else len(rows)
+                if features
+                else len(rows)
+            )
             if support < self.config.min_support:
                 reasons.append("insufficient_sample_support")
             values = np.asarray(self.dsl.evaluate(hypothesis.expression, rows), dtype=float)
@@ -272,13 +276,15 @@ class RankingAgent:
     def evaluate(
         self,
         hypothesis: SignalHypothesis,
-        rows: Sequence[Dict[str, Any]],
+        rows: Sequence[dict[str, Any]],
         n_trials: int,
     ) -> CandidateEvaluation:
         candidate_rows = self._candidate_rows(hypothesis, rows)
         bt_config = ResearchBacktestConfig(
             name=hypothesis.name,
-            min_train_size=min(self.config.backtest_min_train_size, max(len(candidate_rows) // 2, 1)),
+            min_train_size=min(
+                self.config.backtest_min_train_size, max(len(candidate_rows) // 2, 1)
+            ),
             test_size=min(self.config.backtest_test_size, max(len(candidate_rows) // 4, 1)),
             step_size=max(1, min(self.config.backtest_step_size, max(len(candidate_rows) // 4, 1))),
             n_strategy_trials=max(n_trials, 1),
@@ -295,8 +301,8 @@ class RankingAgent:
         )
 
     def _candidate_rows(
-        self, hypothesis: SignalHypothesis, rows: Sequence[Dict[str, Any]]
-    ) -> List[Dict[str, Any]]:
+        self, hypothesis: SignalHypothesis, rows: Sequence[dict[str, Any]]
+    ) -> list[dict[str, Any]]:
         values = np.asarray(self.dsl.evaluate(hypothesis.expression, rows), dtype=float)
         if len(values) == 0:
             return []
@@ -309,11 +315,16 @@ class RankingAgent:
             ) + 0.15 * SafeSignalDSL._zscore(values)
             probabilities = np.clip(probabilities, 0.01, 0.99)
 
-        out: List[Dict[str, Any]] = []
+        out: list[dict[str, Any]] = []
         for row, probability in zip(rows, probabilities):
             candidate = dict(row)
             p_model = float(np.clip(probability, 0.01, 0.99))
-            price = float(candidate.get("execution_price", candidate.get("market_implied", candidate.get("p_baseline", 0.5))))
+            price = float(
+                candidate.get(
+                    "execution_price",
+                    candidate.get("market_implied", candidate.get("p_baseline", 0.5)),
+                )
+            )
             candidate["p_model"] = p_model
             candidate["model_prob"] = p_model
             candidate["stake_fraction"] = 0.01 if p_model >= price else -0.01
@@ -323,7 +334,7 @@ class RankingAgent:
         return out
 
     @staticmethod
-    def reward(metrics: Dict[str, Any], promotion_status: str, complexity: int) -> float:
+    def reward(metrics: dict[str, Any], promotion_status: str, complexity: int) -> float:
         baseline_brier = float(metrics.get("baseline_brier", 0.0))
         brier = float(metrics.get("brier", 1.0))
         brier_improvement = (
@@ -331,9 +342,7 @@ class RankingAgent:
         )
         baseline_log = float(metrics.get("baseline_log_score", 0.0))
         log_score = float(metrics.get("log_score", 1.0))
-        log_improvement = (
-            (baseline_log - log_score) / baseline_log if baseline_log > 1e-12 else 0.0
-        )
+        log_improvement = (baseline_log - log_score) / baseline_log if baseline_log > 1e-12 else 0.0
         calibration = 1.0 - min(float(metrics.get("ece", 1.0)) / 0.20, 1.0)
         dsr = float(metrics.get("deflated_sharpe_ratio", 0.0))
         pbo_score = 1.0 - float(metrics.get("pbo", 1.0))
@@ -356,7 +365,7 @@ class RankingAgent:
         return float(score)
 
     @staticmethod
-    def compute_elo(scores: Dict[str, float], k_factor: float = 24.0) -> Dict[str, float]:
+    def compute_elo(scores: dict[str, float], k_factor: float = 24.0) -> dict[str, float]:
         ratings = {hypothesis_id: 1000.0 for hypothesis_id in scores}
         ids = sorted(scores)
         for left_idx, left in enumerate(ids):
@@ -393,13 +402,17 @@ class EvolutionAgent:
         top_hypotheses: Sequence[SignalHypothesis],
         feature_catalog: Sequence[str],
         limit: int = 4,
-    ) -> Tuple[List[SignalHypothesis], List[DiscoveryTransition]]:
-        children: List[SignalHypothesis] = []
-        transitions: List[DiscoveryTransition] = []
+    ) -> tuple[list[SignalHypothesis], list[DiscoveryTransition]]:
+        children: list[SignalHypothesis] = []
+        transitions: list[DiscoveryTransition] = []
         if not top_hypotheses:
             return children, transitions
 
-        supporting_features = [feature for feature in feature_catalog if feature not in {"p_baseline", "market_implied"}]
+        supporting_features = [
+            feature
+            for feature in feature_catalog
+            if feature not in {"p_baseline", "market_implied"}
+        ]
         if not supporting_features:
             supporting_features = list(feature_catalog)
 
@@ -454,7 +467,7 @@ class EvolutionAgent:
         self,
         expression: str,
         focus: str,
-        parent_ids: List[str],
+        parent_ids: list[str],
         rationale: str,
         mutation_type: str,
     ) -> SignalHypothesis:
@@ -478,7 +491,7 @@ class EvolutionAgent:
     def _transition(
         run_id: str,
         trajectory_id: str,
-        parent_ids: List[str],
+        parent_ids: list[str],
         child_id: str,
         transition_type: str,
         reason: str,

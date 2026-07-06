@@ -1,19 +1,23 @@
-import os
 import logging
+import os
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, List, Tuple
 from scipy.optimize import minimize
-from predmarket.config import Config
+
 from predmarket.audit import AuditLogger
+from predmarket.config import Config
+from predmarket.kalshi_execution_cost import kalshi_net_fee
 
 logger = logging.getLogger("predmarket.risk")
+
 
 class RiskManager:
     def __init__(self, config: Config, audit_logger: AuditLogger):
         self.config = config
         self.audit_logger = audit_logger
 
-    def check_drawdown_circuit_breaker(self) -> Tuple[bool, float]:
+    def check_drawdown_circuit_breaker(self) -> tuple[bool, float]:
         """
         Calculates the 30-day rolling drawdown.
         Returns: (is_halted, current_drawdown_pct)
@@ -22,7 +26,7 @@ class RiskManager:
         # (30 days = 30 * 24 * 3600 seconds)
         thirty_days = 30 * 24 * 3600
         history = self.audit_logger.get_equity_history(thirty_days)
-        
+
         if not history:
             return False, 0.0
 
@@ -43,10 +47,14 @@ class RiskManager:
             # Check for drawdown bypass override environment variable
             override = os.getenv("OVERRIDE_DRAWDOWN_HALT", "false").lower()
             if override == "true":
-                logger.warning(f"DRAWDOWN-ALERT: Current drawdown ({drawdown:.2%}) exceeds limit ({limit:.2%}). BYPASSED via OVERRIDE_DRAWDOWN_HALT=true.")
+                logger.warning(
+                    f"DRAWDOWN-ALERT: Current drawdown ({drawdown:.2%}) exceeds limit ({limit:.2%}). BYPASSED via OVERRIDE_DRAWDOWN_HALT=true."
+                )
                 return False, drawdown
             else:
-                logger.error(f"DRAWDOWN-HALT: Current drawdown ({drawdown:.2%}) exceeds limit ({limit:.2%}). All position sizing locked.")
+                logger.error(
+                    f"DRAWDOWN-HALT: Current drawdown ({drawdown:.2%}) exceeds limit ({limit:.2%}). All position sizing locked."
+                )
                 return True, drawdown
 
         return False, drawdown
@@ -56,7 +64,7 @@ class RiskManager:
         snapshot_mid: float,
         volume_24h: float,
         open_interest: float,
-        line_history: List[float],
+        line_history: list[float],
         venue: str = "Kalshi",
     ) -> str:
         """
@@ -65,7 +73,9 @@ class RiskManager:
         """
         # 1. Liquidity check
         venue_lower = venue.lower()
-        venue_config = self.config.venues.kalshi if venue_lower == "kalshi" else self.config.venues.polymarket
+        venue_config = (
+            self.config.venues.kalshi if venue_lower == "kalshi" else self.config.venues.polymarket
+        )
         if open_interest < venue_config.min_liquidity_usd:
             return "ILLIQUID"
 
@@ -76,16 +86,16 @@ class RiskManager:
             current = line_history[-1]
             shift = abs(current - initial)
             if shift > self.config.portfolio.risk_controls.line_movement_threshold_pct:
-                logger.warning(f"SHARP-MOVE detected. Contract shifted {shift:.2%} within history window. Sizing suspended.")
+                logger.warning(
+                    f"SHARP-MOVE detected. Contract shifted {shift:.2%} within history window. Sizing suspended."
+                )
                 return "SHARP-MOVE"
 
         return "READY"
 
     def optimize_portfolio_kelly(
-        self,
-        forecasts: List[Dict[str, Any]],
-        cash_balance: float
-    ) -> List[Dict[str, Any]]:
+        self, forecasts: list[dict[str, Any]], cash_balance: float
+    ) -> list[dict[str, Any]]:
         """
         Computes correlation-adjusted fractional Kelly sizes across multiple contracts.
         Solves: max_f (f^T g - 0.5 * f^T Sigma f)
@@ -94,27 +104,33 @@ class RiskManager:
             return []
 
         n_contracts = len(forecasts)
-        
-        # 1. Extract Edges (g_i = model_prob - market_implied - tx_costs)
+
+        # 1. Extract Edges (g_i = model_prob - market_implied - canonical fee)
         edges = []
         for f in forecasts:
             raw_edge = f["model_prob"] - f["market_implied"]
-            # Estimate transaction cost based on venue (spread + commission)
-            tx_cost = 0.01 # Simulated transaction fee
-            net_edge = raw_edge - tx_cost
+            # Per-contract canonical fee from fee engine (price-dependent)
+            fee = kalshi_net_fee(
+                price=f["market_implied"],
+                contract_count=1.0,
+                fee_mode="maker",
+            )
+            net_edge = raw_edge - fee
             edges.append(net_edge)
-        
+
         g = np.array(edges)
 
         # 2. Build Covariance Matrix Sigma
         # In a real environment, this is calculated from historical return correlations.
         # Here, we initialize it using a generic category-based block correlation model.
-        Sigma = np.eye(n_contracts) * 0.25 # Assume standard asset variance is 0.25 for binary events
+        Sigma = (
+            np.eye(n_contracts) * 0.25
+        )  # Assume standard asset variance is 0.25 for binary events
         for i in range(n_contracts):
             for j in range(i + 1, n_contracts):
                 # If contracts share the same category/topic, assume 0.50 correlation
                 if forecasts[i]["category"] == forecasts[j]["category"]:
-                    Sigma[i, j] = 0.125 # Covariance = corr * std_i * std_j = 0.50 * 0.50 * 0.50
+                    Sigma[i, j] = 0.125  # Covariance = corr * std_i * std_j = 0.50 * 0.50 * 0.50
                     Sigma[j, i] = 0.125
 
         # 3. Define the Quadratic Optimization Problem
@@ -130,23 +146,19 @@ class RiskManager:
         # Sum of exposures <= leverage_cap
         # Correlated exposures (same category) <= max_correlated_exposure_pct
         constraints = []
-        
+
         # Leverage constraint
         leverage_cap = self.config.portfolio.kelly.leverage_cap
-        constraints.append({
-            "type": "ineq",
-            "fun": lambda f: leverage_cap - np.sum(np.abs(f))
-        })
+        constraints.append({"type": "ineq", "fun": lambda f: leverage_cap - np.sum(np.abs(f))})
 
         # Category correlation constraints
         categories = list(set([f["category"] for f in forecasts]))
         max_corr = self.config.portfolio.kelly.max_correlated_exposure_pct
         for cat in categories:
             indices = [idx for idx, f in enumerate(forecasts) if f["category"] == cat]
-            constraints.append({
-                "type": "ineq",
-                "fun": lambda f, idxs=indices: max_corr - np.sum(np.abs(f[idxs]))
-            })
+            constraints.append(
+                {"type": "ineq", "fun": lambda f, idxs=indices: max_corr - np.sum(np.abs(f[idxs]))}
+            )
 
         # Solve QP
         initial_f = np.zeros(n_contracts)
@@ -157,11 +169,16 @@ class RiskManager:
             # Apply fractional Kelly multiplier (e.g. quarter Kelly)
             fraction = self.config.portfolio.kelly.fraction
             f_opt = res.x * fraction
-            
+
             for idx, f_val in enumerate(f_opt):
-                raw_edge = edges[idx] + 0.01 # reconstruct raw edge
+                forecast_fee = kalshi_net_fee(
+                    price=forecasts[idx]["market_implied"],
+                    contract_count=1.0,
+                    fee_mode="maker",
+                )
+                raw_edge = edges[idx] + forecast_fee  # reconstruct raw edge
                 net_edge = edges[idx]
-                
+
                 # Sizing status check
                 status = forecasts[idx]["status"]
                 venue = forecasts[idx].get("venue", "Kalshi")
@@ -169,52 +186,61 @@ class RiskManager:
                     status = "RESEARCH-ONLY"
                 if status == "READY":
                     if net_edge < self.config.portfolio.kelly.min_edge:
-                        status = "RESEARCH-ONLY" # Edge below threshold
+                        status = "RESEARCH-ONLY"  # Edge below threshold
                     elif f_val <= 0.0001:
-                        status = "RESEARCH-ONLY" # Sized to zero
+                        status = "RESEARCH-ONLY"  # Sized to zero
                 if status != "READY":
                     f_val = 0.0
-                
-                results.append({
-                    "contract_id": forecasts[idx]["contract_id"],
-                    "title": forecasts[idx]["title"],
-                    "venue": venue,
-                    "category": forecasts[idx]["category"],
-                    "model_prob": forecasts[idx]["model_prob"],
-                    "market_implied": forecasts[idx]["market_implied"],
-                    "raw_edge": raw_edge,
-                    "net_edge": net_edge,
-                    "kelly_full": float(res.x[idx]),
-                    "kelly_quarter": float(res.x[idx] * 0.25),
-                    "recommended_fraction": float(f_val),
-                    "recommended_usd": float(f_val * cash_balance),
-                    "status": status,
-                    "base_rate_reference": forecasts[idx]["base_rate_reference"],
-                    "base_rate_prob": forecasts[idx]["base_rate_prob"]
-                })
+
+                results.append(
+                    {
+                        "contract_id": forecasts[idx]["contract_id"],
+                        "title": forecasts[idx]["title"],
+                        "venue": venue,
+                        "category": forecasts[idx]["category"],
+                        "model_prob": forecasts[idx]["model_prob"],
+                        "market_implied": forecasts[idx]["market_implied"],
+                        "raw_edge": raw_edge,
+                        "net_edge": net_edge,
+                        "kelly_full": float(res.x[idx]),
+                        "kelly_quarter": float(res.x[idx] * 0.25),
+                        "recommended_fraction": float(f_val),
+                        "recommended_usd": float(f_val * cash_balance),
+                        "status": status,
+                        "base_rate_reference": forecasts[idx]["base_rate_reference"],
+                        "base_rate_prob": forecasts[idx]["base_rate_prob"],
+                    }
+                )
         else:
             logger.error(f"Sizing optimization failed: {res.message}")
             for item in forecasts:
                 venue = item.get("venue", "Kalshi")
-                results.append({
-                    **item,
-                    "venue": venue,
-                    "raw_edge": item["model_prob"] - item["market_implied"],
-                    "net_edge": item["model_prob"] - item["market_implied"] - 0.01,
-                    "kelly_full": 0.0,
-                    "kelly_quarter": 0.0,
-                    "recommended_fraction": 0.0,
-                    "recommended_usd": 0.0,
-                    "status": "RESEARCH-ONLY"
-                })
+                fallback_fee = kalshi_net_fee(
+                    price=item["market_implied"],
+                    contract_count=1.0,
+                    fee_mode="maker",
+                )
+                results.append(
+                    {
+                        **item,
+                        "venue": venue,
+                        "raw_edge": item["model_prob"] - item["market_implied"],
+                        "net_edge": item["model_prob"] - item["market_implied"] - fallback_fee,
+                        "kelly_full": 0.0,
+                        "kelly_quarter": 0.0,
+                        "recommended_fraction": 0.0,
+                        "recommended_usd": 0.0,
+                        "status": "RESEARCH-ONLY",
+                    }
+                )
 
         return results
 
     def optimize_execution_aware(
         self,
-        forecasts: List[Dict[str, Any]],
+        forecasts: list[dict[str, Any]],
         cash_balance: float,
-    ) -> List[Dict[str, Any]]:
+    ) -> list[dict[str, Any]]:
         """Create staged trade intents from posterior edge and executable costs.
 
         This is the research-engine sizing path. It uses forecast density
@@ -225,12 +251,12 @@ class RiskManager:
         if not forecasts:
             return []
 
-        prepared: List[Dict[str, Any]] = []
+        prepared: list[dict[str, Any]] = []
         for forecast in forecasts:
             density = forecast.get("density_forecast")
             samples = None
             if density is not None and getattr(density, "samples", None) is not None:
-                arr = np.asarray(getattr(density, "samples"), dtype=float)
+                arr = np.asarray(density.samples, dtype=float)
                 if arr.size:
                     samples = np.clip(arr, 0.0, 1.0)
             if samples is None:
@@ -242,7 +268,17 @@ class RiskManager:
                     forecast.get("ask", forecast.get("market_implied", 0.5)),
                 )
             )
-            fees = float(forecast.get("fees", forecast.get("execution_cost_pct", 0.01)))
+            raw_fees = forecast.get("fees")
+            if raw_fees is None:
+                raw_fees = forecast.get("execution_cost_pct")
+            if raw_fees is not None:
+                fees = float(raw_fees)
+            else:
+                fees = kalshi_net_fee(
+                    price=executable_price,
+                    contract_count=1.0,
+                    fee_mode="maker",
+                )
             slippage = float(forecast.get("slippage", forecast.get("slippage_pct", 0.0)))
             fill_probability = float(forecast.get("fill_probability", 1.0))
             lockup_days = float(forecast.get("capital_lockup_days", 1.0))
@@ -270,7 +306,9 @@ class RiskManager:
                     **forecast,
                     "venue": forecast.get("venue", "Kalshi"),
                     "market_implied": executable_price,
-                    "raw_edge": float(forecast.get("model_prob", np.mean(samples)) - executable_price),
+                    "raw_edge": float(
+                        forecast.get("model_prob", np.mean(samples)) - executable_price
+                    ),
                     "net_edge": net_edge,
                     "posterior_edge": posterior_edge,
                     "edge_uncertainty": edge_std,
@@ -285,11 +323,15 @@ class RiskManager:
             )
 
         n_contracts = len(prepared)
-        g = np.asarray([item["net_edge"] if item["status"] == "READY" else -1.0 for item in prepared])
+        g = np.asarray(
+            [item["net_edge"] if item["status"] == "READY" else -1.0 for item in prepared]
+        )
         Sigma = np.eye(n_contracts) * 0.25
         for i in range(n_contracts):
             for j in range(i + 1, n_contracts):
-                same_event = prepared[i].get("event_id") and prepared[i].get("event_id") == prepared[j].get("event_id")
+                same_event = prepared[i].get("event_id") and prepared[i].get(
+                    "event_id"
+                ) == prepared[j].get("event_id")
                 same_category = prepared[i].get("category") == prepared[j].get("category")
                 if same_event:
                     cov = 0.225
@@ -332,15 +374,19 @@ class RiskManager:
             bounds=bounds,
             constraints=constraints,
         )
-        fractions = res.x * self.config.portfolio.kelly.fraction if res.success else np.zeros(n_contracts)
+        fractions = (
+            res.x * self.config.portfolio.kelly.fraction if res.success else np.zeros(n_contracts)
+        )
         if not res.success:
             logger.error(f"Execution-aware sizing optimization failed: {res.message}")
 
-        results: List[Dict[str, Any]] = []
+        results: list[dict[str, Any]] = []
         for idx, item in enumerate(prepared):
             fraction = float(fractions[idx]) if item["status"] == "READY" else 0.0
             if fraction <= 0.0001:
-                item["status"] = "RESEARCH-ONLY" if item["promotion_status"] != "PROMOTED" else item["status"]
+                item["status"] = (
+                    "RESEARCH-ONLY" if item["promotion_status"] != "PROMOTED" else item["status"]
+                )
             results.append(
                 {
                     **item,

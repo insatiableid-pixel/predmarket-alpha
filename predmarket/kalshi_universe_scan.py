@@ -15,15 +15,15 @@ import json
 import math
 import re
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
-from typing import Any, Mapping, Optional, Sequence
+from typing import Any
 
 from predmarket.config import load_config
 from predmarket.kalshi_dataset import KalshiMarketDataClient
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost
-
 
 DEFAULT_MIN_CLOSE_HOURS = 0.0
 DEFAULT_MAX_CLOSE_HOURS = 72.0
@@ -33,11 +33,66 @@ DEFAULT_RAW_OUTPUT_DIR = Path("/home/mrwatson/manual_drops/kalshi_universe")
 DEFAULT_LATEST_RAW_PATH = DEFAULT_RAW_OUTPUT_DIR / "kalshi_universe_scan_latest.json"
 DEFAULT_OUT_DIR = Path("docs/codex/macro/kalshi-universe-scan-latest")
 MACRO_DIR = Path("docs/codex/macro")
+DEFAULT_BROAD_MVE_FILTERS: tuple[str | None, ...] = ("exclude",)
+DEFAULT_FOCUSED_SPORTS_FETCH_MAX_CLOSE_HOURS = 720.0
+DEFAULT_WORLD_CUP_SOCCER_SERIES: tuple[str, ...] = (
+    "KXWCGAME",
+    "KXWCSPREAD",
+    "KXWCTOTAL",
+    "KXWCBTTS",
+    "KXWC1H",
+    "KXWC1HSPREAD",
+    "KXWC1HTOTAL",
+    "KXWC2H",
+    "KXWC2HSPREAD",
+    "KXWC2HTOTAL",
+    "KXWCTEAMH2H",
+    "KXWCTEAMGOALS",
+    "KXWCTEAMSHOT",
+    "KXWCTEAMSOG",
+    "KXWCCORNERS",
+    "KXWCTCORNERS",
+    "KXFIFAGAME",
+    "KXFIFASPREAD",
+    "KXFIFATOTAL",
+    "KXFIFAADVANCE",
+)
+DEFAULT_FOCUSED_SPORTS_SERIES: tuple[str, ...] = (
+    "KXMLBGAME",
+    "KXLMBGAME",
+    "KXKBOGAME",
+    "KXMLBASGAME",
+    "KXMLBSTGAME",
+    "KXATPMATCH",
+    "KXATPGAME",
+    "KXATPSETWINNER",
+    "KXATPS3GWINNER",
+    "KXWIMMEN",
+    "KXWIMWOMEN",
+    "KXWMENSINGLES",
+    "KXWWOMENSINGLES",
+    *DEFAULT_WORLD_CUP_SOCCER_SERIES,
+)
 CORE_MODEL_ROUTES = {
     "nfl": "nfl_quant_glm51_greenfield",
     "mlb": "mlb-platform",
     "nba": "nba-analytics-platform",
     "atp": "atp-oracle",
+}
+SPORTS_CLASSIFICATIONS = frozenset({"nfl", "mlb", "nba", "atp", "other_sports"})
+MONTHS = {
+    "JAN": 1,
+    "FEB": 2,
+    "MAR": 3,
+    "APR": 4,
+    "MAY": 5,
+    "JUN": 6,
+    "JUL": 7,
+    "AUG": 8,
+    "SEP": 9,
+    "OCT": 10,
+    "NOV": 11,
+    "DEC": 12,
 }
 SOFT_ROUTES = {
     "other_sports",
@@ -57,6 +112,10 @@ CSV_FIELDS = [
     "model_route",
     "status",
     "time_to_close_hours",
+    "time_to_settlement_hours",
+    "settlement_time",
+    "settlement_time_source",
+    "horizon_time_basis",
     "yes_bid",
     "yes_ask",
     "yes_spread",
@@ -81,11 +140,11 @@ class KalshiUniverseScanArtifacts:
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 def iso_from_ts(ts: float) -> str:
-    return datetime.fromtimestamp(ts, timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.fromtimestamp(ts, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 async def capture_kalshi_universe_snapshot(
@@ -95,8 +154,11 @@ async def capture_kalshi_universe_snapshot(
     include_unopened: bool = False,
     limit: int = DEFAULT_LIMIT,
     max_pages: int = DEFAULT_MAX_PAGES,
-    created_ts: Optional[float] = None,
-    client: Optional[KalshiMarketDataClient] = None,
+    created_ts: float | None = None,
+    client: KalshiMarketDataClient | None = None,
+    broad_mve_filters: Sequence[str | None] = DEFAULT_BROAD_MVE_FILTERS,
+    focused_sports_series: Sequence[str] = DEFAULT_FOCUSED_SPORTS_SERIES,
+    focused_sports_fetch_max_close_hours: float = DEFAULT_FOCUSED_SPORTS_FETCH_MAX_CLOSE_HOURS,
 ) -> dict[str, Any]:
     ts = float(created_ts or time.time())
     min_close_ts = int(ts + min_close_hours * 3600)
@@ -115,6 +177,9 @@ async def capture_kalshi_universe_snapshot(
             min_close_hours=min_close_hours,
             max_close_hours=max_close_hours,
             include_unopened=include_unopened,
+            broad_mve_filters=broad_mve_filters,
+            focused_sports_series=focused_sports_series,
+            focused_sports_fetch_max_close_hours=focused_sports_fetch_max_close_hours,
         )
 
     config = load_config()
@@ -130,6 +195,9 @@ async def capture_kalshi_universe_snapshot(
             min_close_hours=min_close_hours,
             max_close_hours=max_close_hours,
             include_unopened=include_unopened,
+            broad_mve_filters=broad_mve_filters,
+            focused_sports_series=focused_sports_series,
+            focused_sports_fetch_max_close_hours=focused_sports_fetch_max_close_hours,
         )
 
 
@@ -145,6 +213,9 @@ async def _capture_with_client(
     min_close_hours: float,
     max_close_hours: float,
     include_unopened: bool,
+    broad_mve_filters: Sequence[str | None],
+    focused_sports_series: Sequence[str],
+    focused_sports_fetch_max_close_hours: float,
 ) -> dict[str, Any]:
     series_index, series_error = await _series_index(client)
     markets_by_ticker: dict[str, dict[str, Any]] = {}
@@ -152,42 +223,63 @@ async def _capture_with_client(
     fetch_errors: dict[str, str] = {}
 
     for status in statuses:
-        try:
-            markets = await client.fetch_markets(
-                status=status,
-                limit=limit,
-                max_pages=max_pages,
-                min_close_ts=min_close_ts,
-                max_close_ts=max_close_ts,
-                mve_filter="exclude",
+        for mve_filter in broad_mve_filters:
+            fetch_key = f"{status}:mve_{mve_label(mve_filter)}"
+            try:
+                markets = await client.fetch_markets(
+                    status=status,
+                    limit=limit,
+                    max_pages=max_pages,
+                    min_close_ts=min_close_ts,
+                    max_close_ts=max_close_ts,
+                    mve_filter=mve_filter,
+                )
+            except Exception as exc:
+                markets = []
+                fetch_errors[fetch_key] = str(exc)
+            status_counts[fetch_key] = len(markets)
+            merge_markets(
+                markets_by_ticker,
+                markets,
+                series_index=series_index,
+                discovery_source=f"public_markets_status_{status}_mve_{mve_label(mve_filter)}",
             )
-        except Exception as exc:  # noqa: BLE001 - capture provider error in report.
-            markets = []
-            fetch_errors[status] = str(exc)
-        status_counts[status] = len(markets)
-        for market in markets:
-            if not isinstance(market, Mapping):
-                continue
-            ticker = str(market.get("ticker") or "").strip()
-            if not ticker:
-                continue
-            enriched = dict(market)
-            series_ticker = str(enriched.get("series_ticker") or infer_series_ticker(enriched) or "")
-            if series_ticker:
-                enriched["series_ticker"] = series_ticker
-                series = series_index.get(series_ticker)
-                if series:
-                    enriched.setdefault("category", series.get("category"))
-                    enriched.setdefault("tags", series.get("tags"))
-                    enriched.setdefault("series_title", series.get("title"))
-                    enriched.setdefault("settlement_sources", series.get("settlement_sources"))
-            markets_by_ticker[ticker] = enriched
+
+    focused_counts: dict[str, int] = {}
+    focused_max_close_ts = int(
+        created_ts + max(max_close_hours, focused_sports_fetch_max_close_hours) * 3600
+    )
+    for status in statuses:
+        for series_ticker in dedupe_nonempty(focused_sports_series):
+            fetch_key = f"{status}:series_{series_ticker}:mve_default"
+            try:
+                markets = await client.fetch_markets(
+                    status=status,
+                    limit=limit,
+                    max_pages=max_pages,
+                    min_close_ts=min_close_ts,
+                    max_close_ts=focused_max_close_ts,
+                    series_ticker=series_ticker,
+                    mve_filter=None,
+                )
+            except Exception as exc:
+                markets = []
+                fetch_errors[fetch_key] = str(exc)
+            focused_counts[fetch_key] = len(markets)
+            merge_markets(
+                markets_by_ticker,
+                markets,
+                series_index=series_index,
+                discovery_source=f"public_markets_series_{series_ticker}",
+            )
 
     markets = sorted(markets_by_ticker.values(), key=lambda row: str(row.get("ticker") or ""))
     return {
         "schema_version": 1,
         "created_at_utc": iso_from_ts(created_ts),
-        "status": "kalshi_universe_public_fetch_ok" if markets else "kalshi_universe_public_fetch_empty",
+        "status": "kalshi_universe_public_fetch_ok"
+        if markets
+        else "kalshi_universe_public_fetch_empty",
         "research_only": True,
         "execution_enabled": False,
         "safety": safety_flags(public_market_data_calls=True),
@@ -195,9 +287,12 @@ async def _capture_with_client(
             "statuses": list(statuses),
             "limit": limit,
             "max_pages": max_pages,
-            "mve_filter": "exclude",
+            "broad_mve_filters": [mve_label(value) for value in broad_mve_filters],
+            "focused_sports_series": list(dedupe_nonempty(focused_sports_series)),
+            "focused_sports_fetch_max_close_hours": focused_sports_fetch_max_close_hours,
             "min_close_ts": min_close_ts,
             "max_close_ts": max_close_ts,
+            "focused_sports_max_close_ts": focused_max_close_ts,
             "min_close_hours": min_close_hours,
             "max_close_hours": max_close_hours,
             "include_unopened": include_unopened,
@@ -209,6 +304,7 @@ async def _capture_with_client(
         "summary": {
             "market_count": len(markets),
             "status_counts": status_counts,
+            "focused_series_counts": focused_counts,
             "fetch_error_count": len(fetch_errors) + (1 if series_error else 0),
             "fetch_errors": fetch_errors,
         },
@@ -216,12 +312,59 @@ async def _capture_with_client(
     }
 
 
-async def _series_index(client: KalshiMarketDataClient) -> tuple[dict[str, dict[str, Any]], str | None]:
+def merge_markets(
+    markets_by_ticker: dict[str, dict[str, Any]],
+    markets: Sequence[Any],
+    *,
+    series_index: Mapping[str, Mapping[str, Any]],
+    discovery_source: str,
+) -> None:
+    for market in markets:
+        if not isinstance(market, Mapping):
+            continue
+        ticker = str(market.get("ticker") or "").strip()
+        if not ticker:
+            continue
+        enriched = dict(market)
+        series_ticker = str(enriched.get("series_ticker") or infer_series_ticker(enriched) or "")
+        if series_ticker:
+            enriched["series_ticker"] = series_ticker
+            series = series_index.get(series_ticker)
+            if series:
+                enriched.setdefault("category", series.get("category"))
+                enriched.setdefault("tags", series.get("tags"))
+                enriched.setdefault("series_title", series.get("title"))
+                enriched.setdefault("settlement_sources", series.get("settlement_sources"))
+        enriched.setdefault("discovery_source", discovery_source)
+        existing = markets_by_ticker.get(ticker)
+        if existing and existing.get("discovery_source"):
+            enriched["discovery_source"] = f"{existing['discovery_source']},{discovery_source}"
+        markets_by_ticker[ticker] = enriched
+
+
+def mve_label(value: str | None) -> str:
+    return value if value is not None else "default"
+
+
+def dedupe_nonempty(values: Sequence[str]) -> tuple[str, ...]:
+    seen: set[str] = set()
+    output: list[str] = []
+    for value in values:
+        cleaned = str(value or "").strip().upper()
+        if cleaned and cleaned not in seen:
+            seen.add(cleaned)
+            output.append(cleaned)
+    return tuple(output)
+
+
+async def _series_index(
+    client: KalshiMarketDataClient,
+) -> tuple[dict[str, dict[str, Any]], str | None]:
     if not hasattr(client, "fetch_series_list"):
         return {}, None
     try:
         series = await client.fetch_series_list(include_product_metadata=False, include_volume=True)
-    except Exception as exc:  # noqa: BLE001 - classification can continue without series metadata.
+    except Exception as exc:
         return {}, str(exc)
     return {
         str(item.get("ticker") or ""): dict(item)
@@ -264,7 +407,9 @@ def build_universe_scan_report(
     candidates.sort(
         key=lambda row: (
             -float(row.get("softness_score") or 0.0),
-            float(row.get("time_to_close_hours") or 999999.0),
+            float(
+                row.get("time_to_settlement_hours") or row.get("time_to_close_hours") or 999999.0
+            ),
             str(row.get("ticker") or ""),
         )
     )
@@ -272,9 +417,7 @@ def build_universe_scan_report(
     model_route_candidates = [
         row for row in candidates if row.get("classification") in CORE_MODEL_ROUTES
     ]
-    soft_watch_candidates = [
-        row for row in candidates if row.get("classification") in SOFT_ROUTES
-    ]
+    soft_watch_candidates = [row for row in candidates if row.get("classification") in SOFT_ROUTES]
     if snapshot.get("status") == "kalshi_universe_public_fetch_empty" and not candidates:
         status = "universe_scan_blocked_public_fetch_failed"
     elif model_route_candidates:
@@ -304,14 +447,14 @@ def build_universe_scan_report(
             "model_route_candidate_count": len(model_route_candidates),
             "soft_watch_candidate_count": len(soft_watch_candidates),
             "settlement_window": {
-                "min_close_hours": min_hours,
-                "max_close_hours": max_hours,
+                "min_hours": min_hours,
+                "max_hours": max_hours,
+                "basis": "sports settlement horizon when sports; close horizon otherwise",
+                "legacy_min_close_hours": min_hours,
+                "legacy_max_close_hours": max_hours,
             },
             "classification_counts": counts(row.get("classification") for row in candidates),
-            "route_counts": {
-                route: len(rows)
-                for route, rows in routes.get("routes", {}).items()
-            },
+            "route_counts": {route: len(rows) for route, rows in routes.get("routes", {}).items()},
             "gate_counts": counts(row.get("gate_status") for row in candidates),
         },
         "contract_math": {
@@ -339,13 +482,19 @@ def candidate_from_market(
     min_close_hours: float,
     max_close_hours: float,
 ) -> dict[str, Any] | None:
-    close_ts = close_timestamp(market)
-    if close_ts is None:
+    classification = classify_market(market)
+    settlement = settlement_time_fields(market, classification=classification)
+    settlement_ts = settlement["timestamp"]
+    if settlement_ts is None:
         return None
-    time_to_close_hours = (close_ts - as_of_ts) / 3600
-    if time_to_close_hours < min_close_hours or time_to_close_hours > max_close_hours:
+    time_to_settlement_hours = (settlement_ts - as_of_ts) / 3600
+    if time_to_settlement_hours < min_close_hours or time_to_settlement_hours > max_close_hours:
         return None
 
+    close_ts = close_timestamp(market)
+    if close_ts is None:
+        close_ts = settlement_ts
+    time_to_close_hours = (close_ts - as_of_ts) / 3600
     ticker = str(market.get("ticker") or "")
     series_ticker = str(market.get("series_ticker") or infer_series_ticker(market) or "")
     yes_bid = money(market.get("yes_bid_dollars"))
@@ -365,9 +514,11 @@ def candidate_from_market(
         ticker=ticker,
     )
     resolution_rule = official_rules(market)
-    classification = classify_market(market)
     model_route = model_route_for(classification)
-    softness_score, softness_reasons = softness(market, classification=classification, as_of_ts=as_of_ts)
+    event_start = event_start_time_fields(market, classification=classification)
+    softness_score, softness_reasons = softness(
+        market, classification=classification, as_of_ts=as_of_ts
+    )
     gate_status, gate_reasons = candidate_gate(
         ticker=ticker,
         yes_ask=yes_ask,
@@ -389,15 +540,27 @@ def candidate_from_market(
         "expiration_time": market.get("expiration_time"),
         "close_ts": close_ts,
         "time_to_close_hours": round(time_to_close_hours, 4),
+        "settlement_ts": settlement_ts,
+        "settlement_time": settlement["iso"],
+        "settlement_time_source": settlement["source"],
+        "time_to_settlement_hours": round(time_to_settlement_hours, 4),
+        "horizon_time_basis": settlement["basis"],
+        "event_start_time": event_start["iso"],
+        "event_start_time_source": event_start["source"],
         "yes_bid": yes_bid,
         "yes_ask": yes_ask,
         "no_bid": no_bid,
         "no_ask": no_ask,
-        "yes_spread": round(yes_ask - yes_bid, 6) if yes_ask is not None and yes_bid is not None else None,
-        "no_spread": round(no_ask - no_bid, 6) if no_ask is not None and no_bid is not None else None,
+        "yes_spread": round(yes_ask - yes_bid, 6)
+        if yes_ask is not None and yes_bid is not None
+        else None,
+        "no_spread": round(no_ask - no_bid, 6)
+        if no_ask is not None and no_bid is not None
+        else None,
         "volume": number(market.get("volume_fp")) or number(market.get("volume")),
         "volume_24h": number(market.get("volume_24h_fp")) or number(market.get("volume_24h")),
-        "open_interest": number(market.get("open_interest_fp")) or number(market.get("open_interest")),
+        "open_interest": number(market.get("open_interest_fp"))
+        or number(market.get("open_interest")),
         "liquidity": money(market.get("liquidity_dollars")),
         "official_rules_hash": sha256_text(resolution_rule) if resolution_rule else None,
         "official_rules_source": "public_kalshi_market_payload" if resolution_rule else None,
@@ -433,25 +596,41 @@ def classify_market(market: Mapping[str, Any]) -> str:
     text = searchable_text(market)
     if series.startswith("KXNFL") or re.search(r"\b(nfl|pro football|super bowl)\b", text):
         return "nfl"
-    if series.startswith("KXMLB") or re.search(r"\b(mlb|baseball|world series)\b", text):
+    if series.startswith(("KXMLB", "KXLMB", "KXKBO", "KXWBCGAME")) or re.search(
+        r"\b(mlb|baseball|world series|mexican baseball|kbo)\b",
+        text,
+    ):
         return "mlb"
     if series.startswith("KXNBA") or re.search(r"\b(nba|basketball)\b", text):
         return "nba"
-    if re.search(r"\b(atp|tennis|wimbledon|us open|australian open|french open)\b", text):
+    if series.startswith(("KXATP", "KXTENNIS", "KXWIM")) or re.search(
+        r"\b(atp|tennis|wimbledon|us open|australian open|french open)\b",
+        text,
+    ):
         return "atp"
     if re.search(r"\b(weather|temperature|rain|snow|hurricane|tornado|noaa|wind|heat)\b", text):
         return "weather"
-    if re.search(r"\b(cpi|inflation|fomc|fed|interest rate|jobs report|unemployment|gdp|pce|treasury)\b", text):
+    if re.search(
+        r"\b(cpi|inflation|fomc|fed|interest rate|jobs report|unemployment|gdp|pce|treasury)\b",
+        text,
+    ):
         return "macro_econ"
-    if re.search(r"\b(election|president|congress|senate|house|supreme court|bill|vote|tariff)\b", text):
+    if re.search(
+        r"\b(election|president|congress|senate|house|supreme court|bill|vote|tariff)\b", text
+    ):
         return "politics_policy"
     if re.search(r"\b(bitcoin|btc|ethereum|crypto|nasdaq|s&p|stock|oil|gold|dollar|yield)\b", text):
         return "finance_crypto"
     if re.search(r"\b(oscar|grammy|movie|box office|album|song|tv|streaming)\b", text):
         return "entertainment"
-    if re.search(r"\b(ukraine|russia|iran|israel|gaza|nato|war|ceasefire|hormuz|china|taiwan)\b", text):
+    if re.search(
+        r"\b(ukraine|russia|iran|israel|gaza|nato|war|ceasefire|hormuz|china|taiwan)\b", text
+    ):
         return "geopolitics"
-    if re.search(r"\b(nhl|soccer|golf|ufc|boxing|racing|cricket)\b", text):
+    if series in DEFAULT_WORLD_CUP_SOCCER_SERIES or re.search(
+        r"\b(nhl|soccer|world cup|fifa|uefa|champions league|epl|golf|ufc|boxing|racing|cricket)\b",
+        text,
+    ):
         return "other_sports"
     return "unknown_soft_watch"
 
@@ -472,7 +651,88 @@ def model_route_reason(classification: str) -> str:
     return "unrouted classification"
 
 
-def softness(market: Mapping[str, Any], *, classification: str, as_of_ts: float) -> tuple[float, list[str]]:
+def settlement_time_fields(market: Mapping[str, Any], *, classification: str) -> dict[str, Any]:
+    """Return the horizon timestamp used for inventory filtering.
+
+    Sports contracts can retain an administrative ``close_time`` beyond the event
+    horizon. For game/match discovery, the actionable horizon is expected
+    expiration/settlement. Non-sports keep the historical close-time behavior.
+    """
+    if classification in SPORTS_CLASSIFICATIONS:
+        keys = ("expected_expiration_time", "expiration_time", "settlement_time")
+        basis = "sports_expected_expiration_time"
+    else:
+        keys = ("close_time", "expected_expiration_time", "expiration_time")
+        basis = "close_time"
+    for key in keys:
+        ts = timestamp(market.get(key))
+        if ts is not None:
+            return {"timestamp": ts, "iso": iso_from_ts(ts), "source": key, "basis": basis}
+    if classification == "atp":
+        event_probe = event_ticker_probe_time(market)
+        close_ts = timestamp(market.get("close_time"))
+        if event_probe["timestamp"] is not None and (
+            close_ts is None or event_probe["timestamp"] <= close_ts
+        ):
+            return {**event_probe, "basis": "sports_event_ticker_probe_schedule"}
+        if close_ts is not None:
+            return {
+                "timestamp": close_ts,
+                "iso": iso_from_ts(close_ts),
+                "source": "close_time",
+                "basis": "sports_close_time_fallback",
+            }
+    if classification in SPORTS_CLASSIFICATIONS:
+        ts = timestamp(market.get("close_time"))
+        if ts is not None:
+            return {
+                "timestamp": ts,
+                "iso": iso_from_ts(ts),
+                "source": "close_time",
+                "basis": "sports_close_time_fallback",
+            }
+    return {"timestamp": None, "iso": None, "source": None, "basis": basis}
+
+
+def event_start_time_fields(market: Mapping[str, Any], *, classification: str) -> dict[str, Any]:
+    if classification not in SPORTS_CLASSIFICATIONS:
+        return {"timestamp": None, "iso": None, "source": None}
+    for key in ("event_start_time", "scheduled_start_time", "event_time", "game_start_time"):
+        ts = timestamp(market.get(key))
+        if ts is not None:
+            return {"timestamp": ts, "iso": iso_from_ts(ts), "source": key}
+    return {"timestamp": None, "iso": None, "source": None}
+
+
+def event_ticker_probe_time(market: Mapping[str, Any]) -> dict[str, Any]:
+    event_ticker = str(market.get("event_ticker") or market.get("ticker") or "")
+    match = re.search(
+        r"-(?P<year>\d{2})(?P<month>[A-Z]{3})(?P<day>\d{2})(?P<hour>\d{2})?(?P<minute>\d{2})?",
+        event_ticker,
+    )
+    if not match:
+        return {"timestamp": None, "iso": None, "source": None}
+    month = MONTHS.get(match.group("month"))
+    if month is None:
+        return {"timestamp": None, "iso": None, "source": None}
+    year = 2000 + int(match.group("year"))
+    day = int(match.group("day"))
+    hour_text = match.group("hour")
+    minute_text = match.group("minute")
+    if hour_text is not None and minute_text is not None:
+        dt = datetime(year, month, day, int(hour_text), int(minute_text), tzinfo=UTC) + timedelta(
+            hours=6
+        )
+        source = "event_ticker_datetime_plus_6h_probe_schedule"
+    else:
+        dt = datetime(year, month, day, tzinfo=UTC) + timedelta(days=1, hours=6)
+        source = "event_ticker_date_next_morning_probe_schedule"
+    return {"timestamp": dt.timestamp(), "iso": iso_from_ts(dt.timestamp()), "source": source}
+
+
+def softness(  # noqa: C901
+    market: Mapping[str, Any], *, classification: str, as_of_ts: float
+) -> tuple[float, list[str]]:
     score = 0.0
     reasons: list[str] = []
     yes_bid = money(market.get("yes_bid_dollars"))
@@ -501,9 +761,9 @@ def softness(market: Mapping[str, Any], *, classification: str, as_of_ts: float)
         score += 0.08
         reasons.append("thin lifetime volume")
 
-    close_ts = close_timestamp(market)
-    if close_ts is not None:
-        hours = (close_ts - as_of_ts) / 3600
+    settlement_ts = settlement_time_fields(market, classification=classification)["timestamp"]
+    if settlement_ts is not None:
+        hours = (settlement_ts - as_of_ts) / 3600
         if hours <= 6:
             score += 0.18
             reasons.append("settles within 6h")
@@ -565,7 +825,14 @@ def route_groups(candidates: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     for route, rows in routes.items():
         routes[route] = sorted(
             rows,
-            key=lambda row: (-float(row.get("softness_score") or 0.0), float(row.get("time_to_close_hours") or 999999.0)),
+            key=lambda row: (
+                -float(row.get("softness_score") or 0.0),
+                float(
+                    row.get("time_to_settlement_hours")
+                    or row.get("time_to_close_hours")
+                    or 999999.0
+                ),
+            ),
         )
     return {
         "schema_version": 1,
@@ -584,6 +851,10 @@ def compact_candidate(candidate: Mapping[str, Any]) -> dict[str, Any]:
         "classification": candidate.get("classification"),
         "model_route": candidate.get("model_route"),
         "time_to_close_hours": candidate.get("time_to_close_hours"),
+        "time_to_settlement_hours": candidate.get("time_to_settlement_hours"),
+        "settlement_time": candidate.get("settlement_time"),
+        "settlement_time_source": candidate.get("settlement_time_source"),
+        "horizon_time_basis": candidate.get("horizon_time_basis"),
         "yes_ask": candidate.get("yes_ask"),
         "no_ask": candidate.get("no_ask"),
         "softness_score": candidate.get("softness_score"),
@@ -633,12 +904,16 @@ def write_universe_scan_artifacts(
 
     macro_dir.mkdir(parents=True, exist_ok=True)
     (macro_dir / "latest-kalshi-universe-scan.json").write_text(report_text, encoding="utf-8")
-    write_candidates_csv(report.get("candidates", []), macro_dir / "latest-kalshi-universe-candidates.csv")
+    write_candidates_csv(
+        report.get("candidates", []), macro_dir / "latest-kalshi-universe-candidates.csv"
+    )
     (macro_dir / "latest-kalshi-universe-routes.json").write_text(
         json.dumps(report.get("routes", {}), indent=2, sort_keys=True, default=str) + "\n",
         encoding="utf-8",
     )
-    (macro_dir / "latest-kalshi-soft-market-watch.md").write_text(render_soft_watch(report), encoding="utf-8")
+    (macro_dir / "latest-kalshi-soft-market-watch.md").write_text(
+        render_soft_watch(report), encoding="utf-8"
+    )
 
     return KalshiUniverseScanArtifacts(
         snapshot_path=snapshot_path,
@@ -675,17 +950,26 @@ def render_soft_watch(report: Mapping[str, Any]) -> str:
         "- Execution enabled: `false`",
         "- EV policy: not evaluated here; use the EV ledger after calibrated probabilities exist.",
         "",
-        "| Rank | Ticker | Route | Closes (h) | Softness | Reason | Needed Evidence |",
+        "| Rank | Ticker | Route | Settles (h) | Softness | Reason | Needed Evidence |",
         "| ---: | --- | --- | ---: | ---: | --- | --- |",
     ]
     for idx, row in enumerate(candidates[:25], start=1):
         reasons = "; ".join(str(reason) for reason in row.get("softness_reasons") or [])
         lines.append(
             f"| {idx} | `{row.get('ticker')}` | `{row.get('classification')}` | "
-            f"{fmt(row.get('time_to_close_hours'))} | {fmt(row.get('softness_score'))} | "
+            f"{fmt(row.get('time_to_settlement_hours') or row.get('time_to_close_hours'))} | "
+            f"{fmt(row.get('softness_score'))} | "
             f"{reasons or 'none'} | {needed_evidence(str(row.get('classification') or ''))} |"
         )
-    lines.extend(["", "## Guardrail", "", "This watchlist is not a list of bets. It is a routing inventory.", ""])
+    lines.extend(
+        [
+            "",
+            "## Guardrail",
+            "",
+            "This watchlist is not a list of bets. It is a routing inventory.",
+            "",
+        ]
+    )
     return "\n".join(lines)
 
 
@@ -781,7 +1065,9 @@ def timestamp(value: Any) -> float | None:
 
 
 def infer_series_ticker(market: Mapping[str, Any]) -> str:
-    ticker = str(market.get("series_ticker") or market.get("event_ticker") or market.get("ticker") or "")
+    ticker = str(
+        market.get("series_ticker") or market.get("event_ticker") or market.get("ticker") or ""
+    )
     if "-" in ticker:
         return ticker.split("-", 1)[0]
     return ticker
@@ -848,9 +1134,16 @@ def fmt(value: Any) -> str:
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Scan the public Kalshi market universe in research-only mode.")
+    parser = argparse.ArgumentParser(
+        description="Scan the public Kalshi market universe in research-only mode."
+    )
     parser.add_argument("--min-close-hours", type=float, default=DEFAULT_MIN_CLOSE_HOURS)
     parser.add_argument("--max-close-hours", type=float, default=DEFAULT_MAX_CLOSE_HOURS)
+    parser.add_argument(
+        "--focused-sports-fetch-max-close-hours",
+        type=float,
+        default=DEFAULT_FOCUSED_SPORTS_FETCH_MAX_CLOSE_HOURS,
+    )
     parser.add_argument("--include-unopened", action="store_true")
     parser.add_argument("--limit", type=int, default=DEFAULT_LIMIT)
     parser.add_argument("--max-pages", type=int, default=DEFAULT_MAX_PAGES)
@@ -861,10 +1154,13 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     return parser.parse_args(argv)
 
 
-async def _async_main(args: argparse.Namespace) -> tuple[dict[str, Any], KalshiUniverseScanArtifacts | None]:
+async def _async_main(
+    args: argparse.Namespace,
+) -> tuple[dict[str, Any], KalshiUniverseScanArtifacts | None]:
     snapshot = await capture_kalshi_universe_snapshot(
         min_close_hours=args.min_close_hours,
         max_close_hours=args.max_close_hours,
+        focused_sports_fetch_max_close_hours=args.focused_sports_fetch_max_close_hours,
         include_unopened=args.include_unopened,
         limit=args.limit,
         max_pages=args.max_pages,

@@ -6,14 +6,14 @@ import argparse
 import asyncio
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import datetime, timezone
+from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any
 
 from predmarket.config import load_config
 from predmarket.kalshi_dataset import KalshiMarketDataClient
-
 
 DEFAULT_MLB_SERIES = (
     "KXMLBGAME",
@@ -24,11 +24,16 @@ DEFAULT_MLB_SERIES = (
     "KXMLBF5SPREAD",
 )
 
+SERIES_SNAPSHOT_PREFIXES = {
+    ("KXNFLGAME",): "kalshi_nfl_game_series",
+    ("KXWCGAME",): "kalshi_world_cup_game_series",
+}
+
 
 @dataclass(frozen=True)
 class KalshiManualDropCaptureArtifacts:
-    snapshot: Dict[str, Any]
-    report: Dict[str, Any]
+    snapshot: dict[str, Any]
+    report: dict[str, Any]
     snapshot_path: Path
     latest_path: Path
     report_json_path: Path
@@ -42,14 +47,14 @@ async def capture_kalshi_market_snapshot(
     limit: int = 100,
     max_pages: int = 1,
     delay_seconds: float = 0.75,
-    created_ts: Optional[float] = None,
-    client: Optional[KalshiMarketDataClient] = None,
-) -> Dict[str, Any]:
+    created_ts: float | None = None,
+    client: KalshiMarketDataClient | None = None,
+) -> dict[str, Any]:
     ts = float(created_ts or time.time())
     created_at = _iso_ts(ts)
-    all_markets: List[Dict[str, Any]] = []
-    series_counts: Dict[str, int] = {}
-    series_errors: Dict[str, str] = {}
+    all_markets: list[dict[str, Any]] = []
+    series_counts: dict[str, int] = {}
+    series_errors: dict[str, str] = {}
 
     if client is not None:
         for series in series_tickers:
@@ -82,11 +87,15 @@ async def capture_kalshi_market_snapshot(
                 if delay_seconds > 0:
                     await asyncio.sleep(delay_seconds)
 
-    all_markets.sort(key=lambda row: (str(row.get("event_ticker") or ""), str(row.get("ticker") or "")))
+    all_markets.sort(
+        key=lambda row: (str(row.get("event_ticker") or ""), str(row.get("ticker") or ""))
+    )
     return {
         "schema_version": 1,
         "created_at_utc": created_at,
-        "status": "kalshi_mlb_game_series_public_fetch_ok" if all_markets else "kalshi_mlb_game_series_public_fetch_empty",
+        "status": "kalshi_manual_drop_public_fetch_ok"
+        if all_markets
+        else "kalshi_manual_drop_public_fetch_empty",
         "research_only": True,
         "execution_enabled": False,
         "safety": {
@@ -112,13 +121,15 @@ async def _capture_series(
     status: str,
     limit: int,
     max_pages: int,
-    all_markets: List[Dict[str, Any]],
-    series_counts: Dict[str, int],
-    series_errors: Dict[str, str],
+    all_markets: list[dict[str, Any]],
+    series_counts: dict[str, int],
+    series_errors: dict[str, str],
 ) -> None:
     try:
-        markets = await client.fetch_markets(status=status, limit=limit, max_pages=max_pages, series_ticker=series)
-    except Exception as exc:  # noqa: BLE001 - report provider errors without aborting the whole capture.
+        markets = await client.fetch_markets(
+            status=status, limit=limit, max_pages=max_pages, series_ticker=series
+        )
+    except Exception as exc:
         series_counts[series] = 0
         series_errors[series] = str(exc)
         return
@@ -129,14 +140,18 @@ async def _capture_series(
 def build_capture_report(
     snapshot: Mapping[str, Any],
     *,
-    snapshot_path: Optional[Path] = None,
-    latest_path: Optional[Path] = None,
-) -> Dict[str, Any]:
-    series_errors = snapshot.get("series_errors") if isinstance(snapshot.get("series_errors"), Mapping) else {}
+    snapshot_path: Path | None = None,
+    latest_path: Path | None = None,
+) -> dict[str, Any]:
+    series_errors = (
+        snapshot.get("series_errors") if isinstance(snapshot.get("series_errors"), Mapping) else {}
+    )
     return {
         "schema_version": 1,
         "created_at_utc": snapshot.get("created_at_utc"),
-        "status": "kalshi_manual_drop_capture_written" if snapshot.get("market_count") else "kalshi_manual_drop_capture_empty",
+        "status": "kalshi_manual_drop_capture_written"
+        if snapshot.get("market_count")
+        else "kalshi_manual_drop_capture_empty",
         "research_only": True,
         "execution_enabled": False,
         "safety": dict(snapshot.get("safety") or {}),
@@ -163,9 +178,15 @@ def write_capture_artifacts(
 ) -> KalshiManualDropCaptureArtifacts:
     output_dir.mkdir(parents=True, exist_ok=True)
     report_dir.mkdir(parents=True, exist_ok=True)
-    stamp = str(snapshot.get("created_at_utc") or _iso_ts(time.time())).replace("-", "").replace(":", "").replace("+00:00", "Z")
+    stamp = (
+        str(snapshot.get("created_at_utc") or _iso_ts(time.time()))
+        .replace("-", "")
+        .replace(":", "")
+        .replace("+00:00", "Z")
+    )
     stamp = stamp.replace("T", "T").replace("Z", "Z")
-    snapshot_path = output_dir / f"kalshi_mlb_game_series_{stamp}.json"
+    snapshot_prefix = _snapshot_prefix(snapshot)
+    snapshot_path = output_dir / f"{snapshot_prefix}_{stamp}.json"
     text = json.dumps(snapshot, indent=2, sort_keys=True, default=str) + "\n"
     snapshot_path.write_text(text, encoding="utf-8")
     latest_path.parent.mkdir(parents=True, exist_ok=True)
@@ -173,7 +194,9 @@ def write_capture_artifacts(
     report = build_capture_report(snapshot, snapshot_path=snapshot_path, latest_path=latest_path)
     report_json_path = report_dir / f"{run_id}.json"
     report_markdown_path = report_dir / f"{run_id}.md"
-    report_json_path.write_text(json.dumps(report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8")
+    report_json_path.write_text(
+        json.dumps(report, indent=2, sort_keys=True, default=str) + "\n", encoding="utf-8"
+    )
     report_markdown_path.write_text(render_capture_report_markdown(report), encoding="utf-8")
     return KalshiManualDropCaptureArtifacts(
         snapshot=dict(snapshot),
@@ -183,6 +206,23 @@ def write_capture_artifacts(
         report_json_path=report_json_path,
         report_markdown_path=report_markdown_path,
     )
+
+
+def _snapshot_prefix(snapshot: Mapping[str, Any]) -> str:
+    series = tuple(str(value) for value in snapshot.get("series_tickers") or ())
+    if series == DEFAULT_MLB_SERIES:
+        return "kalshi_mlb_game_series"
+    if series in SERIES_SNAPSHOT_PREFIXES:
+        return SERIES_SNAPSHOT_PREFIXES[series]
+    if series:
+        normalized = "_".join(_normalize_series_part(value) for value in series)
+        return f"kalshi_{normalized}_series"
+    return "kalshi_manual_drop_series"
+
+
+def _normalize_series_part(value: str) -> str:
+    normalized = "".join(ch.lower() if ch.isalnum() else "_" for ch in value)
+    return "_".join(part for part in normalized.split("_") if part) or "unknown"
 
 
 def render_capture_report_markdown(report: Mapping[str, Any]) -> str:
@@ -223,7 +263,7 @@ def render_capture_report_markdown(report: Mapping[str, Any]) -> str:
 
 
 def _iso_ts(ts: float) -> str:
-    return datetime.fromtimestamp(ts, timezone.utc).isoformat(timespec="seconds").replace("+00:00", "Z")
+    return datetime.fromtimestamp(ts, UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
 
 
 async def _async_main(args: argparse.Namespace) -> KalshiManualDropCaptureArtifacts:
@@ -243,16 +283,23 @@ async def _async_main(args: argparse.Namespace) -> KalshiManualDropCaptureArtifa
     )
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
-    parser = argparse.ArgumentParser(description="Capture Kalshi MLB game-series market data into manual_drops.")
+def main(argv: Sequence[str] | None = None) -> int:
+    parser = argparse.ArgumentParser(
+        description="Capture Kalshi MLB game-series market data into manual_drops."
+    )
     parser.add_argument("--series-tickers", default=",".join(DEFAULT_MLB_SERIES))
     parser.add_argument("--status", default="open")
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=1)
     parser.add_argument("--delay-seconds", type=float, default=0.75)
     parser.add_argument("--output-dir", default="/home/mrwatson/manual_drops/kalshi")
-    parser.add_argument("--latest-path", default="/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_latest.json")
-    parser.add_argument("--report-dir", default="docs/codex/artifacts/kalshi-manual-drop-capture-latest")
+    parser.add_argument(
+        "--latest-path",
+        default="/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_latest.json",
+    )
+    parser.add_argument(
+        "--report-dir", default="docs/codex/artifacts/kalshi-manual-drop-capture-latest"
+    )
     parser.add_argument("--run-id", default="kalshi-manual-drop-capture-latest")
     args = parser.parse_args(argv)
     artifacts = asyncio.run(_async_main(args))

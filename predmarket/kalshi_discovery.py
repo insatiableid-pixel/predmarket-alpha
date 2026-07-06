@@ -12,9 +12,10 @@ import argparse
 import asyncio
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence
+from typing import Any
 
 from predmarket.config import Config, load_config
 from predmarket.discovery import AgenticDiscoveryConfig, AgenticSignalDiscoveryEngine
@@ -37,9 +38,9 @@ class KalshiDiscoveryRunnerConfig:
     backtest_min_train_size: int = 20
     backtest_test_size: int = 10
     backtest_step_size: int = 10
-    market_id: Optional[str] = None
-    min_as_of_ts: Optional[float] = None
-    max_as_of_ts: Optional[float] = None
+    market_id: str | None = None
+    min_as_of_ts: float | None = None
+    max_as_of_ts: float | None = None
 
     def to_discovery_config(self) -> AgenticDiscoveryConfig:
         return AgenticDiscoveryConfig(
@@ -58,7 +59,7 @@ class KalshiDiscoveryRunnerConfig:
 
 @dataclass
 class KalshiDiscoveryArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
@@ -66,7 +67,7 @@ class KalshiDiscoveryArtifacts:
 def load_rows_for_discovery(
     store: PointInTimeStore,
     config: KalshiDiscoveryRunnerConfig,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     rows = store.load_kalshi_resolved_rows(
         market_id=config.market_id,
         min_as_of_ts=config.min_as_of_ts,
@@ -75,7 +76,7 @@ def load_rows_for_discovery(
     return [row for row in rows if str(row.get("venue", "")).lower() == "kalshi"]
 
 
-def summarize_rows(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
+def summarize_rows(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
     if not rows:
         return {
             "n_rows": 0,
@@ -89,8 +90,8 @@ def summarize_rows(rows: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
             "liquidity_buckets": {},
         }
 
-    def counts(field: str) -> Dict[str, int]:
-        out: Dict[str, int] = {}
+    def counts(field: str) -> dict[str, int]:
+        out: dict[str, int] = {}
         for row in rows:
             key = str(row.get(field, "unknown"))
             out[key] = out.get(key, 0) + 1
@@ -117,7 +118,7 @@ def compact_discovery_report(
     rows: Sequence[Mapping[str, Any]],
     feature_catalog: Sequence[str],
     runner_config: KalshiDiscoveryRunnerConfig,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     full = discovery_report.to_dict()
     top = []
     for item in full.get("top_hypotheses", []):
@@ -226,13 +227,15 @@ def render_markdown_report(report: Mapping[str, Any]) -> str:
 def run_kalshi_discovery(
     store: PointInTimeStore,
     *,
-    config: Optional[KalshiDiscoveryRunnerConfig] = None,
-    reports_dir: Optional[Path] = None,
+    config: KalshiDiscoveryRunnerConfig | None = None,
+    reports_dir: Path | None = None,
 ) -> KalshiDiscoveryArtifacts:
     config = config or KalshiDiscoveryRunnerConfig()
     rows = load_rows_for_discovery(store, config)
     if not rows:
-        raise ValueError("No stored Kalshi resolved rows found. Run predmarket.kalshi_dataset --write first.")
+        raise ValueError(
+            "No stored Kalshi resolved rows found. Run predmarket.kalshi_dataset --write first."
+        )
     feature_catalog = KalshiResolvedDatasetBuilder.feature_catalog(rows)
     engine = AgenticSignalDiscoveryEngine(store=store)
     discovery_report = engine.run(
@@ -258,7 +261,7 @@ async def build_rows_if_requested(
     limit: int,
     max_pages: int,
     days_back: int,
-    series_ticker: Optional[str],
+    series_ticker: str | None,
     period_interval: int,
 ) -> int:
     if not enabled:
@@ -275,9 +278,13 @@ async def build_rows_if_requested(
     return len(result.rows)
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run Kalshi resolved-row alpha discovery")
-    parser.add_argument("--build-from-api", action="store_true", help="Fetch/persist fresh Kalshi settled rows before discovery")
+    parser.add_argument(
+        "--build-from-api",
+        action="store_true",
+        help="Fetch/persist fresh Kalshi settled rows before discovery",
+    )
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=1)
     parser.add_argument("--days-back", type=int, default=180)
@@ -298,7 +305,7 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
 
     app_config = load_config()
     store = PointInTimeStore(app_config.global_cfg.data_dir)
-    artifacts: Optional[KalshiDiscoveryArtifacts] = None
+    artifacts: KalshiDiscoveryArtifacts | None = None
     built_rows = 0
     try:
         built_rows = asyncio.run(

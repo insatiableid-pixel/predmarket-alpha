@@ -21,6 +21,7 @@ htmlcov/
 data/*.sqlite
 data/*.log
 data/*.jsonl
+data/kalshi_live/
 data/raw/*
 data/processed/*
 !data/raw/.gitkeep
@@ -41,16 +42,26 @@ tests/tmp_data/
 Thumbs.db
 
 # Agent / tool temp files
+.hermes/
 .hermes-tmp.*
 .agents/
 .subagent-*.md
 skills-lock.json
 pi-session-*.html
+Droid Readiness Fixes.*
 
 # Misc
 *.Zone.Identifier
 *:Zone.Identifier
 =*
+
+# Generated Codex/Kalshi research artifacts. Existing tracked snapshots remain
+# tracked; these rules keep newly generated runtime output directories out of
+# future hygiene commits.
+docs/codex/macro/*-latest/
+docs/codex/macro/latest-*
+docs/codex/artifacts/*-latest/
+docs/codex/macro/kalshi-sports-evidence-cycle.*
 
 # Local research/reference drops; keep curated docs explicit when needed
 *.pdf

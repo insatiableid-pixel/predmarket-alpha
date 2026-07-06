@@ -5,11 +5,13 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Any, Dict, Mapping, Optional, Sequence
+from typing import Any
 
 from predmarket.config import load_config
+from predmarket.kalshi_dataset import _stable_hash
 from predmarket.kalshi_research_cycle import (
     KalshiPaperConfig,
     open_paper_intents_missing_close_time,
@@ -18,13 +20,12 @@ from predmarket.kalshi_research_cycle import (
     stale_open_paper_intents,
     summarize_paper_ledger,
 )
-from predmarket.kalshi_dataset import _stable_hash
 from predmarket.store import PointInTimeStore
 
 
 @dataclass
 class KalshiPaperLedgerArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
 
@@ -33,9 +34,9 @@ def build_paper_ledger_report(
     intents: Sequence[Mapping[str, Any]],
     *,
     events: Sequence[Mapping[str, Any]] = (),
-    config: Optional[KalshiPaperConfig] = None,
-    created_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    config: KalshiPaperConfig | None = None,
+    created_ts: float | None = None,
+) -> dict[str, Any]:
     paper_config = config or KalshiPaperConfig()
     ts = float(created_ts or time.time())
     ledger = [dict(intent) for intent in intents]
@@ -221,8 +222,8 @@ def render_paper_ledger_markdown(report: Mapping[str, Any]) -> str:
 def run_paper_ledger_audit(
     store: PointInTimeStore,
     *,
-    config: Optional[KalshiPaperConfig] = None,
-    reports_dir: Optional[Path] = None,
+    config: KalshiPaperConfig | None = None,
+    reports_dir: Path | None = None,
 ) -> KalshiPaperLedgerArtifacts:
     ledger = store.load_kalshi_paper_intents()
     events = store.load_kalshi_paper_events()
@@ -236,24 +237,27 @@ def stable_ledger_report_id(
     events: Sequence[Mapping[str, Any]],
     config: KalshiPaperConfig,
 ) -> str:
-    return "kalshi-ledger-" + _stable_hash(
-        {
-            "ledger": list(ledger),
-            "events": list(events),
-            "config": {"paper": config.__dict__},
-        }
-    )[:16]
+    return (
+        "kalshi-ledger-"
+        + _stable_hash(
+            {
+                "ledger": list(ledger),
+                "events": list(events),
+                "config": {"paper": config.__dict__},
+            }
+        )[:16]
+    )
 
 
-def _status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
-    out: Dict[str, int] = {}
+def _status_counts(items: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    out: dict[str, int] = {}
     for item in items:
         status = str(item.get("status", "UNKNOWN"))
         out[status] = out.get(status, 0) + 1
     return dict(sorted(out.items()))
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Audit the Kalshi research-only paper ledger")
     parser.add_argument("--reports-dir", default=None)
     parser.add_argument("--min-settled-for-review", type=int, default=30)

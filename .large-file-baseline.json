@@ -1,6 +1,7 @@
 {
   "files": [
     "scripts/codex_macro_router.py",
-    "scripts/kalshi_contract_ev_ledger.py"
+    "scripts/kalshi_contract_ev_ledger.py",
+    "scripts/kalshi_signal_factory_status.py"
   ]
 }

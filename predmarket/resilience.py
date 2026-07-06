@@ -1,15 +1,19 @@
 """Resilience patterns for external API calls (Kalshi, Polymarket, Coinbase).
 
-Provides retry-with-exponential-backoff and circuit-breaker semantics using
-``tenacity``. External venue clients should wrap their network calls with
-``resilient_call`` to avoid cascading failures and respect rate limits.
+Provides retry-with-exponential-backoff, circuit-breaker, and token-bucket
+rate-limiting semantics. External venue clients should wrap their network calls
+with ``resilient_call`` or the ``TokenBucket`` rate limiter to avoid cascading
+failures and respect API rate limits.
 """
 
 from __future__ import annotations
 
+import asyncio
 import logging
+import threading
+import time
 from collections.abc import Callable
-from typing import Any, TypeVar
+from typing import TYPE_CHECKING, Any, TypeVar
 
 from tenacity import (
     before_sleep_log,
@@ -18,6 +22,9 @@ from tenacity import (
     stop_after_attempt,
     wait_exponential_jitter,
 )
+
+if TYPE_CHECKING:
+    from predmarket.config import Config
 
 logger = logging.getLogger(__name__)
 
@@ -59,6 +66,7 @@ class CircuitBreaker:
     @property
     def is_open(self) -> bool:
         import time
+
         if self._opened_at is None:
             return False
         if time.monotonic() - self._opened_at >= self.recovery_seconds:
@@ -71,6 +79,7 @@ class CircuitBreaker:
 
     def record_failure(self) -> None:
         import time
+
         self._consecutive_failures += 1
         if self._consecutive_failures >= self.failure_threshold:
             self._opened_at = time.monotonic()
@@ -132,3 +141,143 @@ def resilient_external_call(
         return breaker.call(func, *args, **kwargs)
 
     return _call()
+
+
+# ---------------------------------------------------------------------------
+# Token-bucket rate limiter
+# ---------------------------------------------------------------------------
+
+
+class RateLimitExceeded(RuntimeError):  # noqa: N818
+    """Raised when a rate-limited call is rejected (no-token-consumed mode)."""
+
+    def __init__(
+        self,
+        message: str = "Rate limit exceeded",
+        *,
+        retry_after_seconds: float = 0.0,
+        bucket_name: str = "",
+    ) -> None:
+        super().__init__(message)
+        self.retry_after_seconds = retry_after_seconds
+        self.bucket_name = bucket_name
+
+
+class TokenBucket:
+    """Token-bucket rate limiter with async and synchronous consumption paths.
+
+    Parameters
+    ----------
+    rate : float
+        Token replenishment rate in tokens per second.
+    burst : float
+        Maximum accumulated tokens (bucket capacity).
+    name : str
+        Human-readable name for logging/tracking.
+
+    The bucket supports both ``await consume()`` (asyncio callers) and
+    ``consume_sync()`` (synchronous callers).  Both are concurrency-safe using
+    independent locks for each path.  When tokens are exhausted the caller
+    blocks/awaits until sufficient tokens are available.
+    """
+
+    def __init__(self, rate: float, burst: float, name: str = "") -> None:
+        if rate <= 0:
+            raise ValueError(f"rate must be positive, got {rate}")
+        if burst <= 0:
+            raise ValueError(f"burst must be positive, got {burst}")
+        self.rate = rate
+        self.burst = burst
+        self.name = name
+        self._tokens: float = float(burst)
+        self._last_refill: float = 0.0
+        self._async_lock = asyncio.Lock()
+        self._sync_lock = threading.Lock()
+
+    def _refill(self) -> None:
+        now = time.monotonic()
+        if self._last_refill == 0.0:
+            self._last_refill = now
+            return
+        elapsed = now - self._last_refill
+        self._last_refill = now
+        self._tokens = min(self.burst, self._tokens + elapsed * self.rate)
+
+    async def consume(self, tokens: float = 1.0) -> float:
+        """Wait until *tokens* are available, consume them, return wait time."""
+        async with self._async_lock:
+            self._refill()
+            if self._tokens >= tokens:
+                self._tokens -= tokens
+                return 0.0
+            deficit = tokens - self._tokens
+            wait = deficit / self.rate
+            await asyncio.sleep(wait)
+            self._refill()
+            self._tokens = min(self._tokens, tokens)
+            self._tokens -= tokens
+            return wait
+
+    def consume_sync(self, tokens: float = 1.0, wait: bool = True) -> None:
+        """Synchronous token consumption.
+
+        If *wait* is ``True`` (default) the call blocks until tokens are
+        available.  If *wait* is ``False`` and insufficient tokens exist,
+        raises :class:`RateLimitExceeded`.
+        """
+        with self._sync_lock:
+            self._refill()
+            if self._tokens >= tokens:
+                self._tokens -= tokens
+                return
+            if not wait:
+                deficit = tokens - self._tokens
+                raise RateLimitExceeded(
+                    f"Rate limit exceeded for bucket '{self.name}' "
+                    f"(rate={self.rate}/s, burst={self.burst})",
+                    retry_after_seconds=deficit / self.rate,
+                    bucket_name=self.name,
+                )
+            deficit = tokens - self._tokens
+            wait_time = deficit / self.rate
+        time.sleep(wait_time)
+        with self._sync_lock:
+            self._refill()
+            self._tokens = min(self._tokens, tokens)
+            self._tokens -= tokens
+
+    @property
+    def available_tokens(self) -> float:
+        """Current stored token count (best-effort, not locked)."""
+        return min(self.burst, self._tokens)
+
+
+# Registry of named token buckets for rate limiting.
+_buckets: dict[str, TokenBucket] = {}
+
+
+def get_bucket(
+    name: str,
+    rate: float = 30.0,
+    burst: float = 60.0,
+) -> TokenBucket:
+    """Get or create a named token bucket instance."""
+    if name not in _buckets:
+        _buckets[name] = TokenBucket(rate=rate, burst=burst, name=name)
+    return _buckets[name]
+
+
+def rate_limit_config_from_app_config(
+    config: Config,
+) -> dict[str, tuple[float, float]]:
+    """Read rate-limit parameters from the application config.
+
+    Returns a dict mapping bucket names to ``(rate, burst)`` tuples:
+    - ``"public"`` — public/unauthenticated endpoints
+    - ``"auth"`` — authenticated endpoints
+    """
+    rl = config.kalshi_live.rate_limits
+    return {
+        "public": (rl.public_rate, rl.public_burst),
+        "auth": (rl.auth_rate, rl.auth_burst),
+    }

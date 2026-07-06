@@ -12,3 +12,20 @@ paths = [
 regexes = [
   '''[a-f0-9]{64}''',
 ]
+
+[[allowlists]]
+description = "Kalshi live-mode arming examples are explicit env-var guard values, not credentials."
+regexes = [
+  '''KALSHI_LIVE_TRADING_ENABLED=1''',
+  '''KALSHI_CONFIRM_PRODUCTION_LIVE=I_UNDERSTAND_KALSHI_LIVE_RISK''',
+]
+
+[[allowlists]]
+description = "Signal formula identifiers are deterministic research metadata, not credentials."
+regexes = [
+  '''depth_imbalance_yes_abs_gt_0_25''',
+  '''sports_proxy_strength_win_probability''',
+  '''world_cup_soccer_mechanical_gate_evidence''',
+  '''mlb_sports_mechanical_gate_evidence''',
+  '''atp_tennis_mechanical_gate_evidence''',
+]

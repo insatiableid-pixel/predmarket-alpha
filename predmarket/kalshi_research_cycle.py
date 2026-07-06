@@ -11,19 +11,19 @@ from __future__ import annotations
 import argparse
 import json
 import time
+from collections.abc import Mapping, Sequence
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Mapping, Optional, Sequence, Tuple
+from typing import Any
 
 from predmarket.config import Config, load_config
+from predmarket.kalshi_dataset import _stable_hash
 from predmarket.kalshi_live_rank import (
     KalshiLiveRankArtifacts,
     KalshiLiveRankConfig,
     run_kalshi_live_rank,
 )
-from predmarket.kalshi_dataset import _stable_hash
 from predmarket.store import PointInTimeStore
-
 
 HARD_PAPER_BLOCKING_REASONS = {
     "paper_duplicate_open_intent",
@@ -66,38 +66,35 @@ class KalshiResearchCycleConfig:
 
 @dataclass
 class KalshiResearchCycleArtifacts:
-    report: Dict[str, Any]
+    report: dict[str, Any]
     json_path: Path
     markdown_path: Path
-    live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None
+    live_rank_artifacts: KalshiLiveRankArtifacts | None = None
 
 
 def build_paper_intents(
     rank_report: Mapping[str, Any],
     *,
-    config: Optional[KalshiPaperConfig] = None,
+    config: KalshiPaperConfig | None = None,
     existing_intents: Sequence[Mapping[str, Any]] = (),
-    created_ts: Optional[float] = None,
-) -> Tuple[List[Dict[str, Any]], List[Dict[str, Any]]]:
+    created_ts: float | None = None,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
     paper_config = config or KalshiPaperConfig()
     ts = float(created_ts or time.time())
-    intents: List[Dict[str, Any]] = []
-    blocked: List[Dict[str, Any]] = []
-    event_stakes: Dict[str, float] = {}
+    intents: list[dict[str, Any]] = []
+    blocked: list[dict[str, Any]] = []
+    event_stakes: dict[str, float] = {}
     total_stake = 0.0
     rank_run_id = str(rank_report.get("run_id") or "")
     rank_created_ts = rank_report.get("created_ts")
     rank_age_hours = (
-        max((ts - float(rank_created_ts)) / 3600.0, 0.0)
-        if rank_created_ts is not None
-        else None
+        max((ts - float(rank_created_ts)) / 3600.0, 0.0) if rank_created_ts is not None else None
     )
     rank_report_stale = (
         rank_age_hours is None or rank_age_hours > paper_config.max_rank_report_age_hours
     )
     rank_report_research_only = (
-        rank_report.get("research_only") is True
-        and rank_report.get("execution_enabled") is False
+        rank_report.get("research_only") is True and rank_report.get("execution_enabled") is False
     )
     open_pairs = {
         (str(intent.get("market_id") or ""), str(intent.get("side") or "").upper())
@@ -139,7 +136,9 @@ def build_paper_intents(
             opp,
             config=paper_config,
             remaining_total=max(paper_config.max_total_stake_usd - total_stake, 0.0),
-            remaining_event=max(paper_config.max_event_stake_usd - event_stakes.get(event_id, 0.0), 0.0),
+            remaining_event=max(
+                paper_config.max_event_stake_usd - event_stakes.get(event_id, 0.0), 0.0
+            ),
         )
         if stake < paper_config.min_stake_usd:
             blocked.append({**opp, "paper_blocking_reasons": [*reasons, "stake_below_minimum"]})
@@ -191,7 +190,7 @@ def paper_blocking_reasons(
     opportunity: Mapping[str, Any],
     *,
     config: KalshiPaperConfig,
-) -> List[str]:
+) -> list[str]:
     reasons = list(opportunity.get("blocking_reasons", []))
     if str(opportunity.get("venue", "Kalshi")).lower() != "kalshi":
         reasons.append("paper_non_kalshi_opportunity")
@@ -229,7 +228,9 @@ def compute_paper_stake_usd(
     if base_cap <= 0:
         return 0.0
     edge_multiplier = min(edge / max(config.min_liquidity_adjusted_edge, 1e-9), 2.0) / 2.0
-    directional_multiplier = min(directional_edge / max(config.min_directional_edge, 1e-9), 2.0) / 2.0
+    directional_multiplier = (
+        min(directional_edge / max(config.min_directional_edge, 1e-9), 2.0) / 2.0
+    )
     stake = base_cap * min(edge_multiplier, directional_multiplier) * fill
     return float(round(max(stake, 0.0), 2))
 
@@ -238,10 +239,10 @@ def settle_paper_intents(
     intents: Sequence[Mapping[str, Any]],
     *,
     resolved_rows: Sequence[Mapping[str, Any]] = (),
-    outcomes: Optional[Mapping[str, int]] = None,
-    settled_ts: Optional[float] = None,
-) -> List[Dict[str, Any]]:
-    outcome_by_market: Dict[str, int] = {}
+    outcomes: Mapping[str, int] | None = None,
+    settled_ts: float | None = None,
+) -> list[dict[str, Any]]:
+    outcome_by_market: dict[str, int] = {}
     for row in resolved_rows:
         market_id = str(row.get("market_id") or "")
         if market_id and "outcome" in row:
@@ -249,7 +250,7 @@ def settle_paper_intents(
     if outcomes:
         outcome_by_market.update({str(k): int(v) for k, v in outcomes.items()})
 
-    settled: List[Dict[str, Any]] = []
+    settled: list[dict[str, Any]] = []
     ts = float(settled_ts or time.time())
     for intent in intents:
         market_id = str(intent.get("market_id") or "")
@@ -269,7 +270,9 @@ def settle_paper_intents(
                 "outcome_yes": outcome_yes,
                 "side_outcome": side_outcome,
                 "pnl_usd": float(round(pnl_usd, 4)),
-                "return_on_stake": float(round(pnl_usd / max(float(intent.get("stake_usd", 0.0)), 1e-9), 6)),
+                "return_on_stake": float(
+                    round(pnl_usd / max(float(intent.get("stake_usd", 0.0)), 1e-9), 6)
+                ),
             }
         )
     return settled
@@ -278,17 +281,17 @@ def settle_paper_intents(
 def run_kalshi_research_cycle(
     store: PointInTimeStore,
     *,
-    app_config: Optional[Config] = None,
-    config: Optional[KalshiResearchCycleConfig] = None,
-    rows: Optional[Sequence[Mapping[str, Any]]] = None,
-    rank_report: Optional[Mapping[str, Any]] = None,
-    outcomes: Optional[Mapping[str, int]] = None,
-    reports_dir: Optional[Path] = None,
+    app_config: Config | None = None,
+    config: KalshiResearchCycleConfig | None = None,
+    rows: Sequence[Mapping[str, Any]] | None = None,
+    rank_report: Mapping[str, Any] | None = None,
+    outcomes: Mapping[str, int] | None = None,
+    reports_dir: Path | None = None,
 ) -> KalshiResearchCycleArtifacts:
     app_config = app_config or load_config()
     cycle_config = config or KalshiResearchCycleConfig()
     out_dir = reports_dir or (store.research_dir / "reports")
-    live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None
+    live_rank_artifacts: KalshiLiveRankArtifacts | None = None
 
     if rank_report is None:
         live_rank_artifacts = run_kalshi_live_rank(
@@ -311,7 +314,7 @@ def run_kalshi_research_cycle(
     if paper_intents:
         store.write_kalshi_paper_intents(paper_intents)
 
-    settled: List[Dict[str, Any]] = []
+    settled: list[dict[str, Any]] = []
     if cycle_config.paper.settle_existing:
         open_intents = store.load_kalshi_paper_intents(status="PAPER_INTENDED")
         resolved_rows = store.load_kalshi_resolved_rows()
@@ -349,9 +352,9 @@ def build_cycle_report(
     ledger: Sequence[Mapping[str, Any]],
     config: KalshiResearchCycleConfig,
     paper_events: Sequence[Mapping[str, Any]] = (),
-    live_rank_artifacts: Optional[KalshiLiveRankArtifacts] = None,
-    created_ts: Optional[float] = None,
-) -> Dict[str, Any]:
+    live_rank_artifacts: KalshiLiveRankArtifacts | None = None,
+    created_ts: float | None = None,
+) -> dict[str, Any]:
     ts = float(created_ts or time.time())
     ledger_summary = summarize_paper_ledger(ledger)
     stale_open = stale_open_paper_intents(
@@ -385,7 +388,9 @@ def build_cycle_report(
         "live_rank_ref": {
             "run_id": rank_report.get("run_id"),
             "json_path": str(live_rank_artifacts.json_path) if live_rank_artifacts else None,
-            "markdown_path": str(live_rank_artifacts.markdown_path) if live_rank_artifacts else None,
+            "markdown_path": str(live_rank_artifacts.markdown_path)
+            if live_rank_artifacts
+            else None,
         },
         "ranked": {
             "markets_ranked": rank_report.get("input_summary", {}).get("n_rows", 0),
@@ -413,7 +418,9 @@ def build_cycle_report(
         "paper": {
             "intended_count": len(paper_intents),
             "blocked_count": len(paper_blocked),
-            "total_stake_usd": round(sum(float(item.get("stake_usd", 0.0)) for item in paper_intents), 2),
+            "total_stake_usd": round(
+                sum(float(item.get("stake_usd", 0.0)) for item in paper_intents), 2
+            ),
             "blocking_reason_counts": reason_counts(paper_blocked, "paper_blocking_reasons"),
             "intents": list(paper_intents),
             "blocked": list(paper_blocked),
@@ -454,9 +461,9 @@ def build_cycle_report(
     }
 
 
-def summarize_paper_ledger(ledger: Sequence[Mapping[str, Any]]) -> Dict[str, Any]:
-    status_counts: Dict[str, int] = {}
-    event_exposure: Dict[str, float] = {}
+def summarize_paper_ledger(ledger: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
+    status_counts: dict[str, int] = {}
+    event_exposure: dict[str, float] = {}
     settled = []
     open_stake = 0.0
     total_stake = 0.0
@@ -514,7 +521,7 @@ def paper_promotion_readiness(
     *,
     stale_open_count: int = 0,
     unknown_close_open_count: int = 0,
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     reasons = []
     settled_count = int(ledger_summary.get("settled_count", 0) or 0)
     brier = ledger_summary.get("brier_score")
@@ -563,8 +570,8 @@ def stale_open_paper_intents(
     *,
     now_ts: float,
     grace_hours: float,
-) -> List[Dict[str, Any]]:
-    stale: List[Dict[str, Any]] = []
+) -> list[dict[str, Any]]:
+    stale: list[dict[str, Any]] = []
     for intent in ledger:
         if str(intent.get("status", "")) != "PAPER_INTENDED":
             continue
@@ -593,13 +600,16 @@ def stale_open_paper_intents(
         )
     return sorted(
         stale,
-        key=lambda item: (-float(item.get("hours_past_stale", 0.0)), str(item.get("market_id", ""))),
+        key=lambda item: (
+            -float(item.get("hours_past_stale", 0.0)),
+            str(item.get("market_id", "")),
+        ),
     )
 
 
 def open_paper_intents_missing_close_time(
     ledger: Sequence[Mapping[str, Any]],
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     missing = []
     for intent in ledger:
         if str(intent.get("status", "")) != "PAPER_INTENDED":
@@ -627,10 +637,13 @@ def recent_paper_events(
     events: Sequence[Mapping[str, Any]],
     *,
     limit: int = 10,
-) -> List[Dict[str, Any]]:
+) -> list[dict[str, Any]]:
     normalized = []
     for event in events:
-        event_ts = float(event.get("paper_event_ts", event.get("settled_ts", event.get("created_ts", 0.0))) or 0.0)
+        event_ts = float(
+            event.get("paper_event_ts", event.get("settled_ts", event.get("created_ts", 0.0)))
+            or 0.0
+        )
         normalized.append(
             {
                 "paper_event_id": event.get("paper_event_id"),
@@ -645,20 +658,23 @@ def recent_paper_events(
         )
     return sorted(
         normalized,
-        key=lambda item: (-float(item.get("paper_event_ts", 0.0)), str(item.get("paper_event_id", ""))),
+        key=lambda item: (
+            -float(item.get("paper_event_ts", 0.0)),
+            str(item.get("paper_event_id", "")),
+        ),
     )[:limit]
 
 
-def status_counts(items: Sequence[Mapping[str, Any]]) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def status_counts(items: Sequence[Mapping[str, Any]]) -> dict[str, int]:
+    counts: dict[str, int] = {}
     for item in items:
         status = str(item.get("status", "UNKNOWN"))
         counts[status] = counts.get(status, 0) + 1
     return dict(sorted(counts.items()))
 
 
-def reason_counts(items: Sequence[Mapping[str, Any]], field: str) -> Dict[str, int]:
-    counts: Dict[str, int] = {}
+def reason_counts(items: Sequence[Mapping[str, Any]], field: str) -> dict[str, int]:
+    counts: dict[str, int] = {}
     for item in items:
         for reason in item.get(field, []) or []:
             reason_key = str(reason)
@@ -681,7 +697,7 @@ def cycle_integrity(
     ledger: Sequence[Mapping[str, Any]],
     config: KalshiResearchCycleConfig,
     paper_events: Sequence[Mapping[str, Any]] = (),
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     return {
         "artifact_schema_version": 4,
         "rank_report_hash": _stable_hash(rank_report),
@@ -715,7 +731,7 @@ def write_cycle_report(
     return KalshiResearchCycleArtifacts(dict(report), json_path, markdown_path)
 
 
-def load_rank_report(path: Path) -> Dict[str, Any]:
+def load_rank_report(path: Path) -> dict[str, Any]:
     with path.open("r", encoding="utf-8") as f:
         payload = json.load(f)
     if not isinstance(payload, dict):
@@ -725,10 +741,10 @@ def load_rank_report(path: Path) -> Dict[str, Any]:
     return payload
 
 
-def load_outcomes(path: Path) -> Dict[str, int]:
+def load_outcomes(path: Path) -> dict[str, int]:
     with path.open("r", encoding="utf-8") as f:
         payload = json.load(f)
-    outcomes: Dict[str, int] = {}
+    outcomes: dict[str, int] = {}
     if isinstance(payload, dict):
         source = payload.get("outcomes", payload)
         if isinstance(source, dict):
@@ -748,8 +764,8 @@ def load_outcomes(path: Path) -> Dict[str, int]:
     return outcomes
 
 
-def _outcomes_from_rows(rows: Sequence[Any]) -> Dict[str, int]:
-    out: Dict[str, int] = {}
+def _outcomes_from_rows(rows: Sequence[Any]) -> dict[str, int]:
+    out: dict[str, int] = {}
     for row in rows:
         if not isinstance(row, Mapping):
             continue
@@ -906,7 +922,9 @@ def render_cycle_markdown(report: Mapping[str, Any]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def stable_paper_intent_id(opportunity: Mapping[str, Any], rank_run_id: str, created_ts: float) -> str:
+def stable_paper_intent_id(
+    opportunity: Mapping[str, Any], rank_run_id: str, created_ts: float
+) -> str:
     payload = {
         "market_id": opportunity.get("market_id"),
         "side": opportunity.get("side"),
@@ -952,14 +970,18 @@ def stable_cycle_run_id(
     return "kalshi-cycle-" + _stable_hash(payload)[:16]
 
 
-def main(argv: Optional[Sequence[str]] = None) -> int:
+def main(argv: Sequence[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="Run the closed-loop Kalshi research cycle")
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=1)
     parser.add_argument("--series-ticker", default=None)
     parser.add_argument("--status", default="open")
-    parser.add_argument("--orderbooks", action="store_true", help="Attempt per-market orderbook enrichment")
-    parser.add_argument("--candles", action="store_true", help="Attempt per-market candlestick enrichment")
+    parser.add_argument(
+        "--orderbooks", action="store_true", help="Attempt per-market orderbook enrichment"
+    )
+    parser.add_argument(
+        "--candles", action="store_true", help="Attempt per-market candlestick enrichment"
+    )
     parser.add_argument("--top-k", type=int, default=25)
     parser.add_argument("--bankroll-usd", type=float, default=10_000.0)
     parser.add_argument("--max-intents", type=int, default=10)
@@ -971,8 +993,16 @@ def main(argv: Optional[Sequence[str]] = None) -> int:
     parser.add_argument("--stale-open-grace-hours", type=float, default=24.0)
     parser.add_argument("--max-rank-report-age-hours", type=float, default=6.0)
     parser.add_argument("--no-settle-existing", action="store_true")
-    parser.add_argument("--rank-report", default=None, help="Replay from a saved live rank JSON report instead of fetching live")
-    parser.add_argument("--outcomes-json", default=None, help="Optional market_id -> outcome JSON for paper settlement")
+    parser.add_argument(
+        "--rank-report",
+        default=None,
+        help="Replay from a saved live rank JSON report instead of fetching live",
+    )
+    parser.add_argument(
+        "--outcomes-json",
+        default=None,
+        help="Optional market_id -> outcome JSON for paper settlement",
+    )
     parser.add_argument("--discovery-report", default=None)
     parser.add_argument("--reports-dir", default=None)
     args = parser.parse_args(argv)

@@ -14,11 +14,10 @@ any single platform (Bates & Granger, 1969; Clemen, 1989).
 import logging
 import time
 from dataclasses import dataclass, field
-from typing import Dict, List, Optional, Tuple
 
 import numpy as np
 
-from predmarket.density import DensityForecast, from_point_estimate, combine_density_forecasts
+from predmarket.density import DensityForecast, combine_density_forecasts, from_point_estimate
 
 logger = logging.getLogger("predmarket.aggregator")
 
@@ -66,12 +65,12 @@ class PlatformAggregator:
     def __init__(self, decay_factor: float = 0.95):
         self.decay_factor = decay_factor
         # Per-contract forecasts: contract_id -> list of ExternalForecast
-        self._forecasts: Dict[str, List[ExternalForecast]] = {}
+        self._forecasts: dict[str, list[ExternalForecast]] = {}
         # Per-platform calibration: platform -> list of (brier_score, timestamp)
-        self._calibration: Dict[str, List[Tuple[float, float]]] = {}
+        self._calibration: dict[str, list[tuple[float, float]]] = {}
         # Per-platform running Brier sum (exponentially decayed)
-        self._brier_sum: Dict[str, float] = {}
-        self._brier_count: Dict[str, int] = {}
+        self._brier_sum: dict[str, float] = {}
+        self._brier_count: dict[str, int] = {}
 
     def add_forecast(self, forecast: ExternalForecast) -> None:
         """Add an external forecast observation.
@@ -84,7 +83,7 @@ class PlatformAggregator:
             self._forecasts[cid] = []
         self._forecasts[cid].append(forecast)
 
-    def add_forecasts(self, forecasts: List[ExternalForecast]) -> None:
+    def add_forecasts(self, forecasts: list[ExternalForecast]) -> None:
         """Batch add multiple external forecasts.
 
         Args:
@@ -93,7 +92,7 @@ class PlatformAggregator:
         for f in forecasts:
             self.add_forecast(f)
 
-    def _get_latest_forecasts(self, contract_id: str) -> List[ExternalForecast]:
+    def _get_latest_forecasts(self, contract_id: str) -> list[ExternalForecast]:
         """Get the most recent forecast per platform for a contract.
 
         Args:
@@ -107,15 +106,14 @@ class PlatformAggregator:
             return []
 
         # Keep only the latest per platform
-        latest: Dict[str, ExternalForecast] = {}
+        latest: dict[str, ExternalForecast] = {}
         for fc in all_fc:
             if fc.platform not in latest or fc.timestamp > latest[fc.platform].timestamp:
                 latest[fc.platform] = fc
 
         return list(latest.values())
 
-    def update_calibration(self, platform: str, forecast_prob: float,
-                          outcome: int) -> None:
+    def update_calibration(self, platform: str, forecast_prob: float, outcome: int) -> None:
         """Update per-platform calibration with a resolved outcome.
 
         Args:
@@ -131,9 +129,7 @@ class PlatformAggregator:
             self._brier_count[platform] = 0
 
         # Apply decay to existing sum
-        self._brier_sum[platform] = (
-            self.decay_factor * self._brier_sum[platform] + brier
-        )
+        self._brier_sum[platform] = self.decay_factor * self._brier_sum[platform] + brier
         self._brier_count[platform] += 1
 
         # Also store for detailed analysis
@@ -141,7 +137,7 @@ class PlatformAggregator:
             self._calibration[platform] = []
         self._calibration[platform].append((brier, now))
 
-    def get_platform_weights(self) -> Dict[str, float]:
+    def get_platform_weights(self) -> dict[str, float]:
         """Return calibration-weighted aggregation weights per platform.
 
         Weight = 1 / mean_brier for each platform with calibration data.
@@ -159,7 +155,7 @@ class PlatformAggregator:
         if not all_platforms:
             return {}
 
-        weights: Dict[str, float] = {}
+        weights: dict[str, float] = {}
         uncalibrated = []
 
         for platform in all_platforms:
@@ -220,8 +216,7 @@ class PlatformAggregator:
 
         return float(np.clip(weighted_sum / total_weight, 0.001, 0.999))
 
-    def get_aggregated_density(self, contract_id: str,
-                               n_samples: int = 1000) -> DensityForecast:
+    def get_aggregated_density(self, contract_id: str, n_samples: int = 1000) -> DensityForecast:
         """Get calibration-weighted aggregated density forecast.
 
         Combines density forecasts from each platform using weighted
@@ -265,7 +260,7 @@ class PlatformAggregator:
         """
         return self.get_aggregated_density(contract_id, n_samples=n_samples)
 
-    def get_platform_prices(self, contract_id: str) -> Dict[str, float]:
+    def get_platform_prices(self, contract_id: str) -> dict[str, float]:
         """Return the latest probability seen from each external platform."""
         return {
             forecast.platform: float(forecast.probability)
@@ -275,11 +270,9 @@ class PlatformAggregator:
     def record_outcome(self, contract_id: str, outcome: int) -> None:
         """Update calibration for all latest forecasts on a resolved contract."""
         for forecast in self._get_latest_forecasts(contract_id):
-            self.update_calibration(
-                forecast.platform, forecast.probability, outcome
-            )
+            self.update_calibration(forecast.platform, forecast.probability, outcome)
 
-    def get_platform_summary(self) -> Dict[str, Dict[str, any]]:
+    def get_platform_summary(self) -> dict[str, dict[str, any]]:
         """Return a summary of all known platforms and their calibration.
 
         Returns:
@@ -313,7 +306,7 @@ class MockPlatformData:
         subclass and override fetch_* methods, then pass to PlatformAggregator.
     """
 
-    def fetch_metaculus(self, contract_id: str) -> Optional[ExternalForecast]:
+    def fetch_metaculus(self, contract_id: str) -> ExternalForecast | None:
         """Fetch crowd forecast from Metaculus.
 
         Args:
@@ -326,7 +319,7 @@ class MockPlatformData:
         # API: https://www.metaculus.com/api2/
         return None
 
-    def fetch_manifold(self, contract_id: str) -> Optional[ExternalForecast]:
+    def fetch_manifold(self, contract_id: str) -> ExternalForecast | None:
         """Fetch market probability from Manifold Markets.
 
         Args:
@@ -339,7 +332,7 @@ class MockPlatformData:
         # API: https://docs.manifold.markets/
         return None
 
-    def fetch_polymarket_depth(self, contract_id: str) -> Optional[ExternalForecast]:
+    def fetch_polymarket_depth(self, contract_id: str) -> ExternalForecast | None:
         """Fetch orderbook-implied probability from Polymarket.
 
         Uses the CLOB orderbook to derive a depth-weighted midpoint
@@ -355,7 +348,7 @@ class MockPlatformData:
         # API: https://clob.polymarket.com/
         return None
 
-    def fetch_all_platforms(self, contract_id: str) -> List[ExternalForecast]:
+    def fetch_all_platforms(self, contract_id: str) -> list[ExternalForecast]:
         """Fetch from all platforms and return non-None results.
 
         Args:

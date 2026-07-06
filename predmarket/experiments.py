@@ -2,12 +2,13 @@
 
 from __future__ import annotations
 
+import builtins
 import json
 import time
 import uuid
 from dataclasses import asdict, dataclass, field
 from pathlib import Path
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 
 @dataclass
@@ -15,7 +16,7 @@ class ExperimentProposal:
     name: str
     hypothesis: str
     patch_ref: str
-    experiment_config: Dict[str, Any]
+    experiment_config: dict[str, Any]
     proposer: str = "agent"
     proposal_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     created_ts: float = field(default_factory=time.time)
@@ -34,7 +35,7 @@ class ExperimentQueue:
         self._append(asdict(proposal))
         return proposal.proposal_id
 
-    def list(self, status: Optional[str] = None) -> List[Dict[str, Any]]:
+    def list(self, status: str | None = None) -> builtins.list[dict[str, Any]]:
         rows = self._read_all()
         if status is not None:
             rows = [row for row in rows if row.get("status") == status]
@@ -46,7 +47,7 @@ class ExperimentQueue:
         status: str,
         report_ref: str = "",
         reason_code: str = "",
-        metrics: Optional[Dict[str, Any]] = None,
+        metrics: dict[str, Any] | None = None,
     ) -> None:
         row = {
             "proposal_id": proposal_id,
@@ -71,14 +72,14 @@ class ExperimentQueue:
             for row in self._read_all()
         )
 
-    def _append(self, payload: Dict[str, Any]) -> None:
+    def _append(self, payload: dict[str, Any]) -> None:
         with self.path.open("a", encoding="utf-8") as f:
             f.write(json.dumps(payload, sort_keys=True, default=str) + "\n")
 
-    def _read_all(self) -> List[Dict[str, Any]]:
+    def _read_all(self) -> builtins.list[dict[str, Any]]:
         if not self.path.exists():
             return []
-        rows: List[Dict[str, Any]] = []
+        rows: list[dict[str, Any]] = []
         with self.path.open("r", encoding="utf-8") as f:
             for line in f:
                 line = line.strip()

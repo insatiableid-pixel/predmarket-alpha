@@ -6,22 +6,21 @@ Exposes:
 - /metrics     (GET)  – Prometheus scrape endpoint
 """
 
-import os
-import logging
 import base64
-from typing import Optional
+import logging
+import os
 
 import pandas as pd
-from fastapi import FastAPI, Depends, Security, HTTPException, status, Request
+from fastapi import Depends, FastAPI, HTTPException, Request, Security, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from fastapi.security import APIKeyHeader
+from itsdangerous import BadSignature, URLSafeTimedSerializer
+from prometheus_client import CONTENT_TYPE_LATEST, generate_latest
 from pydantic import BaseModel, Field
-from prometheus_client import generate_latest, CONTENT_TYPE_LATEST
 from slowapi import Limiter, _rate_limit_exceeded_handler
-from slowapi.util import get_remote_address
 from slowapi.errors import RateLimitExceeded
-from itsdangerous import URLSafeTimedSerializer, BadSignature
+from slowapi.util import get_remote_address
 
 logger = logging.getLogger("predmarket.dashboard")
 
@@ -58,6 +57,7 @@ server.add_middleware(
 # ---------------------------------------------------------------------------
 # CSRF protection (F7 remediation: double-submit cookie pattern)
 # ---------------------------------------------------------------------------
+
 
 def _get_csrf_secret() -> str:
     """Derive CSRF secret from API_KEY so no extra env var needed."""
@@ -132,6 +132,8 @@ async def csrf_middleware(request: Request, call_next):
             logger.warning(f"CSRF validation failed for {request.method} {request.url.path}")
 
     return response
+
+
 # ---------------------------------------------------------------------------
 
 # ---------------------------------------------------------------------------
@@ -142,7 +144,7 @@ API_KEY_NAME = "X-API-Key"
 api_key_header = APIKeyHeader(name=API_KEY_NAME, auto_error=False)
 
 
-def get_api_key(api_key: Optional[str] = Security(api_key_header)):
+def get_api_key(api_key: str | None = Security(api_key_header)):
     expected_key = os.getenv("API_KEY")
     if not expected_key:
         raise HTTPException(
@@ -163,12 +165,7 @@ async def dashboard_auth_middleware(request: Request, call_next):
     # API endpoints use X-API-Key; the browser UI uses Basic auth plus a signed
     # cookie so Dash's assets, layout fetches, and websocket callbacks can load.
     path = request.url.path
-    if (
-        path.startswith("/api/")
-        or path == "/metrics"
-        or path == "/openapi.json"
-        or path == "/docs"
-    ):
+    if path.startswith("/api/") or path == "/metrics" or path == "/openapi.json" or path == "/docs":
         return await call_next(request)
 
     # For UI and callbacks, enforce HTTP Basic Auth
@@ -176,8 +173,7 @@ async def dashboard_auth_middleware(request: Request, call_next):
     if not expected_key:
         # Prevent accessing frontend if API_KEY is not configured
         return Response(
-            status_code=500,
-            content="API_KEY environment variable is not set on the server."
+            status_code=500, content="API_KEY environment variable is not set on the server."
         )
 
     auth_cookie = request.cookies.get("dashboard_auth")
@@ -208,7 +204,7 @@ async def dashboard_auth_middleware(request: Request, call_next):
     return Response(
         status_code=401,
         headers={"WWW-Authenticate": 'Basic realm="Kalshi Action Alpha Dashboard"'},
-        content="Unauthorized"
+        content="Unauthorized",
     )
 
 
@@ -254,8 +250,7 @@ def get_staged_orders(request: Request, api_key: str = Depends(get_api_key)):
 @server.post("/api/approve")
 @limiter.limit("5/minute")
 async def approve_order_endpoint(
-    request: Request,
-    body: ApprovalRequest, api_key: str = Depends(get_api_key)
+    request: Request, body: ApprovalRequest, api_key: str = Depends(get_api_key)
 ):
     from .data import approve_staged_order_db
 

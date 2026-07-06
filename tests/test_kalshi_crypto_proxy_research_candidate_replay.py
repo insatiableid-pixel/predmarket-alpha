@@ -4,7 +4,6 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = (
     Path(__file__).resolve().parents[1]
     / "scripts"
@@ -14,7 +13,9 @@ MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
 def load_replay_module():
-    spec = importlib.util.spec_from_file_location("kalshi_crypto_proxy_research_candidate_replay", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_crypto_proxy_research_candidate_replay", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -49,7 +50,9 @@ def safe_packet(rows=None, **overrides):
 
 
 def model_report(*, research_candidate: bool = True):
-    status = "research_candidate_fdr_passed" if research_candidate else "testable_research_candidate"
+    status = (
+        "research_candidate_fdr_passed" if research_candidate else "testable_research_candidate"
+    )
     return safe_packet(
         status="crypto_proxy_feature_model_falsification_ready_with_research_candidates"
         if research_candidate
@@ -114,7 +117,10 @@ def test_replay_blocks_without_research_candidate(tmp_path: Path) -> None:
         min_decay_labels=10,
     )
 
-    assert report["status"] == "crypto_proxy_research_candidate_replay_blocked_missing_research_candidate"
+    assert (
+        report["status"]
+        == "crypto_proxy_research_candidate_replay_blocked_missing_research_candidate"
+    )
     assert report["summary"]["candidate_research_model_present"] is False
     assert report["safety"]["market_execution"] is False
 
@@ -175,9 +181,9 @@ def test_replay_writer_emits_latest_outputs(tmp_path: Path) -> None:
     assert Path(paths["markdown_path"]).exists()
     assert Path(paths["csv_path"]).exists()
     assert Path(paths["latest_json_path"]).exists()
-    assert "Kalshi Crypto Proxy Research Candidate Replay" in Path(paths["markdown_path"]).read_text(
-        encoding="utf-8"
-    )
+    assert "Kalshi Crypto Proxy Research Candidate Replay" in Path(
+        paths["markdown_path"]
+    ).read_text(encoding="utf-8")
 
 
 def test_replay_makefile_target_exists_and_watch_order() -> None:
@@ -185,16 +191,20 @@ def test_replay_makefile_target_exists_and_watch_order() -> None:
 
     assert "kalshi-crypto-proxy-research-candidate-replay" in makefile
     assert "scripts/kalshi_crypto_proxy_research_candidate_replay.py" in makefile
-    watch_target = makefile.split("kalshi-crypto-proxy-observation-watch-once:", 1)[1].split("\n\n", 1)[0]
-    assert watch_target.index("kalshi-crypto-proxy-feature-model-falsification") < watch_target.index(
-        "kalshi-crypto-proxy-research-candidate-replay"
-    )
+    watch_target = makefile.split("kalshi-crypto-proxy-observation-watch-once:", 1)[1].split(
+        "\n\n", 1
+    )[0]
+    assert watch_target.index(
+        "kalshi-crypto-proxy-feature-model-falsification"
+    ) < watch_target.index("kalshi-crypto-proxy-research-candidate-replay")
     assert watch_target.index("kalshi-crypto-proxy-research-candidate-replay") < watch_target.index(
         "kalshi-signal-factory-status"
     )
 
 
-def test_decay_summary_provides_per_bucket_auditability_without_changing_gate(tmp_path: Path) -> None:
+def test_decay_summary_provides_per_bucket_auditability_without_changing_gate(
+    tmp_path: Path,
+) -> None:
     """Decay evidence now carries per-bucket detail for auditability.
 
     Gate threshold is unchanged: recent bucket must be >= 0.5.
@@ -208,11 +218,13 @@ def test_decay_summary_provides_per_bucket_auditability_without_changing_gate(tm
     for bucket_hour, n_correct, n_total in [(1, 3, 4), (2, 2, 4), (3, 1, 4)]:
         for i in range(n_total):
             outcome = 1 if i < n_correct else 0
-            rows.append({
-                "proxy_state": "proxy_above_floor_not_label",
-                "yes_outcome": outcome,
-                "close_time": f"2026-07-02T{bucket_hour:02d}:02:00Z",
-            })
+            rows.append(
+                {
+                    "proxy_state": "proxy_above_floor_not_label",
+                    "yes_outcome": outcome,
+                    "close_time": f"2026-07-02T{bucket_hour:02d}:02:00Z",
+                }
+            )
 
     result = module.decay_summary(rows)
 
@@ -253,8 +265,7 @@ def test_replay_report_surfaces_decay_detail_in_summary_and_gate_reason(tmp_path
     label_dir = tmp_path / "labels"
     model_path = tmp_path / "model.json"
     rows = [
-        label_row(idx, proxy_state="proxy_above_floor_not_label", outcome=1)
-        for idx in range(40)
+        label_row(idx, proxy_state="proxy_above_floor_not_label", outcome=1) for idx in range(40)
     ]
     write_json(label_dir / "labels.json", safe_packet(rows=rows))
     write_json(model_path, model_report())
@@ -279,4 +290,3 @@ def test_replay_report_surfaces_decay_detail_in_summary_and_gate_reason(tmp_path
     assert "cumulative accuracy" in decay_gate["reason"]
     assert "pass" in decay_gate["reason"]
     assert report["summary"]["usable_row_count"] == 0
-

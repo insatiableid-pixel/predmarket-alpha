@@ -1,12 +1,15 @@
-import pytest
 import shutil
 from pathlib import Path
-from predmarket.config import Config, GlobalConfig, VenuesConfig, ForecastingConfig, PortfolioConfig
+
+import pytest
+
+from predmarket.config import Config, ForecastingConfig, GlobalConfig, PortfolioConfig, VenuesConfig
 
 # --- N+1 query detection ---
 # Enable SQLAlchemy query counting to surface N+1 patterns during tests.
 # The fixture tracks total queries per test; tests using the DB can assert
 # reasonable query counts. Set ``query_counter`` on a test to access it.
+
 
 class QueryCounter:
     """Counts SQL queries executed during a test to detect N+1 patterns."""
@@ -19,7 +22,9 @@ class QueryCounter:
         self.count = 0
         self.statements = []
 
-    def before_cursor_execute(self, conn, cursor, statement, parameters, context, executemany) -> None:
+    def before_cursor_execute(
+        self, conn, cursor, statement, parameters, context, executemany
+    ) -> None:
         self.count += 1
         self.statements.append(statement)
 
@@ -40,7 +45,9 @@ def query_counter():
 
     try:
         from sqlalchemy import event
+
         from predmarket.store import PointInTimeStore
+
         # Attach to new SQLite engines created by PointInTimeStore
         original_init = PointInTimeStore.__init__
 
@@ -58,6 +65,7 @@ def query_counter():
 
     try:
         from predmarket.store import PointInTimeStore
+
         PointInTimeStore.__init__ = original_init  # type: ignore[name-defined]
     except (NameError, ImportError):
         pass
@@ -65,7 +73,8 @@ def query_counter():
 
 @pytest.fixture(autouse=True)
 def setup_api_key_env(monkeypatch):
-    monkeypatch.setenv("API_KEY", "predmarket_secret_key_123")
+    monkeypatch.setenv("API_KEY", "test-token")
+
 
 @pytest.fixture
 def test_data_dir(tmp_path):
@@ -77,6 +86,7 @@ def test_data_dir(tmp_path):
 
     # Run Alembic migrations programmatically on the test database
     from alembic.config import Config as AlembicConfig
+
     from alembic import command
 
     db_path = data_dir / "database.sqlite"
@@ -88,6 +98,7 @@ def test_data_dir(tmp_path):
 
     yield data_dir
     shutil.rmtree(data_dir)
+
 
 @pytest.fixture
 def mock_config(test_data_dir):
@@ -104,9 +115,9 @@ def mock_config(test_data_dir):
             data_dir=test_data_dir,
             log_level="DEBUG",
             dashboard_host="127.0.0.1",
-            dashboard_port=9090
+            dashboard_port=9090,
         ),
         venues=venues,
         forecasting=ForecastingConfig(),
-        portfolio=PortfolioConfig()
+        portfolio=PortfolioConfig(),
     )

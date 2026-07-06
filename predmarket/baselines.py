@@ -9,8 +9,8 @@ fair comparison against the ensemble.
 """
 
 import logging
+
 import numpy as np
-from typing import Dict, Optional
 
 from predmarket.density import DensityForecast, from_point_estimate
 
@@ -56,13 +56,13 @@ class HistoricalMeanBaseline:
     name = "historical_mean"
 
     def __init__(self):
-        self.category_means: Dict[str, float] = {
+        self.category_means: dict[str, float] = {
             "political": 0.28,  # From BaseRateModel reference classes
             "econ": 0.45,
             "sports": 0.50,
             "other": 0.38,
         }
-        self._category_counts: Dict[str, int] = {}
+        self._category_counts: dict[str, int] = {}
 
     def update(self, category: str, outcome: float):
         """Update the running mean for a category with a new resolved outcome.
@@ -207,9 +207,7 @@ class SeasonalNaiveBaseline:
         point = self.forecast(snapshot, category)
         history = getattr(snapshot, "line_history", []) or []
         vol = float(np.std(history[-self.window :])) if len(history) >= 2 else 0.05
-        return from_point_estimate(
-            point, uncertainty=max(vol, 0.02), n_samples=n_samples
-        )
+        return from_point_estimate(point, uncertainty=max(vol, 0.02), n_samples=n_samples)
 
 
 class BaselineEnsemble:
@@ -233,7 +231,7 @@ class BaselineEnsemble:
             SeasonalNaiveBaseline(),
         ]
 
-    def forecast_all(self, snapshot, category: str = "") -> Dict[str, float]:
+    def forecast_all(self, snapshot, category: str = "") -> dict[str, float]:
         """Run all baselines and return point forecasts.
 
         Args:
@@ -247,7 +245,7 @@ class BaselineEnsemble:
 
     def forecast_all_density(
         self, snapshot, category: str = "", n_samples: int = 1000
-    ) -> Dict[str, DensityForecast]:
+    ) -> dict[str, DensityForecast]:
         """Run all baselines and return density forecasts.
 
         Args:
@@ -284,11 +282,11 @@ class BaselineForecaster(BaselineEnsemble):
     """
 
     def compare_all(
-        self, snapshot, category: str = "", model_prob: Optional[float] = None
-    ) -> Dict[str, float]:
+        self, snapshot, category: str = "", model_prob: float | None = None
+    ) -> dict[str, float]:
         forecasts = self.forecast_all(snapshot, category)
         model = float(model_prob if model_prob is not None else 0.5)
-        comparison: Dict[str, float] = {}
+        comparison: dict[str, float] = {}
         for name, prob in forecasts.items():
             comparison[name] = float(prob)
             comparison[f"{name}_edge"] = float(model - prob)

@@ -4,13 +4,16 @@ import importlib.util
 import json
 from pathlib import Path
 
-
-SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_observation_loop.py"
+SCRIPT_PATH = (
+    Path(__file__).resolve().parents[1] / "scripts" / "kalshi_crypto_proxy_observation_loop.py"
+)
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
 def load_loop_module():
-    spec = importlib.util.spec_from_file_location("kalshi_crypto_proxy_observation_loop", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_crypto_proxy_observation_loop", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -267,8 +270,12 @@ def test_crypto_proxy_observation_loop_writes_latest_repo_artifacts_and_outside_
     assert Path(paths["label_packet_latest_path"]).exists()
     latest = json.loads(Path(paths["latest_json_path"]).read_text(encoding="utf-8"))
     assert latest["summary"]["label_row_count"] == 1
-    assert "Kalshi Crypto Proxy Observation Loop" in Path(paths["markdown_path"]).read_text(encoding="utf-8")
-    assert "OnUnitActiveSec=10min" in Path(paths["schedule_template_path"]).read_text(encoding="utf-8")
+    assert "Kalshi Crypto Proxy Observation Loop" in Path(paths["markdown_path"]).read_text(
+        encoding="utf-8"
+    )
+    assert "OnUnitActiveSec=10min" in Path(paths["schedule_template_path"]).read_text(
+        encoding="utf-8"
+    )
 
 
 def test_due_observed_tickers_only_includes_past_expected_expiration(tmp_path: Path) -> None:

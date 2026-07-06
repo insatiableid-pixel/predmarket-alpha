@@ -4,16 +4,15 @@ from __future__ import annotations
 
 import hashlib
 import json
-from typing import Any, Dict, List, Optional
+from typing import Any
 
 from predmarket.contracts import EventSpec, MarketLink
 from predmarket.store import PointInTimeStore
 
-
 REQUIRED_RESOLUTION_FIELDS = {"resolution_criteria", "cutoff_ts", "oracle", "payout_rule"}
 
 
-def _rules_key(resolution_rules: Dict[str, Any]) -> str:
+def _rules_key(resolution_rules: dict[str, Any]) -> str:
     selected = {k: resolution_rules.get(k) for k in sorted(REQUIRED_RESOLUTION_FIELDS)}
     payload = json.dumps(selected, sort_keys=True, separators=(",", ":"), default=str)
     return hashlib.sha256(payload.encode("utf-8")).hexdigest()
@@ -68,12 +67,11 @@ class CanonicalEventGraph:
         )
 
     @staticmethod
-    def validate_resolution_rules(resolution_rules: Dict[str, Any]) -> None:
+    def validate_resolution_rules(resolution_rules: dict[str, Any]) -> None:
         missing = REQUIRED_RESOLUTION_FIELDS - set(resolution_rules)
         if missing:
             raise ValueError(
-                "resolution_rules missing required fields: "
-                + ", ".join(sorted(missing))
+                "resolution_rules missing required fields: " + ", ".join(sorted(missing))
             )
 
     def upsert_event(self, event_spec: EventSpec) -> str:
@@ -100,7 +98,7 @@ class CanonicalEventGraph:
         event_id: str,
         venue: str,
         market_id: str,
-        resolution_rules: Dict[str, Any],
+        resolution_rules: dict[str, Any],
         confidence: float,
     ) -> MarketLink:
         self.validate_resolution_rules(resolution_rules)
@@ -111,9 +109,7 @@ class CanonicalEventGraph:
             (event_id,),
         )
         if row and row[0] != _rules_key(resolution_rules):
-            raise ValueError(
-                f"market {market_id} rules do not match canonical event {event_id}"
-            )
+            raise ValueError(f"market {market_id} rules do not match canonical event {event_id}")
         link = MarketLink(
             event_id=event_id,
             venue=venue,
@@ -144,7 +140,7 @@ class CanonicalEventGraph:
         target_event_id: str,
         relation_type: str,
         confidence: float,
-        metadata: Optional[Dict[str, Any]] = None,
+        metadata: dict[str, Any] | None = None,
     ) -> None:
         self.store._execute(
             "INSERT OR REPLACE INTO event_relations VALUES (?, ?, ?, ?, ?)",
@@ -157,7 +153,7 @@ class CanonicalEventGraph:
             ),
         )
 
-    def get_equivalent_markets(self, event_id: str) -> List[Dict[str, Any]]:
+    def get_equivalent_markets(self, event_id: str) -> list[dict[str, Any]]:
         rows = self.store._fetchall(
             """
             SELECT venue, market_id, confidence, resolution_rules_json
@@ -178,7 +174,7 @@ class CanonicalEventGraph:
             for row in rows
         ]
 
-    def get_related_events(self, event_id: str, relation_type: str) -> List[Dict[str, Any]]:
+    def get_related_events(self, event_id: str, relation_type: str) -> list[dict[str, Any]]:
         rows = self.store._fetchall(
             """
             SELECT target_event_id, confidence, metadata_json

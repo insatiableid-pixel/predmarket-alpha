@@ -1,4 +1,4 @@
-.PHONY: setup check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen feature-flags-check validate-agents sync-labels quality-metrics quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
+.PHONY: setup check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen feature-flags-check validate-agents sync-labels quality-metrics quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control kalshi-sports-proxy-feature-packet kalshi-sports-proxy-observation-loop kalshi-sports-proxy-observation-watch-once kalshi-atp-proxy-observation-loop kalshi-atp-proxy-evidence-gate kalshi-atp-proxy-observation-watch-once kalshi-world-cup-proxy-observation-loop kalshi-world-cup-proxy-feature-model-falsification kalshi-world-cup-outcome-independence-diagnostic kalshi-world-cup-proxy-observation-watch-once kalshi-ghost-listing-depth-diagnostic kalshi-sports-stack-sequencing kalshi-sports-consensus-reference-build kalshi-sports-consensus-sharp-provider-capture kalshi-sports-consensus-soccer-asian-provider-diagnostic kalshi-sports-consensus-public-kalshi-refresh kalshi-sports-consensus-atp-donor-adapter kalshi-sports-consensus-nfl-adapter kalshi-sports-consensus-soccer-adapter kalshi-sports-consensus-nba-adapter kalshi-sports-consensus-refresh kalshi-sports-consensus-preflight kalshi-sports-consensus-observation-loop kalshi-sports-consensus-observation-watch-once kalshi-sports-consensus-falsification kalshi-sports-consensus-provider-audit kalshi-sports-event-velocity-eta kalshi-claude-advice-audit kalshi-sports-blocker-clearance-cycle kalshi-sports-microstructure-observation-loop kalshi-sports-microstructure-observation-watch-once kalshi-near-resolution-informed-flow-evidence-gate kalshi-near-resolution-flow-replay-gates kalshi-near-resolution-flow-terms-capture kalshi-passive-liquidity-provision-evidence-gate kalshi-passive-liquidity-paper-fill-loop kalshi-passive-liquidity-paper-fill-falsification kalshi-passive-liquidity-fill-clock-diagnostic kalshi-sports-nondirectional-evidence-watch-once kalshi-sports-evidence-cycle-report kalshi-sports-evidence-cycle kalshi-sports-label-accumulation-cycle kalshi-sports-paper-burn-in-cycle kalshi-always-on-collector kalshi-always-on-collector-once kalshi-sports-proxy-feature-model-falsification kalshi-sports-proxy-research-candidate-replay kalshi-sports-proxy-capacity-correlation-decay kalshi-sports-proxy-correlation-cluster-control kalshi-weather-proxy-feature-packet kalshi-weather-proxy-feature-watch-once kalshi-weather-proxy-observation-loop kalshi-weather-proxy-observation-watch-once kalshi-weather-proxy-feature-model-falsification kalshi-weather-proxy-research-candidate-replay kalshi-weather-proxy-capacity-correlation-decay kalshi-weather-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-source-repo-inventory kalshi-external-artifact-wrap kalshi-external-artifact-preflight kalshi-signal-formula-registry kalshi-prior-only-donor-gate kalshi-paper-decision-candidates kalshi-paper-settlement-reconcile kalshi-signal-decay-retirement kalshi-jurisdiction-refresh kalshi-live-preflight kalshi-live-demo kalshi-live-trader kalshi-live-reconcile kalshi-live-risk-snapshot kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
 
 # Default target
 help:
@@ -39,6 +39,45 @@ help:
 	@echo "  make kalshi-labeled-oos-backtest — Run labeled OOS hypothesis falsification"
 	@echo "  make kalshi-probability-breadth-scout — Scout fast-settling probability-source routes"
 	@echo "  make kalshi-crypto-proxy-feature-packet — Build contract-keyed crypto proxy feature packets"
+	@echo "  make kalshi-sports-proxy-feature-packet — Build contract-keyed baseball proxy feature packets"
+	@echo "  make kalshi-sports-proxy-feature-model-falsification — Falsify sports proxy strength model against settled labels"
+	@echo "  make kalshi-sports-proxy-research-candidate-replay — Replay sports research candidates against all-in cost gates"
+	@echo "  make kalshi-sports-proxy-capacity-correlation-decay — Gate sports replay candidates on depth, clusters, and decay"
+	@echo "  make kalshi-sports-proxy-correlation-cluster-control — Apply cluster exposure controls to sports candidates before overlay"
+	@echo "  make kalshi-world-cup-proxy-observation-loop — Archive World Cup/FIFA soft-watch rows as research evidence"
+	@echo "  make kalshi-world-cup-proxy-feature-model-falsification — Falsify World Cup market-structure rules"
+	@echo "  make kalshi-world-cup-outcome-independence-diagnostic — Diagnose World Cup outcome-family labels vs match correlation"
+	@echo "  make kalshi-ghost-listing-depth-diagnostic — Probe current public depth before cap_i lock"
+	@echo "  make kalshi-sports-stack-sequencing — Sequence sports lanes by current season/evidence"
+	@echo "  make kalshi-sports-consensus-reference-build — Build derived no-vig sports consensus reference"
+	@echo "  make kalshi-sports-consensus-sharp-provider-capture — Probe sharp provider availability across target sports"
+	@echo "  make kalshi-sports-consensus-refresh — Fetch current odds, build consensus reference, then preflight"
+	@echo "  make kalshi-sports-consensus-preflight — Validate timestamp-matched no-vig multi-book sports consensus"
+	@echo "  make kalshi-sports-consensus-nfl-adapter — Adapt NFL sharp consensus rows into strict manifest"
+	@echo "  make kalshi-sports-consensus-soccer-adapter — Adapt World Cup sharp consensus rows into strict manifest"
+	@echo "  make kalshi-sports-consensus-nba-adapter — Adapt NBA sharp consensus rows into strict manifest"
+	@echo "  make kalshi-sports-consensus-observation-loop — Archive no-vig consensus observations and exact Kalshi labels"
+	@echo "  make kalshi-sports-consensus-observation-watch-once — Refresh, archive consensus observations, probe labels, then falsify"
+	@echo "  make kalshi-sports-consensus-falsification — OOS/FDR-test Kalshi-vs-consensus divergence before any paper sizing"
+	@echo "  make kalshi-sports-consensus-provider-audit — Audit sharp-provider coverage per sport"
+	@echo "  make kalshi-sports-event-velocity-eta — Report per-surface sports label/OOS/paper-fill deficits"
+	@echo "  make kalshi-claude-advice-audit — Audit implementation status against Claude sports advice"
+	@echo "  make kalshi-sports-blocker-clearance-cycle — Plan/run due sports blocker refreshes without lowering gates"
+	@echo "  make kalshi-sports-nondirectional-evidence-watch-once — Capture sports microstructure and run flow/liquidity gates"
+	@echo "  make kalshi-passive-liquidity-paper-fill-loop — Persist passive maker paper intents and label prior intents from later snapshots"
+	@echo "  make kalshi-passive-liquidity-paper-fill-falsification — Falsify passive maker paper fill labels"
+	@echo "  make kalshi-passive-liquidity-fill-clock-diagnostic — Diagnose passive paper fill drought causes"
+	@echo "  make kalshi-near-resolution-flow-replay-gates — Replay FDR-surviving flow candidates through cost/depth/decay gates"
+	@echo "  make kalshi-sports-evidence-cycle — Refresh sports labels/snapshots/gates and write cycle report"
+	@echo "  make kalshi-sports-paper-burn-in-cycle — Advance paper settlement, retirement, and sports evidence audit"
+	@echo "  make kalshi-always-on-collector-once — Run one safe collector cycle for sports burn-in + crypto"
+	@echo "  make kalshi-always-on-collector — Run continuous safe sports burn-in + crypto collector"
+	@echo "  make kalshi-weather-proxy-feature-packet — Build contract-keyed weather proxy feature packets"
+	@echo "  make kalshi-weather-proxy-observation-loop — Archive weather proxy observations and labels"
+	@echo "  make kalshi-weather-proxy-feature-model-falsification — Falsify weather proxy bracket model against settled labels"
+	@echo "  make kalshi-weather-proxy-research-candidate-replay — Replay weather research candidates against all-in cost gates"
+	@echo "  make kalshi-weather-proxy-capacity-correlation-decay — Gate weather replay candidates on depth, clusters, and decay"
+	@echo "  make kalshi-weather-proxy-correlation-cluster-control — Apply cluster exposure controls to weather candidates before overlay"
 	@echo "  make kalshi-crypto-proxy-observation-loop — Archive crypto proxy observations and labels"
 	@echo "  make kalshi-crypto-proxy-feature-model-falsification — Falsify crypto proxy feature families"
 	@echo "  make kalshi-crypto-proxy-research-candidate-replay — Replay research candidates against all-in cost gates"
@@ -49,7 +88,22 @@ help:
 	@echo "  make type2-paper-matcher — Run local paper-only Type 2 matcher"
 	@echo "  make type2-candidate-disposition — Downgrade Type 2 timing artifacts"
 	@echo "  make type2-threshold-sensitivity — Analyze watch-only Type 2 threshold distance"
+	@echo "  make kalshi-source-repo-inventory — Inventory donor repos and admissible artifacts"
+	@echo "  make kalshi-external-artifact-wrap — Wrap donor artifacts in strict intake manifests"
+	@echo "  make kalshi-external-artifact-preflight — Validate external research artifacts"
+	@echo "  make kalshi-signal-formula-registry — Build safe agentic formula registry"
+	@echo "  make kalshi-prior-only-donor-gate — Admit donor priors only as pre-falsification context"
+	@echo "  make kalshi-paper-decision-candidates — Build paper-autonomous decision candidates"
+	@echo "  make kalshi-paper-settlement-reconcile — Reconcile paper decisions to public Kalshi settlements"
+	@echo "  make kalshi-signal-decay-retirement — Build signal decay/retirement ledger"
+	@echo "  make kalshi-jurisdiction-refresh — Refresh jurisdiction state from config, optionally validating against external Kalshi agreement via source_url"
+	@echo "  make kalshi-live-preflight — Build live-autonomous eligibility and blocker report"
+	@echo "  make kalshi-live-demo — Run one demo-mode autonomous live pass when armed"
+	@echo "  make kalshi-live-trader — Run one configured live-autonomous trader pass"
+	@echo "  make kalshi-live-reconcile — Reconcile unresolved live Kalshi orders"
+	@echo "  make kalshi-live-risk-snapshot — Write live risk/exposure snapshot"
 	@echo "  make kalshi-ev-ledger — Build federated Kalshi contract EV ledger"
+	@echo "  make kalshi-near-resolution-flow-terms-capture — Capture public official terms for current flow candidates"
 	@echo "  make kalshi-ev-overlay-preflight — Validate local EV mapping/probability overlays"
 	@echo "  make kalshi-ev-calibration-work-order — Queue exact contracts needing calibrated probabilities"
 	@echo "  make kalshi-ev-contract-mapping-work-order — Queue model rows needing exact Kalshi contract mapping"
@@ -97,6 +151,62 @@ TYPE2_THRESHOLD_DISPOSITION_JSON ?= docs/codex/artifacts/type2-candidate-disposi
 TYPE2_THRESHOLD_OUT_DIR ?= docs/codex/artifacts/type2-threshold-sensitivity-latest
 TYPE2_THRESHOLD_RUN_ID ?= type2-threshold-sensitivity-latest
 TYPE2_THRESHOLD_GRID ?= 0.10,0.075,0.05,0.025,0.02,0.015,0.01,0.005,0.0
+KALSHI_SPORTS_CONSENSUS_JSON ?= /home/mrwatson/manual_drops/predmarket/sports-no-vig-consensus.json
+KALSHI_SPORTS_CONSENSUS_KALSHI_JSON ?= /home/mrwatson/manual_drops/predmarket/sports-consensus-kalshi-snapshot.json
+KALSHI_SPORTS_CONSENSUS_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-preflight-latest
+KALSHI_SPORTS_CONSENSUS_MIN_BOOKS ?= 2
+KALSHI_SPORTS_CONSENSUS_MAX_SKEW_SECONDS ?= 180
+KALSHI_SPORTS_CONSENSUS_BUILD_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-reference-build-latest
+KALSHI_SPORTS_CONSENSUS_ATP_ADAPTER_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-atp-donor-adapter-latest
+KALSHI_SPORTS_CONSENSUS_ATP_BOOK_JSONL ?= /home/mrwatson/projects/atp-oracle/data/sports/books/the-odds-api-atp-wimbledon-sharp-20260704T234540Z.jsonl
+KALSHI_SPORTS_CONSENSUS_ATP_KALSHI_JSONL ?= /home/mrwatson/projects/atp-oracle/data/sports/kalshi/kalshi-atp-wimbledon-20260704T234559Z.jsonl
+KALSHI_SPORTS_CONSENSUS_ATP_ODDS_JSON ?=
+KALSHI_SPORTS_CONSENSUS_ATP_ODDS_META_JSON ?=
+KALSHI_SPORTS_CONSENSUS_ATP_CAPTURE ?= 0
+KALSHI_SPORTS_CONSENSUS_NFL_ADAPTER_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-nfl-adapter-latest
+KALSHI_SPORTS_CONSENSUS_NFL_KALSHI_JSON ?= /home/mrwatson/manual_drops/kalshi/kalshi_nfl_game_series_latest.json
+KALSHI_SPORTS_CONSENSUS_NFL_ODDS_JSON ?=
+KALSHI_SPORTS_CONSENSUS_NFL_ODDS_META_JSON ?=
+KALSHI_SPORTS_CONSENSUS_NFL_CAPTURE ?= 0
+KALSHI_SPORTS_CONSENSUS_SOCCER_ADAPTER_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-soccer-adapter-latest
+KALSHI_SPORTS_CONSENSUS_SOCCER_KALSHI_JSON ?= /home/mrwatson/manual_drops/kalshi/kalshi_world_cup_game_series_latest.json
+KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_JSON ?=
+KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_META_JSON ?=
+KALSHI_SPORTS_CONSENSUS_SOCCER_CAPTURE ?= 0
+KALSHI_SPORTS_CONSENSUS_NBA_ADAPTER_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-nba-adapter-latest
+KALSHI_SPORTS_CONSENSUS_NBA_KALSHI_JSON ?= docs/codex/macro/latest-kalshi-universe-scan.json
+KALSHI_SPORTS_CONSENSUS_NBA_ODDS_JSON ?=
+KALSHI_SPORTS_CONSENSUS_NBA_ODDS_META_JSON ?=
+KALSHI_SPORTS_CONSENSUS_NBA_CAPTURE ?= 0
+KALSHI_SPORTS_CONSENSUS_KEY_FILE ?= /mnt/c/Users/mrwat/OneDrive/Desktop/Welcome to The Odds API!.txt
+KALSHI_SPORTS_CONSENSUS_RAW_DIR ?= /home/mrwatson/manual_drops/odds_api
+KALSHI_SPORTS_CONSENSUS_SPORT_KEYS ?= baseball_mlb
+KALSHI_SPORTS_CONSENSUS_BOOKMAKERS ?= pinnacle,betfair_ex_uk,matchbook,smarkets
+KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_SPORT_KEYS ?= baseball_mlb,tennis_atp_wimbledon,soccer_fifa_world_cup,americanfootball_nfl,basketball_nba
+KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS ?= pinnacle,circa,bookmaker,betcris,betfair_ex_uk,matchbook,smarkets
+KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_JSON ?= /home/mrwatson/manual_drops/predmarket/sports-sharp-provider-probe-consensus.json
+KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-sharp-provider-capture-latest
+KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDER_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-soccer-asian-provider-diagnostic-latest
+KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDERS ?= sbobet,singbet,ibc
+KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE ?= 0
+KALSHI_SPORTS_CONSENSUS_REQUIRED_BOOKS ?= pinnacle,betfair_ex_uk,matchbook,smarkets
+KALSHI_SPORTS_CONSENSUS_MAX_EVENT_DELTA_SECONDS ?= 900
+KALSHI_SPORTS_CONSENSUS_MAX_SOURCE_AGE_SECONDS ?= 900
+KALSHI_SPORTS_CONSENSUS_ODDS_RAW_JSON ?=
+KALSHI_SPORTS_CONSENSUS_ODDS_META_JSON ?=
+KALSHI_SPORTS_CONSENSUS_FALSIFICATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-falsification-latest
+KALSHI_SPORTS_CONSENSUS_FALSIFICATION_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_observations
+KALSHI_SPORTS_CONSENSUS_FALSIFICATION_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_labels
+KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-provider-audit-latest
+KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_TARGET_SPORTS ?= mlb,tennis,soccer,nfl,nba
+KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_DEFERRED_SPORTS ?= nba
+KALSHI_SPORTS_CONSENSUS_OBSERVATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-consensus-observation-loop-latest
+KALSHI_SPORTS_CONSENSUS_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_observations
+KALSHI_SPORTS_CONSENSUS_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_labels
+KALSHI_SPORTS_CONSENSUS_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_settlements
+KALSHI_SPORTS_CONSENSUS_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_sports_consensus_settlements/kalshi_sports_consensus_observed_markets_latest.json
+KALSHI_SPORTS_CONSENSUS_OBSERVED_PROBE_MAX_TICKERS ?= 100
+KALSHI_SPORTS_CONSENSUS_PROBE_OBSERVED ?= 1
 KALSHI_EV_LEDGER_OUT_DIR ?= docs/codex/macro/kalshi-contract-ev-ledger-latest
 KALSHI_EV_LEDGER_MAX_ROWS_PER_REPO ?= 500
 KALSHI_EV_OVERLAY_PREFLIGHT_OUT_DIR ?= docs/codex/macro/kalshi-ev-overlay-preflight-latest
@@ -113,6 +223,56 @@ KALSHI_EV_REVIEW_QUEUE_MIN_ROBUST_MARGIN ?= 0.02
 KALSHI_EV_REVIEW_QUEUE_MAX_ROWS ?= 100
 KALSHI_EV_QUEUE_ROBUSTNESS_OUT_DIR ?= docs/codex/macro/kalshi-ev-queue-robustness-latest
 KALSHI_EV_QUEUE_ROBUSTNESS_MIN_ROBUST_MARGIN ?= 0.02
+KALSHI_SOURCE_REPO_INVENTORY_OUT_DIR ?= docs/codex/macro/source-repo-inventory-latest
+KALSHI_EXTERNAL_ARTIFACT_WRAP_OUT_DIR ?= docs/codex/macro/external-artifact-wrap-latest
+KALSHI_EXTERNAL_ARTIFACT_WRAP_ROOT ?= /home/mrwatson/manual_drops/predmarket_external_artifacts
+KALSHI_EXTERNAL_ARTIFACT_PREFLIGHT_OUT_DIR ?= docs/codex/macro/external-artifact-preflight-latest
+KALSHI_SIGNAL_FORMULA_REGISTRY_OUT_DIR ?= docs/codex/macro/signal-formula-registry-latest
+KALSHI_SIGNAL_FORMULA_REGISTRY_SPEC ?=
+KALSHI_PRIOR_ONLY_DONOR_GATE_OUT_DIR ?= docs/codex/macro/prior-only-donor-gate-latest
+KALSHI_PRIOR_ONLY_DONOR_GATE_EXTERNAL_PREFLIGHT ?= docs/codex/macro/latest-external-artifact-preflight.json
+KALSHI_PRIOR_ONLY_DONOR_GATE_FORMULA_REGISTRY ?= docs/codex/macro/latest-signal-formula-registry.json
+KALSHI_PAPER_DECISION_OUT_DIR ?= docs/codex/macro/paper-decision-candidates-latest
+KALSHI_PAPER_DECISION_LEDGER ?= docs/codex/macro/latest-kalshi-contract-ev-ledger.json
+KALSHI_PAPER_DECISION_RETIREMENT ?= docs/codex/macro/latest-signal-decay-retirement-ledger.json
+KALSHI_PAPER_DECISION_BANKROLL ?= 10000
+KALSHI_PAPER_DECISION_KELLY_FRACTION ?= 0.25
+KALSHI_PAPER_DECISION_MAX_FRACTION ?= 0.02
+KALSHI_PAPER_DECISION_MAX_CLUSTER_SHARE ?= 0.35
+KALSHI_PAPER_DECISION_GHOST_DEPTH ?= docs/codex/macro/latest-kalshi-ghost-listing-depth-diagnostic.json
+KALSHI_PAPER_SETTLEMENT_OUT_DIR ?= docs/codex/macro/paper-settlement-reconciliation-latest
+KALSHI_PAPER_SETTLEMENT_PAPER_DECISIONS ?= docs/codex/macro/latest-paper-decision-candidates.json
+KALSHI_PAPER_SETTLEMENT_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_paper_settlements/kalshi_paper_observed_markets_latest.json
+KALSHI_PAPER_SETTLEMENT_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_paper_settlements
+KALSHI_PAPER_SETTLEMENT_FETCH ?= 0
+KALSHI_PAPER_SETTLEMENT_MAX_FETCH_TICKERS ?= 100
+KALSHI_SPORTS_PAPER_BURN_IN_OUT_DIR ?= docs/codex/macro/kalshi-sports-paper-burn-in-cycle-latest
+KALSHI_SPORTS_PAPER_BURN_IN_FETCH ?= 0
+KALSHI_SPORTS_PAPER_BURN_IN_MAX_FETCH_TICKERS ?= 100
+KALSHI_ALWAYS_ON_COLLECTOR_OUT_DIR ?= docs/codex/macro/kalshi-always-on-collector-latest
+KALSHI_ALWAYS_ON_COLLECTOR_TARGETS ?= sports,crypto
+KALSHI_ALWAYS_ON_COLLECTOR_BASE_INTERVAL_SECONDS ?= 300
+KALSHI_ALWAYS_ON_COLLECTOR_NEAR_INTERVAL_SECONDS ?= 60
+KALSHI_ALWAYS_ON_COLLECTOR_DUE_INTERVAL_SECONDS ?= 60
+KALSHI_ALWAYS_ON_COLLECTOR_NEAR_CLOSE_WINDOW_SECONDS ?= 1800
+KALSHI_ALWAYS_ON_COLLECTOR_MAX_CYCLES ?= 0
+KALSHI_SIGNAL_DECAY_RETIREMENT_OUT_DIR ?= docs/codex/macro/signal-decay-retirement-ledger-latest
+KALSHI_SIGNAL_DECAY_RETIREMENT_PAPER_DECISIONS ?= docs/codex/macro/latest-paper-decision-candidates.json
+KALSHI_SIGNAL_DECAY_RETIREMENT_MIN_RECENT ?= 3
+KALSHI_SIGNAL_DECAY_RETIREMENT_MIN_ACCURACY ?= 0.50
+KALSHI_SIGNAL_DECAY_RETIREMENT_MAX_CAL_ERROR ?= 0.20
+KALSHI_LIVE_STATE_DIR ?= data/kalshi_live
+KALSHI_LIVE_MARKET_SNAPSHOTS ?=
+KALSHI_LIVE_CAPTURE_MARKET_SNAPSHOTS ?= 1
+KALSHI_LIVE_MARKET_SNAPSHOT_DEPTH ?= 10
+KALSHI_LIVE_PREFLIGHT_OUT_DIR ?= docs/codex/macro/kalshi-live-preflight-latest
+KALSHI_LIVE_TRADER_OUT_DIR ?= docs/codex/macro/kalshi-live-trader-latest
+KALSHI_LIVE_RECONCILE_OUT_DIR ?= docs/codex/macro/kalshi-live-reconcile-latest
+KALSHI_LIVE_RISK_SNAPSHOT_OUT_DIR ?= docs/codex/macro/kalshi-live-risk-snapshot-latest
+KALSHI_LIVE_EXECUTION_MODE ?= disabled
+KALSHI_LIVE_PAPER_DECISIONS ?= docs/codex/macro/latest-paper-decision-candidates.json
+KALSHI_LIVE_EXTERNAL_PREFLIGHT ?= docs/codex/macro/latest-external-artifact-preflight.json
+KALSHI_LIVE_RETIREMENT ?= docs/codex/macro/latest-signal-decay-retirement-ledger.json
 MACRO_BLOCKER_AUDIT_OUT_DIR ?= docs/codex/macro/macro-blocker-audit-latest
 KALSHI_MANUAL_DROP_SERIES ?= KXMLBGAME,KXMLBTOTAL,KXMLBSPREAD,KXMLBF5,KXMLBF5TOTAL,KXMLBF5SPREAD
 KALSHI_MANUAL_DROP_STATUS ?= open
@@ -125,6 +285,7 @@ KALSHI_MANUAL_DROP_REPORT_DIR ?= docs/codex/artifacts/kalshi-manual-drop-capture
 KALSHI_MANUAL_DROP_RUN_ID ?= kalshi-manual-drop-capture-latest
 KALSHI_UNIVERSE_MIN_CLOSE_HOURS ?= 0
 KALSHI_UNIVERSE_MAX_CLOSE_HOURS ?= 72
+KALSHI_UNIVERSE_FOCUSED_SPORTS_FETCH_MAX_CLOSE_HOURS ?= 720
 KALSHI_UNIVERSE_LIMIT ?= 1000
 KALSHI_UNIVERSE_MAX_PAGES ?= 10
 KALSHI_UNIVERSE_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_universe
@@ -152,6 +313,13 @@ KALSHI_PROBABILITY_BREADTH_PROBE ?= 1
 KALSHI_CRYPTO_PROXY_FEATURE_OUT_DIR ?= docs/codex/macro/kalshi-crypto-proxy-feature-packet-latest
 KALSHI_CRYPTO_PROXY_FEATURE_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_crypto_proxy_features
 KALSHI_CRYPTO_PROXY_FEATURE_RAW_UNIVERSE ?= /home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json
+KALSHI_SPORTS_PROXY_FEATURE_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-feature-packet-latest
+KALSHI_SPORTS_PROXY_FEATURE_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_proxy_features
+KALSHI_SPORTS_PROXY_FEATURE_RAW_UNIVERSE ?= /home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json
+KALSHI_SPORTS_PROXY_FEATURE_MLB_PLATFORM_MODEL ?= /home/mrwatson/manual_drops/mlb_platform_signal_features/mlb_platform_sports_model_latest.json
+KALSHI_SPORTS_PROXY_FEATURE_MAX_CLOSE_HOURS ?= 6
+KALSHI_SPORTS_PROXY_FEATURE_MAX_CONTRACTS ?= 1500
+KALSHI_SPORTS_PROXY_FEATURE_CAPTURE ?= 1
 KALSHI_CRYPTO_PROXY_FEATURE_MAX_CLOSE_HOURS ?= 6
 KALSHI_CRYPTO_PROXY_FEATURE_MAX_CONTRACTS ?= 1500
 KALSHI_CRYPTO_PROXY_FEATURE_CAPTURE ?= 1
@@ -165,6 +333,100 @@ KALSHI_CRYPTO_PROXY_SETTLED_MAX_PAGES ?= 1
 KALSHI_CRYPTO_PROXY_OBSERVATION_CAPTURE_SETTLED ?= 1
 KALSHI_CRYPTO_PROXY_OBSERVATION_PROBE_OBSERVED ?= 1
 KALSHI_CRYPTO_PROXY_OBSERVATION_PROBE_MAX_TICKERS ?= 300
+KALSHI_SPORTS_PROXY_OBSERVATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-observation-loop-latest
+KALSHI_SPORTS_PROXY_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_proxy_observations
+KALSHI_SPORTS_PROXY_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_proxy_labels
+KALSHI_SPORTS_PROXY_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_sports_settlements/kalshi_settled_markets_latest.json
+KALSHI_SPORTS_PROXY_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_settlements
+KALSHI_SPORTS_PROXY_SETTLED_LIMIT ?= 1000
+KALSHI_SPORTS_PROXY_SETTLED_MAX_PAGES ?= 1
+KALSHI_SPORTS_PROXY_OBSERVATION_CAPTURE_SETTLED ?= 1
+KALSHI_SPORTS_PROXY_OBSERVATION_PROBE_OBSERVED ?= 1
+KALSHI_SPORTS_PROXY_OBSERVATION_PROBE_MAX_TICKERS ?= 300
+KALSHI_ATP_PROXY_OBSERVATION_OUT_DIR ?= docs/codex/macro/kalshi-atp-proxy-observation-loop-latest
+KALSHI_ATP_PROXY_MATCH_SNAPSHOT ?= $(lastword $(sort $(wildcard /home/mrwatson/projects/atp-oracle/data/kalshi/matches-*.json)))
+KALSHI_ATP_PROXY_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_atp_proxy_observations
+KALSHI_ATP_PROXY_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_atp_proxy_labels
+KALSHI_ATP_PROXY_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_atp_settlements/kalshi_atp_settled_markets_latest.json
+KALSHI_ATP_PROXY_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_atp_settlements
+KALSHI_ATP_PROXY_SETTLED_LIMIT ?= 1000
+KALSHI_ATP_PROXY_SETTLED_MAX_PAGES ?= 1
+KALSHI_ATP_PROXY_OBSERVATION_CAPTURE_SETTLED ?= 1
+KALSHI_ATP_PROXY_OBSERVATION_PROBE_OBSERVED ?= 1
+KALSHI_ATP_PROXY_OBSERVATION_PROBE_MAX_TICKERS ?= 300
+KALSHI_ATP_PROXY_EVIDENCE_OUT_DIR ?= docs/codex/macro/kalshi-atp-proxy-evidence-gate-latest
+KALSHI_ATP_PROXY_FORWARD_OOS ?= /home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-latest/report.json
+KALSHI_ATP_PROXY_LIQUIDITY ?= /home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-liquidity-latest/liquidity.json
+KALSHI_ATP_PROXY_BETTABLE_GATE ?= /home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-bettable-line-gate-latest/bettable-line-gate.json
+KALSHI_ATP_PROXY_PRICE_OBSERVATIONS ?= /home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-price-observations-latest/prices.json
+KALSHI_ATP_PROXY_MIN_SETTLED_LABELS ?= 10
+KALSHI_WORLD_CUP_PROXY_OBSERVATION_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-proxy-observation-loop-latest
+KALSHI_WORLD_CUP_PROXY_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_world_cup_proxy_observations
+KALSHI_WORLD_CUP_PROXY_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_world_cup_proxy_labels
+KALSHI_WORLD_CUP_PROXY_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_world_cup_settlements/kalshi_observed_markets_latest.json
+KALSHI_WORLD_CUP_PROXY_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_world_cup_settlements
+KALSHI_WORLD_CUP_PROXY_UNIVERSE_SCAN ?= docs/codex/macro/latest-kalshi-universe-scan.json
+KALSHI_WORLD_CUP_PROXY_MAX_CONTRACTS ?= 300
+KALSHI_WORLD_CUP_PROXY_OBSERVATION_PROBE_OBSERVED ?= 1
+KALSHI_WORLD_CUP_PROXY_OBSERVATION_PROBE_MAX_TICKERS ?= 300
+KALSHI_WORLD_CUP_PROXY_MODEL_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-proxy-feature-model-falsification-latest
+KALSHI_WORLD_CUP_PROXY_MODEL_MIN_INDEPENDENT_LABELS ?= 30
+KALSHI_WORLD_CUP_PROXY_MODEL_MIN_OOS_LABELS ?= 10
+KALSHI_WORLD_CUP_PROXY_MODEL_TEST_FRACTION ?= 0.30
+KALSHI_WORLD_CUP_PROXY_MODEL_FDR_ALPHA ?= 0.10
+KALSHI_WORLD_CUP_OUTCOME_INDEPENDENCE_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-outcome-independence-diagnostic-latest
+KALSHI_SPORTS_LABEL_ACCUMULATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-label-accumulation-cycle-latest
+KALSHI_GHOST_LISTING_DEPTH_OUT_DIR ?= docs/codex/macro/kalshi-ghost-listing-depth-diagnostic-latest
+KALSHI_GHOST_LISTING_DEPTH_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_ghost_listing_depth
+KALSHI_GHOST_LISTING_DEPTH_MAX_CONTRACTS ?= 120
+KALSHI_GHOST_LISTING_DEPTH_DEPTH ?= 0
+KALSHI_GHOST_LISTING_DEPTH_DELAY_SECONDS ?= 0.03
+KALSHI_GHOST_LISTING_DEPTH_CAPTURE ?= 1
+KALSHI_GHOST_LISTING_DEPTH_MIN_PROBE_COVERAGE ?= 0.80
+KALSHI_GHOST_LISTING_DEPTH_MIN_POSITIVE_FRACTION ?= 0.18
+KALSHI_GHOST_LISTING_CLASSIFICATIONS ?= other_sports,mlb,atp,nfl,nba,weather,finance_crypto,macro_econ,politics_policy
+KALSHI_SPORTS_STACK_SEQUENCING_OUT_DIR ?= docs/codex/macro/kalshi-sports-stack-sequencing-latest
+KALSHI_SPORTS_STACK_MLB_REPLAY_PATH ?= docs/codex/macro/latest-kalshi-sports-proxy-research-candidate-replay.json
+KALSHI_SPORTS_STACK_MLB_CCD_PATH ?= docs/codex/macro/latest-kalshi-sports-proxy-capacity-correlation-decay.json
+KALSHI_SPORTS_STACK_MLB_CLUSTER_PATH ?= docs/codex/macro/latest-kalshi-sports-proxy-correlation-cluster-control.json
+KALSHI_SPORTS_MICROSTRUCTURE_OUT_DIR ?= docs/codex/macro/kalshi-sports-microstructure-observation-loop-latest
+KALSHI_SPORTS_MICROSTRUCTURE_RAW_ORDERBOOK_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_microstructure_orderbooks
+KALSHI_SPORTS_MICROSTRUCTURE_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_microstructure_observations
+KALSHI_SPORTS_MICROSTRUCTURE_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_sports_microstructure_settlements/kalshi_sports_microstructure_observed_markets_latest.json
+KALSHI_SPORTS_MICROSTRUCTURE_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_microstructure_settlements
+KALSHI_SPORTS_MICROSTRUCTURE_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_microstructure_labels
+KALSHI_SPORTS_MICROSTRUCTURE_MAX_TICKERS ?= 120
+KALSHI_SPORTS_MICROSTRUCTURE_MAX_CLOSE_HOURS ?= 48
+KALSHI_SPORTS_MICROSTRUCTURE_DEPTH ?= 0
+KALSHI_SPORTS_MICROSTRUCTURE_DELAY_SECONDS ?= 0.03
+KALSHI_SPORTS_MICROSTRUCTURE_CAPTURE ?= 1
+KALSHI_SPORTS_MICROSTRUCTURE_PROBE_OBSERVED ?= 1
+KALSHI_SPORTS_MICROSTRUCTURE_PROBE_MAX_TICKERS ?= 300
+KALSHI_NEAR_RESOLUTION_FLOW_OUT_DIR ?= docs/codex/macro/kalshi-near-resolution-informed-flow-evidence-gate-latest
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_OUT_DIR ?= docs/codex/macro/kalshi-near-resolution-flow-replay-gates-latest
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CLOSE_HOURS ?= 6
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CURRENT_CANDIDATES ?= 60
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_OBSERVATION_AGE_SECONDS ?= 900
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CLUSTER_SHARE ?= 0.35
+KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MIN_POSITIVE_CAPACITY_CONTRACTS ?= 1
+KALSHI_NEAR_RESOLUTION_FLOW_TERMS_OUT_DIR ?= docs/codex/macro/kalshi-near-resolution-flow-terms-capture-latest
+KALSHI_NEAR_RESOLUTION_FLOW_TERMS_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi
+KALSHI_NEAR_RESOLUTION_FLOW_TERMS_MAX_MARKETS ?= 120
+KALSHI_NEAR_RESOLUTION_FLOW_TERMS_CAPTURE ?= 1
+KALSHI_NEAR_RESOLUTION_FLOW_TERMS_DELAY_SECONDS ?= 0.03
+KALSHI_PASSIVE_LIQUIDITY_OUT_DIR ?= docs/codex/macro/kalshi-passive-liquidity-provision-evidence-gate-latest
+KALSHI_PASSIVE_LIQUIDITY_TTL_SECONDS ?= 43200
+KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_OUT_DIR ?= docs/codex/macro/kalshi-passive-liquidity-paper-fill-loop-latest
+KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_STATE_DIR ?= /home/mrwatson/manual_drops/kalshi_passive_liquidity_paper_fills
+KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_FALSIFICATION_OUT_DIR ?= docs/codex/macro/kalshi-passive-liquidity-paper-fill-falsification-latest
+KALSHI_PASSIVE_LIQUIDITY_FILL_CLOCK_DIAGNOSTIC_OUT_DIR ?= docs/codex/macro/kalshi-passive-liquidity-fill-clock-diagnostic-latest
+KALSHI_SPORTS_EVENT_VELOCITY_ETA_OUT_DIR ?= docs/codex/macro/kalshi-sports-event-velocity-eta-latest
+KALSHI_CLAUDE_ADVICE_AUDIT_OUT_DIR ?= docs/codex/macro/kalshi-claude-advice-audit-latest
+KALSHI_SPORTS_BLOCKER_CLEARANCE_OUT_DIR ?= docs/codex/macro/kalshi-sports-blocker-clearance-cycle-latest
+KALSHI_SPORTS_BLOCKER_CLEARANCE_RUN_DUE ?= 0
+KALSHI_SPORTS_BLOCKER_CLEARANCE_ATP_REPO ?= /home/mrwatson/projects/atp-oracle
+KALSHI_SPORTS_BLOCKER_CLEARANCE_COMMAND_TIMEOUT_SECONDS ?= 900
+KALSHI_SPORTS_EVIDENCE_CYCLE_OUT_DIR ?= docs/codex/macro/kalshi-sports-evidence-cycle-latest
 KALSHI_CRYPTO_PROXY_MODEL_OUT_DIR ?= docs/codex/macro/kalshi-crypto-proxy-feature-model-falsification-latest
 KALSHI_CRYPTO_PROXY_MODEL_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_crypto_proxy_labels
 KALSHI_CRYPTO_PROXY_MODEL_MIN_INDEPENDENT_LABELS ?= 30
@@ -177,6 +439,59 @@ KALSHI_CRYPTO_PROXY_REPLAY_MODEL_PATH ?= docs/codex/macro/latest-kalshi-crypto-p
 KALSHI_CRYPTO_PROXY_REPLAY_MIN_SIDE_OOS_LABELS ?= 30
 KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_BUCKETS ?= 3
 KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_LABELS ?= 100
+KALSHI_SPORTS_PROXY_MODEL_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-feature-model-falsification-latest
+KALSHI_SPORTS_PROXY_REPLAY_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-research-candidate-replay-latest
+KALSHI_SPORTS_PROXY_REPLAY_MODEL_PATH ?= docs/codex/macro/latest-kalshi-sports-proxy-feature-model-falsification.json
+KALSHI_SPORTS_PROXY_REPLAY_PREFERRED_MODEL_ID ?=
+KALSHI_SPORTS_PROXY_CCD_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-capacity-correlation-decay-latest
+KALSHI_SPORTS_PROXY_CCD_FEATURE_PACKET ?= docs/codex/macro/latest-kalshi-sports-proxy-feature-packet.json
+KALSHI_SPORTS_PROXY_CCD_REPLAY ?= docs/codex/macro/latest-kalshi-sports-proxy-research-candidate-replay.json
+KALSHI_SPORTS_PROXY_CCD_RAW_ORDERBOOK_DIR ?= /home/mrwatson/manual_drops/kalshi_sports_proxy_orderbooks
+KALSHI_SPORTS_PROXY_CCD_MAX_CLOSE_HOURS ?= 6
+KALSHI_SPORTS_PROXY_CCD_MAX_TICKERS ?= 60
+KALSHI_SPORTS_PROXY_CCD_DEPTH ?= 0
+KALSHI_SPORTS_PROXY_CCD_DELAY_SECONDS ?= 0.05
+KALSHI_SPORTS_PROXY_CCD_CAPTURE_ORDERBOOKS ?= 1
+KALSHI_SPORTS_PROXY_CLUSTER_OUT_DIR ?= docs/codex/macro/kalshi-sports-proxy-correlation-cluster-control-latest
+KALSHI_SPORTS_PROXY_CLUSTER_CCD ?= docs/codex/macro/latest-kalshi-sports-proxy-capacity-correlation-decay.json
+KALSHI_SPORTS_PROXY_CLUSTER_MAX_SHARE ?= 0.35
+KALSHI_SPORTS_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS ?= 0
+# Weather proxy variables
+KALSHI_WEATHER_PROXY_FEATURE_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-feature-packet-latest
+KALSHI_WEATHER_PROXY_FEATURE_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_features
+KALSHI_WEATHER_PROXY_FEATURE_RAW_UNIVERSE ?= /home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json
+KALSHI_WEATHER_PROXY_FEATURE_MAX_CLOSE_HOURS ?= 48
+KALSHI_WEATHER_PROXY_FEATURE_MAX_CONTRACTS ?= 1500
+KALSHI_WEATHER_PROXY_FEATURE_CAPTURE ?= 0
+KALSHI_WEATHER_PROXY_OBSERVATION_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-observation-loop-latest
+KALSHI_WEATHER_PROXY_OBSERVATION_DIR ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_observations
+KALSHI_WEATHER_PROXY_LABEL_DIR ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_labels
+KALSHI_WEATHER_PROXY_SETTLED_SNAPSHOT ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_settlements/kalshi_weather_settled_markets_latest.json
+KALSHI_WEATHER_PROXY_SETTLED_RAW_DIR ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_settlements
+KALSHI_WEATHER_PROXY_SETTLED_LIMIT ?= 1000
+KALSHI_WEATHER_PROXY_SETTLED_MAX_PAGES ?= 1
+KALSHI_WEATHER_PROXY_OBSERVATION_CAPTURE_SETTLED ?= 1
+KALSHI_WEATHER_PROXY_OBSERVATION_PROBE_MAX_TICKERS ?= 300
+KALSHI_WEATHER_PROXY_MODEL_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-feature-model-falsification-latest
+KALSHI_WEATHER_PROXY_MODEL_MIN_INDEPENDENT_LABELS ?= 30
+KALSHI_WEATHER_PROXY_MODEL_MIN_OOS_LABELS ?= 10
+KALSHI_WEATHER_PROXY_MODEL_TEST_FRACTION ?= 0.30
+KALSHI_WEATHER_PROXY_MODEL_FDR_ALPHA ?= 0.10
+KALSHI_WEATHER_PROXY_REPLAY_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-research-candidate-replay-latest
+KALSHI_WEATHER_PROXY_REPLAY_MODEL_PATH ?= docs/codex/macro/latest-kalshi-weather-proxy-feature-model-falsification.json
+KALSHI_WEATHER_PROXY_CCD_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-capacity-correlation-decay-latest
+KALSHI_WEATHER_PROXY_CCD_FEATURE_PACKET ?= docs/codex/macro/latest-kalshi-weather-proxy-feature-packet.json
+KALSHI_WEATHER_PROXY_CCD_REPLAY ?= docs/codex/macro/latest-kalshi-weather-proxy-research-candidate-replay.json
+KALSHI_WEATHER_PROXY_CCD_RAW_ORDERBOOK_DIR ?= /home/mrwatson/manual_drops/kalshi_weather_proxy_orderbooks
+KALSHI_WEATHER_PROXY_CCD_MAX_CLOSE_HOURS ?= 48
+KALSHI_WEATHER_PROXY_CCD_MAX_TICKERS ?= 60
+KALSHI_WEATHER_PROXY_CCD_DEPTH ?= 0
+KALSHI_WEATHER_PROXY_CCD_DELAY_SECONDS ?= 0.05
+KALSHI_WEATHER_PROXY_CCD_CAPTURE_ORDERBOOKS ?= 0
+KALSHI_WEATHER_PROXY_CLUSTER_OUT_DIR ?= docs/codex/macro/kalshi-weather-proxy-correlation-cluster-control-latest
+KALSHI_WEATHER_PROXY_CLUSTER_CCD ?= docs/codex/macro/latest-kalshi-weather-proxy-capacity-correlation-decay.json
+KALSHI_WEATHER_PROXY_CLUSTER_MAX_SHARE ?= 0.35
+KALSHI_WEATHER_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS ?= 0
 KALSHI_CRYPTO_PROXY_CCD_OUT_DIR ?= docs/codex/macro/kalshi-crypto-proxy-capacity-correlation-decay-latest
 KALSHI_CRYPTO_PROXY_CCD_FEATURE_PACKET ?= docs/codex/macro/latest-kalshi-crypto-proxy-feature-packet.json
 KALSHI_CRYPTO_PROXY_CCD_REPLAY ?= docs/codex/macro/latest-kalshi-crypto-proxy-research-candidate-replay.json
@@ -384,6 +699,7 @@ kalshi-universe-scan:
 		--write \
 		--min-close-hours $(KALSHI_UNIVERSE_MIN_CLOSE_HOURS) \
 		--max-close-hours $(KALSHI_UNIVERSE_MAX_CLOSE_HOURS) \
+		--focused-sports-fetch-max-close-hours $(KALSHI_UNIVERSE_FOCUSED_SPORTS_FETCH_MAX_CLOSE_HOURS) \
 		--limit $(KALSHI_UNIVERSE_LIMIT) \
 		--max-pages $(KALSHI_UNIVERSE_MAX_PAGES) \
 		--raw-output-dir $(KALSHI_UNIVERSE_RAW_DIR) \
@@ -458,6 +774,17 @@ kalshi-crypto-proxy-feature-watch-once:
 	@$(MAKE) --no-print-directory kalshi-probability-breadth-scout
 	@$(MAKE) --no-print-directory kalshi-crypto-proxy-feature-packet
 
+kalshi-sports-proxy-feature-packet:
+	@python3 scripts/kalshi_sports_proxy_feature_packet.py \
+		--write \
+		--max-close-hours $(KALSHI_SPORTS_PROXY_FEATURE_MAX_CLOSE_HOURS) \
+		--max-contracts $(KALSHI_SPORTS_PROXY_FEATURE_MAX_CONTRACTS) \
+		--raw-universe-path $(KALSHI_SPORTS_PROXY_FEATURE_RAW_UNIVERSE) \
+		--raw-proxy-dir $(KALSHI_SPORTS_PROXY_FEATURE_RAW_DIR) \
+		--mlb-platform-model-path $(KALSHI_SPORTS_PROXY_FEATURE_MLB_PLATFORM_MODEL) \
+		--out-dir $(KALSHI_SPORTS_PROXY_FEATURE_OUT_DIR) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_PROXY_FEATURE_CAPTURE)),--capture-public-features,)
+
 kalshi-crypto-proxy-observation-loop:
 	@python3 scripts/kalshi_crypto_proxy_observation_loop.py \
 		--write \
@@ -482,6 +809,518 @@ kalshi-crypto-proxy-observation-watch-once:
 	@$(MAKE) --no-print-directory kalshi-signal-factory-status
 	@$(MAKE) --no-print-directory macro-route
 
+kalshi-sports-proxy-observation-loop:
+	@python3 scripts/kalshi_sports_proxy_observation_loop.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_PROXY_OBSERVATION_OUT_DIR) \
+		--observation-dir $(KALSHI_SPORTS_PROXY_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_SPORTS_PROXY_LABEL_DIR) \
+		--settled-snapshot-path $(KALSHI_SPORTS_PROXY_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_SPORTS_PROXY_SETTLED_RAW_DIR) \
+		--settled-limit $(KALSHI_SPORTS_PROXY_SETTLED_LIMIT) \
+		--settled-max-pages $(KALSHI_SPORTS_PROXY_SETTLED_MAX_PAGES) \
+		--observed-probe-max-tickers $(KALSHI_SPORTS_PROXY_OBSERVATION_PROBE_MAX_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_PROXY_OBSERVATION_PROBE_OBSERVED)),--probe-observed-public,) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_PROXY_OBSERVATION_CAPTURE_SETTLED)),--capture-settled-public,)
+
+kalshi-sports-proxy-observation-watch-once:
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-feature-packet
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-observation-loop
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-feature-model-falsification
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-research-candidate-replay
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-capacity-correlation-decay
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-correlation-cluster-control
+	@$(MAKE) --no-print-directory kalshi-signal-factory-status
+	@$(MAKE) --no-print-directory macro-route
+
+kalshi-atp-proxy-observation-loop:
+	@python3 scripts/kalshi_atp_proxy_observation_loop.py \
+		--write \
+		--out-dir $(KALSHI_ATP_PROXY_OBSERVATION_OUT_DIR) \
+		--atp-match-snapshot-path $(KALSHI_ATP_PROXY_MATCH_SNAPSHOT) \
+		--observation-dir $(KALSHI_ATP_PROXY_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_ATP_PROXY_LABEL_DIR) \
+		--settled-snapshot-path $(KALSHI_ATP_PROXY_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_ATP_PROXY_SETTLED_RAW_DIR) \
+		--settled-limit $(KALSHI_ATP_PROXY_SETTLED_LIMIT) \
+		--settled-max-pages $(KALSHI_ATP_PROXY_SETTLED_MAX_PAGES) \
+		--observed-probe-max-tickers $(KALSHI_ATP_PROXY_OBSERVATION_PROBE_MAX_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_ATP_PROXY_OBSERVATION_PROBE_OBSERVED)),--probe-observed-public,) \
+		$(if $(filter 1 true yes,$(KALSHI_ATP_PROXY_OBSERVATION_CAPTURE_SETTLED)),--capture-settled-public,)
+
+kalshi-atp-proxy-evidence-gate:
+	@python3 scripts/kalshi_atp_proxy_evidence_gate.py \
+		--write \
+		--out-dir $(KALSHI_ATP_PROXY_EVIDENCE_OUT_DIR) \
+		--observation-loop-path docs/codex/macro/latest-kalshi-atp-proxy-observation-loop.json \
+		--forward-oos-path $(KALSHI_ATP_PROXY_FORWARD_OOS) \
+		--liquidity-path $(KALSHI_ATP_PROXY_LIQUIDITY) \
+		--bettable-gate-path $(KALSHI_ATP_PROXY_BETTABLE_GATE) \
+		--price-observations-path $(KALSHI_ATP_PROXY_PRICE_OBSERVATIONS) \
+		--min-settled-labels $(KALSHI_ATP_PROXY_MIN_SETTLED_LABELS)
+
+kalshi-atp-proxy-observation-watch-once:
+	@$(MAKE) --no-print-directory kalshi-atp-proxy-observation-loop
+	@$(MAKE) --no-print-directory kalshi-atp-proxy-evidence-gate
+	@$(MAKE) --no-print-directory kalshi-signal-factory-status
+	@$(MAKE) --no-print-directory macro-route
+
+kalshi-world-cup-proxy-observation-loop:
+	@python3 scripts/kalshi_world_cup_proxy_observation_loop.py \
+		--write \
+		--universe-scan-path $(KALSHI_WORLD_CUP_PROXY_UNIVERSE_SCAN) \
+		--out-dir $(KALSHI_WORLD_CUP_PROXY_OBSERVATION_OUT_DIR) \
+		--observation-dir $(KALSHI_WORLD_CUP_PROXY_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_WORLD_CUP_PROXY_LABEL_DIR) \
+		--settled-snapshot-path $(KALSHI_WORLD_CUP_PROXY_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_WORLD_CUP_PROXY_SETTLED_RAW_DIR) \
+		--max-contracts $(KALSHI_WORLD_CUP_PROXY_MAX_CONTRACTS) \
+		--observed-probe-max-tickers $(KALSHI_WORLD_CUP_PROXY_OBSERVATION_PROBE_MAX_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_WORLD_CUP_PROXY_OBSERVATION_PROBE_OBSERVED)),--probe-observed-public,)
+
+kalshi-world-cup-proxy-feature-model-falsification:
+	@python3 scripts/kalshi_world_cup_proxy_feature_model_falsification.py \
+		--write \
+		--label-dir $(KALSHI_WORLD_CUP_PROXY_LABEL_DIR) \
+		--out-dir $(KALSHI_WORLD_CUP_PROXY_MODEL_OUT_DIR) \
+		--min-independent-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_INDEPENDENT_LABELS) \
+		--min-oos-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_OOS_LABELS) \
+		--test-fraction $(KALSHI_WORLD_CUP_PROXY_MODEL_TEST_FRACTION) \
+		--fdr-alpha $(KALSHI_WORLD_CUP_PROXY_MODEL_FDR_ALPHA)
+
+kalshi-world-cup-outcome-independence-diagnostic:
+	@python3 scripts/kalshi_world_cup_outcome_independence_diagnostic.py \
+		--write \
+		--label-dir $(KALSHI_WORLD_CUP_PROXY_LABEL_DIR) \
+		--world-cup-model-path docs/codex/macro/latest-kalshi-world-cup-proxy-feature-model-falsification.json \
+		--out-dir $(KALSHI_WORLD_CUP_OUTCOME_INDEPENDENCE_OUT_DIR) \
+		--min-independent-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_INDEPENDENT_LABELS) \
+		--min-oos-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_OOS_LABELS)
+
+kalshi-world-cup-proxy-observation-watch-once:
+	@$(MAKE) --no-print-directory kalshi-universe-scan
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-observation-loop
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-feature-model-falsification
+	@$(MAKE) --no-print-directory kalshi-world-cup-outcome-independence-diagnostic
+	@$(MAKE) --no-print-directory kalshi-ghost-listing-depth-diagnostic
+	@$(MAKE) --no-print-directory kalshi-sports-stack-sequencing
+	@$(MAKE) --no-print-directory kalshi-signal-factory-status
+	@$(MAKE) --no-print-directory macro-route
+
+kalshi-ghost-listing-depth-diagnostic:
+	@python3 scripts/kalshi_ghost_listing_depth_diagnostic.py \
+		--write \
+		--universe-scan-path docs/codex/macro/latest-kalshi-universe-scan.json \
+		--raw-orderbook-dir $(KALSHI_GHOST_LISTING_DEPTH_RAW_DIR) \
+		--out-dir $(KALSHI_GHOST_LISTING_DEPTH_OUT_DIR) \
+		--max-contracts $(KALSHI_GHOST_LISTING_DEPTH_MAX_CONTRACTS) \
+		--depth $(KALSHI_GHOST_LISTING_DEPTH_DEPTH) \
+		--delay-seconds $(KALSHI_GHOST_LISTING_DEPTH_DELAY_SECONDS) \
+		--classifications $(KALSHI_GHOST_LISTING_CLASSIFICATIONS) \
+		--min-probe-coverage $(KALSHI_GHOST_LISTING_DEPTH_MIN_PROBE_COVERAGE) \
+		--min-positive-depth-fraction $(KALSHI_GHOST_LISTING_DEPTH_MIN_POSITIVE_FRACTION) \
+		$(if $(filter 1 true yes,$(KALSHI_GHOST_LISTING_DEPTH_CAPTURE)),--capture-orderbooks,)
+
+kalshi-sports-stack-sequencing:
+	@python3 scripts/kalshi_sports_stack_sequencing.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_STACK_SEQUENCING_OUT_DIR) \
+		--universe-scan-path docs/codex/macro/latest-kalshi-universe-scan.json \
+		--world-cup-observation-path docs/codex/macro/latest-kalshi-world-cup-proxy-observation-loop.json \
+		--world-cup-model-path docs/codex/macro/latest-kalshi-world-cup-proxy-feature-model-falsification.json \
+		--mlb-observation-path docs/codex/macro/latest-kalshi-sports-proxy-observation-loop.json \
+		--mlb-model-path docs/codex/macro/latest-kalshi-sports-proxy-feature-model-falsification.json \
+		--mlb-replay-path $(KALSHI_SPORTS_STACK_MLB_REPLAY_PATH) \
+		--mlb-ccd-path $(KALSHI_SPORTS_STACK_MLB_CCD_PATH) \
+		--mlb-cluster-path $(KALSHI_SPORTS_STACK_MLB_CLUSTER_PATH) \
+		--atp-observation-path docs/codex/macro/latest-kalshi-atp-proxy-observation-loop.json \
+		--atp-evidence-path docs/codex/macro/latest-kalshi-atp-proxy-evidence-gate.json \
+		--ghost-depth-path docs/codex/macro/latest-kalshi-ghost-listing-depth-diagnostic.json
+
+kalshi-sports-consensus-reference-build:
+	@args="--kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json --reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) --report-dir $(KALSHI_SPORTS_CONSENSUS_BUILD_OUT_DIR) --required-books $(KALSHI_SPORTS_CONSENSUS_REQUIRED_BOOKS) --max-event-delta-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_EVENT_DELTA_SECONDS) --max-source-age-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_SOURCE_AGE_SECONDS)"; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_ODDS_RAW_JSON)" ]; then args="$$args --odds-raw-json $(KALSHI_SPORTS_CONSENSUS_ODDS_RAW_JSON)"; fi; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_ODDS_META_JSON)" ]; then args="$$args --odds-meta-json $(KALSHI_SPORTS_CONSENSUS_ODDS_META_JSON)"; fi; \
+	python3 scripts/kalshi_sports_consensus_reference_build.py $$args
+
+kalshi-sports-consensus-sharp-provider-capture:
+	@python3 scripts/kalshi_sports_consensus_reference_build.py \
+		--capture-current \
+		--kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json \
+		--reference-json $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_JSON) \
+		--report-dir $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_OUT_DIR) \
+		--api-key-file "$(KALSHI_SPORTS_CONSENSUS_KEY_FILE)" \
+		--sport-keys $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_SPORT_KEYS) \
+		--bookmakers $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) \
+		--raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR) \
+		--required-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) \
+		--max-event-delta-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_EVENT_DELTA_SECONDS) \
+		--max-source-age-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_SOURCE_AGE_SECONDS)
+
+kalshi-sports-consensus-soccer-asian-provider-diagnostic:
+	@if [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "yes" ]; then \
+		python3 scripts/kalshi_sports_consensus_soccer_asian_provider_diagnostic.py \
+			--out-dir $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDER_OUT_DIR) \
+			--target-providers $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDERS) \
+			--max-raw-files 20 \
+			--capture-current \
+			--api-key-file "$(KALSHI_SPORTS_CONSENSUS_KEY_FILE)" \
+			--raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR); \
+	else \
+		python3 scripts/kalshi_sports_consensus_soccer_asian_provider_diagnostic.py \
+			--out-dir $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDER_OUT_DIR) \
+			--target-providers $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDERS) \
+			--max-raw-files 20; \
+	fi
+
+kalshi-sports-consensus-public-kalshi-refresh:
+	@$(MAKE) --no-print-directory kalshi-manual-drop-capture \
+		KALSHI_MANUAL_DROP_SERIES=KXNFLGAME \
+		KALSHI_MANUAL_DROP_LATEST=$(KALSHI_SPORTS_CONSENSUS_NFL_KALSHI_JSON) \
+		KALSHI_MANUAL_DROP_RUN_ID=kalshi-nfl-manual-drop-capture-latest \
+		KALSHI_MANUAL_DROP_LIMIT=100 \
+		KALSHI_MANUAL_DROP_MAX_PAGES=1 \
+		KALSHI_MANUAL_DROP_DELAY_SECONDS=0
+	@$(MAKE) --no-print-directory kalshi-manual-drop-capture \
+		KALSHI_MANUAL_DROP_SERIES=KXWCGAME \
+		KALSHI_MANUAL_DROP_LATEST=$(KALSHI_SPORTS_CONSENSUS_SOCCER_KALSHI_JSON) \
+		KALSHI_MANUAL_DROP_RUN_ID=kalshi-world-cup-game-capture-latest \
+		KALSHI_MANUAL_DROP_LIMIT=100 \
+		KALSHI_MANUAL_DROP_MAX_PAGES=1 \
+		KALSHI_MANUAL_DROP_DELAY_SECONDS=0
+
+kalshi-sports-consensus-atp-donor-adapter:
+	@args="--write --reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) --combined-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --base-kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json --atp-book-jsonl $(KALSHI_SPORTS_CONSENSUS_ATP_BOOK_JSONL) --atp-kalshi-jsonl $(KALSHI_SPORTS_CONSENSUS_ATP_KALSHI_JSONL) --out-dir $(KALSHI_SPORTS_CONSENSUS_ATP_ADAPTER_OUT_DIR) --allowed-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) --raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR)"; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_ATP_ODDS_JSON)" ]; then args="$$args --atp-odds-json $(KALSHI_SPORTS_CONSENSUS_ATP_ODDS_JSON)"; fi; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_ATP_ODDS_META_JSON)" ]; then args="$$args --atp-odds-meta-json $(KALSHI_SPORTS_CONSENSUS_ATP_ODDS_META_JSON)"; fi; \
+	if [ "$(KALSHI_SPORTS_CONSENSUS_ATP_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_ATP_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_ATP_CAPTURE)" = "yes" ]; then args="$$args --capture-current"; fi; \
+	python3 scripts/kalshi_sports_consensus_atp_donor_adapter.py $$args
+
+kalshi-sports-consensus-nfl-adapter:
+	@args="--write --reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) --combined-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --base-kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json --nfl-kalshi-json $(KALSHI_SPORTS_CONSENSUS_NFL_KALSHI_JSON) --out-dir $(KALSHI_SPORTS_CONSENSUS_NFL_ADAPTER_OUT_DIR) --allowed-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) --raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR)"; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_NFL_ODDS_JSON)" ]; then args="$$args --nfl-odds-json $(KALSHI_SPORTS_CONSENSUS_NFL_ODDS_JSON)"; fi; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_NFL_ODDS_META_JSON)" ]; then args="$$args --nfl-odds-meta-json $(KALSHI_SPORTS_CONSENSUS_NFL_ODDS_META_JSON)"; fi; \
+	if [ "$(KALSHI_SPORTS_CONSENSUS_NFL_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_NFL_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_NFL_CAPTURE)" = "yes" ]; then args="$$args --capture-current"; fi; \
+	python3 scripts/kalshi_sports_consensus_nfl_adapter.py $$args
+
+kalshi-sports-consensus-soccer-adapter:
+	@args="--write --reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) --combined-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --base-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --soccer-kalshi-json $(KALSHI_SPORTS_CONSENSUS_SOCCER_KALSHI_JSON) --out-dir $(KALSHI_SPORTS_CONSENSUS_SOCCER_ADAPTER_OUT_DIR) --allowed-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) --raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR)"; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_JSON)" ]; then args="$$args --soccer-odds-json $(KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_JSON)"; fi; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_META_JSON)" ]; then args="$$args --soccer-odds-meta-json $(KALSHI_SPORTS_CONSENSUS_SOCCER_ODDS_META_JSON)"; fi; \
+	if [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_CAPTURE)" = "yes" ]; then args="$$args --capture-current"; fi; \
+	python3 scripts/kalshi_sports_consensus_soccer_adapter.py $$args
+
+kalshi-sports-consensus-nba-adapter:
+	@args="--write --reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) --combined-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --base-kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) --nba-kalshi-json $(KALSHI_SPORTS_CONSENSUS_NBA_KALSHI_JSON) --out-dir $(KALSHI_SPORTS_CONSENSUS_NBA_ADAPTER_OUT_DIR) --allowed-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) --raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR)"; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_NBA_ODDS_JSON)" ]; then args="$$args --nba-odds-json $(KALSHI_SPORTS_CONSENSUS_NBA_ODDS_JSON)"; fi; \
+	if [ -n "$(KALSHI_SPORTS_CONSENSUS_NBA_ODDS_META_JSON)" ]; then args="$$args --nba-odds-meta-json $(KALSHI_SPORTS_CONSENSUS_NBA_ODDS_META_JSON)"; fi; \
+	if [ "$(KALSHI_SPORTS_CONSENSUS_NBA_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_NBA_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_NBA_CAPTURE)" = "yes" ]; then args="$$args --capture-current"; fi; \
+	python3 scripts/kalshi_sports_consensus_nba_adapter.py $$args
+
+kalshi-sports-consensus-refresh:
+	@$(MAKE) --no-print-directory kalshi-universe-scan
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-public-kalshi-refresh
+	@python3 scripts/kalshi_sports_consensus_reference_build.py \
+		--capture-current \
+		--kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json \
+		--reference-json $(KALSHI_SPORTS_CONSENSUS_JSON) \
+		--report-dir $(KALSHI_SPORTS_CONSENSUS_BUILD_OUT_DIR) \
+		--api-key-file "$(KALSHI_SPORTS_CONSENSUS_KEY_FILE)" \
+		--sport-keys $(KALSHI_SPORTS_CONSENSUS_SPORT_KEYS) \
+		--bookmakers $(KALSHI_SPORTS_CONSENSUS_BOOKMAKERS) \
+		--raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR) \
+		--required-books $(KALSHI_SPORTS_CONSENSUS_REQUIRED_BOOKS) \
+		--max-event-delta-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_EVENT_DELTA_SECONDS) \
+		--max-source-age-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_SOURCE_AGE_SECONDS)
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-atp-donor-adapter \
+		KALSHI_SPORTS_CONSENSUS_ATP_CAPTURE=1
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-nfl-adapter \
+		KALSHI_SPORTS_CONSENSUS_NFL_CAPTURE=1
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-soccer-adapter \
+		KALSHI_SPORTS_CONSENSUS_SOCCER_CAPTURE=1
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-nba-adapter \
+		KALSHI_SPORTS_CONSENSUS_NBA_CAPTURE=1
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-preflight
+
+kalshi-sports-consensus-preflight:
+	@python3 scripts/kalshi_sports_consensus_preflight.py \
+		--write \
+		--kalshi-json $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) \
+		--consensus-json $(KALSHI_SPORTS_CONSENSUS_JSON) \
+		--out-dir $(KALSHI_SPORTS_CONSENSUS_OUT_DIR) \
+		--min-distinct-books $(KALSHI_SPORTS_CONSENSUS_MIN_BOOKS) \
+		--max-timestamp-skew-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_SKEW_SECONDS)
+
+kalshi-sports-consensus-observation-loop:
+	@python3 scripts/kalshi_sports_consensus_observation_loop.py \
+		--write \
+		--preflight-path docs/codex/macro/latest-kalshi-sports-consensus-preflight.json \
+		--universe-path $(KALSHI_SPORTS_CONSENSUS_KALSHI_JSON) \
+		--settled-snapshot-path $(KALSHI_SPORTS_CONSENSUS_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_SPORTS_CONSENSUS_SETTLED_RAW_DIR) \
+		--observation-dir $(KALSHI_SPORTS_CONSENSUS_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_SPORTS_CONSENSUS_LABEL_DIR) \
+		--out-dir $(KALSHI_SPORTS_CONSENSUS_OBSERVATION_OUT_DIR) \
+		--observed-probe-max-tickers $(KALSHI_SPORTS_CONSENSUS_OBSERVED_PROBE_MAX_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_CONSENSUS_PROBE_OBSERVED)),--probe-observed-public,)
+
+kalshi-sports-consensus-observation-watch-once:
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-refresh
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-observation-loop \
+		KALSHI_SPORTS_CONSENSUS_PROBE_OBSERVED=1
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-falsification
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-provider-audit
+
+kalshi-sports-consensus-falsification:
+	@python3 scripts/kalshi_sports_consensus_falsification.py \
+		--write \
+		--preflight-path docs/codex/macro/latest-kalshi-sports-consensus-preflight.json \
+		--observation-dir $(KALSHI_SPORTS_CONSENSUS_FALSIFICATION_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_SPORTS_CONSENSUS_FALSIFICATION_LABEL_DIR) \
+		--out-dir $(KALSHI_SPORTS_CONSENSUS_FALSIFICATION_OUT_DIR)
+
+kalshi-sports-consensus-provider-audit:
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-soccer-asian-provider-diagnostic
+	@python3 scripts/kalshi_sports_consensus_provider_audit.py \
+		--out-dir $(KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_OUT_DIR) \
+		--target-sports $(KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_TARGET_SPORTS) \
+		--deferred-target-sports $(KALSHI_SPORTS_CONSENSUS_PROVIDER_AUDIT_DEFERRED_SPORTS)
+
+kalshi-sports-event-velocity-eta:
+	@python3 scripts/kalshi_sports_event_velocity_eta.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_EVENT_VELOCITY_ETA_OUT_DIR)
+
+kalshi-claude-advice-audit:
+	@python3 scripts/kalshi_claude_advice_audit.py \
+		--out-dir $(KALSHI_CLAUDE_ADVICE_AUDIT_OUT_DIR)
+
+kalshi-sports-blocker-clearance-cycle:
+	@python3 scripts/kalshi_sports_blocker_clearance_cycle.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_BLOCKER_CLEARANCE_OUT_DIR) \
+		--atp-repo $(KALSHI_SPORTS_BLOCKER_CLEARANCE_ATP_REPO) \
+		--command-timeout-seconds $(KALSHI_SPORTS_BLOCKER_CLEARANCE_COMMAND_TIMEOUT_SECONDS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_BLOCKER_CLEARANCE_RUN_DUE)),--run-due,)
+
+kalshi-sports-microstructure-observation-loop:
+	@python3 scripts/kalshi_sports_microstructure_observation_loop.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_MICROSTRUCTURE_OUT_DIR) \
+		--universe-scan-path docs/codex/macro/latest-kalshi-universe-scan.json \
+		--raw-orderbook-dir $(KALSHI_SPORTS_MICROSTRUCTURE_RAW_ORDERBOOK_DIR) \
+		--observation-dir $(KALSHI_SPORTS_MICROSTRUCTURE_OBSERVATION_DIR) \
+		--settled-snapshot-path $(KALSHI_SPORTS_MICROSTRUCTURE_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_SPORTS_MICROSTRUCTURE_SETTLED_RAW_DIR) \
+		--label-dir $(KALSHI_SPORTS_MICROSTRUCTURE_LABEL_DIR) \
+		--max-tickers $(KALSHI_SPORTS_MICROSTRUCTURE_MAX_TICKERS) \
+		--max-close-hours $(KALSHI_SPORTS_MICROSTRUCTURE_MAX_CLOSE_HOURS) \
+		--depth $(KALSHI_SPORTS_MICROSTRUCTURE_DEPTH) \
+		--delay-seconds $(KALSHI_SPORTS_MICROSTRUCTURE_DELAY_SECONDS) \
+		--observed-probe-max-tickers $(KALSHI_SPORTS_MICROSTRUCTURE_PROBE_MAX_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_MICROSTRUCTURE_PROBE_OBSERVED)),--probe-observed-public,) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_MICROSTRUCTURE_CAPTURE)),--capture-orderbooks,)
+
+kalshi-near-resolution-informed-flow-evidence-gate:
+	@python3 scripts/kalshi_near_resolution_informed_flow_evidence_gate.py \
+		--write \
+		--out-dir $(KALSHI_NEAR_RESOLUTION_FLOW_OUT_DIR) \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
+
+kalshi-near-resolution-flow-replay-gates:
+	@python3 scripts/kalshi_near_resolution_flow_replay_gates.py \
+		--write \
+		--out-dir $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_OUT_DIR) \
+		--evidence-path docs/codex/macro/latest-kalshi-near-resolution-informed-flow-evidence-gate.json \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json \
+		--max-close-hours $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CLOSE_HOURS) \
+		--max-current-candidates $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CURRENT_CANDIDATES) \
+		--max-observation-age-seconds $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_OBSERVATION_AGE_SECONDS) \
+		--max-cluster-share $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CLUSTER_SHARE) \
+		--min-positive-capacity-contracts $(KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MIN_POSITIVE_CAPACITY_CONTRACTS)
+
+kalshi-near-resolution-flow-terms-capture:
+	@python3 scripts/kalshi_near_resolution_flow_terms_capture.py \
+		--write \
+		--out-dir $(KALSHI_NEAR_RESOLUTION_FLOW_TERMS_OUT_DIR) \
+		--flow-replay-path docs/codex/macro/latest-kalshi-near-resolution-flow-replay-gates.json \
+		--raw-terms-dir $(KALSHI_NEAR_RESOLUTION_FLOW_TERMS_RAW_DIR) \
+		--max-markets $(KALSHI_NEAR_RESOLUTION_FLOW_TERMS_MAX_MARKETS) \
+		--delay-seconds $(KALSHI_NEAR_RESOLUTION_FLOW_TERMS_DELAY_SECONDS) \
+		$(if $(filter 1 true yes,$(KALSHI_NEAR_RESOLUTION_FLOW_TERMS_CAPTURE)),--capture-terms,)
+
+kalshi-passive-liquidity-provision-evidence-gate:
+	@python3 scripts/kalshi_passive_liquidity_provision_evidence_gate.py \
+		--write \
+		--out-dir $(KALSHI_PASSIVE_LIQUIDITY_OUT_DIR) \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json \
+		--ttl-seconds $(KALSHI_PASSIVE_LIQUIDITY_TTL_SECONDS)
+
+kalshi-passive-liquidity-paper-fill-loop:
+	@python3 scripts/kalshi_passive_liquidity_paper_fill_loop.py \
+		--write \
+		--out-dir $(KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_OUT_DIR) \
+		--state-dir $(KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_STATE_DIR) \
+		--passive-path docs/codex/macro/latest-kalshi-passive-liquidity-provision-evidence-gate.json \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
+
+kalshi-passive-liquidity-paper-fill-falsification:
+	@python3 scripts/kalshi_passive_liquidity_paper_fill_falsification.py \
+		--write \
+		--out-dir $(KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_FALSIFICATION_OUT_DIR) \
+		--paper-fill-path docs/codex/macro/latest-kalshi-passive-liquidity-paper-fill-loop.json \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
+
+kalshi-passive-liquidity-fill-clock-diagnostic:
+	@python3 scripts/kalshi_passive_liquidity_fill_clock_diagnostic.py \
+		--write \
+		--out-dir $(KALSHI_PASSIVE_LIQUIDITY_FILL_CLOCK_DIAGNOSTIC_OUT_DIR) \
+		--paper-fill-path docs/codex/macro/latest-kalshi-passive-liquidity-paper-fill-loop.json \
+		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
+
+kalshi-sports-microstructure-observation-watch-once:
+	@$(MAKE) --no-print-directory kalshi-sports-stack-sequencing
+	@$(MAKE) --no-print-directory kalshi-sports-microstructure-observation-loop
+
+kalshi-sports-nondirectional-evidence-watch-once:
+	@$(MAKE) --no-print-directory kalshi-sports-microstructure-observation-watch-once
+	@$(MAKE) --no-print-directory kalshi-near-resolution-informed-flow-evidence-gate
+	@$(MAKE) --no-print-directory kalshi-near-resolution-flow-replay-gates
+	@$(MAKE) --no-print-directory kalshi-passive-liquidity-provision-evidence-gate
+	@$(MAKE) --no-print-directory kalshi-passive-liquidity-paper-fill-loop
+	@$(MAKE) --no-print-directory kalshi-passive-liquidity-paper-fill-falsification
+	@$(MAKE) --no-print-directory kalshi-passive-liquidity-fill-clock-diagnostic
+
+kalshi-sports-evidence-cycle-report:
+	@python3 scripts/kalshi_sports_evidence_cycle_report.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_EVIDENCE_CYCLE_OUT_DIR)
+
+kalshi-sports-evidence-cycle:
+	@$(MAKE) --no-print-directory kalshi-universe-scan
+	@$(MAKE) --no-print-directory kalshi-sports-proxy-observation-watch-once
+	@$(MAKE) --no-print-directory kalshi-atp-proxy-observation-watch-once
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-observation-watch-once
+	@$(MAKE) --no-print-directory kalshi-sports-nondirectional-evidence-watch-once
+	@$(MAKE) --no-print-directory kalshi-sports-stack-sequencing
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-refresh
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-observation-loop
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-falsification
+	@$(MAKE) --no-print-directory kalshi-sports-consensus-provider-audit
+	@$(MAKE) --no-print-directory kalshi-sports-event-velocity-eta
+	@$(MAKE) --no-print-directory kalshi-world-cup-outcome-independence-diagnostic
+	@$(MAKE) --no-print-directory kalshi-near-resolution-flow-terms-capture
+	@$(MAKE) --no-print-directory kalshi-ev-ledger
+	@$(MAKE) --no-print-directory kalshi-paper-decision-candidates
+	@$(MAKE) --no-print-directory kalshi-paper-settlement-reconcile
+	@$(MAKE) --no-print-directory kalshi-signal-decay-retirement \
+		KALSHI_SIGNAL_DECAY_RETIREMENT_PAPER_DECISIONS=docs/codex/macro/latest-paper-settlement-reconciliation.json
+	@$(MAKE) --no-print-directory kalshi-live-preflight
+	@$(MAKE) --no-print-directory kalshi-sports-evidence-cycle-report
+
+kalshi-sports-label-accumulation-cycle:
+	@$(MAKE) --no-print-directory kalshi-sports-evidence-cycle
+	@python3 scripts/kalshi_sports_label_accumulation_cycle.py \
+		--write \
+		--out-dir $(KALSHI_SPORTS_LABEL_ACCUMULATION_OUT_DIR)
+
+kalshi-weather-proxy-feature-packet:
+	python3 scripts/kalshi_weather_proxy_feature_packet.py \
+		--write \
+		--max-close-hours $(KALSHI_WEATHER_PROXY_FEATURE_MAX_CLOSE_HOURS) \
+		--max-contracts $(KALSHI_WEATHER_PROXY_FEATURE_MAX_CONTRACTS) \
+		--raw-universe-path $(KALSHI_WEATHER_PROXY_FEATURE_RAW_UNIVERSE) \
+		--raw-proxy-dir $(KALSHI_WEATHER_PROXY_FEATURE_RAW_DIR) \
+		--out-dir $(KALSHI_WEATHER_PROXY_FEATURE_OUT_DIR) \
+		$(if $(filter 1 true yes,$(KALSHI_WEATHER_PROXY_FEATURE_CAPTURE)),--capture-public-proxy,)
+
+kalshi-weather-proxy-feature-watch-once:
+	$(MAKE) --no-print-directory kalshi-universe-watch-once
+	$(MAKE) --no-print-directory kalshi-probability-breadth-scout
+	$(MAKE) --no-print-directory kalshi-weather-proxy-feature-packet
+
+kalshi-weather-proxy-observation-loop:
+	python3 scripts/kalshi_weather_proxy_observation_loop.py \
+		--write \
+		--out-dir $(KALSHI_WEATHER_PROXY_OBSERVATION_OUT_DIR) \
+		--settled-snapshot-path $(KALSHI_WEATHER_PROXY_SETTLED_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_WEATHER_PROXY_SETTLED_RAW_DIR) \
+		--settled-limit $(KALSHI_WEATHER_PROXY_SETTLED_LIMIT) \
+		--settled-max-pages $(KALSHI_WEATHER_PROXY_SETTLED_MAX_PAGES) \
+		--observed-probe-max-tickers $(KALSHI_WEATHER_PROXY_OBSERVATION_PROBE_MAX_TICKERS) \
+		--observation-dir $(KALSHI_WEATHER_PROXY_OBSERVATION_DIR) \
+		--label-dir $(KALSHI_WEATHER_PROXY_LABEL_DIR) \
+		$(if $(filter 1 true yes,$(KALSHI_WEATHER_PROXY_OBSERVATION_CAPTURE_SETTLED)),--capture-settled-public,)
+
+kalshi-weather-proxy-observation-watch-once:
+	$(MAKE) --no-print-directory kalshi-weather-proxy-feature-watch-once
+	$(MAKE) --no-print-directory kalshi-weather-proxy-observation-loop
+	$(MAKE) --no-print-directory kalshi-weather-proxy-feature-model-falsification
+	$(MAKE) --no-print-directory kalshi-weather-proxy-research-candidate-replay
+	$(MAKE) --no-print-directory kalshi-weather-proxy-capacity-correlation-decay
+	$(MAKE) --no-print-directory kalshi-weather-proxy-correlation-cluster-control
+	$(MAKE) --no-print-directory kalshi-signal-factory-status
+	$(MAKE) --no-print-directory macro-route
+
+kalshi-weather-proxy-feature-model-falsification:
+	python3 scripts/kalshi_weather_proxy_feature_model_falsification.py \
+		--write \
+		--label-dir $(KALSHI_WEATHER_PROXY_LABEL_DIR) \
+		--out-dir $(KALSHI_WEATHER_PROXY_MODEL_OUT_DIR) \
+		--min-independent-labels $(KALSHI_WEATHER_PROXY_MODEL_MIN_INDEPENDENT_LABELS) \
+		--min-oos-labels $(KALSHI_WEATHER_PROXY_MODEL_MIN_OOS_LABELS) \
+		--test-fraction $(KALSHI_WEATHER_PROXY_MODEL_TEST_FRACTION) \
+		--fdr-alpha $(KALSHI_WEATHER_PROXY_MODEL_FDR_ALPHA)
+
+kalshi-weather-proxy-research-candidate-replay:
+	python3 scripts/kalshi_weather_proxy_research_candidate_replay.py \
+		--write \
+		--label-dir $(KALSHI_WEATHER_PROXY_LABEL_DIR) \
+		--model-falsification-path $(KALSHI_WEATHER_PROXY_REPLAY_MODEL_PATH) \
+		--out-dir $(KALSHI_WEATHER_PROXY_REPLAY_OUT_DIR)
+
+kalshi-weather-proxy-capacity-correlation-decay:
+	python3 scripts/kalshi_weather_proxy_capacity_correlation_decay.py \
+		--write \
+		--feature-packet-path $(KALSHI_WEATHER_PROXY_CCD_FEATURE_PACKET) \
+		--replay-path $(KALSHI_WEATHER_PROXY_CCD_REPLAY) \
+		--raw-orderbook-dir $(KALSHI_WEATHER_PROXY_CCD_RAW_ORDERBOOK_DIR) \
+		--out-dir $(KALSHI_WEATHER_PROXY_CCD_OUT_DIR) \
+		--max-close-hours $(KALSHI_WEATHER_PROXY_CCD_MAX_CLOSE_HOURS) \
+		--max-tickers $(KALSHI_WEATHER_PROXY_CCD_MAX_TICKERS) \
+		--depth $(KALSHI_WEATHER_PROXY_CCD_DEPTH) \
+		--delay-seconds $(KALSHI_WEATHER_PROXY_CCD_DELAY_SECONDS) \
+		$(if $(filter 1 true yes,$(KALSHI_WEATHER_PROXY_CCD_CAPTURE_ORDERBOOKS)),--capture-orderbooks,)
+
+kalshi-weather-proxy-correlation-cluster-control:
+	python3 scripts/kalshi_weather_proxy_correlation_cluster_control.py \
+		--write \
+		--ccd-path $(KALSHI_WEATHER_PROXY_CLUSTER_CCD) \
+		--out-dir $(KALSHI_WEATHER_PROXY_CLUSTER_OUT_DIR) \
+		--max-cluster-share $(KALSHI_WEATHER_PROXY_CLUSTER_MAX_SHARE) \
+		--min-positive-clusters $(KALSHI_WEATHER_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS)
+
+kalshi-sports-proxy-capacity-correlation-decay:
+	@python3 scripts/kalshi_sports_proxy_capacity_correlation_decay.py \
+		--write \
+		--feature-packet-path $(KALSHI_SPORTS_PROXY_CCD_FEATURE_PACKET) \
+		--replay-path $(KALSHI_SPORTS_PROXY_CCD_REPLAY) \
+		--raw-orderbook-dir $(KALSHI_SPORTS_PROXY_CCD_RAW_ORDERBOOK_DIR) \
+		--out-dir $(KALSHI_SPORTS_PROXY_CCD_OUT_DIR) \
+		--max-close-hours $(KALSHI_SPORTS_PROXY_CCD_MAX_CLOSE_HOURS) \
+		--max-tickers $(KALSHI_SPORTS_PROXY_CCD_MAX_TICKERS) \
+		--depth $(KALSHI_SPORTS_PROXY_CCD_DEPTH) \
+		--delay-seconds $(KALSHI_SPORTS_PROXY_CCD_DELAY_SECONDS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_PROXY_CCD_CAPTURE_ORDERBOOKS)),--capture-orderbooks,)
+
+kalshi-sports-proxy-correlation-cluster-control:
+	@python3 scripts/kalshi_sports_proxy_correlation_cluster_control.py \
+		--write \
+		--ccd-path $(KALSHI_SPORTS_PROXY_CLUSTER_CCD) \
+		--out-dir $(KALSHI_SPORTS_PROXY_CLUSTER_OUT_DIR) \
+		--max-cluster-share $(KALSHI_SPORTS_PROXY_CLUSTER_MAX_SHARE) \
+		--min-positive-clusters $(KALSHI_SPORTS_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS)
+
 kalshi-crypto-proxy-feature-model-falsification:
 	@python3 scripts/kalshi_crypto_proxy_feature_model_falsification.py \
 		--write \
@@ -491,6 +1330,27 @@ kalshi-crypto-proxy-feature-model-falsification:
 		--min-oos-labels $(KALSHI_CRYPTO_PROXY_MODEL_MIN_OOS_LABELS) \
 		--test-fraction $(KALSHI_CRYPTO_PROXY_MODEL_TEST_FRACTION) \
 		--fdr-alpha $(KALSHI_CRYPTO_PROXY_MODEL_FDR_ALPHA)
+
+kalshi-sports-proxy-feature-model-falsification:
+	@python3 scripts/kalshi_sports_proxy_feature_model_falsification.py \
+		--write \
+		--label-dir $(KALSHI_SPORTS_PROXY_LABEL_DIR) \
+		--out-dir $(KALSHI_SPORTS_PROXY_MODEL_OUT_DIR) \
+		--min-independent-labels $(KALSHI_CRYPTO_PROXY_MODEL_MIN_INDEPENDENT_LABELS) \
+		--min-oos-labels $(KALSHI_CRYPTO_PROXY_MODEL_MIN_OOS_LABELS) \
+		--test-fraction $(KALSHI_CRYPTO_PROXY_MODEL_TEST_FRACTION) \
+		--fdr-alpha $(KALSHI_CRYPTO_PROXY_MODEL_FDR_ALPHA)
+
+kalshi-sports-proxy-research-candidate-replay:
+	@python3 scripts/kalshi_sports_proxy_research_candidate_replay.py \
+		--write \
+		--label-dir $(KALSHI_SPORTS_PROXY_LABEL_DIR) \
+		--model-falsification-path $(KALSHI_SPORTS_PROXY_REPLAY_MODEL_PATH) \
+		--out-dir $(KALSHI_SPORTS_PROXY_REPLAY_OUT_DIR) \
+		--min-side-oos-labels $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_SIDE_OOS_LABELS) \
+		--min-decay-buckets $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_BUCKETS) \
+		--min-decay-labels $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_LABELS) \
+		$(if $(KALSHI_SPORTS_PROXY_REPLAY_PREFERRED_MODEL_ID),--preferred-model-id $(KALSHI_SPORTS_PROXY_REPLAY_PREFERRED_MODEL_ID),)
 
 kalshi-crypto-proxy-research-candidate-replay:
 	@python3 scripts/kalshi_crypto_proxy_research_candidate_replay.py \
@@ -558,6 +1418,149 @@ type2-threshold-sensitivity:
 		--output-dir $(TYPE2_THRESHOLD_OUT_DIR) \
 		--run-id $(TYPE2_THRESHOLD_RUN_ID) \
 		--thresholds $(TYPE2_THRESHOLD_GRID)
+
+kalshi-source-repo-inventory:
+	@python3 scripts/kalshi_source_repo_inventory.py \
+		--write \
+		--out-dir $(KALSHI_SOURCE_REPO_INVENTORY_OUT_DIR)
+
+kalshi-external-artifact-wrap:
+	@python3 scripts/kalshi_external_artifact_wrap.py \
+		--write \
+		--wrap-root $(KALSHI_EXTERNAL_ARTIFACT_WRAP_ROOT) \
+		--out-dir $(KALSHI_EXTERNAL_ARTIFACT_WRAP_OUT_DIR)
+
+kalshi-external-artifact-preflight:
+	@python3 scripts/kalshi_external_artifact_preflight.py \
+		--write \
+		--wrap-root $(KALSHI_EXTERNAL_ARTIFACT_WRAP_ROOT) \
+		--out-dir $(KALSHI_EXTERNAL_ARTIFACT_PREFLIGHT_OUT_DIR)
+
+kalshi-signal-formula-registry:
+	@args="--write --out-dir $(KALSHI_SIGNAL_FORMULA_REGISTRY_OUT_DIR)"; \
+	if [ -n "$(KALSHI_SIGNAL_FORMULA_REGISTRY_SPEC)" ]; then args="$$args --spec-path $(KALSHI_SIGNAL_FORMULA_REGISTRY_SPEC)"; fi; \
+	python3 scripts/kalshi_signal_formula_registry.py $$args
+
+kalshi-prior-only-donor-gate:
+	@python3 scripts/kalshi_prior_only_donor_gate.py \
+		--write \
+		--external-preflight-path $(KALSHI_PRIOR_ONLY_DONOR_GATE_EXTERNAL_PREFLIGHT) \
+		--formula-registry-path $(KALSHI_PRIOR_ONLY_DONOR_GATE_FORMULA_REGISTRY) \
+		--out-dir $(KALSHI_PRIOR_ONLY_DONOR_GATE_OUT_DIR)
+
+kalshi-paper-decision-candidates:
+	@python3 scripts/kalshi_paper_decision_candidates.py \
+		--write \
+		--ledger-path $(KALSHI_PAPER_DECISION_LEDGER) \
+		--retirement-path $(KALSHI_PAPER_DECISION_RETIREMENT) \
+		--ghost-depth-path $(KALSHI_PAPER_DECISION_GHOST_DEPTH) \
+		--out-dir $(KALSHI_PAPER_DECISION_OUT_DIR) \
+		--paper-bankroll $(KALSHI_PAPER_DECISION_BANKROLL) \
+		--kelly-fraction $(KALSHI_PAPER_DECISION_KELLY_FRACTION) \
+		--max-fraction-per-contract $(KALSHI_PAPER_DECISION_MAX_FRACTION) \
+		--max-cluster-share $(KALSHI_PAPER_DECISION_MAX_CLUSTER_SHARE)
+
+kalshi-paper-settlement-reconcile:
+	@python3 scripts/kalshi_paper_settlement_reconcile.py \
+		--write \
+		--paper-decisions-path $(KALSHI_PAPER_SETTLEMENT_PAPER_DECISIONS) \
+		--settled-snapshot-path $(KALSHI_PAPER_SETTLEMENT_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_PAPER_SETTLEMENT_RAW_DIR) \
+		--out-dir $(KALSHI_PAPER_SETTLEMENT_OUT_DIR) \
+		--max-fetch-tickers $(KALSHI_PAPER_SETTLEMENT_MAX_FETCH_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_PAPER_SETTLEMENT_FETCH)),--fetch-settled,)
+
+kalshi-sports-paper-burn-in-cycle:
+	@$(MAKE) --no-print-directory kalshi-sports-label-accumulation-cycle
+	@python3 scripts/kalshi_sports_paper_burn_in_cycle.py \
+		--write \
+		--paper-decisions-path $(KALSHI_PAPER_SETTLEMENT_PAPER_DECISIONS) \
+		--settled-snapshot-path $(KALSHI_PAPER_SETTLEMENT_SNAPSHOT) \
+		--settled-raw-dir $(KALSHI_PAPER_SETTLEMENT_RAW_DIR) \
+		--out-dir $(KALSHI_SPORTS_PAPER_BURN_IN_OUT_DIR) \
+		--max-fetch-tickers $(KALSHI_SPORTS_PAPER_BURN_IN_MAX_FETCH_TICKERS) \
+		$(if $(filter 1 true yes,$(KALSHI_SPORTS_PAPER_BURN_IN_FETCH)),--fetch-due-settlements,)
+
+kalshi-always-on-collector-once:
+	@python3 scripts/kalshi_always_on_collector.py \
+		--write \
+		--once \
+		--targets $(KALSHI_ALWAYS_ON_COLLECTOR_TARGETS) \
+		--out-dir $(KALSHI_ALWAYS_ON_COLLECTOR_OUT_DIR) \
+		--base-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_BASE_INTERVAL_SECONDS) \
+		--near-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_NEAR_INTERVAL_SECONDS) \
+		--due-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_DUE_INTERVAL_SECONDS) \
+		--near-close-window-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_NEAR_CLOSE_WINDOW_SECONDS)
+
+kalshi-always-on-collector:
+	@python3 scripts/kalshi_always_on_collector.py \
+		--write \
+		--targets $(KALSHI_ALWAYS_ON_COLLECTOR_TARGETS) \
+		--out-dir $(KALSHI_ALWAYS_ON_COLLECTOR_OUT_DIR) \
+		--max-cycles $(KALSHI_ALWAYS_ON_COLLECTOR_MAX_CYCLES) \
+		--base-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_BASE_INTERVAL_SECONDS) \
+		--near-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_NEAR_INTERVAL_SECONDS) \
+		--due-interval-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_DUE_INTERVAL_SECONDS) \
+		--near-close-window-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_NEAR_CLOSE_WINDOW_SECONDS)
+
+kalshi-signal-decay-retirement:
+	@python3 scripts/kalshi_signal_decay_retirement.py \
+		--write \
+		--paper-decisions-path $(KALSHI_SIGNAL_DECAY_RETIREMENT_PAPER_DECISIONS) \
+		--out-dir $(KALSHI_SIGNAL_DECAY_RETIREMENT_OUT_DIR) \
+		--min-recent-decisions $(KALSHI_SIGNAL_DECAY_RETIREMENT_MIN_RECENT) \
+		--min-recent-accuracy $(KALSHI_SIGNAL_DECAY_RETIREMENT_MIN_ACCURACY) \
+		--max-calibration-error $(KALSHI_SIGNAL_DECAY_RETIREMENT_MAX_CAL_ERROR)
+
+kalshi-live-preflight:
+	@python3 scripts/kalshi_live_preflight.py \
+		--write \
+		--paper-decisions-path $(KALSHI_LIVE_PAPER_DECISIONS) \
+		--external-preflight-path $(KALSHI_LIVE_EXTERNAL_PREFLIGHT) \
+		--retirement-path $(KALSHI_LIVE_RETIREMENT) \
+		--state-dir $(KALSHI_LIVE_STATE_DIR) \
+		$(if $(KALSHI_LIVE_MARKET_SNAPSHOTS),--market-snapshots-path $(KALSHI_LIVE_MARKET_SNAPSHOTS),) \
+		$(if $(filter 1 true yes,$(KALSHI_LIVE_CAPTURE_MARKET_SNAPSHOTS)),--capture-market-snapshots,) \
+		--market-snapshot-depth $(KALSHI_LIVE_MARKET_SNAPSHOT_DEPTH) \
+		--execution-mode $(KALSHI_LIVE_EXECUTION_MODE) \
+		--out-dir $(KALSHI_LIVE_PREFLIGHT_OUT_DIR)
+
+kalshi-live-demo:
+	@python3 scripts/kalshi_live_trader.py \
+		--write \
+		--paper-decisions-path $(KALSHI_LIVE_PAPER_DECISIONS) \
+		--external-preflight-path $(KALSHI_LIVE_EXTERNAL_PREFLIGHT) \
+		--retirement-path $(KALSHI_LIVE_RETIREMENT) \
+		--state-dir $(KALSHI_LIVE_STATE_DIR) \
+		--execution-mode demo \
+		--out-dir $(KALSHI_LIVE_TRADER_OUT_DIR)
+
+kalshi-live-trader:
+	@python3 scripts/kalshi_live_trader.py \
+		--write \
+		--paper-decisions-path $(KALSHI_LIVE_PAPER_DECISIONS) \
+		--external-preflight-path $(KALSHI_LIVE_EXTERNAL_PREFLIGHT) \
+		--retirement-path $(KALSHI_LIVE_RETIREMENT) \
+		--state-dir $(KALSHI_LIVE_STATE_DIR) \
+		--execution-mode $(KALSHI_LIVE_EXECUTION_MODE) \
+		--out-dir $(KALSHI_LIVE_TRADER_OUT_DIR)
+
+kalshi-live-reconcile:
+	@python3 scripts/kalshi_live_reconcile.py \
+		--write \
+		--state-dir $(KALSHI_LIVE_STATE_DIR) \
+		--execution-mode $(KALSHI_LIVE_EXECUTION_MODE) \
+		--out-dir $(KALSHI_LIVE_RECONCILE_OUT_DIR)
+
+KALSHI_JURISDICTION_SOURCE_URL ?=
+kalshi-jurisdiction-refresh:
+	@PYTHONPATH=. $(PYTHON) -c "import os; from predmarket.kalshi_jurisdiction import refresh_jurisdiction_state_from_config; from predmarket.config import load_config; cfg = load_config(); d = cfg.model_dump(); src = (os.environ.get('KALSHI_JURISDICTION_SOURCE_URL') or '').strip(); src and d.setdefault('kalshi_live', {}).setdefault('jurisdiction', {}) and d['kalshi_live']['jurisdiction'].update({'source_url': src}); s = refresh_jurisdiction_state_from_config(d); print('OK restricted_states=' + str(sorted(s.restricted_states)) + ' last_refreshed=' + s.last_refreshed.isoformat())"
+
+kalshi-live-risk-snapshot:
+	@python3 scripts/kalshi_live_risk_snapshot.py \
+		--write \
+		--state-dir $(KALSHI_LIVE_STATE_DIR) \
+		--out-dir $(KALSHI_LIVE_RISK_SNAPSHOT_OUT_DIR)
 
 kalshi-ev-ledger:
 	@python3 scripts/kalshi_contract_ev_ledger.py \

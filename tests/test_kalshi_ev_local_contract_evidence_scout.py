@@ -4,17 +4,16 @@ import importlib.util
 import json
 from pathlib import Path
 
-
 SCRIPT_PATH = (
-    Path(__file__).resolve().parents[1]
-    / "scripts"
-    / "kalshi_ev_local_contract_evidence_scout.py"
+    Path(__file__).resolve().parents[1] / "scripts" / "kalshi_ev_local_contract_evidence_scout.py"
 )
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
 
 def load_scout_module():
-    spec = importlib.util.spec_from_file_location("kalshi_ev_local_contract_evidence_scout", SCRIPT_PATH)
+    spec = importlib.util.spec_from_file_location(
+        "kalshi_ev_local_contract_evidence_scout", SCRIPT_PATH
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -127,7 +126,9 @@ def test_local_contract_evidence_scout_blocks_when_only_mlb_snapshots_exist(tmp_
     assert sample["official_terms_present"] is True
 
 
-def test_local_contract_evidence_scout_requires_clean_timing_for_ready_match(tmp_path: Path) -> None:
+def test_local_contract_evidence_scout_requires_clean_timing_for_ready_match(
+    tmp_path: Path,
+) -> None:
     scout = load_scout_module()
     work_order = tmp_path / "macro/latest-kalshi-ev-contract-mapping-work-order.json"
     search_dir = tmp_path / "manual_drops/kalshi"
@@ -162,7 +163,9 @@ def test_local_contract_evidence_scout_requires_clean_timing_for_ready_match(tmp
     assert match["clean_timing_present"] is False
 
 
-def test_local_contract_evidence_scout_derives_clean_timing_from_future_public_snapshot(tmp_path: Path) -> None:
+def test_local_contract_evidence_scout_derives_clean_timing_from_future_public_snapshot(
+    tmp_path: Path,
+) -> None:
     scout = load_scout_module()
     work_order = tmp_path / "macro/latest-kalshi-ev-contract-mapping-work-order.json"
     search_dir = tmp_path / "manual_drops/kalshi"

@@ -100,9 +100,9 @@ def test_reflection_rejects_duplicate_leaky_unsupported_and_complex_hypotheses()
     leaky = agent.reflect(_hyp("outcome"), rows, set())
     assert any(reason.startswith("dsl_validation:forbidden feature") for reason in leaky.reasons)
 
-    unsupported = ReflectionAgent(
-        dsl, AgenticDiscoveryConfig(min_support=4)
-    ).reflect(_hyp("rank(edge)"), rows, set())
+    unsupported = ReflectionAgent(dsl, AgenticDiscoveryConfig(min_support=4)).reflect(
+        _hyp("rank(edge)"), rows, set()
+    )
     assert "insufficient_sample_support" in unsupported.reasons
 
     complex_expr = "edge + edge + edge + edge + edge + edge + edge"
@@ -179,7 +179,9 @@ def test_discovery_ledger_persists_and_reloads(tmp_path):
     store.close()
 
 
-def test_agentic_discovery_finds_known_synthetic_signal_and_stays_research_only_by_default(tmp_path):
+def test_agentic_discovery_finds_known_synthetic_signal_and_stays_research_only_by_default(
+    tmp_path,
+):
     rows = []
     for idx in range(80):
         outcome = float(idx % 2 == 0)
@@ -213,13 +215,27 @@ def test_agentic_discovery_finds_known_synthetic_signal_and_stays_research_only_
             evolution_interval=5,
         ),
         rows,
-        feature_catalog=["known_signal", "p_baseline", "market_implied", "bid_ask_spread", "volume_24h"],
+        feature_catalog=[
+            "known_signal",
+            "p_baseline",
+            "market_implied",
+            "bid_ask_spread",
+            "volume_24h",
+        ],
     )
 
     assert report.top_hypotheses
     assert "known_signal" in report.top_hypotheses[0]["hypothesis"]["expression"]
-    assert report.top_hypotheses[0]["metrics"]["brier"] < report.top_hypotheses[0]["metrics"]["baseline_brier"]
-    assert report.promotion_decisions[report.top_hypotheses[0]["hypothesis"]["hypothesis_id"]]["status"] == "RESEARCH_ONLY"
+    assert (
+        report.top_hypotheses[0]["metrics"]["brier"]
+        < report.top_hypotheses[0]["metrics"]["baseline_brier"]
+    )
+    assert (
+        report.promotion_decisions[report.top_hypotheses[0]["hypothesis"]["hypothesis_id"]][
+            "status"
+        ]
+        == "RESEARCH_ONLY"
+    )
     assert report.accepted_transitions
     assert store.load_discovery_run(report.run_id) is not None
     assert store.load_discovery_artifacts(report.run_id)

@@ -15,8 +15,7 @@ replacing the current ad-hoc feature extraction scattered across modules.
 
 import logging
 import time
-from datetime import datetime, timezone
-from typing import Dict, List, Optional
+from datetime import UTC, datetime
 
 import numpy as np
 
@@ -38,13 +37,13 @@ class FeatureStore:
             Currently unused but reserved for future persistence.
     """
 
-    def __init__(self, cache_dir: Optional[str] = None):
+    def __init__(self, cache_dir: str | None = None):
         self.cache_dir = cache_dir
-        self._macro_cache: Dict[str, float] = {}
+        self._macro_cache: dict[str, float] = {}
         self._macro_cache_time: float = 0.0
         self._macro_ttl: float = 3600.0  # 1 hour cache
 
-    def get_macro_features(self) -> Dict[str, float]:
+    def get_macro_features(self) -> dict[str, float]:
         """Fetch macroeconomic indicator features.
 
         Returns:
@@ -58,6 +57,7 @@ class FeatureStore:
 
         try:
             from predmarket.signals import MacroSignalExtractor
+
             extractor = MacroSignalExtractor()
             self._macro_cache = {
                 "cpi_yoy": extractor.fetch_fred_rate("CPIAUCSNS"),
@@ -78,7 +78,7 @@ class FeatureStore:
 
         return dict(self._macro_cache)
 
-    def get_temporal_features(self, timestamp: float) -> Dict[str, float]:
+    def get_temporal_features(self, timestamp: float) -> dict[str, float]:
         """Extract time-based features from a Unix timestamp.
 
         Args:
@@ -88,7 +88,7 @@ class FeatureStore:
             Dict with keys: day_of_week (0-6), hour_of_day (0-23),
             is_weekend (0/1), days_to_expiry_estimate (0-365), quarter (1-4).
         """
-        dt = datetime.fromtimestamp(timestamp, tz=timezone.utc)
+        dt = datetime.fromtimestamp(timestamp, tz=UTC)
 
         return {
             "day_of_week": float(dt.weekday()),
@@ -100,7 +100,7 @@ class FeatureStore:
             "quarter": float((dt.month - 1) // 3 + 1),
         }
 
-    def get_market_features(self, snapshot: object) -> Dict[str, float]:
+    def get_market_features(self, snapshot: object) -> dict[str, float]:
         """Extract market microstructure features from a snapshot.
 
         Args:
@@ -128,7 +128,9 @@ class FeatureStore:
 
         # Volatility: std of returns over last 5 periods
         if line_history and len(line_history) >= 3:
-            returns = np.diff(line_history[-6:]) if len(line_history) >= 6 else np.diff(line_history)
+            returns = (
+                np.diff(line_history[-6:]) if len(line_history) >= 6 else np.diff(line_history)
+            )
             volatility_5 = float(np.std(returns)) if len(returns) > 1 else 0.0
         else:
             volatility_5 = 0.0
@@ -146,7 +148,7 @@ class FeatureStore:
             "volatility_5": volatility_5,
         }
 
-    def _category_encode(self, category: str) -> Dict[str, float]:
+    def _category_encode(self, category: str) -> dict[str, float]:
         """One-hot encode category for ML consumption.
 
         Args:
@@ -166,8 +168,9 @@ class FeatureStore:
 
         return encoded
 
-    def get_all_features(self, snapshot: object, timestamp: float,
-                         category: str) -> Dict[str, float]:
+    def get_all_features(
+        self, snapshot: object, timestamp: float, category: str
+    ) -> dict[str, float]:
         """Combine all feature sources into one dict.
 
         Args:
@@ -185,7 +188,7 @@ class FeatureStore:
         features.update(self._category_encode(category))
         return features
 
-    def get_feature_names(self) -> List[str]:
+    def get_feature_names(self) -> list[str]:
         """Return ordered feature names matching get_feature_vector().
 
         Returns:
@@ -194,19 +197,32 @@ class FeatureStore:
         """
         return [
             # Macro (4)
-            "cpi_yoy", "fed_funds_rate", "unemployment_rate", "gdp_growth",
+            "cpi_yoy",
+            "fed_funds_rate",
+            "unemployment_rate",
+            "gdp_growth",
             # Temporal (5)
-            "day_of_week", "hour_of_day", "is_weekend",
-            "days_to_expiry_estimate", "quarter",
+            "day_of_week",
+            "hour_of_day",
+            "is_weekend",
+            "days_to_expiry_estimate",
+            "quarter",
             # Market (7)
-            "bid_ask_spread", "mid_price", "log_volume",
-            "volume_24h", "open_interest", "price_momentum_1h", "volatility_5",
+            "bid_ask_spread",
+            "mid_price",
+            "log_volume",
+            "volume_24h",
+            "open_interest",
+            "price_momentum_1h",
+            "volatility_5",
             # Category one-hot (4)
-            "cat_political", "cat_econ", "cat_sports", "cat_other",
+            "cat_political",
+            "cat_econ",
+            "cat_sports",
+            "cat_other",
         ]
 
-    def get_feature_vector(self, snapshot: object, timestamp: float,
-                           category: str) -> np.ndarray:
+    def get_feature_vector(self, snapshot: object, timestamp: float, category: str) -> np.ndarray:
         """Produce ordered numpy feature vector for ML consumption.
 
         Args:
@@ -230,9 +246,9 @@ class FeatureEngineer(FeatureStore):
         snapshot: object,
         category: str,
         headline: str = "",
-        as_of_ts: Optional[float] = None,
-        source_documents: Optional[List[object]] = None,
-    ) -> Dict[str, float]:
+        as_of_ts: float | None = None,
+        source_documents: list[object] | None = None,
+    ) -> dict[str, float]:
         ts = float(as_of_ts or getattr(snapshot, "timestamp", time.time()))
         for doc in source_documents or []:
             if hasattr(doc, "validate_as_of"):
@@ -250,12 +266,8 @@ class FeatureEngineer(FeatureStore):
         features.update(
             {
                 "headline_length": float(len(headline)),
-                "headline_positive_terms": float(
-                    sum(1 for term in positive_terms if term in text)
-                ),
-                "headline_negative_terms": float(
-                    sum(1 for term in negative_terms if term in text)
-                ),
+                "headline_positive_terms": float(sum(1 for term in positive_terms if term in text)),
+                "headline_negative_terms": float(sum(1 for term in negative_terms if term in text)),
                 "source_doc_count": float(len(source_documents or [])),
             }
         )
