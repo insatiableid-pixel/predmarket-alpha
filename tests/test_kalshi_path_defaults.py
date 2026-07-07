@@ -179,3 +179,15 @@ def test_sports_feature_packet_defaults_do_not_hardcode_local_roots() -> None:
 
     assert "/home/mrwatson/manual_drops" not in text
     assert "/home/mrwatson/projects" not in text
+
+
+def test_ev_overlay_local_scout_defaults_do_not_hardcode_local_roots() -> None:
+    paths = [
+        "scripts/kalshi_ev_nfl_overlay_assembler.py",
+        "scripts/kalshi_ev_local_contract_evidence_scout.py",
+    ]
+
+    for relative in paths:
+        text = (REPO / relative).read_text(encoding="utf-8")
+        assert "/home/mrwatson/manual_drops" not in text, relative
+        assert "/home/mrwatson/projects" not in text, relative
