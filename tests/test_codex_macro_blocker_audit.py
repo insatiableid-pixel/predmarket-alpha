@@ -2,6 +2,8 @@ import importlib.util
 import json
 from pathlib import Path
 
+from predmarket.shared_helpers import project_path
+
 SCRIPT_PATH = Path(__file__).resolve().parents[1] / "scripts" / "codex_macro_blocker_audit.py"
 MAKEFILE_PATH = Path(__file__).resolve().parents[1] / "Makefile"
 
@@ -90,7 +92,7 @@ def exact_lanes() -> list[dict]:
             "status": "betexplorer_market_closing_comparison_ready_no_policy_change",
             "blocked": True,
             "missing_input": "Independent clean slate or stronger true closing-line validation evidence.",
-            "next_local_command": "cd /home/mrwatson/projects/mlb-platform && make macro-status",
+            "next_local_command": f"cd {project_path('mlb-platform')} && make macro-status",
             "what_exists": "current_threshold_count=0",
         },
         {
@@ -98,7 +100,9 @@ def exact_lanes() -> list[dict]:
             "status": "blocked_g1g2_model_quality_evidence",
             "blocked": True,
             "missing_input": "Fresh validation and D3/G5/P5 external proof evidence.",
-            "next_local_command": "cd /home/mrwatson/projects/atp-oracle && make type2-g1g2-diagnostic",
+            "next_local_command": (
+                f"cd {project_path('atp-oracle')} && make type2-g1g2-diagnostic"
+            ),
             "what_exists": "vision_score=93",
         },
         {
@@ -106,7 +110,9 @@ def exact_lanes() -> list[dict]:
             "status": "macro_partial_truth_shrinkage_clipped_residual_market_parity",
             "blocked": True,
             "missing_input": "New source-backed NBA signal or market dataset that can beat market parity.",
-            "next_local_command": "cd /home/mrwatson/projects/nba-analytics-platform && make macro-status",
+            "next_local_command": (
+                f"cd {project_path('nba-analytics-platform')} && make macro-status"
+            ),
             "what_exists": "market parity",
         },
         {
@@ -114,7 +120,10 @@ def exact_lanes() -> list[dict]:
             "status": "line_readiness_profiled_slate_forward_context_not_yet_due_research_only",
             "blocked": True,
             "missing_input": "Forward-context evidence when due: injuries, weather, official starting QBs, and closing reference lines.",
-            "next_local_command": "cd /home/mrwatson/projects/nfl_quant_glm51_greenfield && make forward-context-availability && make macro-status",
+            "next_local_command": (
+                f"cd {project_path('nfl_quant_glm51_greenfield')} "
+                "&& make forward-context-availability && make macro-status"
+            ),
             "what_exists": "not yet due",
         },
     ]
