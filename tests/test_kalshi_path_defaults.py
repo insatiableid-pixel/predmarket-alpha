@@ -170,3 +170,12 @@ def test_world_cup_atp_replay_defaults_do_not_hardcode_local_roots() -> None:
         text = (REPO / relative).read_text(encoding="utf-8")
         assert "/home/mrwatson/manual_drops" not in text, relative
         assert "/home/mrwatson/projects" not in text, relative
+
+
+def test_sports_feature_packet_defaults_do_not_hardcode_local_roots() -> None:
+    text = (REPO / "scripts/kalshi_sports_proxy_feature_packet.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "/home/mrwatson/manual_drops" not in text
+    assert "/home/mrwatson/projects" not in text
