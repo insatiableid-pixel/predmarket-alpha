@@ -193,7 +193,58 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
     assert report["market_execution"] is False
 
 
-def test_claude_advice_audit_temp_out_dir_does_not_write_latest(tmp_path: Path, monkeypatch) -> None:
+def test_claude_advice_audit_treats_price_null_rejection_as_implemented(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    files = base_inputs(tmp_path)
+    files["flow_gate"] = write_json(
+        tmp_path / "flow_gate_rejected.json",
+        safe_artifact(
+            "near_resolution_informed_flow_falsification_ready_no_research_candidate",
+            research_candidate_count=0,
+            testable_candidate_count=3,
+            min_oos_labels=10,
+            min_settled_contracts=30,
+        ),
+    )
+    files["flow_replay"] = write_json(
+        tmp_path / "flow_replay_rejected.json",
+        safe_artifact(
+            "near_resolution_flow_replay_gates_blocked_missing_research_candidate",
+            capacity_positive_row_count=0,
+            positive_correlation_cluster_count=0,
+            min_positive_correlation_clusters=3,
+            decay_status="recent_bucket_not_worse_than_random",
+        ),
+    )
+
+    report = module.build_claude_advice_audit(
+        flow_gate_path=files["flow_gate"],
+        flow_replay_path=files["flow_replay"],
+        ev_ledger_path=files["ev"],
+        paper_path=files["paper"],
+        passive_fill_path=files["passive"],
+        atp_path=files["atp"],
+        world_cup_independence_path=files["world_cup"],
+        prior_only_path=files["prior"],
+        event_velocity_path=files["velocity"],
+        live_path=files["live"],
+        generated_utc="2026-07-07T05:00:00Z",
+    )
+
+    rows = {row["requirement_id"]: row for row in report["advice_rows"]}
+    assert rows["CLAUDE-001"]["status"] == "satisfied"
+    assert rows["CLAUDE-001"]["implementation_status"] == "satisfied"
+    assert rows["CLAUDE-002"]["status"] == "satisfied"
+    assert rows["CLAUDE-002"]["implementation_status"] == "satisfied"
+    assert report["summary"]["implementation_satisfied_count"] == 10
+    assert report["summary"]["implementation_open_requirement_ids"] == []
+
+
+def test_claude_advice_audit_temp_out_dir_does_not_write_latest(
+    tmp_path: Path, monkeypatch
+) -> None:
     module = load_module()
     macro_dir = tmp_path / "macro"
     monkeypatch.setattr(module, "MACRO_DIR", macro_dir)
