@@ -84,6 +84,7 @@ def test_execute_collector_cycle_runs_targets_and_preserves_safety(tmp_path: Pat
         env={"KALSHI_SPORTS_PAPER_BURN_IN_FETCH": "1"},
         cadence_group="fast_sports_settlement",
         purpose="test",
+        poll_interval_seconds=None,
     )
 
     def fake_runner(received: CollectorTarget) -> CommandResult:
@@ -112,6 +113,7 @@ def test_execute_collector_cycle_runs_targets_and_preserves_safety(tmp_path: Pat
     assert report["status"] == "kalshi_always_on_collector_ready"
     assert report["summary"]["safe_artifact_count"] == 1
     assert report["summary"]["total_label_count"] == 327
+    assert report["summary"]["total_capture_count"] == 0
     assert report["cadence"]["reason"] == "near_close_or_probe_window"
     assert report["targets"][0]["status"] == "pass"
     assert report["targets"][0]["artifact_safe"] is True
@@ -128,6 +130,7 @@ def test_execute_collector_cycle_schedules_from_completion_time(tmp_path: Path) 
         env={"KALSHI_CRYPTO_PROXY_OBSERVATION_PROBE_OBSERVED": "1"},
         cadence_group="fast_crypto_settlement",
         purpose="test",
+        poll_interval_seconds=None,
     )
 
     def fake_runner(received: CollectorTarget) -> CommandResult:
@@ -166,10 +169,22 @@ def test_selected_targets_rejects_unknown_target() -> None:
 
 
 def test_selected_targets_include_sports_consensus_collector() -> None:
-    targets = selected_targets(["sports_consensus", "sports", "crypto"])
+    targets = selected_targets(["line_moves", "ticks", "sports_consensus", "sports", "crypto"])
 
-    assert [target.target_id for target in targets] == ["sports_consensus", "sports", "crypto"]
-    consensus = targets[0]
+    assert [target.target_id for target in targets] == [
+        "line_moves",
+        "ticks",
+        "sports_consensus",
+        "sports",
+        "crypto",
+    ]
+    line_moves = targets[0]
+    assert line_moves.make_target == "kalshi-sports-line-move-delta-logger"
+    assert line_moves.poll_interval_seconds == 60
+    ticks = targets[1]
+    assert ticks.make_target == "kalshi-tick-recorder"
+    assert ticks.poll_interval_seconds == 60
+    consensus = targets[2]
     assert consensus.make_target == "kalshi-sports-consensus-observation-watch-once"
     assert consensus.artifact_path.name == "latest-kalshi-sports-consensus-observation-loop.json"
     assert consensus.env["KALSHI_SPORTS_CONSENSUS_PROBE_OBSERVED"] == "1"
@@ -181,10 +196,58 @@ def test_default_collector_targets_run_full_sports_burn_in() -> None:
     args = parse_args([])
     targets = selected_targets(args.targets.split(","))
 
-    assert [target.target_id for target in targets] == ["sports", "crypto"]
-    sports = targets[0]
+    assert [target.target_id for target in targets] == [
+        "line_moves",
+        "ticks",
+        "sports_consensus",
+        "sports",
+        "crypto",
+    ]
+    sports = targets[3]
     assert sports.make_target == "kalshi-sports-paper-burn-in-cycle"
     assert sports.env["KALSHI_SPORTS_PAPER_BURN_IN_FETCH"] == "1"
+
+
+def test_capture_targets_force_high_frequency_cadence(tmp_path: Path) -> None:
+    artifact_path = tmp_path / "ticks.json"
+    target = CollectorTarget(
+        target_id="ticks",
+        make_target="kalshi-tick-recorder",
+        artifact_path=artifact_path,
+        env={},
+        cadence_group="high_frequency_kalshi_sports_ticks",
+        purpose="test",
+        poll_interval_seconds=60,
+    )
+
+    def fake_runner(received: CollectorTarget) -> CommandResult:
+        assert received == target
+        write_json(
+            artifact_path,
+            safe_artifact(
+                "kalshi_tick_recorder_ready",
+                recorded_line_count=42,
+                gap_count=1,
+            ),
+        )
+        return CommandResult(returncode=0, stdout="ok", stderr="", duration_seconds=30.0)
+
+    report = execute_collector_cycle(
+        targets=[target],
+        generated_utc="2026-07-07T00:00:00Z",
+        runner=fake_runner,
+        base_interval_seconds=300,
+        near_interval_seconds=60,
+        due_interval_seconds=60,
+        near_close_window_seconds=1800,
+    )
+
+    assert report["cadence"]["reason"] == "high_frequency_capture_interval"
+    assert report["cadence"]["interval_seconds"] == 60
+    assert report["summary"]["total_capture_count"] == 42
+    assert report["summary"]["total_gap_count"] == 1
+    assert report["targets"][0]["capture_count"] == 42
+    assert report["targets"][0]["gap_count"] == 1
 
 
 def test_makefile_exposes_always_on_collector_targets() -> None:
@@ -192,7 +255,12 @@ def test_makefile_exposes_always_on_collector_targets() -> None:
 
     assert "kalshi-always-on-collector-once:" in text
     assert "kalshi-always-on-collector:" in text
-    assert "KALSHI_ALWAYS_ON_COLLECTOR_TARGETS ?= sports,crypto" in text
+    assert (
+        "KALSHI_ALWAYS_ON_COLLECTOR_TARGETS ?= "
+        "line_moves,ticks,sports_consensus,sports,crypto"
+    ) in text
+    assert "kalshi-sports-line-move-delta-logger:" in text
+    assert "kalshi-tick-recorder:" in text
     assert "kalshi-sports-consensus-observation-watch-once:" in text
     assert "scripts/kalshi_always_on_collector.py" in text
 
