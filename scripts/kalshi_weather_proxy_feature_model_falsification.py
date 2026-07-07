@@ -11,7 +11,7 @@ Weather-specific differences:
   (bracket probability threshold rule: YES/NO based on |bracket_probability - yes_ask|).
 - Model evaluators: ``weather_bracket_directional_accuracy`` +
   ``weather_market_yes_ask_probability_baseline`` (diagnostic only).
-- Labels from ``/home/mrwatson/manual_drops/kalshi_weather_proxy_labels/``.
+- Labels from the configurable manual-drop ``kalshi_weather_proxy_labels/`` directory.
 - Output artifacts under ``docs/codex/macro/latest-kalshi-weather-proxy-feature-model-falsification.*``.
 - Every row ``usable=false``.
 """
@@ -36,6 +36,7 @@ from predmarket.engine import build_falsification  # noqa: E402
 from predmarket.shared_helpers import (  # noqa: E402
     counts,
     gate,
+    manual_drop_path,
     read_json_or_empty,
     safe_research_artifact,
     safety_flags,
@@ -57,7 +58,7 @@ def outside_repo(path: Path) -> bool:
     return False
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_weather_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-weather-proxy-feature-model-falsification-latest"
 
 # Binding constants (shared, do NOT change)

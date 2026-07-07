@@ -28,13 +28,16 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.feature_flags import FeatureFlag, is_enabled  # noqa: E402
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-crypto-proxy-feature-packet.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path("/home/mrwatson/manual_drops/kalshi_oos_settlements/kalshi_settled_markets_latest.json")
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_settlements")
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_crypto_proxy_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_crypto_proxy_labels")
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_oos_settlements", "kalshi_settled_markets_latest.json"
+)
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_oos_settlements")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_crypto_proxy_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_crypto_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-crypto-proxy-observation-loop-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 CSV_FIELDS = [
@@ -741,7 +744,7 @@ WantedBy=timers.target
 # Description=Research-only Kalshi crypto proxy observation loop
 # [Service]
 # Type=oneshot
-# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# WorkingDirectory=/path/to/predmarket-alpha
 # ExecStart=/usr/bin/make kalshi-crypto-proxy-observation-watch-once
 """
 

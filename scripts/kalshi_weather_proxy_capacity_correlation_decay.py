@@ -11,8 +11,8 @@ Weather-specific differences:
 - Cluster key: ``station|bracket|date`` via ``weather_cluster_key_composer``.
 - Inputs: ``latest-kalshi-weather-proxy-feature-packet.json`` and
   ``latest-kalshi-weather-proxy-research-candidate-replay.json``.
-- Raw orderbook payloads outside the repo under
-  ``/home/mrwatson/manual_drops/kalshi_weather_proxy_orderbooks/``.
+- Raw orderbook payloads outside the repo under the configurable manual-drop
+  ``kalshi_weather_proxy_orderbooks/`` directory.
 - Every row ``usable=false``.
 """
 
@@ -39,6 +39,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     counts,
     gate,
     json_float,
+    manual_drop_path,
     path_is_within,
     probability,
     read_json_or_empty,
@@ -64,7 +65,7 @@ def outside_repo(path: Path) -> bool:
 
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-weather-proxy-feature-packet.json"
 DEFAULT_REPLAY_PATH = MACRO_DIR / "latest-kalshi-weather-proxy-research-candidate-replay.json"
-DEFAULT_RAW_ORDERBOOK_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_orderbooks")
+DEFAULT_RAW_ORDERBOOK_DIR = manual_drop_path("kalshi_weather_proxy_orderbooks")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-weather-proxy-capacity-correlation-decay-latest"
 DEFAULT_MAX_CLOSE_HOURS = 48.0  # Weather contracts settle at end of day
 DEFAULT_MAX_TICKERS = 60

@@ -9,7 +9,7 @@ for modification (zero spine edits).
 Weather-specific differences:
 - Prediction rule: ``weather_prediction_rule`` (bracket probability threshold rule).
 - Cluster key: ``station|bracket|date`` (each station-bracket-day is an independent cluster).
-- Labels from ``/home/mrwatson/manual_drops/kalshi_weather_proxy_labels/``.
+- Labels from the configurable manual-drop ``kalshi_weather_proxy_labels/`` directory.
 - Falsification report from ``latest-kalshi-weather-proxy-feature-model-falsification.json``.
 - Output artifacts under ``docs/codex/macro/latest-kalshi-weather-proxy-research-candidate-replay.*``.
 - Every row ``usable=false``.
@@ -43,6 +43,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     gate,
     iso_from_timestamp,
     json_float,
+    manual_drop_path,
     mean,
     median,
     outcome_value,
@@ -70,7 +71,7 @@ def outside_repo(path: Path) -> bool:
 
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_weather_proxy_labels")
 DEFAULT_MODEL_FALSIFICATION_PATH = (
     MACRO_DIR / "latest-kalshi-weather-proxy-feature-model-falsification.json"
 )
