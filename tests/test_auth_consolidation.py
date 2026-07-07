@@ -377,6 +377,7 @@ class TestKalshiAuthErrorActionable:
         with pytest.raises(KalshiAuthError) as exc_info:
             load_private_key("")
         assert "required" in str(exc_info.value).lower()
+        assert "KALSHI_PRIVATE_KEY_PATH" in str(exc_info.value)
 
     def test_non_rsa_pem_key_raises_auth_error(self, tmp_path) -> None:
         """A valid PEM that is not an RSA key produces KalshiAuthError mentioning RSA."""
@@ -457,6 +458,15 @@ class TestSingleKeyPathInConfig:
         client_config = trading_client_config_from_app_config(config, execution_mode="demo")
         assert client_config.api_key == "test-key-id"
         assert client_config.private_key_pem_or_path == "/path/to/key.pem"
+
+    def test_env_template_documents_rsa_private_key_not_base64_secret(self) -> None:
+        template = (
+            pathlib.Path(__file__).resolve().parents[1] / ".env.template"
+        ).read_text("utf-8")
+
+        assert "KALSHI_PRIVATE_KEY_PATH" in template
+        assert "RSA private key PEM" in template
+        assert "your_kalshi_api_secret_base64_here" not in template
 
 
 # ---------------------------------------------------------------------------

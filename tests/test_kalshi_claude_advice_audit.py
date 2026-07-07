@@ -545,6 +545,59 @@ def test_claude_advice_audit_satisfies_provider_coverage(tmp_path: Path) -> None
     assert rows["CLAUDE-015"]["implementation_status"] == "satisfied"
 
 
+def test_claude_advice_audit_excludes_deferred_sports_from_provider_completion(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    files = base_inputs(tmp_path)
+    provider_artifact = safe_artifact(
+        "sports_consensus_provider_audit_ready_with_deferred_target_sports",
+        sport_target_count=5,
+        strict_consensus_sport_count=3,
+        sport_covered_count=3,
+        sport_gap_count=0,
+        sport_deferred_count=2,
+        strict_consensus_provider_count=4,
+        strict_anchor_provider_count=4,
+    )
+    provider_artifact["sport_coverage"] = [
+        {"sport": "mlb", "coverage_status": "covered", "strict_provider_count": 2},
+        {"sport": "nfl", "coverage_status": "covered", "strict_provider_count": 2},
+        {"sport": "soccer", "coverage_status": "covered", "strict_provider_count": 3},
+        {
+            "sport": "tennis",
+            "coverage_status": "deferred_no_compatible_current_market",
+            "strict_provider_count": 0,
+        },
+        {"sport": "nba", "coverage_status": "deferred_no_current_rows", "strict_provider_count": 0},
+    ]
+    files["provider_audit"] = write_json(tmp_path / "provider_audit_deferred.json", provider_artifact)
+
+    report = module.build_claude_advice_audit(
+        flow_gate_path=files["flow_gate"],
+        flow_replay_path=files["flow_replay"],
+        ev_ledger_path=files["ev"],
+        paper_path=files["paper"],
+        passive_fill_path=files["passive"],
+        atp_path=files["atp"],
+        world_cup_independence_path=files["world_cup"],
+        prior_only_path=files["prior"],
+        event_velocity_path=files["velocity"],
+        live_path=files["live"],
+        line_move_path=files["line_move"],
+        tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
+        historical_feasibility_path=files["historical_feasibility"],
+        historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
+        generated_utc="2026-07-07T05:00:00Z",
+    )
+
+    rows = {row["requirement_id"]: row for row in report["advice_rows"]}
+    assert rows["CLAUDE-015"]["status"] == "satisfied"
+    assert "actionable_mature=3/3" in rows["CLAUDE-015"]["evidence"]
+
+
 def test_claude_advice_audit_temp_out_dir_does_not_write_latest(
     tmp_path: Path, monkeypatch
 ) -> None:

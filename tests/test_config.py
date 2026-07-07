@@ -24,3 +24,23 @@ def test_config_env_overrides(monkeypatch):
     assert (
         config.venues.kalshi.effective_api_url == "https://external-api.demo.kalshi.co/trade-api/v2"
     )
+
+
+def test_config_prefers_explicit_kalshi_private_key_aliases(monkeypatch):
+    monkeypatch.setenv("KALSHI_PRIVATE_KEY_PATH", "/tmp/kalshi-rsa.pem")
+    monkeypatch.setenv("KALSHI_PRIVATE_KEY_PEM", "inline-rsa-private-key-pem")
+    monkeypatch.setenv("KALSHI_API_SECRET", "legacy-secret-value")
+
+    config = load_config()
+
+    assert config.venues.kalshi.api_secret == "inline-rsa-private-key-pem"
+
+
+def test_config_uses_kalshi_private_key_path_when_pem_absent(monkeypatch):
+    monkeypatch.delenv("KALSHI_PRIVATE_KEY_PEM", raising=False)
+    monkeypatch.setenv("KALSHI_PRIVATE_KEY_PATH", "/tmp/kalshi-rsa.pem")
+    monkeypatch.setenv("KALSHI_API_SECRET", "legacy-secret-value")
+
+    config = load_config()
+
+    assert config.venues.kalshi.api_secret == "/tmp/kalshi-rsa.pem"

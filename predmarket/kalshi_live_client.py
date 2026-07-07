@@ -286,7 +286,8 @@ def load_private_key(value: str) -> rsa.RSAPrivateKey:
     text = value.strip()
     if not text:
         raise KalshiAuthError(
-            "Kalshi private key is required: set venues.kalshi.api_secret or KALSHI_API_SECRET"
+            "Kalshi private key is required: set venues.kalshi.api_secret, "
+            "KALSHI_PRIVATE_KEY_PATH, KALSHI_PRIVATE_KEY_PEM, or legacy KALSHI_API_SECRET"
         )
 
     path: Path | None = None

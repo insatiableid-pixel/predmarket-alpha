@@ -64,6 +64,11 @@ CSV_FIELDS = [
     "blocker_type",
 ]
 
+NON_ACTIONABLE_PROVIDER_COVERAGE_STATUSES = {
+    "deferred_no_current_rows",
+    "deferred_no_compatible_current_market",
+}
+
 OPEN_STATUSES = {
     "blocked_clock",
     "blocked_external",
@@ -607,8 +612,36 @@ def provider_coverage_row(provider_audit: Mapping[str, Any]) -> dict[str, str]:
     deferred = int_value(summary.get("sport_deferred_count"))
     strict_providers = int_value(summary.get("strict_consensus_provider_count"))
     anchor_providers = int_value(summary.get("strict_anchor_provider_count"))
-    strict_complete = target > 0 and strict_sports >= target
-    mature_complete = target > 0 and covered >= target and mature_gaps == 0 and deferred == 0
+    sport_rows = (
+        provider_audit.get("sport_coverage")
+        if isinstance(provider_audit.get("sport_coverage"), Sequence)
+        else ()
+    )
+    actionable_rows = [
+        item
+        for item in sport_rows
+        if isinstance(item, Mapping)
+        and str(item.get("coverage_status") or "")
+        not in NON_ACTIONABLE_PROVIDER_COVERAGE_STATUSES
+    ]
+    if actionable_rows:
+        actionable_target = len(actionable_rows)
+        strict_actionable_sports = sum(
+            1 for item in actionable_rows if int_value(item.get("strict_provider_count")) > 0
+        )
+        covered_actionable = sum(
+            1 for item in actionable_rows if item.get("coverage_status") == "covered"
+        )
+    else:
+        actionable_target = max(0, target - deferred)
+        strict_actionable_sports = strict_sports
+        covered_actionable = covered
+    strict_complete = actionable_target > 0 and strict_actionable_sports >= actionable_target
+    mature_complete = (
+        actionable_target > 0
+        and covered_actionable >= actionable_target
+        and mature_gaps == 0
+    )
     implemented = (
         provider_audit.get("exists") is not False
         and bool(status_text)
@@ -621,10 +654,12 @@ def provider_coverage_row(provider_audit: Mapping[str, Any]) -> dict[str, str]:
         "satisfied" if strict_complete and mature_complete else "blocked_external",
         (
             f"status={provider_audit.get('status')}; strict_sports={strict_sports}/{target}; "
+            f"actionable_strict={strict_actionable_sports}/{actionable_target}; "
+            f"actionable_mature={covered_actionable}/{actionable_target}; "
             f"mature_sports={covered}/{target}; gaps={mature_gaps}; deferred={deferred}; "
             f"strict_providers={strict_providers}; anchors={anchor_providers}"
         ),
-        "Close remaining sport/provider gaps with timestamp-matched sharp or exchange sources before claiming all-sport consensus coverage.",
+        "Close remaining actionable sport/provider gaps with timestamp-matched sharp or exchange sources before claiming current-surface consensus coverage.",
         "provider_coverage",
         implementation_status="satisfied" if implemented else "warning",
     )
