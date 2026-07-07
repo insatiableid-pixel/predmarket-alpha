@@ -42,6 +42,8 @@ DEFAULT_WORLD_CUP_INDEPENDENCE_PATH = (
 DEFAULT_PRIOR_ONLY_PATH = MACRO_DIR / "latest-prior-only-donor-gate.json"
 DEFAULT_EVENT_VELOCITY_PATH = MACRO_DIR / "latest-kalshi-sports-event-velocity-eta.json"
 DEFAULT_LIVE_PATH = MACRO_DIR / "latest-kalshi-live-preflight.json"
+DEFAULT_LINE_MOVE_PATH = MACRO_DIR / "latest-kalshi-sports-line-move-delta-logger.json"
+DEFAULT_TICK_RECORDER_PATH = MACRO_DIR / "latest-kalshi-tick-recorder.json"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-claude-advice-audit-latest"
 
 CSV_FIELDS = [
@@ -79,6 +81,8 @@ def build_claude_advice_audit(
     prior_only_path: Path = DEFAULT_PRIOR_ONLY_PATH,
     event_velocity_path: Path = DEFAULT_EVENT_VELOCITY_PATH,
     live_path: Path = DEFAULT_LIVE_PATH,
+    line_move_path: Path = DEFAULT_LINE_MOVE_PATH,
+    tick_recorder_path: Path = DEFAULT_TICK_RECORDER_PATH,
     generated_utc: str | None = None,
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
@@ -93,6 +97,8 @@ def build_claude_advice_audit(
         "prior_only": artifact(prior_only_path),
         "event_velocity": artifact(event_velocity_path),
         "live": artifact(live_path),
+        "line_move": artifact(line_move_path),
+        "tick_recorder": artifact(tick_recorder_path),
     }
     rows = advice_rows(artifacts)
     gates = build_gates(artifacts, rows)
@@ -169,6 +175,8 @@ def advice_rows(artifacts: Mapping[str, Mapping[str, Any]]) -> list[dict[str, st
         event_velocity_row(artifacts["event_velocity"]),
         live_avoidance_row(artifacts["live"]),
         no_threshold_lowering_row(artifacts),
+        line_move_delta_row(artifacts["line_move"]),
+        tick_recorder_row(artifacts["tick_recorder"]),
     ]
 
 
@@ -434,6 +442,67 @@ def no_threshold_lowering_row(artifacts: Mapping[str, Mapping[str, Any]]) -> dic
     )
 
 
+def line_move_delta_row(line_move: Mapping[str, Any]) -> dict[str, str]:
+    summary = line_move.get("summary", {})
+    status_text = str(line_move.get("status") or "")
+    snapshots = int_value(summary.get("snapshot_count"))
+    events = int_value(summary.get("event_count"))
+    deltas = int_value(summary.get("delta_count"))
+    line_moves = int_value(summary.get("line_move_count"))
+    errors = int_value(summary.get("error_count"))
+    provider_ready = status_text.startswith("kalshi_sports_line_move_delta_logger_ready")
+    evidence_ready = provider_ready and snapshots > 0 and events > 0 and errors == 0
+    implemented = (
+        line_move.get("exists") is not False
+        and bool(status_text)
+        and "delta_logger" in status_text
+    )
+    return row(
+        "CLAUDE-011",
+        "sharp_line_move_delta_capture",
+        "satisfied" if evidence_ready else "blocked_external",
+        (
+            f"status={line_move.get('status')}; snapshots={snapshots}; events={events}; "
+            f"deltas={deltas}; line_moves={line_moves}; errors={errors}"
+        ),
+        "Keep the 60s sharp-provider delta logger running; do not convert line moves into signals until stale-quote rules are pre-registered.",
+        "provider_capture",
+        implementation_status="satisfied" if implemented else "warning",
+    )
+
+
+def tick_recorder_row(tick_recorder: Mapping[str, Any]) -> dict[str, str]:
+    summary = tick_recorder.get("summary", {})
+    status_text = str(tick_recorder.get("status") or "")
+    channels = summary.get("channel_counts") if isinstance(summary.get("channel_counts"), Mapping) else {}
+    ticker_count = int_value(summary.get("ticker_count"))
+    recorded = int_value(summary.get("recorded_line_count"))
+    gaps = int_value(summary.get("gap_count"))
+    has_required_channels = int_value(channels.get("ticker")) > 0 and int_value(
+        channels.get("orderbook_delta")
+    ) > 0
+    ready = status_text == "kalshi_tick_recorder_ready" and recorded > 0
+    auth_blocked = status_text == "kalshi_tick_recorder_blocked_missing_or_invalid_auth"
+    implemented = (
+        tick_recorder.get("exists") is not False
+        and bool(status_text)
+        and ticker_count > 0
+        and has_required_channels
+    )
+    return row(
+        "CLAUDE-012",
+        "kalshi_tick_orderbook_delta_capture",
+        "satisfied" if ready else "blocked_external",
+        (
+            f"status={tick_recorder.get('status')}; tickers={ticker_count}; "
+            f"channels={dict(channels)}; recorded_lines={recorded}; gaps={gaps}"
+        ),
+        "Configure read-only Kalshi WebSocket auth and run the tick recorder until append-only ticker/orderbook_delta rows accrue.",
+        "kalshi_market_data_auth" if auth_blocked else "market_data_capture",
+        implementation_status="satisfied" if implemented else "warning",
+    )
+
+
 def row(
     requirement_id: str,
     advice_area: str,
@@ -523,8 +592,10 @@ def next_action(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
     priority = [
         "CLAUDE-002",
         "CLAUDE-004",
+        "CLAUDE-012",
         "CLAUDE-008",
         "CLAUDE-005",
+        "CLAUDE-011",
     ]
     rows_by_id = {row["requirement_id"]: row for row in rows}
     for requirement_id in priority:
