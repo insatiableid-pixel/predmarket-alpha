@@ -13,7 +13,7 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any
 
-from predmarket.shared_helpers import utc_now
+from predmarket.shared_helpers import manual_drop_path, project_path, utc_now
 
 
 @dataclass(frozen=True, slots=True)
@@ -45,49 +45,90 @@ class SourceRepoSnapshot:
         return row
 
 
+def _manual(*parts: str) -> str:
+    return str(manual_drop_path(*parts))
+
+
+def _project(repo_name: str, *parts: str) -> str:
+    return str(project_path(repo_name, *parts))
+
+
 DEFAULT_SOURCE_REPOS: tuple[SourceRepoDescriptor, ...] = (
     SourceRepoDescriptor(
         repo_id="mlb-platform",
-        path="/home/mrwatson/projects/mlb-platform",
+        path=_project("mlb-platform"),
         donor_type="model-output",
         admission_status="admit_via_external_artifact_bridge",
         family_ids=("sports_baseball",),
         admissible_artifacts=(
-            "/home/mrwatson/manual_drops/mlb_platform_signal_features/mlb_platform_sports_model_latest.json",
-            "/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-betexplorer-market-closing-comparison-latest/type2-betexplorer-market-closing-comparison.json",
-            "/home/mrwatson/projects/mlb-platform/docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
+            _manual(
+                "mlb_platform_signal_features",
+                "mlb_platform_sports_model_latest.json",
+            ),
+            _project(
+                "mlb-platform",
+                "docs/codex/artifacts/type2-betexplorer-market-closing-comparison-latest/type2-betexplorer-market-closing-comparison.json",
+            ),
+            _project(
+                "mlb-platform",
+                "docs/codex/artifacts/type2-settled-outcome-validation-latest/type2-settled-outcome-validation.json",
+            ),
         ),
         blockers=("current evidence does not support threshold/policy change",),
         notes="Use model/evidence artifacts only; do not import repo code.",
     ),
     SourceRepoDescriptor(
         repo_id="nfl_quant_glm51_greenfield",
-        path="/home/mrwatson/projects/nfl_quant_glm51_greenfield",
+        path=_project("nfl_quant_glm51_greenfield"),
         donor_type="model-output",
         admission_status="admit_via_external_artifact_bridge",
         family_ids=("sports_football",),
         admissible_artifacts=(
-            "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json",
-            "/home/mrwatson/manual_drops/kalshi_ev_probabilities/kalshi_ev_nfl_calibrated_probability_overlay_keys_96008378d65c.json",
-            "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
-            "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
-            "/home/mrwatson/projects/nfl_quant_glm51_greenfield/docs/codex/artifacts/nfl-calibration-overlay-latest/calibration-overlay.json",
+            _manual(
+                "kalshi_ev_contract_mappings",
+                "kalshi_ev_nfl_contract_mapping_overlay_keys_96008378d65c.json",
+            ),
+            _manual(
+                "kalshi_ev_probabilities",
+                "kalshi_ev_nfl_calibrated_probability_overlay_keys_96008378d65c.json",
+            ),
+            _project(
+                "nfl_quant_glm51_greenfield",
+                "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+            ),
+            _project(
+                "nfl_quant_glm51_greenfield",
+                "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
+            ),
+            _project(
+                "nfl_quant_glm51_greenfield",
+                "docs/codex/artifacts/nfl-calibration-overlay-latest/calibration-overlay.json",
+            ),
         ),
         blockers=("forward context not yet due for the 2026 season",),
         notes="Existing EV ledger overlays are the fastest paper-engine surface.",
     ),
     SourceRepoDescriptor(
         repo_id="atp-oracle",
-        path="/home/mrwatson/projects/atp-oracle",
+        path=_project("atp-oracle"),
         donor_type="model-output",
         admission_status="watch_only_until_oos_labels",
         family_ids=("sports_tennis",),
         admissible_artifacts=(
-            "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-latest/report.json",
-            "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-liquidity-latest/liquidity.json",
-            "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-bettable-line-gate-latest/bettable-line-gate.json",
-            "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-price-observations-latest/prices.json",
-            "/home/mrwatson/projects/atp-oracle/data/kalshi/matches-2026-07-03.json",
+            _project("atp-oracle", "docs/codex/artifacts/kalshi-forward-oos-latest/report.json"),
+            _project(
+                "atp-oracle",
+                "docs/codex/artifacts/kalshi-forward-oos-liquidity-latest/liquidity.json",
+            ),
+            _project(
+                "atp-oracle",
+                "docs/codex/artifacts/kalshi-bettable-line-gate-latest/bettable-line-gate.json",
+            ),
+            _project(
+                "atp-oracle",
+                "docs/codex/artifacts/kalshi-forward-oos-price-observations-latest/prices.json",
+            ),
+            _project("atp-oracle", "data/kalshi/matches-2026-07-03.json"),
         ),
         blockers=(
             "needs predmarket settlement labels plus passing ATP forward-OOS, liquidity, and bettable-line gates",
@@ -95,30 +136,39 @@ DEFAULT_SOURCE_REPOS: tuple[SourceRepoDescriptor, ...] = (
     ),
     SourceRepoDescriptor(
         repo_id="nba-analytics-platform",
-        path="/home/mrwatson/projects/nba-analytics-platform",
+        path=_project("nba-analytics-platform"),
         donor_type="hold",
         admission_status="blocked_market_benchmark",
         family_ids=("sports_basketball",),
         admissible_artifacts=(
-            "/home/mrwatson/projects/nba-analytics-platform/docs/codex/artifacts/nba-market-claim-gate-latest/nba-market-claim-gate.json",
+            _project(
+                "nba-analytics-platform",
+                "docs/codex/artifacts/nba-market-claim-gate-latest/nba-market-claim-gate.json",
+            ),
         ),
         blockers=("no non-market challenger currently beats the market benchmark",),
     ),
     SourceRepoDescriptor(
         repo_id="us-statarb-lab",
-        path="/home/mrwatson/projects/us-statarb-lab",
+        path=_project("us-statarb-lab"),
         donor_type="source-data",
         admission_status="admit_public_source_adapters",
         family_ids=("macro_rates", "corporate_edgar", "commodities_energy"),
         admissible_artifacts=(
-            "/home/mrwatson/projects/us-statarb-lab/data/curated/platform_readiness/date=2026-04-28/public_snapshot_adapter_audit.csv",
-            "/home/mrwatson/projects/us-statarb-lab/data/curated/platform_readiness/date=2026-04-28/daily_gate_summary.json",
+            _project(
+                "us-statarb-lab",
+                "data/curated/platform_readiness/date=2026-04-28/public_snapshot_adapter_audit.csv",
+            ),
+            _project(
+                "us-statarb-lab",
+                "data/curated/platform_readiness/date=2026-04-28/daily_gate_summary.json",
+            ),
         ),
         notes="Import public-source feature contracts, not securities backtest alpha.",
     ),
     SourceRepoDescriptor(
         repo_id="odds-surveillance-platform",
-        path="/home/mrwatson/projects/odds-surveillance-platform",
+        path=_project("odds-surveillance-platform"),
         donor_type="evidence-control",
         admission_status="admit_patterns_only",
         family_ids=("cross_market_surveillance",),
@@ -127,7 +177,7 @@ DEFAULT_SOURCE_REPOS: tuple[SourceRepoDescriptor, ...] = (
     ),
     SourceRepoDescriptor(
         repo_id="numeraire",
-        path="/home/mrwatson/projects/numeraire",
+        path=_project("numeraire"),
         donor_type="math-control",
         admission_status="admit_small_primitives_only",
         family_ids=("signal_formula", "calibration", "paper_sizing"),
@@ -136,7 +186,7 @@ DEFAULT_SOURCE_REPOS: tuple[SourceRepoDescriptor, ...] = (
     ),
     SourceRepoDescriptor(
         repo_id="speculator_ev_engine",
-        path="/home/mrwatson/projects/speculator_ev_engine",
+        path=_project("speculator_ev_engine"),
         donor_type="math-control",
         admission_status="hold_until_sizing_gate",
         family_ids=("paper_sizing",),

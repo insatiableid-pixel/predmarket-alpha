@@ -102,3 +102,15 @@ def test_makefile_uses_configurable_roots_for_local_data_paths() -> None:
     assert "PREDMARKET_PROJECTS_ROOT ?=" in text
     assert "/home/mrwatson/manual_drops" not in text
     assert "/home/mrwatson/projects" not in text
+
+
+def test_donor_bridge_defaults_do_not_hardcode_local_roots() -> None:
+    inventory = (REPO / "predmarket" / "source_inventory.py").read_text(encoding="utf-8")
+    wrappers = (REPO / "predmarket" / "external_artifact_wrappers.py").read_text(
+        encoding="utf-8"
+    )
+
+    assert "/home/mrwatson/manual_drops" not in inventory
+    assert "/home/mrwatson/projects" not in inventory
+    assert "/home/mrwatson/manual_drops" not in wrappers
+    assert "manual_drop_path(\"predmarket_external_artifacts\")" in wrappers
