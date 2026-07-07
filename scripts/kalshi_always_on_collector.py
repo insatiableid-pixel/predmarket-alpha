@@ -46,6 +46,8 @@ CSV_FIELDS = [
     "next_probe_utc",
     "due_count",
     "label_count",
+    "capture_count",
+    "gap_count",
 ]
 
 
@@ -57,6 +59,7 @@ class CollectorTarget:
     env: Mapping[str, str]
     cadence_group: str
     purpose: str
+    poll_interval_seconds: int | None = None
 
 
 @dataclass(frozen=True)
@@ -68,6 +71,33 @@ class CommandResult:
 
 
 DEFAULT_TARGETS: dict[str, CollectorTarget] = {
+    "line_moves": CollectorTarget(
+        target_id="line_moves",
+        make_target="kalshi-sports-line-move-delta-logger",
+        artifact_path=MACRO_DIR / "latest-kalshi-sports-line-move-delta-logger.json",
+        env={
+            "KALSHI_SPORTS_LINE_MOVE_MAX_CYCLES": "1",
+            "KALSHI_SPORTS_LINE_MOVE_INTERVAL_SECONDS": "60",
+        },
+        cadence_group="high_frequency_sports_line_moves",
+        purpose=(
+            "Record timestamped sharp sportsbook line-move deltas for the stale-quote "
+            "evidence family without producing probabilities or labels."
+        ),
+        poll_interval_seconds=60,
+    ),
+    "ticks": CollectorTarget(
+        target_id="ticks",
+        make_target="kalshi-tick-recorder",
+        artifact_path=MACRO_DIR / "latest-kalshi-tick-recorder.json",
+        env={},
+        cadence_group="high_frequency_kalshi_sports_ticks",
+        purpose=(
+            "Record read-only Kalshi sports ticker and orderbook_delta WebSocket messages "
+            "for replayable stale-quote evidence."
+        ),
+        poll_interval_seconds=60,
+    ),
     "sports_consensus": CollectorTarget(
         target_id="sports_consensus",
         make_target="kalshi-sports-consensus-observation-watch-once",
@@ -233,6 +263,17 @@ def target_result_row(
             "total_independent_label_count",
         ],
     )
+    capture_count = first_int(
+        summary,
+        [
+            "recorded_line_count",
+            "line_move_count",
+            "delta_count",
+            "snapshot_count",
+            "event_count",
+        ],
+    )
+    gap_count = first_int(summary, ["gap_count", "error_count"])
     next_probe = first_time(
         summary,
         [
@@ -256,7 +297,10 @@ def target_result_row(
         "artifact_safe": artifact_is_safe(artifact),
         "due_count": due_count,
         "label_count": label_count,
+        "capture_count": capture_count,
+        "gap_count": gap_count,
         "next_probe_utc": next_probe,
+        "poll_interval_seconds": target.poll_interval_seconds,
         "stdout_tail": tail(command_result.stdout),
         "stderr_tail": tail(command_result.stderr),
         "env_overrides": dict(target.env),
@@ -308,6 +352,9 @@ def cadence_decision(
     elif seconds_to_next is not None and seconds_to_next <= near_close_window_seconds:
         interval = near_interval_seconds
         reason = "near_close_or_probe_window"
+    elif (capture_interval := min_capture_poll_interval(target_results)) is not None:
+        interval = min(base_interval_seconds, capture_interval)
+        reason = "high_frequency_capture_interval"
     else:
         interval = base_interval_seconds
         reason = "base_collection_interval"
@@ -342,6 +389,8 @@ def build_summary(
         "safe_artifact_count": sum(1 for row in target_results if row.get("artifact_safe") is True),
         "total_due_count": sum(int_value(row.get("due_count")) for row in target_results),
         "total_label_count": sum(int_value(row.get("label_count")) for row in target_results),
+        "total_capture_count": sum(int_value(row.get("capture_count")) for row in target_results),
+        "total_gap_count": sum(int_value(row.get("gap_count")) for row in target_results),
         "targets": [row.get("target_id") for row in target_results],
         "dry_run": dry_run,
         "cadence_reason": cadence.get("reason"),
@@ -428,6 +477,15 @@ def first_int(summary: Mapping[str, Any], keys: Sequence[str]) -> int:
     return 0
 
 
+def min_capture_poll_interval(target_results: Sequence[Mapping[str, Any]]) -> int | None:
+    intervals = [
+        int_value(row.get("poll_interval_seconds"))
+        for row in target_results
+        if int_value(row.get("poll_interval_seconds")) > 0
+    ]
+    return min(intervals) if intervals else None
+
+
 def first_time(summary: Mapping[str, Any], keys: Sequence[str]) -> str | None:
     for key in keys:
         value = summary.get(key)
@@ -500,11 +558,13 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Safe artifacts: `{summary.get('safe_artifact_count')}/{summary.get('target_count')}`",
         f"- Total due count: `{summary.get('total_due_count')}`",
         f"- Total label count: `{summary.get('total_label_count')}`",
+        f"- Total capture count: `{summary.get('total_capture_count')}`",
+        f"- Total gap/error count: `{summary.get('total_gap_count')}`",
         f"- Cadence: `{cadence.get('interval_seconds')}` seconds (`{cadence.get('reason')}`)",
         f"- Next run: `{cadence.get('next_run_utc')}`",
         "",
-        "| Target | Status | Artifact | Due | Labels | Next Probe |",
-        "| --- | --- | --- | ---: | ---: | --- |",
+        "| Target | Status | Artifact | Due | Labels | Capture | Gap/Error | Next Probe |",
+        "| --- | --- | --- | ---: | ---: | ---: | ---: | --- |",
     ]
     rows = report.get("targets") if isinstance(report.get("targets"), list) else []
     for row in rows:
@@ -512,7 +572,8 @@ def render_markdown(report: Mapping[str, Any]) -> str:
             lines.append(
                 f"| `{row.get('target_id')}` | `{row.get('status')}` | "
                 f"`{row.get('artifact_status')}` | `{row.get('due_count')}` | "
-                f"`{row.get('label_count')}` | `{row.get('next_probe_utc')}` |"
+                f"`{row.get('label_count')}` | `{row.get('capture_count')}` | "
+                f"`{row.get('gap_count')}` | `{row.get('next_probe_utc')}` |"
             )
     lines.extend(
         [
@@ -560,7 +621,7 @@ def write_csv(rows: Any, path: Path) -> None:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--targets", default="sports,crypto")
+    parser.add_argument("--targets", default="line_moves,ticks,sports_consensus,sports,crypto")
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--once", action="store_true")
     parser.add_argument("--dry-run", action="store_true")
