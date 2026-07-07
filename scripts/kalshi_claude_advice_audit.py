@@ -45,6 +45,12 @@ DEFAULT_LIVE_PATH = MACRO_DIR / "latest-kalshi-live-preflight.json"
 DEFAULT_LINE_MOVE_PATH = MACRO_DIR / "latest-kalshi-sports-line-move-delta-logger.json"
 DEFAULT_TICK_RECORDER_PATH = MACRO_DIR / "latest-kalshi-tick-recorder.json"
 DEFAULT_RESOLVED_ARCHIVE_PATH = MACRO_DIR / "latest-kalshi-resolved-archive-backfill.json"
+DEFAULT_HISTORICAL_FEASIBILITY_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-historical-consensus-feasibility.json"
+)
+DEFAULT_HISTORICAL_BACKFILL_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-historical-consensus-backfill.json"
+)
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-claude-advice-audit-latest"
 
 CSV_FIELDS = [
@@ -85,6 +91,8 @@ def build_claude_advice_audit(
     line_move_path: Path = DEFAULT_LINE_MOVE_PATH,
     tick_recorder_path: Path = DEFAULT_TICK_RECORDER_PATH,
     resolved_archive_path: Path = DEFAULT_RESOLVED_ARCHIVE_PATH,
+    historical_feasibility_path: Path = DEFAULT_HISTORICAL_FEASIBILITY_PATH,
+    historical_backfill_path: Path = DEFAULT_HISTORICAL_BACKFILL_PATH,
     generated_utc: str | None = None,
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
@@ -102,6 +110,8 @@ def build_claude_advice_audit(
         "line_move": artifact(line_move_path),
         "tick_recorder": artifact(tick_recorder_path),
         "resolved_archive": artifact(resolved_archive_path),
+        "historical_feasibility": artifact(historical_feasibility_path),
+        "historical_backfill": artifact(historical_backfill_path),
     }
     rows = advice_rows(artifacts)
     gates = build_gates(artifacts, rows)
@@ -181,6 +191,9 @@ def advice_rows(artifacts: Mapping[str, Mapping[str, Any]]) -> list[dict[str, st
         line_move_delta_row(artifacts["line_move"]),
         tick_recorder_row(artifacts["tick_recorder"]),
         resolved_archive_backfill_row(artifacts["resolved_archive"]),
+        historical_consensus_row(
+            artifacts["historical_feasibility"], artifacts["historical_backfill"]
+        ),
     ]
 
 
@@ -532,6 +545,52 @@ def resolved_archive_backfill_row(resolved_archive: Mapping[str, Any]) -> dict[s
     )
 
 
+def historical_consensus_row(
+    feasibility: Mapping[str, Any], backfill: Mapping[str, Any]
+) -> dict[str, str]:
+    feasibility_summary = feasibility.get("summary", {})
+    backfill_summary = backfill.get("summary", {})
+    feasibility_status = str(feasibility.get("status") or "")
+    backfill_status = str(backfill.get("status") or "")
+    skew_pass = feasibility_summary.get("skew_gate_pass") is True
+    access_verified = feasibility_summary.get("paid_access_verified") is True
+    rows = int_value(backfill_summary.get("historical_consensus_row_count"))
+    observations = int_value(backfill_summary.get("valid_observation_count"))
+    tested = int_value(backfill_summary.get("tested_hypothesis_count"))
+    survivors = int_value(backfill_summary.get("fdr_survivor_count"))
+    completed = backfill_status in {
+        "kalshi_sports_historical_consensus_backfill_ready_no_research_candidates",
+        "kalshi_sports_historical_consensus_backfill_ready_with_research_candidates",
+    }
+    implemented = (
+        feasibility.get("exists") is not False
+        and backfill.get("exists") is not False
+        and bool(feasibility_status)
+        and bool(backfill_status)
+        and skew_pass
+    )
+    blocker_type = (
+        "paid_historical_access"
+        if not access_verified
+        else "historical_consensus_archive"
+        if rows <= 0
+        else "historical_consensus_join_or_power"
+    )
+    return row(
+        "CLAUDE-014",
+        "historical_sharp_consensus_backfill",
+        "satisfied" if completed and observations > 0 and tested > 0 else "blocked_external",
+        (
+            f"feasibility={feasibility.get('status')}; backfill={backfill.get('status')}; "
+            f"skew_gate={skew_pass}; paid_access={access_verified}; rows={rows}; "
+            f"observations={observations}; tested={tested}; fdr_survivors={survivors}"
+        ),
+        "Acquire a replayable timestamped historical no-vig consensus archive only if paid access is verified and <=180s skew is preserved.",
+        blocker_type,
+        implementation_status="satisfied" if implemented else "warning",
+    )
+
+
 def row(
     requirement_id: str,
     advice_area: str,
@@ -622,6 +681,7 @@ def next_action(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
         "CLAUDE-002",
         "CLAUDE-004",
         "CLAUDE-012",
+        "CLAUDE-014",
         "CLAUDE-013",
         "CLAUDE-008",
         "CLAUDE-005",
