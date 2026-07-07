@@ -1,9 +1,8 @@
 """Optional MLB-platform artifact bridge for sports signal features.
 
-This module deliberately consumes files, not Python imports from
-``/home/mrwatson/projects/mlb-platform``. The MLB platform can produce richer
-baseball model rows, but predmarket keeps the dependency boundary at a safe,
-research-only artifact.
+This module deliberately consumes files, not Python imports from a sibling
+MLB-platform checkout. The MLB platform can produce richer baseball model rows,
+but predmarket keeps the dependency boundary at a safe, research-only artifact.
 """
 
 from __future__ import annotations
