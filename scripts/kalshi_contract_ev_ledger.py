@@ -30,6 +30,7 @@ from predmarket.kalshi_execution_cost import (  # noqa: E402
     kalshi_net_fee,
     normalize_kalshi_execution_cost,
 )
+from predmarket.shared_helpers import manual_drop_path, project_path  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 ACTIVE_UNIVERSE_PATH = MACRO_DIR / "active-universe.json"
@@ -46,16 +47,22 @@ DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH = (
     MACRO_DIR / "latest-kalshi-near-resolution-flow-replay-gates.json"
 )
 DEFAULT_NFL_FAIR_LINE_REVIEW_PATH = (
-    Path("/home/mrwatson/projects/nfl_quant_glm51_greenfield")
-    / "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"
+    project_path(
+        "nfl_quant_glm51_greenfield",
+        "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
+    )
 )
 DEFAULT_NFL_HISTORICAL_LINE_BACKTEST_PATH = (
-    Path("/home/mrwatson/projects/nfl_quant_glm51_greenfield")
-    / "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json"
+    project_path(
+        "nfl_quant_glm51_greenfield",
+        "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
+    )
 )
 DEFAULT_NFL_HISTORICAL_LINE_VALIDATION_PATH = (
-    Path("/home/mrwatson/projects/nfl_quant_glm51_greenfield")
-    / "docs/codex/artifacts/nfl-historical-line-validation-latest/historical-line-validation-summary.json"
+    project_path(
+        "nfl_quant_glm51_greenfield",
+        "docs/codex/artifacts/nfl-historical-line-validation-latest/historical-line-validation-summary.json",
+    )
 )
 SPORTS_PROJECTION_MODEL_BLOCKER = (
     "sports projection or strength-model probability is not the primary sports model; "
@@ -67,13 +74,17 @@ LEDGER_SCHEMA_VERSION = 1
 DEFAULT_BINARY_PAYOUT = 1.0
 MIN_VALID_PAYOUT_MULTIPLE = 1.0
 OFFICIAL_TERMS_SNAPSHOT_PATHS = (
-    Path("/home/mrwatson/manual_drops/kalshi"),
+    manual_drop_path("kalshi", env_vars=("KALSHI_EV_OFFICIAL_TERMS_DIR",)),
     CONTROL_REPO / "data",
 )
 CALIBRATED_PROBABILITY_OVERLAY_PATHS = (
-    Path("/home/mrwatson/manual_drops/kalshi_ev_probabilities"),
+    manual_drop_path(
+        "kalshi_ev_probabilities", env_vars=("KALSHI_EV_CALIBRATED_PROBABILITY_DIR",)
+    ),
 )
-CONTRACT_MAPPING_OVERLAY_PATHS = (Path("/home/mrwatson/manual_drops/kalshi_ev_contract_mappings"),)
+CONTRACT_MAPPING_OVERLAY_PATHS = (
+    manual_drop_path("kalshi_ev_contract_mappings", env_vars=("KALSHI_EV_CONTRACT_MAPPING_DIR",)),
+)
 OFFICIAL_TERMS_FILENAME_PREFIXES = (
     "kalshi_mlb_game_series",
     "kalshi_scored",
@@ -118,6 +129,18 @@ ContractMapping = dict[str, Any]
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat().replace("+00:00", "Z")
+
+
+def local_make_command(repo_name: str, target: str) -> str:
+    return f"cd {project_path(repo_name)} && make {target}"
+
+
+def control_make_command(target: str) -> str:
+    return f"cd {CONTROL_REPO} && make {target}"
+
+
+def configured_overlay_dir(path: Path) -> str:
+    return str(path)
 
 
 def load_active_universe(path: Path = ACTIVE_UNIVERSE_PATH) -> list[dict[str, Any]]:
@@ -355,7 +378,9 @@ def adapt_repo(
                     "A local Kalshi NFL market snapshot or manual mapping with ticker, side, official rules, "
                     "YES/NO outcome mapping, and executable quote for the profiled Week 1 games."
                 ),
-                "next_local_command": "cd /home/mrwatson/projects/nfl_quant_glm51_greenfield && make macro-status",
+                "next_local_command": local_make_command(
+                    "nfl_quant_glm51_greenfield", "macro-status"
+                ),
             },
         )
     if repo_id == "nba-analytics-platform":
@@ -391,7 +416,9 @@ def adapt_repo(
                     "A new source-backed NBA signal or market dataset plus exact Kalshi ticker/side/rules/quote "
                     "mapping for the target contract class."
                 ),
-                "next_local_command": "cd /home/mrwatson/projects/nba-analytics-platform && make macro-status",
+                "next_local_command": local_make_command(
+                    "nba-analytics-platform", "macro-status"
+                ),
             },
         )
     if repo_id == "atp-oracle":
@@ -437,7 +464,9 @@ def adapt_repo(
                     "Fresh ATP validation/promotion evidence plus D3/G5/P5 external proof and exact Kalshi "
                     "ticker/side/rules/quote mapping."
                 ),
-                "next_local_command": "cd /home/mrwatson/projects/atp-oracle && make type2-g1g2-diagnostic",
+                "next_local_command": local_make_command(
+                    "atp-oracle", "type2-g1g2-diagnostic"
+                ),
             },
         )
     return blocked_feed(
@@ -1912,9 +1941,9 @@ def row_feed_exact_next_input(repo_id: str) -> str:
 
 def row_feed_next_command(repo_id: str) -> str:
     if repo_id == "predmarket-alpha":
-        return "cd /home/mrwatson/projects/predmarket-alpha && make kalshi-ev-ledger"
+        return control_make_command("kalshi-ev-ledger")
     if repo_id == "mlb-platform":
-        return "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        return local_make_command("mlb-platform", "macro-status")
     return "make macro-status"
 
 
@@ -2588,7 +2617,8 @@ def calibration_work_order_next_action(rows: list[dict[str, Any]]) -> str:
         )
     return (
         "Send the probability_overlay_template rows to the appropriate model repo or worker. "
-        "Write the filled safe overlay under /home/mrwatson/manual_drops/kalshi_ev_probabilities/, "
+        "Write the filled safe overlay under "
+        f"{configured_overlay_dir(CALIBRATED_PROBABILITY_OVERLAY_PATHS[0])}, "
         "then run make kalshi-ev-overlay-preflight && make kalshi-ev-ledger."
     )
 
@@ -2876,8 +2906,9 @@ def contract_mapping_work_order_next_action(rows: list[dict[str, Any]]) -> str:
     return (
         "Fill exact Kalshi ticker, official terms, clean timing status, and executable cost for one "
         "selected NFL row; write matching contract-mapping and calibrated-probability overlays under "
-        "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/ and "
-        "/home/mrwatson/manual_drops/kalshi_ev_probabilities/, then rerun overlay preflight and the EV ledger."
+        f"{configured_overlay_dir(CONTRACT_MAPPING_OVERLAY_PATHS[0])} and "
+        f"{configured_overlay_dir(CALIBRATED_PROBABILITY_OVERLAY_PATHS[0])}, "
+        "then rerun overlay preflight and the EV ledger."
     )
 
 
@@ -2948,12 +2979,12 @@ def overlay_preflight_next_action(
     if not mapping_count:
         return (
             "Drop a safe contract-mapping overlay under "
-            "/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/."
+            f"{configured_overlay_dir(CONTRACT_MAPPING_OVERLAY_PATHS[0])}."
         )
     if not probability_count:
         return (
             "Drop a safe calibrated-probability overlay under "
-            "/home/mrwatson/manual_drops/kalshi_ev_probabilities/."
+            f"{configured_overlay_dir(CALIBRATED_PROBABILITY_OVERLAY_PATHS[0])}."
         )
     if not joined_count:
         return "Fix overlay contract_ticker/side keys so mapping and probability rows join exactly."
@@ -3278,7 +3309,8 @@ def render_calibration_work_order_markdown(report: dict[str, Any]) -> str:
             "The JSON template is written beside this report and to "
             "`docs/codex/macro/latest-kalshi-ev-calibrated-probability-template.json`.",
             "",
-            "A filled overlay belongs under `/home/mrwatson/manual_drops/kalshi_ev_probabilities/`, "
+            "A filled overlay belongs under "
+            f"`{configured_overlay_dir(CALIBRATED_PROBABILITY_OVERLAY_PATHS[0])}`, "
             "not in the repo, and must keep `research_only=true`, `execution_enabled=false`, "
             "and account/order/market execution flags false.",
             "",
@@ -3324,8 +3356,9 @@ def render_contract_mapping_work_order_markdown(report: dict[str, Any]) -> str:
             "- Matching probability template: `docs/codex/macro/latest-kalshi-ev-contract-mapped-probability-template.json`",
             "",
             "Both templates are marked `template_only=true` and use TODO statuses so they are not evidence. "
-            "Filled overlays belong under `/home/mrwatson/manual_drops/kalshi_ev_contract_mappings/` and "
-            "`/home/mrwatson/manual_drops/kalshi_ev_probabilities/`.",
+            "Filled overlays belong under "
+            f"`{configured_overlay_dir(CONTRACT_MAPPING_OVERLAY_PATHS[0])}` and "
+            f"`{configured_overlay_dir(CALIBRATED_PROBABILITY_OVERLAY_PATHS[0])}`.",
             "",
             "## Next Action",
             "",

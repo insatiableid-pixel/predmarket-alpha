@@ -193,6 +193,31 @@ def test_ev_overlay_local_scout_defaults_do_not_hardcode_local_roots() -> None:
         assert "/home/mrwatson/projects" not in text, relative
 
 
+def test_contract_ev_ledger_defaults_do_not_hardcode_local_roots(monkeypatch, tmp_path: Path) -> None:
+    manual_root = tmp_path / "manual"
+    projects_root = tmp_path / "projects"
+    monkeypatch.setenv("PREDMARKET_MANUAL_DROPS_ROOT", str(manual_root))
+    monkeypatch.setenv("PREDMARKET_PROJECTS_ROOT", str(projects_root))
+
+    ledger = load_script("scripts/kalshi_contract_ev_ledger.py", "_path_default_ev_ledger")
+    text = (REPO / "scripts" / "kalshi_contract_ev_ledger.py").read_text(encoding="utf-8")
+
+    assert "/home/mrwatson/manual_drops" not in text
+    assert "/home/mrwatson/projects" not in text
+    assert ledger.OFFICIAL_TERMS_SNAPSHOT_PATHS[0] == manual_root / "kalshi"
+    assert ledger.CALIBRATED_PROBABILITY_OVERLAY_PATHS[0] == (
+        manual_root / "kalshi_ev_probabilities"
+    )
+    assert ledger.CONTRACT_MAPPING_OVERLAY_PATHS[0] == (
+        manual_root / "kalshi_ev_contract_mappings"
+    )
+    assert ledger.DEFAULT_NFL_FAIR_LINE_REVIEW_PATH == (
+        projects_root
+        / "nfl_quant_glm51_greenfield"
+        / "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json"
+    )
+
+
 def test_crypto_weather_probability_defaults_do_not_hardcode_local_roots() -> None:
     paths = [
         "scripts/kalshi_crypto_proxy_feature_packet.py",
