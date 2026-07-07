@@ -10,6 +10,7 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
 from datetime import UTC, datetime
@@ -371,6 +372,34 @@ def gate_status(gates: Sequence[Mapping[str, Any]], name: str) -> str:
 
 
 # ── IO / artifact helpers ────────────────────────────────────────────────
+
+DEFAULT_MANUAL_DROPS_ROOT = Path("/home/mrwatson/manual_drops")
+DEFAULT_PROJECTS_ROOT = Path("/home/mrwatson/projects")
+
+
+def configured_path(default: Path | str, *env_vars: str) -> Path:
+    """Resolve a path from the first populated environment variable, then a default."""
+    for env_var in env_vars:
+        raw = os.getenv(env_var)
+        if raw:
+            return Path(raw).expanduser()
+    return Path(default).expanduser()
+
+
+def manual_drop_path(*parts: str, env_vars: Sequence[str] = ()) -> Path:
+    """Build a manual-drop path from configurable roots.
+
+    ``PREDMARKET_MANUAL_DROPS_ROOT`` moves the whole manual-drop tree. Specific
+    env vars can still override individual files or directories.
+    """
+    root = configured_path(DEFAULT_MANUAL_DROPS_ROOT, "PREDMARKET_MANUAL_DROPS_ROOT")
+    return configured_path(root.joinpath(*parts), *env_vars)
+
+
+def project_path(repo_name: str, *parts: str, env_vars: Sequence[str] = ()) -> Path:
+    """Build a sibling-project path from a configurable projects root."""
+    root = configured_path(DEFAULT_PROJECTS_ROOT, "PREDMARKET_PROJECTS_ROOT")
+    return configured_path(root / repo_name / Path(*parts), *env_vars)
 
 
 def read_json_or_empty(path: Path) -> dict[str, Any]:

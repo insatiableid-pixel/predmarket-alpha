@@ -30,6 +30,7 @@ from predmarket.kalshi_websocket import (  # noqa: E402
 )
 from predmarket.shared_helpers import (  # noqa: E402
     counts,
+    manual_drop_path,
     path_is_within,
     read_json_or_empty,
     safe_stamp,
@@ -39,7 +40,10 @@ from predmarket.shared_helpers import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-tick-recorder-latest"
-DEFAULT_JSONL_DIR = Path("/home/mrwatson/manual_drops/kalshi_ticks")
+DEFAULT_JSONL_DIR = manual_drop_path(
+    "kalshi_ticks",
+    env_vars=("KALSHI_TICK_RECORDER_JSONL_DIR",),
+)
 DEFAULT_UNIVERSE_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 SPORT_CLASSIFICATIONS = {"mlb", "atp", "nfl", "nba", "other_sports", "world_cup"}
 SPORT_SERIES_PREFIXES = ("KXMLB", "KXATP", "KXWIM", "KXWC", "KXFIFA", "KXNFL", "KXNBA")

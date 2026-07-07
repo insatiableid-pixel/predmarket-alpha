@@ -34,6 +34,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     iso_from_timestamp,
     iso_time,
     json_float,
+    manual_drop_path,
     probability,
     read_json_or_empty,
     safe_stamp,
@@ -47,7 +48,10 @@ from predmarket.sports_consensus_falsification import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-resolved-archive-backfill-latest"
-DEFAULT_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_resolved_archive_backfill")
+DEFAULT_RAW_DIR = manual_drop_path(
+    "kalshi_resolved_archive_backfill",
+    env_vars=("KALSHI_RESOLVED_ARCHIVE_RAW_DIR",),
+)
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 DEFAULT_SERIES_TICKERS = (
     "KXMLBGAME",

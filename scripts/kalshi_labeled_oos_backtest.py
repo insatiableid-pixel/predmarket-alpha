@@ -25,11 +25,18 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
-from predmarket.shared_helpers import benjamini_hochberg, binomial_survival  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402
+    benjamini_hochberg,
+    binomial_survival,
+    manual_drop_path,
+)
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_REGISTRY_PATH = MACRO_DIR / "latest-kalshi-hypothesis-registry.json"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_labels")
+DEFAULT_LABEL_DIR = manual_drop_path(
+    "kalshi_oos_labels",
+    env_vars=("KALSHI_LABELED_OOS_LABEL_DIR", "KALSHI_LABELED_OBSERVATION_LABEL_DIR"),
+)
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-labeled-oos-backtest-latest"
 DEFAULT_MIN_OBSERVATIONS = 30
 DEFAULT_MIN_OOS_OBSERVATIONS = 10
@@ -66,9 +73,7 @@ def build_labeled_oos_backtest(
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
     registry = read_json_or_empty(registry_path)
-    hypotheses = [
-        row for row in registry.get("hypotheses", []) if isinstance(row, Mapping)
-    ]
+    hypotheses = [row for row in registry.get("hypotheses", []) if isinstance(row, Mapping)]
     hypothesis_by_id = {str(row.get("hypothesis_id")): row for row in hypotheses}
     label_load = load_label_packets(label_dir)
     valid_rows: list[dict[str, Any]] = []
@@ -84,7 +89,9 @@ def build_labeled_oos_backtest(
             invalid_rows.append(
                 {
                     "hypothesis_id": raw.get("hypothesis_id") if isinstance(raw, Mapping) else None,
-                    "contract_ticker": raw.get("contract_ticker") if isinstance(raw, Mapping) else None,
+                    "contract_ticker": raw.get("contract_ticker")
+                    if isinstance(raw, Mapping)
+                    else None,
                     "errors": errors or ["invalid_observation_shape"],
                 }
             )
@@ -205,7 +212,10 @@ def normalize_observation(row: Mapping[str, Any]) -> tuple[dict[str, Any] | None
         errors.append("side_must_be_yes_or_no")
     model_probability = probability(row.get("model_probability", row.get("calibrated_probability")))
     all_in_cost = probability(
-        row.get("all_in_break_even_probability", row.get("all_in_cost", row.get("break_even_probability")))
+        row.get(
+            "all_in_break_even_probability",
+            row.get("all_in_cost", row.get("break_even_probability")),
+        )
     )
     side_outcome = outcome_value(row.get("side_outcome", row.get("outcome")))
     decision_ts = timestamp(row.get("decision_ts", row.get("decision_time")))
@@ -239,7 +249,9 @@ def normalize_observation(row: Mapping[str, Any]) -> tuple[dict[str, Any] | None
     assert model_ts is not None
     assert close_ts is not None
     assert settled_ts is not None
-    time_safe = quote_ts <= decision_ts and model_ts <= decision_ts and decision_ts < close_ts <= settled_ts
+    time_safe = (
+        quote_ts <= decision_ts and model_ts <= decision_ts and decision_ts < close_ts <= settled_ts
+    )
     if not time_safe:
         errors.append("not_time_safe")
     expected_edge = model_probability - all_in_cost
@@ -287,7 +299,9 @@ def evaluate_hypotheses(
     testable: list[dict[str, Any]] = []
     for hypothesis in hypotheses:
         hypothesis_id = str(hypothesis.get("hypothesis_id"))
-        rows = sorted(rows_by_hypothesis.get(hypothesis_id, []), key=lambda item: float(item["decision_ts"]))
+        rows = sorted(
+            rows_by_hypothesis.get(hypothesis_id, []), key=lambda item: float(item["decision_ts"])
+        )
         positive_rows = [row for row in rows if row.get("positive_decision") is True]
         oos_rows = chronological_holdout(positive_rows, test_fraction=test_fraction)
         evaluation = base_evaluation(hypothesis, rows, positive_rows, oos_rows)
@@ -335,7 +349,9 @@ def base_evaluation(
 ) -> dict[str, Any]:
     return {
         "hypothesis_id": hypothesis.get("hypothesis_id"),
-        "status": "hypothesis_backtest_blocked_missing_observations" if not rows else "hypothesis_backtest_unscored",
+        "status": "hypothesis_backtest_blocked_missing_observations"
+        if not rows
+        else "hypothesis_backtest_unscored",
         "classification": hypothesis.get("classification"),
         "model_route": hypothesis.get("model_route"),
         "feature_family": hypothesis.get("feature_family"),
@@ -345,7 +361,9 @@ def base_evaluation(
         "positive_decision_count": len(positive_rows),
         "oos_count": len(oos_rows),
         "mean_expected_edge": mean(row.get("expected_edge") for row in oos_rows),
-        "mean_realized_pnl_per_contract": mean(row.get("realized_pnl_per_contract") for row in oos_rows),
+        "mean_realized_pnl_per_contract": mean(
+            row.get("realized_pnl_per_contract") for row in oos_rows
+        ),
         "win_rate": None,
         "brier": None,
         "baseline_brier": None,
@@ -382,11 +400,15 @@ def score_oos_rows(rows: Sequence[Mapping[str, Any]]) -> dict[str, Any]:
         "brier_improvement": baseline_brier - brier,
         "p_value": binomial_survival(wins, n, 0.5),
         "mean_expected_edge": mean(row.get("expected_edge") for row in rows),
-        "mean_realized_pnl_per_contract": mean(row.get("realized_pnl_per_contract") for row in rows),
+        "mean_realized_pnl_per_contract": mean(
+            row.get("realized_pnl_per_contract") for row in rows
+        ),
     }
 
 
-def chronological_holdout(rows: Sequence[Mapping[str, Any]], *, test_fraction: float) -> list[Mapping[str, Any]]:
+def chronological_holdout(
+    rows: Sequence[Mapping[str, Any]], *, test_fraction: float
+) -> list[Mapping[str, Any]]:
     if not rows:
         return []
     count = max(1, math.ceil(len(rows) * test_fraction))
@@ -402,7 +424,9 @@ def build_falsification_gate(
     label_load: Mapping[str, Any],
     generated_utc: str,
 ) -> dict[str, Any]:
-    promoted = [row for row in evaluations if row.get("status") == "hypothesis_promoted_research_fdr_passed"]
+    promoted = [
+        row for row in evaluations if row.get("status") == "hypothesis_promoted_research_fdr_passed"
+    ]
     tested = [row for row in evaluations if row.get("p_value") is not None]
     status = (
         "falsification_gate_research_promotions_present"
@@ -432,7 +456,11 @@ def build_falsification_gate(
             "pass" if promoted else "blocked",
             f"{len(promoted)} research promotion(s) after FDR control.",
         ),
-        gate("no_execution_boundary", "pass", "Harness is research-only and emits no account/order fields."),
+        gate(
+            "no_execution_boundary",
+            "pass",
+            "Harness is research-only and emits no account/order fields.",
+        ),
     ]
     counts = Counter(item["status"] for item in gates)
     return {
@@ -448,7 +476,9 @@ def build_falsification_gate(
             1 for row in evaluations if row.get("status") == "hypothesis_rejected_oos_cost_aware"
         ),
         "blocked_hypothesis_count": sum(
-            1 for row in evaluations if str(row.get("status", "")).startswith("hypothesis_backtest_blocked")
+            1
+            for row in evaluations
+            if str(row.get("status", "")).startswith("hypothesis_backtest_blocked")
         ),
         "gates": gates,
         "gate_counts": {
@@ -478,11 +508,15 @@ def summary_from_evaluations(
         "valid_observation_count": valid_observation_count,
         "invalid_observation_count": invalid_observation_count,
         "unknown_hypothesis_observation_count": unknown_hypothesis_rows,
-        "testable_hypothesis_count": sum(1 for row in evaluations if row.get("p_value") is not None),
+        "testable_hypothesis_count": sum(
+            1 for row in evaluations if row.get("p_value") is not None
+        ),
         "promoted_research_hypothesis_count": statuses["hypothesis_promoted_research_fdr_passed"],
         "rejected_hypothesis_count": statuses["hypothesis_rejected_oos_cost_aware"],
         "blocked_hypothesis_count": sum(
-            count for status, count in statuses.items() if status.startswith("hypothesis_backtest_blocked")
+            count
+            for status, count in statuses.items()
+            if status.startswith("hypothesis_backtest_blocked")
         ),
         "by_status": dict(sorted(statuses.items())),
     }
@@ -605,7 +639,9 @@ def sha256_or_none(path: Path) -> str | None:
     return digest.hexdigest()
 
 
-def write_labeled_oos_backtest(report: Mapping[str, Any], out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, str]:
+def write_labeled_oos_backtest(
+    report: Mapping[str, Any], out_dir: Path = DEFAULT_OUT_DIR
+) -> dict[str, str]:
     out_dir.mkdir(parents=True, exist_ok=True)
     json_path = out_dir / "kalshi-labeled-oos-backtest.json"
     markdown_path = out_dir / "kalshi-labeled-oos-backtest.md"
@@ -614,7 +650,11 @@ def write_labeled_oos_backtest(report: Mapping[str, Any], out_dir: Path = DEFAUL
     gate_markdown_path = out_dir / "kalshi-oos-falsification-gate.md"
 
     report_text = json.dumps(report, indent=2, sort_keys=True, default=str) + "\n"
-    gate_payload = report.get("falsification_gate") if isinstance(report.get("falsification_gate"), Mapping) else {}
+    gate_payload = (
+        report.get("falsification_gate")
+        if isinstance(report.get("falsification_gate"), Mapping)
+        else {}
+    )
     gate_text = json.dumps(gate_payload, indent=2, sort_keys=True, default=str) + "\n"
     json_path.write_text(report_text, encoding="utf-8")
     markdown_path.write_text(render_markdown(report), encoding="utf-8")
@@ -700,7 +740,9 @@ def render_gate_markdown(gate_payload: Mapping[str, Any]) -> str:
     ]
     for item in gate_payload.get("gates", []):
         if isinstance(item, Mapping):
-            lines.append(f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |")
+            lines.append(
+                f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |"
+            )
     lines.append("")
     return "\n".join(lines)
 
