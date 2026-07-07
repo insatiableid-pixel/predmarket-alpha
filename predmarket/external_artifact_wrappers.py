@@ -9,10 +9,10 @@ from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
-from predmarket.shared_helpers import probability, sha256_or_none, utc_now
+from predmarket.shared_helpers import manual_drop_path, probability, sha256_or_none, utc_now
 from predmarket.source_inventory import SourceRepoDescriptor
 
-DEFAULT_WRAP_ROOT = Path("/home/mrwatson/manual_drops/predmarket_external_artifacts")
+DEFAULT_WRAP_ROOT = manual_drop_path("predmarket_external_artifacts")
 ARTIFACT_KIND_PATTERNS = (
     ("kalshi_ev_contract_mappings", "contract_mapping_overlay"),
     ("kalshi_ev_probabilities", "probability_overlay"),
