@@ -36,6 +36,19 @@ def test_default_roots_are_home_relative() -> None:
     assert 'Path("/home/mrwatson/projects")' not in source
 
 
+def test_top_level_helpers_do_not_hardcode_project_root() -> None:
+    paths = [
+        "setup_env.sh",
+        "run_smoke_test.sh",
+        "predmarket/mlb_platform_bridge.py",
+    ]
+
+    for relative in paths:
+        text = (REPO / relative).read_text(encoding="utf-8")
+        assert "/home/mrwatson/projects" not in text, relative
+        assert "/home/mrwatson/manual_drops" not in text, relative
+
+
 def test_manual_drop_specific_override_wins(monkeypatch, tmp_path: Path) -> None:
     from predmarket.shared_helpers import manual_drop_path
 

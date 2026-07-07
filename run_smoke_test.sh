@@ -6,8 +6,9 @@
 
 set -euo pipefail
 
-PROJECT_ROOT="/home/mrwatson/projects/predmarket-alpha"
-VENV_DIR="${PROJECT_ROOT}/.venv"
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_ROOT="${PREDMARKET_PROJECT_ROOT:-$SCRIPT_DIR}"
+VENV_DIR="${PREDMARKET_VENV_DIR:-${PROJECT_ROOT}/.venv}"
 PYTHON="${VENV_DIR}/bin/python"
 PYTEST="${VENV_DIR}/bin/pytest"
 export TMPDIR="${PROJECT_ROOT}/.tmp"
