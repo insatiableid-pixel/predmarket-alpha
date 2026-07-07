@@ -276,7 +276,7 @@ def test_makefile_exposes_label_accumulation_and_dynamic_atp_snapshot() -> None:
     assert "kalshi-sports-label-accumulation-cycle" in text
     assert "scripts/kalshi_sports_label_accumulation_cycle.py" in text
     assert (
-        "$(lastword $(sort $(wildcard /home/mrwatson/projects/atp-oracle/data/kalshi/matches-*.json)))"
+        "$(lastword $(sort $(wildcard $(PREDMARKET_PROJECTS_ROOT)/atp-oracle/data/kalshi/matches-*.json)))"
         in text
     )
 

@@ -83,3 +83,12 @@ def test_always_on_collector_has_no_machine_specific_home_paths() -> None:
     text = (REPO / "scripts" / "kalshi_always_on_collector.py").read_text(encoding="utf-8")
 
     assert "/home/mrwatson" not in text
+
+
+def test_makefile_uses_configurable_roots_for_local_data_paths() -> None:
+    text = (REPO / "Makefile").read_text(encoding="utf-8")
+
+    assert "PREDMARKET_MANUAL_DROPS_ROOT ?=" in text
+    assert "PREDMARKET_PROJECTS_ROOT ?=" in text
+    assert "/home/mrwatson/manual_drops" not in text
+    assert "/home/mrwatson/projects" not in text
