@@ -55,7 +55,7 @@ source .venv/bin/activate
 
 # 3. Copy the env template and fill in credentials
 cp .env.template .env
-#   edit .env with your Kalshi API key/secret
+#   edit .env with your Kalshi API key and RSA private key path/PEM
 
 # 4. Verify runtime imports resolve
 make check-env

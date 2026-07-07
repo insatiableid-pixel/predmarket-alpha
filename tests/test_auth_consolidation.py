@@ -468,6 +468,12 @@ class TestSingleKeyPathInConfig:
         assert "RSA private key PEM" in template
         assert "your_kalshi_api_secret_base64_here" not in template
 
+    def test_readme_documents_rsa_private_key_not_api_secret(self) -> None:
+        readme = (pathlib.Path(__file__).resolve().parents[1] / "README.md").read_text("utf-8")
+
+        assert "Kalshi API key and RSA private key path/PEM" in readme
+        assert "Kalshi API key/secret" not in readme
+
 
 # ---------------------------------------------------------------------------
 # VAL-AUTH-009: Token/timestamp replay protection
