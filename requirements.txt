@@ -52,7 +52,7 @@ alembic==1.18.4
 # Infrastructure
 prometheus-client==0.25.0
 python-json-logger==4.1.0
-slowapi==0.1.9
+slowapi==0.1.10
 itsdangerous==2.2.0
 SQLAlchemy==2.0.50
 arch==8.0.0
