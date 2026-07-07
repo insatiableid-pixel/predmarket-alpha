@@ -444,6 +444,7 @@ KALSHI_SPORTS_MICROSTRUCTURE_CAPTURE ?= 1
 KALSHI_SPORTS_MICROSTRUCTURE_PROBE_OBSERVED ?= 1
 KALSHI_SPORTS_MICROSTRUCTURE_PROBE_MAX_TICKERS ?= 300
 KALSHI_NEAR_RESOLUTION_FLOW_OUT_DIR ?= docs/codex/macro/kalshi-near-resolution-informed-flow-evidence-gate-latest
+KALSHI_NEAR_RESOLUTION_FLOW_MICROSTRUCTURE_PATH ?= docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
 KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_OUT_DIR ?= docs/codex/macro/kalshi-near-resolution-flow-replay-gates-latest
 KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CLOSE_HOURS ?= 6
 KALSHI_NEAR_RESOLUTION_FLOW_REPLAY_MAX_CURRENT_CANDIDATES ?= 60
@@ -1221,7 +1222,7 @@ kalshi-near-resolution-informed-flow-evidence-gate:
 	@python3 scripts/kalshi_near_resolution_informed_flow_evidence_gate.py \
 		--write \
 		--out-dir $(KALSHI_NEAR_RESOLUTION_FLOW_OUT_DIR) \
-		--microstructure-path docs/codex/macro/latest-kalshi-sports-microstructure-observation-loop.json
+		--microstructure-path $(KALSHI_NEAR_RESOLUTION_FLOW_MICROSTRUCTURE_PATH)
 
 kalshi-near-resolution-flow-replay-gates:
 	@python3 scripts/kalshi_near_resolution_flow_replay_gates.py \
