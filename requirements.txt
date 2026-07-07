@@ -56,5 +56,5 @@ slowapi==0.1.9
 itsdangerous==2.2.0
 SQLAlchemy==2.0.50
 arch==8.0.0
-xgboost==3.2.0
+xgboost==3.3.0
 statsmodels==0.14.6
