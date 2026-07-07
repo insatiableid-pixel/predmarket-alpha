@@ -60,10 +60,39 @@ def test_append_message_writes_replayable_jsonl_and_gap_stats(tmp_path: Path) ->
 
     assert len(rows) == 2
     assert rows[0]["type"] == "ticker"
+    assert rows[0]["received_monotonic_ns"] < rows[1]["received_monotonic_ns"]
     assert rows[0]["raw_text_sha256"]
     assert rows[0]["raw_text"].startswith('{"type":"ticker"')
     assert stats.line_count == 2
     assert stats.gap_count >= 1
+
+
+def test_append_message_rotates_jsonl_files_and_reports_hashes(tmp_path: Path) -> None:
+    module = load_module()
+    path = tmp_path / "ticks.jsonl"
+    stats = module.RecorderStats()
+    message = {
+        "received_at_utc": "2026-07-06T00:00:00.000Z",
+        "text": '{"type":"orderbook_delta","sid":1}',
+        "payload": {"type": "orderbook_delta", "sid": 1},
+    }
+
+    first_path = module.append_message(path, message, stats=stats, max_gap_seconds=30)
+    second_path = module.append_message(
+        path,
+        {**message, "received_at_utc": "2026-07-06T00:00:01.000Z"},
+        stats=stats,
+        max_gap_seconds=30,
+        rotate_bytes=1,
+    )
+    files = module.jsonl_file_info(stats, path)
+
+    assert first_path == path
+    assert second_path != path
+    assert second_path.name == "ticks.part-0002.jsonl"
+    assert len(files) == 2
+    assert all(row["sha256"] for row in files)
+    assert [row["path"] for row in files] == [str(path), str(second_path)]
 
 
 def test_recorder_report_is_research_only(tmp_path: Path) -> None:
@@ -84,6 +113,8 @@ def test_recorder_report_is_research_only(tmp_path: Path) -> None:
     assert report["account_or_order_paths"] is False
     assert report["market_execution"] is False
     assert report["summary"]["recorded_line_count"] == 3
+    assert report["summary"]["jsonl_file_count"] == 0
+    assert report["summary"]["rotation_count"] == 0
 
 
 def test_makefile_wires_tick_recorder_target() -> None:
@@ -92,3 +123,5 @@ def test_makefile_wires_tick_recorder_target() -> None:
     assert "kalshi-tick-recorder:" in text
     assert "scripts/kalshi_tick_recorder.py" in text
     assert "KALSHI_TICK_RECORDER_CHANNELS ?= ticker,orderbook_delta" in text
+    assert "KALSHI_TICK_RECORDER_ROTATE_BYTES ?= 250000000" in text
+    assert "--rotate-bytes $(KALSHI_TICK_RECORDER_ROTATE_BYTES)" in text

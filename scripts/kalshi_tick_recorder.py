@@ -10,7 +10,7 @@ import json
 import sys
 import time
 from collections.abc import AsyncIterator, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
@@ -57,6 +57,7 @@ class RecorderStats:
     first_received_utc: str | None = None
     last_received_utc: str | None = None
     previous_monotonic: float | None = None
+    jsonl_paths: list[str] = field(default_factory=list)
 
 
 def utc_now() -> str:
@@ -115,6 +116,7 @@ async def record_ticks(
     jsonl_path: Path,
     duration_seconds: float,
     max_gap_seconds: float,
+    rotate_bytes: int,
     execution_mode: str,
 ) -> dict[str, Any]:
     generated = utc_now()
@@ -152,6 +154,7 @@ async def record_ticks(
                 jsonl_path=jsonl_path,
                 duration_seconds=duration_seconds,
                 max_gap_seconds=max_gap_seconds,
+                rotate_bytes=rotate_bytes,
                 stats=stats,
             )
     except Exception as exc:
@@ -183,6 +186,7 @@ async def drain_messages(
     jsonl_path: Path,
     duration_seconds: float,
     max_gap_seconds: float,
+    rotate_bytes: int,
     stats: RecorderStats,
 ) -> None:
     deadline = time.monotonic() + max(0.0, duration_seconds)
@@ -192,7 +196,13 @@ async def drain_messages(
             message = await asyncio.wait_for(anext(messages), timeout=timeout)
         except TimeoutError:
             continue
-        append_message(jsonl_path, message, stats=stats, max_gap_seconds=max_gap_seconds)
+        append_message(
+            jsonl_path,
+            message,
+            stats=stats,
+            max_gap_seconds=max_gap_seconds,
+            rotate_bytes=rotate_bytes,
+        )
 
 
 def append_message(
@@ -201,8 +211,10 @@ def append_message(
     *,
     stats: RecorderStats,
     max_gap_seconds: float,
-) -> None:
+    rotate_bytes: int = 0,
+) -> Path:
     now_mono = time.monotonic()
+    now_mono_ns = time.monotonic_ns()
     if stats.previous_monotonic is not None:
         gap = now_mono - stats.previous_monotonic
         stats.max_gap_seconds = max(stats.max_gap_seconds, gap)
@@ -216,6 +228,7 @@ def append_message(
         payload = message.get("payload")
     row = {
         "received_at_utc": received,
+        "received_monotonic_ns": now_mono_ns,
         "type": payload.get("type") if isinstance(payload, Mapping) else None,
         "sid": payload.get("sid") if isinstance(payload, Mapping) else None,
         "raw_text_sha256": hashlib.sha256(text.encode("utf-8")).hexdigest(),
@@ -224,12 +237,48 @@ def append_message(
         "research_only": True,
         "execution_enabled": False,
     }
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("a", encoding="utf-8") as handle:
+    active_path = active_jsonl_path(path, stats=stats, rotate_bytes=rotate_bytes)
+    active_path.parent.mkdir(parents=True, exist_ok=True)
+    with active_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(row, sort_keys=True, separators=(",", ":"), default=str) + "\n")
     stats.line_count += 1
     stats.first_received_utc = stats.first_received_utc or received
     stats.last_received_utc = received
+    return active_path
+
+
+def active_jsonl_path(base_path: Path, *, stats: RecorderStats, rotate_bytes: int = 0) -> Path:
+    if not stats.jsonl_paths:
+        stats.jsonl_paths.append(str(base_path))
+        return base_path
+    active = Path(stats.jsonl_paths[-1])
+    if rotate_bytes <= 0 or not active.exists() or active.stat().st_size < rotate_bytes:
+        return active
+    rotated = rotated_jsonl_path(base_path, len(stats.jsonl_paths) + 1)
+    stats.jsonl_paths.append(str(rotated))
+    return rotated
+
+
+def rotated_jsonl_path(base_path: Path, index: int) -> Path:
+    suffix = base_path.suffix or ".jsonl"
+    stem = base_path.name[: -len(suffix)] if base_path.name.endswith(suffix) else base_path.stem
+    return base_path.with_name(f"{stem}.part-{index:04d}{suffix}")
+
+
+def jsonl_file_info(stats: RecorderStats, fallback_path: Path) -> list[dict[str, Any]]:
+    paths = [Path(value) for value in stats.jsonl_paths] or [fallback_path]
+    output: list[dict[str, Any]] = []
+    for path in paths:
+        if not path.exists():
+            continue
+        output.append(
+            {
+                "path": str(path),
+                "sha256": sha256_or_none(path),
+                "byte_count": path.stat().st_size,
+            }
+        )
+    return output
 
 
 def recorder_report(
@@ -243,6 +292,7 @@ def recorder_report(
     authenticated: bool,
     error: str | None,
 ) -> dict[str, Any]:
+    files = jsonl_file_info(stats, jsonl_path)
     return {
         "schema_version": 1,
         "generated_utc": generated_utc,
@@ -260,6 +310,7 @@ def recorder_report(
         "inputs": {
             "jsonl_path": str(jsonl_path),
             "jsonl_sha256": sha256_or_none(jsonl_path),
+            "jsonl_files": files,
             "ticker_count": len(tickers),
             "channels": list(channels),
         },
@@ -267,6 +318,8 @@ def recorder_report(
             "recorded_line_count": stats.line_count,
             "gap_count": stats.gap_count,
             "max_gap_seconds": round(stats.max_gap_seconds, 6),
+            "jsonl_file_count": len(files),
+            "rotation_count": max(0, len(files) - 1),
             "first_received_utc": stats.first_received_utc,
             "last_received_utc": stats.last_received_utc,
             "ticker_count": len(tickers),
@@ -324,6 +377,8 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Tickers: `{summary.get('ticker_count')}`",
         f"- Recorded lines: `{summary.get('recorded_line_count')}`",
         f"- Gaps: `{summary.get('gap_count')}`",
+        f"- JSONL files: `{summary.get('jsonl_file_count')}`",
+        f"- Rotations: `{summary.get('rotation_count')}`",
         f"- JSONL: `{report.get('inputs', {}).get('jsonl_path')}`",
         "",
         "Read-only evidence capture. No orders, balances, accounts, EV, or paper stake.",
@@ -346,6 +401,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--max-tickers", type=int, default=250)
     parser.add_argument("--duration-seconds", type=float, default=300.0)
     parser.add_argument("--max-gap-seconds", type=float, default=30.0)
+    parser.add_argument("--rotate-bytes", type=int, default=250_000_000)
     parser.add_argument("--execution-mode", default="live")
     parser.add_argument("--write", action="store_true")
     return parser.parse_args(argv)
@@ -368,6 +424,7 @@ async def async_main(argv: Sequence[str] | None = None) -> int:
         jsonl_path=jsonl_path,
         duration_seconds=args.duration_seconds,
         max_gap_seconds=args.max_gap_seconds,
+        rotate_bytes=max(0, int(args.rotate_bytes)),
         execution_mode=args.execution_mode,
     )
     if args.write:
