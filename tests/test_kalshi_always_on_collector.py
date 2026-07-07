@@ -1,7 +1,9 @@
+import subprocess
 from pathlib import Path
 
 import pytest
 
+import scripts.kalshi_always_on_collector as collector_module
 from scripts.kalshi_always_on_collector import (
     MACRO_DIR,
     CollectorTarget,
@@ -190,6 +192,34 @@ def test_selected_targets_include_sports_consensus_collector() -> None:
     assert consensus.env["KALSHI_SPORTS_CONSENSUS_PROBE_OBSERVED"] == "1"
 
 
+def test_run_make_target_timeout_is_target_failure(monkeypatch: pytest.MonkeyPatch) -> None:
+    target = CollectorTarget(
+        target_id="sports_consensus",
+        make_target="kalshi-sports-consensus-observation-watch-once",
+        artifact_path=Path("missing.json"),
+        env={},
+        cadence_group="fast_sports_consensus_settlement",
+        purpose="test",
+    )
+
+    def fake_run(*_args: object, **_kwargs: object) -> subprocess.CompletedProcess[str]:
+        raise subprocess.TimeoutExpired(
+            cmd=["make", "kalshi-sports-consensus-observation-watch-once"],
+            timeout=2,
+            output="partial stdout",
+            stderr=b"partial stderr",
+        )
+
+    monkeypatch.setattr(collector_module.subprocess, "run", fake_run)
+
+    result = collector_module.run_make_target(target, timeout_seconds=2)
+
+    assert result.returncode == 124
+    assert "partial stdout" in result.stdout
+    assert "partial stderr" in result.stderr
+    assert "sports_consensus" in result.stderr
+
+
 def test_default_collector_targets_run_full_sports_burn_in() -> None:
     from scripts.kalshi_always_on_collector import parse_args
 
@@ -259,6 +289,8 @@ def test_makefile_exposes_always_on_collector_targets() -> None:
         "KALSHI_ALWAYS_ON_COLLECTOR_TARGETS ?= "
         "line_moves,ticks,sports_consensus,sports,crypto"
     ) in text
+    assert "KALSHI_ALWAYS_ON_COLLECTOR_COMMAND_TIMEOUT_SECONDS ?= 600" in text
+    assert "--command-timeout-seconds $(KALSHI_ALWAYS_ON_COLLECTOR_COMMAND_TIMEOUT_SECONDS)" in text
     assert "kalshi-sports-line-move-delta-logger:" in text
     assert "kalshi-tick-recorder:" in text
     assert "kalshi-sports-consensus-observation-watch-once:" in text

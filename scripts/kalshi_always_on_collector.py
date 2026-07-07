@@ -151,15 +151,26 @@ def run_make_target(
     env = os.environ.copy()
     env.update(target.env)
     started = time.monotonic()
-    completed = subprocess.run(
-        ["make", "--no-print-directory", target.make_target],
-        cwd=CONTROL_REPO,
-        env=env,
-        text=True,
-        capture_output=True,
-        timeout=timeout_seconds,
-        check=False,
-    )
+    try:
+        completed = subprocess.run(
+            ["make", "--no-print-directory", target.make_target],
+            cwd=CONTROL_REPO,
+            env=env,
+            text=True,
+            capture_output=True,
+            timeout=timeout_seconds,
+            check=False,
+        )
+    except subprocess.TimeoutExpired as exc:
+        return CommandResult(
+            returncode=124,
+            stdout=timeout_text(exc.stdout),
+            stderr=(
+                f"collector target {target.target_id} timed out after "
+                f"{timeout_seconds}s\n{timeout_text(exc.stderr)}"
+            ).strip(),
+            duration_seconds=time.monotonic() - started,
+        )
     return CommandResult(
         returncode=completed.returncode,
         stdout=completed.stdout,
@@ -442,6 +453,7 @@ def run_collector(
     write: bool,
     max_cycles: int,
     dry_run: bool,
+    command_timeout_seconds: int,
     base_interval_seconds: int,
     near_interval_seconds: int,
     due_interval_seconds: int,
@@ -450,8 +462,14 @@ def run_collector(
     cycle_index = 0
     last_report: dict[str, Any] = {}
     while True:
+        runner = None
+        if command_timeout_seconds != DEFAULT_COMMAND_TIMEOUT_SECONDS:
+            runner = lambda target: run_make_target(  # noqa: E731
+                target, timeout_seconds=max(1, command_timeout_seconds)
+            )
         last_report = execute_collector_cycle(
             targets=targets,
+            runner=runner,
             dry_run=dry_run,
             base_interval_seconds=base_interval_seconds,
             near_interval_seconds=near_interval_seconds,
@@ -504,6 +522,14 @@ def int_value(value: Any) -> int:
 
 def tail(text: str, *, limit: int = 4000) -> str:
     return text[-limit:] if len(text) > limit else text
+
+
+def timeout_text(value: str | bytes | None) -> str:
+    if value is None:
+        return ""
+    if isinstance(value, bytes):
+        return value.decode("utf-8", errors="replace")
+    return str(value)
 
 
 def write_outputs(report: Mapping[str, Any], *, out_dir: Path = DEFAULT_OUT_DIR) -> dict[str, str]:
@@ -630,6 +656,9 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--near-interval-seconds", type=int, default=DEFAULT_NEAR_INTERVAL_SECONDS)
     parser.add_argument("--due-interval-seconds", type=int, default=DEFAULT_DUE_INTERVAL_SECONDS)
     parser.add_argument(
+        "--command-timeout-seconds", type=int, default=DEFAULT_COMMAND_TIMEOUT_SECONDS
+    )
+    parser.add_argument(
         "--near-close-window-seconds", type=int, default=DEFAULT_NEAR_CLOSE_WINDOW_SECONDS
     )
     parser.add_argument("--write", action="store_true")
@@ -646,6 +675,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         write=args.write,
         max_cycles=args.max_cycles,
         dry_run=args.dry_run,
+        command_timeout_seconds=args.command_timeout_seconds,
         base_interval_seconds=args.base_interval_seconds,
         near_interval_seconds=args.near_interval_seconds,
         due_interval_seconds=args.due_interval_seconds,
