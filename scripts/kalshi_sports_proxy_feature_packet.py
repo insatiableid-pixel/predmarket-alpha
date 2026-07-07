@@ -48,6 +48,7 @@ from predmarket.mlb_platform_bridge import (  # noqa: E402
     mlb_platform_model_index,
 )
 from predmarket.shared_helpers import (  # noqa: E402
+    manual_drop_path,
     optional_float,
     outside_repo,
     read_json_or_empty,
@@ -58,13 +59,13 @@ from predmarket.shared_helpers import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 DEFAULT_BREADTH_SCOUT_PATH = MACRO_DIR / "latest-kalshi-probability-breadth-scout.json"
-DEFAULT_RAW_UNIVERSE_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json"
+DEFAULT_RAW_UNIVERSE_PATH = manual_drop_path(
+    "kalshi_universe", "kalshi_universe_scan_latest.json"
 )
-DEFAULT_RAW_PROXY_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_proxy_features")
+DEFAULT_RAW_PROXY_DIR = manual_drop_path("kalshi_sports_proxy_features")
 DEFAULT_STRENGTH_COEFFICIENTS_PATH = MACRO_DIR / "sports-baseball-strength-coefficients.json"
-DEFAULT_MLB_PLATFORM_MODEL_PATH = Path(
-    "/home/mrwatson/manual_drops/mlb_platform_signal_features/mlb_platform_sports_model_latest.json"
+DEFAULT_MLB_PLATFORM_MODEL_PATH = manual_drop_path(
+    "mlb_platform_signal_features", "mlb_platform_sports_model_latest.json"
 )
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-proxy-feature-packet-latest"
 DEFAULT_MAX_CLOSE_HOURS = 6.0
