@@ -44,6 +44,7 @@ DEFAULT_EVENT_VELOCITY_PATH = MACRO_DIR / "latest-kalshi-sports-event-velocity-e
 DEFAULT_LIVE_PATH = MACRO_DIR / "latest-kalshi-live-preflight.json"
 DEFAULT_LINE_MOVE_PATH = MACRO_DIR / "latest-kalshi-sports-line-move-delta-logger.json"
 DEFAULT_TICK_RECORDER_PATH = MACRO_DIR / "latest-kalshi-tick-recorder.json"
+DEFAULT_RESOLVED_ARCHIVE_PATH = MACRO_DIR / "latest-kalshi-resolved-archive-backfill.json"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-claude-advice-audit-latest"
 
 CSV_FIELDS = [
@@ -83,6 +84,7 @@ def build_claude_advice_audit(
     live_path: Path = DEFAULT_LIVE_PATH,
     line_move_path: Path = DEFAULT_LINE_MOVE_PATH,
     tick_recorder_path: Path = DEFAULT_TICK_RECORDER_PATH,
+    resolved_archive_path: Path = DEFAULT_RESOLVED_ARCHIVE_PATH,
     generated_utc: str | None = None,
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
@@ -99,6 +101,7 @@ def build_claude_advice_audit(
         "live": artifact(live_path),
         "line_move": artifact(line_move_path),
         "tick_recorder": artifact(tick_recorder_path),
+        "resolved_archive": artifact(resolved_archive_path),
     }
     rows = advice_rows(artifacts)
     gates = build_gates(artifacts, rows)
@@ -177,6 +180,7 @@ def advice_rows(artifacts: Mapping[str, Mapping[str, Any]]) -> list[dict[str, st
         no_threshold_lowering_row(artifacts),
         line_move_delta_row(artifacts["line_move"]),
         tick_recorder_row(artifacts["tick_recorder"]),
+        resolved_archive_backfill_row(artifacts["resolved_archive"]),
     ]
 
 
@@ -503,6 +507,31 @@ def tick_recorder_row(tick_recorder: Mapping[str, Any]) -> dict[str, str]:
     )
 
 
+def resolved_archive_backfill_row(resolved_archive: Mapping[str, Any]) -> dict[str, str]:
+    summary = resolved_archive.get("summary", {})
+    status_text = str(resolved_archive.get("status") or "")
+    labels = int_value(summary.get("label_count"))
+    distinct = int_value(summary.get("distinct_contract_count"))
+    observations = int_value(summary.get("observation_count"))
+    tested = int_value(summary.get("tested_hypothesis_count"))
+    survivors = int_value(summary.get("fdr_survivor_count"))
+    powered = labels >= 1000 and distinct >= 1000 and observations > 0 and tested > 0
+    ready_status = status_text.startswith("kalshi_resolved_archive_backfill_ready")
+    implemented = resolved_archive.get("exists") is not False and bool(status_text)
+    return row(
+        "CLAUDE-013",
+        "resolved_archive_price_bucket_power",
+        "satisfied" if ready_status and powered else "blocked_clock",
+        (
+            f"status={resolved_archive.get('status')}; labels={labels}; distinct={distinct}; "
+            f"observations={observations}; tested={tested}; fdr_survivors={survivors}"
+        ),
+        "Keep scaling public Kalshi-only resolved archives; do not lower thresholds or add post-hoc buckets after no-survivor results.",
+        "public_archive_backfill",
+        implementation_status="satisfied" if implemented else "warning",
+    )
+
+
 def row(
     requirement_id: str,
     advice_area: str,
@@ -593,6 +622,7 @@ def next_action(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
         "CLAUDE-002",
         "CLAUDE-004",
         "CLAUDE-012",
+        "CLAUDE-013",
         "CLAUDE-008",
         "CLAUDE-005",
         "CLAUDE-011",
