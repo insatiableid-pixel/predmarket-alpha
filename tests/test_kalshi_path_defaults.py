@@ -26,6 +26,16 @@ def test_manual_drop_path_uses_configurable_root(monkeypatch, tmp_path: Path) ->
     assert manual_drop_path("kalshi_ticks") == root / "kalshi_ticks"
 
 
+def test_default_roots_are_home_relative() -> None:
+    from predmarket.shared_helpers import DEFAULT_MANUAL_DROPS_ROOT, DEFAULT_PROJECTS_ROOT
+
+    assert DEFAULT_MANUAL_DROPS_ROOT == Path.home() / "manual_drops"
+    assert DEFAULT_PROJECTS_ROOT == Path.home() / "projects"
+    source = (REPO / "predmarket" / "shared_helpers.py").read_text(encoding="utf-8")
+    assert 'Path("/home/mrwatson/manual_drops")' not in source
+    assert 'Path("/home/mrwatson/projects")' not in source
+
+
 def test_manual_drop_specific_override_wins(monkeypatch, tmp_path: Path) -> None:
     from predmarket.shared_helpers import manual_drop_path
 

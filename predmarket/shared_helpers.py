@@ -373,8 +373,8 @@ def gate_status(gates: Sequence[Mapping[str, Any]], name: str) -> str:
 
 # ── IO / artifact helpers ────────────────────────────────────────────────
 
-DEFAULT_MANUAL_DROPS_ROOT = Path("/home/mrwatson/manual_drops")
-DEFAULT_PROJECTS_ROOT = Path("/home/mrwatson/projects")
+DEFAULT_MANUAL_DROPS_ROOT = Path.home() / "manual_drops"
+DEFAULT_PROJECTS_ROOT = Path.home() / "projects"
 
 
 def configured_path(default: Path | str, *env_vars: str) -> Path:
