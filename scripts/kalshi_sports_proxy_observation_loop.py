@@ -12,9 +12,9 @@ Sports-specific differences from the crypto loop (cosmetic constants + field sch
 - ``observation_id`` prefix is ``sports_obs_`` (vs ``crypto_obs_``).
 - ``packet_type`` strings are ``kalshi_sports_proxy_feature_observations`` /
   ``kalshi_sports_proxy_feature_labels``.
-- Observation/label packets live OUTSIDE the repo under
-  ``/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/`` and
-  ``/kalshi_sports_proxy_labels/``.
+- Observation/label packets live OUTSIDE the repo under configurable
+  manual-drop ``kalshi_sports_proxy_observations/`` and
+  ``kalshi_sports_proxy_labels/`` directories.
 - Labels come from KALSHI PUBLIC SETTLEMENT (the contract's actual settlement
   outcome after expiration; the official game result / league box score is Kalshi's
   documented settlement SOURCE, but the LABEL OF RECORD is what Kalshi settled) --
@@ -48,14 +48,16 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-sports-proxy-feature-packet.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_sports_settlements/kalshi_settled_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_sports_settlements", "kalshi_settled_markets_latest.json"
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_settlements")
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_proxy_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_proxy_labels")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_sports_settlements")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_sports_proxy_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_sports_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-proxy-observation-loop-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 # The sports feature-status value that marks a row ready for observation.
@@ -860,7 +862,7 @@ WantedBy=timers.target
 # Description=Research-only Kalshi sports proxy observation loop
 # [Service]
 # Type=oneshot
-# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# WorkingDirectory=/path/to/predmarket-alpha
 # ExecStart=/usr/bin/make kalshi-sports-proxy-observation-watch-once
 """
 

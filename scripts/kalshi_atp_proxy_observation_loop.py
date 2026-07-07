@@ -29,14 +29,16 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.shared_helpers import (  # noqa: E402
+    manual_drop_path,
     optional_float,
     outside_repo,
+    project_path,
     safe_research_artifact,
     sha256_or_none,
 )
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_ATP_MATCH_SNAPSHOT_DIR = Path("/home/mrwatson/projects/atp-oracle/data/kalshi")
+DEFAULT_ATP_MATCH_SNAPSHOT_DIR = project_path("atp-oracle", "data/kalshi")
 
 
 def latest_atp_match_snapshot_path(
@@ -53,12 +55,12 @@ def latest_atp_match_snapshot_path(
 
 
 DEFAULT_ATP_MATCH_SNAPSHOT_PATH = latest_atp_match_snapshot_path()
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_atp_settlements/kalshi_atp_settled_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_atp_settlements", "kalshi_atp_settled_markets_latest.json"
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_atp_settlements")
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_atp_proxy_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_atp_proxy_labels")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_atp_settlements")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_atp_proxy_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_atp_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-atp-proxy-observation-loop-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 
@@ -825,7 +827,7 @@ WantedBy=timers.target
 # Matching service:
 # [Service]
 # Type=oneshot
-# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# WorkingDirectory=/path/to/predmarket-alpha
 # ExecStart=/usr/bin/make kalshi-atp-proxy-observation-watch-once
 """
 
