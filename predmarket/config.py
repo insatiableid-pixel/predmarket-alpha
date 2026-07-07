@@ -53,7 +53,12 @@ class KalshiConfig(BaseModel):
         if not self.api_key:
             self.api_key = os.getenv("KALSHI_API_KEY") or ""
         if not self.api_secret:
-            self.api_secret = os.getenv("KALSHI_API_SECRET") or ""
+            self.api_secret = (
+                os.getenv("KALSHI_PRIVATE_KEY_PEM")
+                or os.getenv("KALSHI_PRIVATE_KEY_PATH")
+                or os.getenv("KALSHI_API_SECRET")
+                or ""
+            )
         return self
 
     @property
