@@ -41,10 +41,10 @@ from kalshi_falsification_replay_shared import (  # noqa: E402
     write_csv_generic,
 )
 
-from predmarket.shared_helpers import counts, iso_from_timestamp  # noqa: E402
+from predmarket.shared_helpers import counts, iso_from_timestamp, manual_drop_path  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_world_cup_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_world_cup_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-world-cup-proxy-feature-model-falsification-latest"
 
 

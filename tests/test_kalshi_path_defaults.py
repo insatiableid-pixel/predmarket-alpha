@@ -154,3 +154,19 @@ def test_core_capture_reference_defaults_do_not_hardcode_local_roots() -> None:
         text = (REPO / relative).read_text(encoding="utf-8")
         assert "/home/mrwatson/manual_drops" not in text, relative
         assert "/home/mrwatson/projects" not in text, relative
+
+
+def test_world_cup_atp_replay_defaults_do_not_hardcode_local_roots() -> None:
+    paths = [
+        "scripts/kalshi_world_cup_proxy_observation_loop.py",
+        "scripts/kalshi_world_cup_proxy_feature_model_falsification.py",
+        "scripts/kalshi_world_cup_outcome_independence_diagnostic.py",
+        "scripts/kalshi_atp_proxy_evidence_gate.py",
+        "scripts/kalshi_sports_proxy_research_candidate_replay.py",
+        "scripts/kalshi_sports_blocker_clearance_cycle.py",
+    ]
+
+    for relative in paths:
+        text = (REPO / relative).read_text(encoding="utf-8")
+        assert "/home/mrwatson/manual_drops" not in text, relative
+        assert "/home/mrwatson/projects" not in text, relative
