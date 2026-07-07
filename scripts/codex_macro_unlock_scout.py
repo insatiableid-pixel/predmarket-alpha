@@ -10,13 +10,19 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from predmarket.shared_helpers import manual_drop_path, project_path
+
 CONTROL_REPO = Path(__file__).resolve().parents[1]
-DEFAULT_MANUAL_DROPS = Path("/home/mrwatson/manual_drops")
-DEFAULT_MLB_REPO = Path("/home/mrwatson/projects/mlb-platform")
+DEFAULT_MANUAL_DROPS = manual_drop_path()
+DEFAULT_MLB_REPO = project_path("mlb-platform")
 
 
 def utc_now() -> str:
     return datetime.now(UTC).isoformat(timespec="seconds").replace("+00:00", "Z")
+
+
+def local_make_command(repo_name: str, target: str) -> str:
+    return f"cd {project_path(repo_name)} && make {target}"
 
 
 def build_unlock_scout(
@@ -46,7 +52,10 @@ def build_unlock_scout(
         control_repo / "docs/codex/macro/latest-kalshi-ev-nfl-overlay-assembler.json"
     )
     atp_diagnostic = _read_json(
-        Path("/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/type2-g1g2-diagnostic-latest/type2-g1g2-diagnostic.json")
+        project_path(
+            "atp-oracle",
+            "docs/codex/artifacts/type2-g1g2-diagnostic-latest/type2-g1g2-diagnostic.json",
+        )
     )
 
     odds_files = _files(manual_drops / "odds_api", patterns=("*.json",))
@@ -64,6 +73,7 @@ def build_unlock_scout(
 
     lanes = [
         _predmarket_lane(
+            manual_drops,
             predmarket_reference,
             predmarket_builder,
             predmarket_disposition,
@@ -248,6 +258,7 @@ def render_unlock_scout_markdown(report: Mapping[str, Any]) -> str:
 
 
 def _predmarket_lane(
+    manual_drops: Path,
     predmarket_reference: Path,
     builder: Mapping[str, Any],
     disposition: Mapping[str, Any],
@@ -349,7 +360,7 @@ def _predmarket_lane(
             ),
             "missing_input": (
                 "Safe validated calibrated-probability overlay under "
-                "/home/mrwatson/manual_drops/kalshi_ev_probabilities/ keyed by exact contract_ticker and side."
+                f"{manual_drops / 'kalshi_ev_probabilities'} keyed by exact contract_ticker and side."
                 if usable == 0
                 else "No missing EV overlay input; usable research-only rows are present for review."
             ),
@@ -504,18 +515,18 @@ def _mlb_lane(
             "repeatability_no_signal_clean_packets",
         }
         next_local_command = (
-            "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+            local_make_command("mlb-platform", "macro-status")
             if terminal_repeatability_status
-            else "cd /home/mrwatson/projects/mlb-platform && make type2-repeatability-ledger"
+            else local_make_command("mlb-platform", "type2-repeatability-ledger")
         )
     elif review_adjudication and review_adjudication.get("ready_for_human_review") is True:
         next_local_command = (
-            "cd /home/mrwatson/projects/mlb-platform && make type2-review-adjudication "
+            f"{local_make_command('mlb-platform', 'type2-review-adjudication')} "
             "TYPE2_BUNDLE_DIR=<clean_bundle>"
         )
     else:
         next_local_command = (
-            "cd /home/mrwatson/projects/mlb-platform && make type2-pregame-drop-intake "
+            f"{local_make_command('mlb-platform', 'type2-pregame-drop-intake')} "
             "TYPE2_PREGAME_ODDS_RAW=<odds_json> TYPE2_PREGAME_ODDS_META=<odds_meta> "
             "TYPE2_PREGAME_KALSHI_JSON=<kalshi_json>"
         )
@@ -549,7 +560,7 @@ def _mlb_lane(
                 "Corrected contract mapping invalidated the previous run-line repeatability result; "
                 "zero clean packets remain for research review."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     if threshold_policy_review and threshold_policy_review.get("review_only") is True:
         summary = (
             threshold_policy_review.get("summary")
@@ -583,7 +594,7 @@ def _mlb_lane(
             missing_input = (
                 "Clean threshold-policy evidence is incomplete; produce a safe local threshold-policy report."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     if settled_validation and settled_validation.get("review_only") is True:
         summary = (
             settled_validation.get("summary")
@@ -617,7 +628,7 @@ def _mlb_lane(
             missing_input = (
                 "Settled validation is incomplete; produce a safe local settled-outcome report."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     if closing_proxy_validation and closing_proxy_validation.get("review_only") is True:
         summary = (
             closing_proxy_validation.get("summary")
@@ -655,7 +666,7 @@ def _mlb_lane(
                 "Closing-proxy validation is incomplete; produce a safe local proxy report from "
                 "existing clean packets only."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     if betexplorer_moneyline_comparison and betexplorer_moneyline_comparison.get("review_only") is True:
         summary = (
             betexplorer_moneyline_comparison.get("summary")
@@ -685,7 +696,7 @@ def _mlb_lane(
                 "BetExplorer moneyline comparison is incomplete; fix mapping before using it as a "
                 "closing-line evidence surface."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     if betexplorer_market_comparison and betexplorer_market_comparison.get("review_only") is True:
         summary = (
             betexplorer_market_comparison.get("summary")
@@ -717,7 +728,7 @@ def _mlb_lane(
                 "BetExplorer market comparison is incomplete; fix book/market/selection/line mapping "
                 "before using it as a closing-line evidence surface."
             )
-        next_local_command = "cd /home/mrwatson/projects/mlb-platform && make macro-status"
+        next_local_command = local_make_command("mlb-platform", "macro-status")
     return {
         "repo_id": "mlb-platform",
         "status": status,
@@ -742,7 +753,7 @@ def _atp_lane(diagnostic: Mapping[str, Any]) -> dict[str, Any]:
             f"vision_score={summary.get('vision_score') if isinstance(summary, Mapping) else None}"
         ),
         "missing_input": f"Fresh validation/promotion evidence plus {external_blockers}.",
-        "next_local_command": "cd /home/mrwatson/projects/atp-oracle && make type2-g1g2-diagnostic",
+        "next_local_command": local_make_command("atp-oracle", "type2-g1g2-diagnostic"),
     }
 
 
@@ -779,11 +790,11 @@ def _route_lane_unlock(*, repo_id: str, status: str, fallback: Any) -> tuple[str
             return (
                 "New source-backed NBA signal or market dataset that can beat the current market-parity baseline; "
                 "do not run new residual variants without that input.",
-                "cd /home/mrwatson/projects/nba-analytics-platform && make macro-status",
+                local_make_command("nba-analytics-platform", "macro-status"),
             )
         return (
             "A source-backed NBA signal/data update plus current macro-status evidence for promotability gates.",
-            "cd /home/mrwatson/projects/nba-analytics-platform && make macro-status",
+            local_make_command("nba-analytics-platform", "macro-status"),
         )
     if repo_id == "nfl_quant_glm51_greenfield":
         if status == "line_readiness_profiled_slate_forward_context_not_yet_due_research_only":
@@ -791,11 +802,14 @@ def _route_lane_unlock(*, repo_id: str, status: str, fallback: Any) -> tuple[str
                 "Forward-context evidence when due or manually dropped outside the repo: injuries, weather, official "
                 "starting QBs/depth chart changes, and closing/reference line evidence. Current availability says these "
                 "inputs are not yet due.",
-                "cd /home/mrwatson/projects/nfl_quant_glm51_greenfield && make forward-context-availability && make macro-status",
+                local_make_command(
+                    "nfl_quant_glm51_greenfield",
+                    "forward-context-availability && make macro-status",
+                ),
             )
         return (
             "Fresh NFL governance/line-readiness evidence from local artifacts only; no new betting features.",
-            "cd /home/mrwatson/projects/nfl_quant_glm51_greenfield && make macro-status",
+            local_make_command("nfl_quant_glm51_greenfield", "macro-status"),
         )
     return (
         "A named external evidence input for this lane plus refreshed macro-status evidence.",
