@@ -53,6 +53,8 @@ def build_feasibility(
     )
     if not skew_pass:
         status = "kalshi_sports_historical_consensus_feasibility_blocked_snapshot_skew"
+    elif paid_probe and not access_verified:
+        status = "kalshi_sports_historical_consensus_feasibility_blocked_paid_access_probe"
     elif not access_verified:
         status = "kalshi_sports_historical_consensus_feasibility_ready_paid_access_unverified"
     else:

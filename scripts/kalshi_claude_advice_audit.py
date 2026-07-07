@@ -556,6 +556,7 @@ def historical_consensus_row(
     backfill_summary = backfill.get("summary", {})
     feasibility_status = str(feasibility.get("status") or "")
     backfill_status = str(backfill.get("status") or "")
+    paid_probe_status = str(feasibility_summary.get("paid_probe_status") or "")
     skew_pass = feasibility_summary.get("skew_gate_pass") is True
     access_verified = feasibility_summary.get("paid_access_verified") is True
     rows = int_value(backfill_summary.get("historical_consensus_row_count"))
@@ -586,8 +587,9 @@ def historical_consensus_row(
         "satisfied" if completed and observations > 0 and tested > 0 else "blocked_external",
         (
             f"feasibility={feasibility.get('status')}; backfill={backfill.get('status')}; "
-            f"skew_gate={skew_pass}; paid_access={access_verified}; rows={rows}; "
-            f"observations={observations}; tested={tested}; fdr_survivors={survivors}"
+            f"skew_gate={skew_pass}; paid_access={access_verified}; "
+            f"paid_probe={paid_probe_status or None}; rows={rows}; observations={observations}; "
+            f"tested={tested}; fdr_survivors={survivors}"
         ),
         "Acquire a replayable timestamped historical no-vig consensus archive only if paid access is verified and <=180s skew is preserved.",
         blocker_type,

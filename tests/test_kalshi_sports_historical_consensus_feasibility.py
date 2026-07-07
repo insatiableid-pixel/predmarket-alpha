@@ -52,6 +52,23 @@ def test_paid_probe_success_promotes_to_backfill_ready() -> None:
     assert report["paid_historical_calls"] is True
 
 
+def test_paid_probe_failure_blocks_paid_access_explicitly() -> None:
+    report = build_feasibility(
+        generated_utc="2026-07-06T00:00:00Z",
+        snapshot_interval_seconds=300,
+        max_allowed_skew_seconds=180,
+        paid_probe={"status": "historical_probe_blocked_http_error", "status_code": 401},
+    )
+
+    assert (
+        report["status"]
+        == "kalshi_sports_historical_consensus_feasibility_blocked_paid_access_probe"
+    )
+    assert report["summary"]["paid_access_verified"] is False
+    assert report["summary"]["paid_probe_status"] == "historical_probe_blocked_http_error"
+    assert report["paid_historical_calls"] is True
+
+
 def test_makefile_exposes_historical_consensus_feasibility_target() -> None:
     text = MAKEFILE_PATH.read_text(encoding="utf-8")
 

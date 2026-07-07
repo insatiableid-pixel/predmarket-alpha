@@ -461,6 +461,48 @@ def test_claude_advice_audit_satisfies_historical_consensus_backfill(
     assert rows["CLAUDE-014"]["implementation_status"] == "satisfied"
 
 
+def test_claude_advice_audit_surfaces_historical_paid_probe_blocker(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    files = base_inputs(tmp_path)
+    files["historical_feasibility"] = write_json(
+        tmp_path / "historical_feasibility_blocked_probe.json",
+        safe_artifact(
+            "kalshi_sports_historical_consensus_feasibility_blocked_paid_access_probe",
+            skew_gate_pass=True,
+            paid_access_verified=False,
+            paid_probe_status="historical_probe_blocked_http_error",
+        ),
+    )
+
+    report = module.build_claude_advice_audit(
+        flow_gate_path=files["flow_gate"],
+        flow_replay_path=files["flow_replay"],
+        ev_ledger_path=files["ev"],
+        paper_path=files["paper"],
+        passive_fill_path=files["passive"],
+        atp_path=files["atp"],
+        world_cup_independence_path=files["world_cup"],
+        prior_only_path=files["prior"],
+        event_velocity_path=files["velocity"],
+        live_path=files["live"],
+        line_move_path=files["line_move"],
+        tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
+        historical_feasibility_path=files["historical_feasibility"],
+        historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
+        generated_utc="2026-07-07T05:00:00Z",
+    )
+
+    rows = {row["requirement_id"]: row for row in report["advice_rows"]}
+    assert rows["CLAUDE-014"]["status"] == "blocked_external"
+    assert rows["CLAUDE-014"]["blocker_type"] == "paid_historical_access"
+    assert "paid_probe=historical_probe_blocked_http_error" in rows["CLAUDE-014"]["evidence"]
+    assert rows["CLAUDE-014"]["implementation_status"] == "satisfied"
+
+
 def test_claude_advice_audit_satisfies_provider_coverage(tmp_path: Path) -> None:
     module = load_module()
     files = base_inputs(tmp_path)
