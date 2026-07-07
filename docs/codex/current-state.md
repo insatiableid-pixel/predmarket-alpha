@@ -1,6 +1,6 @@
 # Codex Current State
 
-Last updated: 2026-07-06
+Last updated: 2026-07-07
 
 ## Canonical Root
 
@@ -9,6 +9,8 @@ Last updated: 2026-07-06
 This is the active prediction-market research root and macro command center.
 
 ## Current Landing
+
+- 2026-07-07 Kalshi tick recorder split: added the Fable-requested read-only Kalshi WebSocket tick/orderbook capture surface on `codex/fable-tick-recorder`. `predmarket/kalshi_websocket.py` now supports raw receive-timestamped messages and multi-channel subscriptions, while new `make kalshi-tick-recorder` records append-only sports `ticker,orderbook_delta` JSONL under `/home/mrwatson/manual_drops/kalshi_ticks/` and writes only safety/provenance macro artifacts in-repo. Latest real run is honest and blocked on missing read-only Kalshi auth: `kalshi_tick_recorder_blocked_missing_or_invalid_auth`, `250` sports tickers selected, channels `ticker,orderbook_delta`, `0` recorded lines, `jsonl_sha256=null`, and error `Kalshi private key is required: set venues.kalshi.api_secret or KALSHI_API_SECRET`. Safety flags remain research-only: no database writes, no provider/paid calls, no account/order paths, no market execution, no staking/sizing guidance. Verification: focused tick/websocket tests `24 passed`; touched-file Ruff clean; real `make kalshi-tick-recorder KALSHI_TICK_RECORDER_DURATION_SECONDS=1` exits `0`. Next action is external credential/config repair for read-only Kalshi market-data auth, not code loosening. Tranche note: `docs/codex/tranches/2026-07-07-kalshi-tick-recorder.md`.
 
 - 2026-07-06 historical consensus feasibility split: added `make kalshi-sports-historical-consensus-feasibility` on `codex/fable-historical-consensus-feasibility` to gate any future historical sharp-consensus divergence backfill before it can enter evidence. The target models The Odds API historical cadence as `300s` snapshots and a nearest-snapshot request strategy, producing max expected absolute skew `150s`, which passes the configured `<=180s` timestamp gate. Latest status is `kalshi_sports_historical_consensus_feasibility_ready_paid_access_unverified`; historical endpoint cost is recorded as `10` credits per region/market, `paid_access_verified=false`, and no paid endpoint probe is run by default. Next action remains external: verify paid historical provider access before any historical divergence backfill. No historical backfill, labels, probabilities, paper stake, or live paths were produced.
 

@@ -18,8 +18,9 @@ from __future__ import annotations
 import asyncio
 import json
 import logging
-from collections.abc import AsyncIterator
+from collections.abc import AsyncIterator, Sequence
 from dataclasses import dataclass
+from datetime import UTC, datetime
 from enum import Enum, auto
 from typing import Any
 
@@ -67,6 +68,15 @@ class MarketDataEvent:
     yes_ask: float
     last_price: float
     timestamp: int  # Unix milliseconds
+
+
+@dataclass(frozen=True)
+class RawWebSocketMessage:
+    """A raw Kalshi WebSocket message with a local receive timestamp."""
+
+    received_at_utc: str
+    text: str
+    payload: dict[str, Any] | None
 
 
 # ---------------------------------------------------------------------------
@@ -189,6 +199,7 @@ class KalshiWebSocketClient:
 
         # Ticker subscriptions managed by this client.
         self._subscribed_tickers: set[str] = set()
+        self._subscribed_channels: set[str] = {"ticker"}
         # Monotonically increasing message id for subscription commands.
         self._msg_id: int = 1
         # The active WebSocket connection (None when disconnected/initial).
@@ -277,10 +288,12 @@ class KalshiWebSocketClient:
     async def _resubscribe(self) -> None:
         """Re-issue all active subscriptions after a reconnect."""
         if self._subscribed_tickers:
-            await self._send_subscribe(list(self._subscribed_tickers))
+            await self._send_subscribe(
+                list(self._subscribed_tickers), channels=sorted(self._subscribed_channels)
+            )
 
-    async def _send_subscribe(self, tickers: list[str]) -> None:
-        """Send a subscribe command for the ticker channel."""
+    async def _send_subscribe(self, tickers: list[str], *, channels: list[str]) -> None:
+        """Send a subscribe command for the requested read-only channels."""
         if not self._ws:
             return
         msg_id = self._msg_id
@@ -289,7 +302,7 @@ class KalshiWebSocketClient:
             "id": msg_id,
             "cmd": "subscribe",
             "params": {
-                "channels": ["ticker"],
+                "channels": channels,
                 "market_tickers": tickers,
             },
         }
@@ -402,8 +415,8 @@ class KalshiWebSocketClient:
     # Public API
     # ------------------------------------------------------------------
 
-    async def subscribe(self, tickers: list[str]) -> None:
-        """Subscribe to ticker updates for the given market tickers.
+    async def subscribe(self, tickers: list[str], *, channels: Sequence[str] | None = None) -> None:
+        """Subscribe to read-only updates for the given market tickers.
 
         Multiple calls are additive. All tickers are multiplexed over the
         same underlying WebSocket connection.
@@ -413,15 +426,24 @@ class KalshiWebSocketClient:
         if self._state is _ConnectionState.DISCONNECTED:
             raise WebSocketPermanentFailure("Client is in terminal disconnected state")
 
+        requested_channels = {
+            str(channel).strip() for channel in (channels or ("ticker",)) if str(channel).strip()
+        }
+        requested_channels = requested_channels or {"ticker"}
         new_tickers = [t for t in tickers if t not in self._subscribed_tickers]
-        if not new_tickers:
+        new_channels = requested_channels - self._subscribed_channels
+        if not new_tickers and not new_channels:
             return
 
         self._subscribed_tickers.update(new_tickers)
+        self._subscribed_channels.update(requested_channels)
 
         if self._ws is not None:
             try:
-                await self._send_subscribe(new_tickers)
+                await self._send_subscribe(
+                    sorted(self._subscribed_tickers),
+                    channels=sorted(self._subscribed_channels),
+                )
             except websockets.ConnectionClosed:
                 logger.info("ws_subscribe_connection_closed tickers=%s", new_tickers)
 
@@ -442,13 +464,8 @@ class KalshiWebSocketClient:
             except websockets.ConnectionClosed:
                 pass
 
-    async def messages(self) -> AsyncIterator[MarketDataEvent]:
-        """Async generator yielding parsed :class:`MarketDataEvent` objects.
-
-        On unexpected disconnect the generator will attempt to reconnect
-        with exponential backoff. If reconnection fails permanently it
-        raises :class:`WebSocketPermanentFailure`.
-        """
+    async def raw_messages(self) -> AsyncIterator[RawWebSocketMessage]:
+        """Yield raw read-only WebSocket messages with local receive timestamps."""
         if self._state is _ConnectionState.CLOSED:
             raise WebSocketClientClosed("Client is closed")
 
@@ -457,15 +474,33 @@ class KalshiWebSocketClient:
         while not self._closed_event.is_set():
             if self._state is _ConnectionState.DISCONNECTED:
                 raise WebSocketPermanentFailure("Client is in terminal disconnected state")
-            # CLOSED check: if disconnect() was called from another task.
             if self._state.value == _ConnectionState.CLOSED.value:
                 return
 
             raw = await self._recv_with_reconnect()
             if raw is None:
                 continue
+            try:
+                payload = json.loads(raw)
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                payload = None
+            yield RawWebSocketMessage(
+                received_at_utc=datetime.now(UTC)
+                .isoformat(timespec="milliseconds")
+                .replace("+00:00", "Z"),
+                text=raw,
+                payload=payload if isinstance(payload, dict) else None,
+            )
 
-            event = _parse_ticker_message(raw)
+    async def messages(self) -> AsyncIterator[MarketDataEvent]:
+        """Async generator yielding parsed :class:`MarketDataEvent` objects.
+
+        On unexpected disconnect the generator will attempt to reconnect
+        with exponential backoff. If reconnection fails permanently it
+        raises :class:`WebSocketPermanentFailure`.
+        """
+        async for raw in self.raw_messages():
+            event = _parse_ticker_message(raw.text)
             if event is not None:
                 yield event
 
