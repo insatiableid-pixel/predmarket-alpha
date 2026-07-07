@@ -121,3 +121,18 @@ def test_sports_consensus_scripts_do_not_hardcode_local_roots() -> None:
         text = path.read_text(encoding="utf-8")
         assert "/home/mrwatson/manual_drops" not in text, path
         assert "/home/mrwatson/projects" not in text, path
+
+
+def test_sports_evidence_scripts_do_not_hardcode_local_roots() -> None:
+    paths = [
+        "scripts/kalshi_atp_proxy_observation_loop.py",
+        "scripts/kalshi_sports_proxy_observation_loop.py",
+        "scripts/kalshi_sports_microstructure_observation_loop.py",
+        "scripts/kalshi_sports_proxy_feature_model_falsification.py",
+        "scripts/kalshi_sports_proxy_capacity_correlation_decay.py",
+    ]
+
+    for relative in paths:
+        text = (REPO / relative).read_text(encoding="utf-8")
+        assert "/home/mrwatson/manual_drops" not in text, relative
+        assert "/home/mrwatson/projects" not in text, relative

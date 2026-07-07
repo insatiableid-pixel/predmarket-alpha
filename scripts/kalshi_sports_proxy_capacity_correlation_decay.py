@@ -11,8 +11,8 @@ Sports-specific differences:
 - Cluster key: ``league|game_winner_ticker|date`` (each game is an independent cluster).
 - Inputs: ``latest-kalshi-sports-proxy-feature-packet.json`` and
   ``latest-kalshi-sports-proxy-research-candidate-replay.json``.
-- Raw orderbook payloads outside the repo under
-  ``/home/mrwatson/manual_drops/kalshi_sports_proxy_orderbooks/``.
+- Raw orderbook payloads outside the repo under the configurable manual-drop
+  ``kalshi_sports_proxy_orderbooks/`` directory.
 - Every row ``usable=false``.
 """
 
@@ -37,12 +37,13 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-sports-proxy-feature-packet.json"
 DEFAULT_REPLAY_PATH = MACRO_DIR / "latest-kalshi-sports-proxy-research-candidate-replay.json"
-DEFAULT_RAW_ORDERBOOK_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_proxy_orderbooks")
+DEFAULT_RAW_ORDERBOOK_DIR = manual_drop_path("kalshi_sports_proxy_orderbooks")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-proxy-capacity-correlation-decay-latest"
 DEFAULT_MAX_CLOSE_HOURS = 6.0
 DEFAULT_MAX_TICKERS = 60

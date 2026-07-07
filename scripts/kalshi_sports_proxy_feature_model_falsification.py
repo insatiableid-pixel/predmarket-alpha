@@ -9,7 +9,7 @@ module ``kalshi_falsification_replay_shared``.
 Sports-specific differences:
 - Prediction rule: ``predicted_side`` from the strength-mechanical model (yes/no/None).
 - Model evaluator: ``strength_win_prob_directional_accuracy``.
-- Labels from ``/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/``.
+- Labels from the configurable manual-drop ``kalshi_sports_proxy_labels/`` directory.
 - Output artifacts under ``docs/codex/macro/latest-kalshi-sports-proxy-feature-model-falsification.*``.
 - Every row ``usable=false``.
 """
@@ -46,8 +46,10 @@ from kalshi_falsification_replay_shared import (  # noqa: E402
     write_csv_generic,
 )
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_sports_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-proxy-feature-model-falsification-latest"
 
 
