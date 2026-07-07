@@ -30,6 +30,7 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.shared_helpers import (  # noqa: E402
+    manual_drop_path,
     path_is_within,
     read_json_or_empty,
     safe_research_artifact,
@@ -46,8 +47,8 @@ from predmarket.sports_consensus_falsification import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_PREFLIGHT_PATH = MACRO_DIR / "latest-kalshi-sports-consensus-preflight.json"
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_consensus_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_consensus_labels")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_sports_consensus_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_sports_consensus_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-consensus-falsification-latest"
 
 CSV_FIELDS = [

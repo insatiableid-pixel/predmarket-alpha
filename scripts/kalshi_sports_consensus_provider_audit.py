@@ -14,6 +14,7 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path, project_path  # noqa: E402
 from predmarket.sports_consensus_provider_policy import (  # noqa: E402
     DEFAULT_PROVIDER_AUDIT_TARGET_SPORTS,
     build_provider_audit,
@@ -23,15 +24,13 @@ from predmarket.sports_consensus_provider_policy import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_REPORT_DIR = MACRO_DIR / "kalshi-sports-consensus-provider-audit-latest"
-DEFAULT_STRICT_CONSENSUS = Path(
-    "/home/mrwatson/manual_drops/predmarket/sports-no-vig-consensus.json"
+DEFAULT_STRICT_CONSENSUS = manual_drop_path("predmarket", "sports-no-vig-consensus.json")
+DEFAULT_ATP_CONSENSUS = project_path(
+    "atp-oracle",
+    "docs/codex/artifacts/sports-market-consensus-latest/sports-market-consensus.json",
 )
-DEFAULT_ATP_CONSENSUS = Path(
-    "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/"
-    "sports-market-consensus-latest/sports-market-consensus.json"
-)
-DEFAULT_ATP_BOOK_GLOB = Path("/home/mrwatson/projects/atp-oracle/data/sports/books")
-DEFAULT_ODDS_API_GLOB = Path("/home/mrwatson/manual_drops/odds_api")
+DEFAULT_ATP_BOOK_GLOB = project_path("atp-oracle", "data/sports/books")
+DEFAULT_ODDS_API_GLOB = manual_drop_path("odds_api")
 DEFAULT_SOCCER_ASIAN_DIAGNOSTIC = (
     MACRO_DIR / "latest-kalshi-sports-consensus-soccer-asian-provider-diagnostic.json"
 )
