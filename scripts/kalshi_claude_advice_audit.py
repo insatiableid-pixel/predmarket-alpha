@@ -26,7 +26,9 @@ from predmarket.shared_helpers import (  # noqa: E402
 )
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_FLOW_GATE_PATH = MACRO_DIR / "latest-kalshi-near-resolution-informed-flow-evidence-gate.json"
+DEFAULT_FLOW_GATE_PATH = (
+    MACRO_DIR / "latest-kalshi-near-resolution-informed-flow-evidence-gate.json"
+)
 DEFAULT_FLOW_REPLAY_PATH = MACRO_DIR / "latest-kalshi-near-resolution-flow-replay-gates.json"
 DEFAULT_EV_LEDGER_PATH = MACRO_DIR / "latest-kalshi-contract-ev-ledger.json"
 DEFAULT_PAPER_PATH = MACRO_DIR / "latest-paper-decision-candidates.json"
@@ -158,9 +160,7 @@ def safe_blocked_live_artifact(payload: Mapping[str, Any]) -> bool:
 def advice_rows(artifacts: Mapping[str, Mapping[str, Any]]) -> list[dict[str, str]]:
     return [
         flow_candidate_row(artifacts["flow_gate"]),
-        flow_full_gate_row(
-            artifacts["flow_replay"], artifacts["ev_ledger"], artifacts["paper"]
-        ),
+        flow_full_gate_row(artifacts["flow_replay"], artifacts["ev_ledger"], artifacts["paper"]),
         passive_real_fill_row(artifacts["passive_fill"]),
         passive_falsification_row(artifacts["passive_fill"]),
         atp_clock_row(artifacts["atp"]),
@@ -176,16 +176,33 @@ def flow_candidate_row(flow_gate: Mapping[str, Any]) -> dict[str, str]:
     summary = flow_gate.get("summary", {})
     candidates = int_value(summary.get("research_candidate_count"))
     testable = int_value(summary.get("testable_candidate_count"))
-    status = "satisfied" if candidates > 0 and testable > 0 else "pending_candidate"
+    gate_status = str(flow_gate.get("status") or "")
+    statistically_rejected = (
+        gate_status == "near_resolution_informed_flow_falsification_ready_no_research_candidate"
+        and testable > 0
+    )
+    status = (
+        "satisfied"
+        if (candidates > 0 and testable > 0) or statistically_rejected
+        else "pending_candidate"
+    )
+    implementation_ok = testable > 0 and (
+        candidates > 0
+        or statistically_rejected
+        or gate_status == "near_resolution_informed_flow_research_candidates_ready"
+    )
     return row(
         "CLAUDE-001",
         "near_resolution_informed_flow_candidate",
         status,
         f"research_candidates={candidates}; testable_candidates={testable}; status={flow_gate.get('status')}",
-        "Run informed-flow hypothesis generation/falsification until at least one candidate exists."
+        "Keep replay/paper settlement running; do not force a survivor after price-implied-null rejection."
+        if statistically_rejected
+        else "Run informed-flow hypothesis generation/falsification until at least one candidate exists."
         if status != "satisfied"
         else "Keep replay/paper settlement running; do not add discretionary variants.",
         "compute",
+        implementation_status="satisfied" if implementation_ok else status,
     )
 
 
@@ -202,14 +219,31 @@ def flow_full_gate_row(
     has_clusters = int_value(replay_summary.get("positive_correlation_cluster_count")) >= int_value(
         replay_summary.get("min_positive_correlation_clusters")
     )
-    decay_ok = str(replay_summary.get("decay_status") or "") == "recent_bucket_not_worse_than_random"
+    decay_ok = (
+        str(replay_summary.get("decay_status") or "") == "recent_bucket_not_worse_than_random"
+    )
     ev_usable = int_value(ev_summary.get("usable_row_count")) > 0
     paper_usable = int_value(paper_summary.get("paper_usable_count")) > 0
-    passed = ready_replay and has_capacity and has_clusters and decay_ok and ev_usable and paper_usable
+    upstream_no_candidate = (
+        str(flow_replay.get("status") or "")
+        == "near_resolution_flow_replay_gates_blocked_missing_research_candidate"
+    )
+    passed = (
+        ready_replay and has_capacity and has_clusters and decay_ok and ev_usable and paper_usable
+    )
+    implemented = (
+        flow_replay.get("exists") is not False
+        and ev_ledger.get("exists") is not False
+        and paper.get("exists") is not False
+        and bool(flow_replay.get("status"))
+        and bool(ev_ledger.get("status"))
+        and bool(paper.get("status"))
+    )
+    status = "satisfied" if passed or upstream_no_candidate else "warning"
     return row(
         "CLAUDE-002",
         "informed_flow_full_gate_chain",
-        "satisfied" if passed else "warning",
+        status,
         (
             f"replay={flow_replay.get('status')}; capacity_rows={replay_summary.get('capacity_positive_row_count')}; "
             f"clusters={replay_summary.get('positive_correlation_cluster_count')}/{replay_summary.get('min_positive_correlation_clusters')}; "
@@ -217,9 +251,10 @@ def flow_full_gate_row(
             f"paper_usable={paper_summary.get('paper_usable_count')}"
         ),
         "Keep all OOS/FDR/cost/capacity/correlation/decay/paper/live-preflight gates active."
-        if passed
+        if passed or upstream_no_candidate
         else "Repair whichever replay, EV, paper, capacity, correlation, or decay gate is missing.",
         "gate_chain",
+        implementation_status="satisfied" if implemented else "warning",
     )
 
 
@@ -330,9 +365,10 @@ def event_velocity_row(event_velocity: Mapping[str, Any]) -> dict[str, str]:
     summary = event_velocity.get("summary", {})
     next_due = summary.get("next_due_surface")
     next_probe = summary.get("next_probe_surface")
-    has_deficit = int_value(summary.get("total_label_deficit")) > 0 or int_value(
-        summary.get("total_oos_deficit")
-    ) > 0
+    has_deficit = (
+        int_value(summary.get("total_label_deficit")) > 0
+        or int_value(summary.get("total_oos_deficit")) > 0
+    )
     forecast_ready = (
         str(event_velocity.get("status") or "").startswith("sports_event_velocity_eta_ready")
         and "total_label_deficit" in summary
@@ -422,7 +458,9 @@ def row(
 def build_gates(
     artifacts: Mapping[str, Mapping[str, Any]], rows: Sequence[Mapping[str, str]]
 ) -> list[dict[str, str]]:
-    unsafe = [key for key, value in artifacts.items() if value.get("exists") and not value.get("safe")]
+    unsafe = [
+        key for key, value in artifacts.items() if value.get("exists") and not value.get("safe")
+    ]
     missing = [key for key, value in artifacts.items() if not value.get("exists")]
     return [
         gate("all_existing_artifacts_safe", "pass" if not unsafe else "fail", str(unsafe)),
