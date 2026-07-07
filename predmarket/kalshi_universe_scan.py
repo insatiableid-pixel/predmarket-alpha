@@ -24,12 +24,13 @@ from typing import Any
 from predmarket.config import load_config
 from predmarket.kalshi_dataset import KalshiMarketDataClient
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost
+from predmarket.shared_helpers import manual_drop_path
 
 DEFAULT_MIN_CLOSE_HOURS = 0.0
 DEFAULT_MAX_CLOSE_HOURS = 72.0
 DEFAULT_LIMIT = 1000
 DEFAULT_MAX_PAGES = 10
-DEFAULT_RAW_OUTPUT_DIR = Path("/home/mrwatson/manual_drops/kalshi_universe")
+DEFAULT_RAW_OUTPUT_DIR = manual_drop_path("kalshi_universe")
 DEFAULT_LATEST_RAW_PATH = DEFAULT_RAW_OUTPUT_DIR / "kalshi_universe_scan_latest.json"
 DEFAULT_OUT_DIR = Path("docs/codex/macro/kalshi-universe-scan-latest")
 MACRO_DIR = Path("docs/codex/macro")
@@ -994,7 +995,7 @@ WantedBy=timers.target
 # Description=Research-only Kalshi universe scan
 # [Service]
 # Type=oneshot
-# WorkingDirectory=/home/mrwatson/projects/predmarket-alpha
+# WorkingDirectory=/path/to/predmarket-alpha
 # ExecStart=/usr/bin/make kalshi-universe-watch-once
 """
 

@@ -12,6 +12,8 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from predmarket.shared_helpers import manual_drop_path
+
 
 @dataclass(frozen=True)
 class Type2CandidateDispositionArtifacts:
@@ -356,7 +358,7 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--sportsbook-json",
-        default="/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json",
+        default=manual_drop_path("predmarket", "type2-sportsbook-reference.json"),
     )
     parser.add_argument(
         "--kalshi-json", default="data/kalshi_mlb_game_series_live_current_20260620T230203Z.json"

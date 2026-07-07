@@ -30,6 +30,7 @@ from predmarket.kalshi_universe_scan import DEFAULT_WORLD_CUP_SOCCER_SERIES  # n
 from predmarket.shared_helpers import (  # noqa: E402
     counts,
     json_float,
+    manual_drop_path,
     optional_float,
     outside_repo,
     price_probability,
@@ -44,7 +45,7 @@ from predmarket.shared_helpers import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
-DEFAULT_RAW_ORDERBOOK_DIR = Path("/home/mrwatson/manual_drops/kalshi_ghost_listing_depth")
+DEFAULT_RAW_ORDERBOOK_DIR = manual_drop_path("kalshi_ghost_listing_depth")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-ghost-listing-depth-diagnostic-latest"
 DEFAULT_CLASSIFICATIONS = (
     "other_sports",
