@@ -35,6 +35,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     gate,
     gate_counts,
     iso_time,
+    manual_drop_path,
     optional_float,
     outside_repo,
     path_is_within,
@@ -50,12 +51,12 @@ from predmarket.shared_helpers import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_PREFLIGHT_PATH = MACRO_DIR / "latest-kalshi-sports-consensus-preflight.json"
 DEFAULT_UNIVERSE_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_consensus_settlements")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_sports_consensus_settlements")
 DEFAULT_SETTLED_SNAPSHOT_PATH = (
     DEFAULT_SETTLED_RAW_DIR / "kalshi_sports_consensus_observed_markets_latest.json"
 )
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_consensus_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_consensus_labels")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_sports_consensus_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_sports_consensus_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-consensus-observation-loop-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 FAMILY_ID = "sports_no_vig_consensus"

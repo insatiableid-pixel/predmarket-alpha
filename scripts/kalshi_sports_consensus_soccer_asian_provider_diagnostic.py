@@ -14,6 +14,7 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
 from predmarket.sports_consensus_reference_builder import (  # noqa: E402
     DEFAULT_KEY_FILE,
     DEFAULT_RAW_DIR,
@@ -28,7 +29,7 @@ from predmarket.sports_consensus_soccer_asian_provider import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_REPORT_DIR = MACRO_DIR / "kalshi-sports-consensus-soccer-asian-provider-diagnostic-latest"
-DEFAULT_ODDS_API_DIR = Path("/home/mrwatson/manual_drops/odds_api")
+DEFAULT_ODDS_API_DIR = manual_drop_path("odds_api")
 
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:

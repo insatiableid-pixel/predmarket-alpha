@@ -14,6 +14,7 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
 from predmarket.sports_consensus import (  # noqa: E402
     build_sports_consensus_preflight,
     render_sports_consensus_markdown,
@@ -21,7 +22,7 @@ from predmarket.sports_consensus import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_KALSHI_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
-DEFAULT_CONSENSUS_PATH = Path("/home/mrwatson/manual_drops/predmarket/sports-no-vig-consensus.json")
+DEFAULT_CONSENSUS_PATH = manual_drop_path("predmarket", "sports-no-vig-consensus.json")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-consensus-preflight-latest"
 
 
