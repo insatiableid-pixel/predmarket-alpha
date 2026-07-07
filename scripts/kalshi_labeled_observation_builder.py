@@ -27,16 +27,29 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_REGISTRY_PATH = MACRO_DIR / "latest-kalshi-hypothesis-registry.json"
 DEFAULT_EV_LEDGER_PATH = MACRO_DIR / "latest-kalshi-contract-ev-ledger.json"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_oos_settlements/kalshi_settled_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_oos_settlements",
+    "kalshi_settled_markets_latest.json",
+    env_vars=("KALSHI_LABELED_OBSERVATION_SETTLED_SNAPSHOT",),
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_settlements")
-DEFAULT_PENDING_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_pending")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_labels")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path(
+    "kalshi_oos_settlements",
+    env_vars=("KALSHI_LABELED_OBSERVATION_SETTLED_RAW_DIR",),
+)
+DEFAULT_PENDING_DIR = manual_drop_path(
+    "kalshi_oos_pending",
+    env_vars=("KALSHI_LABELED_OBSERVATION_PENDING_DIR",),
+)
+DEFAULT_LABEL_DIR = manual_drop_path(
+    "kalshi_oos_labels",
+    env_vars=("KALSHI_LABELED_OBSERVATION_LABEL_DIR",),
+)
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-labeled-observation-builder-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 CSV_FIELDS = [
@@ -129,7 +142,9 @@ def build_labeled_observation_report(
         "label_row_count": len(label_rows),
         "blocked_source_row_count": len(blocked) + len(universe_blocked),
         "blocked_label_row_count": len(label_blocked),
-        "blocked_reason_counts": blocked_reason_counts([*blocked, *universe_blocked, *label_blocked]),
+        "blocked_reason_counts": blocked_reason_counts(
+            [*blocked, *universe_blocked, *label_blocked]
+        ),
     }
     gates = build_gates(
         registry=registry,
@@ -204,8 +219,12 @@ def capture_public_settled_snapshot(
             "mve_filter": "exclude",
             "cursor": cursor or None,
         }
-        query = urllib.parse.urlencode({key: value for key, value in params.items() if value is not None})
-        with urllib.request.urlopen(f"{KALSHI_PUBLIC_BASE_URL}/markets?{query}", timeout=30) as response:
+        query = urllib.parse.urlencode(
+            {key: value for key, value in params.items() if value is not None}
+        )
+        with urllib.request.urlopen(
+            f"{KALSHI_PUBLIC_BASE_URL}/markets?{query}", timeout=30
+        ) as response:
             payload = json.load(response)
         if not isinstance(payload, Mapping):
             break
@@ -216,7 +235,9 @@ def capture_public_settled_snapshot(
     snapshot = {
         "schema_version": 1,
         "created_at_utc": generated,
-        "status": "kalshi_public_settled_fetch_ok" if markets else "kalshi_public_settled_fetch_empty",
+        "status": "kalshi_public_settled_fetch_ok"
+        if markets
+        else "kalshi_public_settled_fetch_empty",
         "research_only": True,
         "execution_enabled": False,
         "market_execution": False,
@@ -241,7 +262,9 @@ def capture_public_settled_snapshot(
     return latest_path
 
 
-def contract_ev_hypotheses(hypotheses: Sequence[Mapping[str, Any]]) -> dict[tuple[str, str], list[Mapping[str, Any]]]:
+def contract_ev_hypotheses(
+    hypotheses: Sequence[Mapping[str, Any]],
+) -> dict[tuple[str, str], list[Mapping[str, Any]]]:
     indexed: dict[tuple[str, str], list[Mapping[str, Any]]] = {}
     for hypothesis in hypotheses:
         filt = hypothesis.get("market_universe_filter")
@@ -294,7 +317,11 @@ def pending_rows_from_ledger(
             blocked.append({**base, "blocker": "no_registered_contract_ev_hypothesis_match"})
             continue
         if common_errors:
-            blocked.extend({**base, "hypothesis_id": hypothesis.get("hypothesis_id"), "blocker": err} for hypothesis in matched_hypotheses for err in common_errors)
+            blocked.extend(
+                {**base, "hypothesis_id": hypothesis.get("hypothesis_id"), "blocker": err}
+                for hypothesis in matched_hypotheses
+                for err in common_errors
+            )
             continue
         for hypothesis in matched_hypotheses:
             pending.append(
@@ -316,7 +343,9 @@ def row_matches_hypothesis(row: Mapping[str, Any], hypothesis: Mapping[str, Any]
         return probability(row.get("calibrated_probability")) is not None
     if family == "legacy_positive_margin_survival":
         edge = optional_float(row.get("expected_value_per_contract", row.get("margin_probability")))
-        return row.get("usable") is True or (str(row.get("gate_status")) == "pass" and edge is not None and edge > 0.0)
+        return row.get("usable") is True or (
+            str(row.get("gate_status")) == "pass" and edge is not None and edge > 0.0
+        )
     return False
 
 
@@ -330,11 +359,34 @@ def pending_row_errors(row: Mapping[str, Any], *, ledger_generated_utc: str) -> 
         errors.append("missing_calibrated_model_probability")
     if probability(row.get("all_in_break_even_probability", row.get("all_in_cost"))) is None:
         errors.append("missing_all_in_break_even_probability")
-    if timestamp(first_present(row, ["decision_time", "decision_ts", "as_of_utc", "generated_utc"], ledger_generated_utc)) is None:
+    if (
+        timestamp(
+            first_present(
+                row,
+                ["decision_time", "decision_ts", "as_of_utc", "generated_utc"],
+                ledger_generated_utc,
+            )
+        )
+        is None
+    ):
         errors.append("missing_decision_time")
-    if timestamp(first_present(row, ["quote_time", "quote_ts", "as_of_utc", "generated_utc"], ledger_generated_utc)) is None:
+    if (
+        timestamp(
+            first_present(
+                row, ["quote_time", "quote_ts", "as_of_utc", "generated_utc"], ledger_generated_utc
+            )
+        )
+        is None
+    ):
         errors.append("missing_quote_time")
-    if timestamp(first_present(row, ["model_time", "model_ts", "as_of_utc", "generated_utc"], ledger_generated_utc)) is None:
+    if (
+        timestamp(
+            first_present(
+                row, ["model_time", "model_ts", "as_of_utc", "generated_utc"], ledger_generated_utc
+            )
+        )
+        is None
+    ):
         errors.append("missing_model_time")
     return errors
 
@@ -348,9 +400,23 @@ def pending_observation(
     source_sha256: str | None,
     ledger_generated_utc: str,
 ) -> dict[str, Any]:
-    decision_time = iso_time(first_present(row, ["decision_time", "decision_ts", "as_of_utc", "generated_utc"], ledger_generated_utc))
-    quote_time = iso_time(first_present(row, ["quote_time", "quote_ts", "as_of_utc", "generated_utc"], ledger_generated_utc))
-    model_time = iso_time(first_present(row, ["model_time", "model_ts", "as_of_utc", "generated_utc"], ledger_generated_utc))
+    decision_time = iso_time(
+        first_present(
+            row,
+            ["decision_time", "decision_ts", "as_of_utc", "generated_utc"],
+            ledger_generated_utc,
+        )
+    )
+    quote_time = iso_time(
+        first_present(
+            row, ["quote_time", "quote_ts", "as_of_utc", "generated_utc"], ledger_generated_utc
+        )
+    )
+    model_time = iso_time(
+        first_present(
+            row, ["model_time", "model_ts", "as_of_utc", "generated_utc"], ledger_generated_utc
+        )
+    )
     return {
         "schema_version": "KalshiPendingOosObservationV1",
         "hypothesis_id": hypothesis.get("hypothesis_id"),
@@ -365,7 +431,9 @@ def pending_observation(
         "model_time": model_time,
         "timestamp_source": "ev_ledger_row_or_report_generated_utc",
         "model_probability": probability(row.get("calibrated_probability")),
-        "all_in_break_even_probability": probability(row.get("all_in_break_even_probability", row.get("all_in_cost"))),
+        "all_in_break_even_probability": probability(
+            row.get("all_in_break_even_probability", row.get("all_in_cost"))
+        ),
         "model_probability_source": row.get("calibrated_probability_source"),
         "cost_source": row.get("break_even_source") or row.get("cost_basis_source"),
         "source_artifact": source_artifact,
@@ -441,7 +509,12 @@ def dedupe_pending(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
             continue
         seen.add(key)
         output.append(dict(row))
-    output.sort(key=lambda item: (str(item.get("decision_time") or ""), str(item.get("contract_ticker") or "")))
+    output.sort(
+        key=lambda item: (
+            str(item.get("decision_time") or ""),
+            str(item.get("contract_ticker") or ""),
+        )
+    )
     return output
 
 
@@ -470,16 +543,40 @@ def label_rows_from_pending(
         side = normalize_side(row.get("side"))
         market = settled_index.get(ticker)
         if market is None:
-            blocked.append({"contract_ticker": ticker, "hypothesis_id": row.get("hypothesis_id"), "blocker": "pending_contract_not_settled_in_snapshot"})
+            blocked.append(
+                {
+                    "contract_ticker": ticker,
+                    "hypothesis_id": row.get("hypothesis_id"),
+                    "blocker": "pending_contract_not_settled_in_snapshot",
+                }
+            )
             continue
         yes_outcome = settlement_outcome(market)
-        close_time = iso_time(first_present(market, ["close_time", "expected_expiration_time", "expiration_time"]))
-        settled_time = iso_time(first_present(market, ["settlement_ts", "settled_time", "close_time", "expiration_time"]))
+        close_time = iso_time(
+            first_present(market, ["close_time", "expected_expiration_time", "expiration_time"])
+        )
+        settled_time = iso_time(
+            first_present(
+                market, ["settlement_ts", "settled_time", "close_time", "expiration_time"]
+            )
+        )
         if yes_outcome is None:
-            blocked.append({"contract_ticker": ticker, "hypothesis_id": row.get("hypothesis_id"), "blocker": "settlement_outcome_missing"})
+            blocked.append(
+                {
+                    "contract_ticker": ticker,
+                    "hypothesis_id": row.get("hypothesis_id"),
+                    "blocker": "settlement_outcome_missing",
+                }
+            )
             continue
         if close_time is None or settled_time is None:
-            blocked.append({"contract_ticker": ticker, "hypothesis_id": row.get("hypothesis_id"), "blocker": "settlement_timestamps_missing"})
+            blocked.append(
+                {
+                    "contract_ticker": ticker,
+                    "hypothesis_id": row.get("hypothesis_id"),
+                    "blocker": "settlement_timestamps_missing",
+                }
+            )
             continue
         side_outcome = yes_outcome if side == "yes" else 1 - yes_outcome
         label_rows.append(
@@ -517,13 +614,45 @@ def build_gates(
     label_dir: Path,
 ) -> list[dict[str, Any]]:
     return [
-        gate("registry_safe", "pass" if safe_research_artifact(registry) else "blocked", "Hypothesis registry is research-only." if safe_research_artifact(registry) else "Hypothesis registry missing or unsafe."),
-        gate("ev_ledger_safe", "pass" if safe_research_artifact(ledger) else "blocked", "EV ledger is research-only." if safe_research_artifact(ledger) else "EV ledger missing or unsafe."),
-        gate("pending_observations_available", "pass" if pending_count else "blocked", f"{pending_count} pending OOS observation(s) available."),
-        gate("settled_markets_available", "pass" if settled_market_count else "warn", f"{settled_market_count} settled public market(s) loaded."),
-        gate("label_rows_available", "pass" if label_count else "blocked", f"{label_count} settled label row(s) emitted."),
-        gate("manual_drop_dirs_outside_repo", "pass" if outside_repo(pending_dir) and outside_repo(label_dir) else "blocked", "Pending and label directories are outside the repo."),
-        gate("no_execution_boundary", "pass", "Builder emits research-only observation packets and no account/order fields."),
+        gate(
+            "registry_safe",
+            "pass" if safe_research_artifact(registry) else "blocked",
+            "Hypothesis registry is research-only."
+            if safe_research_artifact(registry)
+            else "Hypothesis registry missing or unsafe.",
+        ),
+        gate(
+            "ev_ledger_safe",
+            "pass" if safe_research_artifact(ledger) else "blocked",
+            "EV ledger is research-only."
+            if safe_research_artifact(ledger)
+            else "EV ledger missing or unsafe.",
+        ),
+        gate(
+            "pending_observations_available",
+            "pass" if pending_count else "blocked",
+            f"{pending_count} pending OOS observation(s) available.",
+        ),
+        gate(
+            "settled_markets_available",
+            "pass" if settled_market_count else "warn",
+            f"{settled_market_count} settled public market(s) loaded.",
+        ),
+        gate(
+            "label_rows_available",
+            "pass" if label_count else "blocked",
+            f"{label_count} settled label row(s) emitted.",
+        ),
+        gate(
+            "manual_drop_dirs_outside_repo",
+            "pass" if outside_repo(pending_dir) and outside_repo(label_dir) else "blocked",
+            "Pending and label directories are outside the repo.",
+        ),
+        gate(
+            "no_execution_boundary",
+            "pass",
+            "Builder emits research-only observation packets and no account/order fields.",
+        ),
     ]
 
 
@@ -589,14 +718,24 @@ def write_labeled_observation_outputs(
         "markdown_path": str(md_path),
         "csv_path": str(csv_path),
     }
-    pending_rows = report.get("pending_packet", {}).get("rows", []) if isinstance(report.get("pending_packet"), Mapping) else []
-    label_rows = report.get("label_packet", {}).get("rows", []) if isinstance(report.get("label_packet"), Mapping) else []
+    pending_rows = (
+        report.get("pending_packet", {}).get("rows", [])
+        if isinstance(report.get("pending_packet"), Mapping)
+        else []
+    )
+    label_rows = (
+        report.get("label_packet", {}).get("rows", [])
+        if isinstance(report.get("label_packet"), Mapping)
+        else []
+    )
     stamp = safe_stamp(str(report.get("generated_utc") or utc_now()))
     if pending_rows:
         pending_dir.mkdir(parents=True, exist_ok=True)
         pending_path = pending_dir / f"kalshi_oos_pending_{stamp}.json"
         pending_latest = pending_dir / "kalshi_oos_pending_latest.json"
-        pending_text = json.dumps(report["pending_packet"], indent=2, sort_keys=True, default=str) + "\n"
+        pending_text = (
+            json.dumps(report["pending_packet"], indent=2, sort_keys=True, default=str) + "\n"
+        )
         pending_path.write_text(pending_text, encoding="utf-8")
         pending_latest.write_text(pending_text, encoding="utf-8")
         paths["pending_packet_path"] = str(pending_path)
@@ -605,7 +744,9 @@ def write_labeled_observation_outputs(
         label_dir.mkdir(parents=True, exist_ok=True)
         label_path = label_dir / f"kalshi_oos_label_packet_{stamp}.json"
         label_latest = label_dir / "kalshi_oos_label_packet_latest.json"
-        label_text = json.dumps(report["label_packet"], indent=2, sort_keys=True, default=str) + "\n"
+        label_text = (
+            json.dumps(report["label_packet"], indent=2, sort_keys=True, default=str) + "\n"
+        )
         label_path.write_text(label_text, encoding="utf-8")
         label_latest.write_text(label_text, encoding="utf-8")
         paths["label_packet_path"] = str(label_path)
@@ -628,7 +769,13 @@ def write_csv(report: Mapping[str, Any], path: Path) -> None:
     rows: list[dict[str, Any]] = []
     for row in report.get("pending_rows_sample", []):
         if isinstance(row, Mapping):
-            rows.append({**{field: row.get(field) for field in CSV_FIELDS}, "status": "pending", "blocker": ""})
+            rows.append(
+                {
+                    **{field: row.get(field) for field in CSV_FIELDS},
+                    "status": "pending",
+                    "blocker": "",
+                }
+            )
     for row in report.get("blocked_source_rows_sample", []):
         if isinstance(row, Mapping):
             rows.append({**{field: row.get(field) for field in CSV_FIELDS}, "status": "blocked"})
@@ -657,8 +804,14 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     ]
     for item in report.get("gates", []):
         if isinstance(item, Mapping):
-            lines.append(f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |")
-    blocked = summary.get("blocked_reason_counts") if isinstance(summary.get("blocked_reason_counts"), Mapping) else {}
+            lines.append(
+                f"| `{item.get('name')}` | `{item.get('status')}` | {item.get('reason')} |"
+            )
+    blocked = (
+        summary.get("blocked_reason_counts")
+        if isinstance(summary.get("blocked_reason_counts"), Mapping)
+        else {}
+    )
     lines.extend(["", "## Blocked Reasons", ""])
     if blocked:
         for reason, count in blocked.items():
@@ -677,7 +830,13 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     return "\n".join(lines)
 
 
-def safe_packet(*, generated_utc: str, packet_type: str, rows: Sequence[Mapping[str, Any]], inputs: Mapping[str, Any]) -> dict[str, Any]:
+def safe_packet(
+    *,
+    generated_utc: str,
+    packet_type: str,
+    rows: Sequence[Mapping[str, Any]],
+    inputs: Mapping[str, Any],
+) -> dict[str, Any]:
     return {
         "schema_version": 1,
         "generated_utc": generated_utc,

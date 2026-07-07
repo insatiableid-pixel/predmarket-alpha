@@ -23,6 +23,7 @@ if str(CONTROL_REPO) not in sys.path:
 
 from predmarket.shared_helpers import (  # noqa: E402
     counts,
+    manual_drop_path,
     path_is_within,
     read_json_or_empty,
     safe_stamp,
@@ -36,7 +37,10 @@ from predmarket.sports_consensus_reference_builder import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-line-move-delta-logger-latest"
-DEFAULT_STATE_DIR = Path("/home/mrwatson/manual_drops/kalshi_sports_line_moves")
+DEFAULT_STATE_DIR = manual_drop_path(
+    "kalshi_sports_line_moves",
+    env_vars=("KALSHI_SPORTS_LINE_MOVE_STATE_DIR",),
+)
 DEFAULT_SPORT_KEYS = (
     "baseball_mlb",
     "tennis_atp_wimbledon",

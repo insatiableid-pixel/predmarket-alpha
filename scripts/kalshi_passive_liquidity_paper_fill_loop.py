@@ -19,6 +19,7 @@ if str(CONTROL_REPO) not in sys.path:
 from predmarket.shared_helpers import (  # noqa: E402
     iso_from_timestamp,
     json_float,
+    manual_drop_path,
     outside_repo,
     path_is_within,
     read_json_or_empty,
@@ -34,7 +35,10 @@ DEFAULT_MICROSTRUCTURE_PATH = (
     MACRO_DIR / "latest-kalshi-sports-microstructure-observation-loop.json"
 )
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-passive-liquidity-paper-fill-loop-latest"
-DEFAULT_STATE_DIR = Path("/home/mrwatson/manual_drops/kalshi_passive_liquidity_paper_fills")
+DEFAULT_STATE_DIR = manual_drop_path(
+    "kalshi_passive_liquidity_paper_fills",
+    env_vars=("KALSHI_PASSIVE_LIQUIDITY_PAPER_FILL_STATE_DIR",),
+)
 
 INTENT_FIELDS = [
     "paper_intent_id",
