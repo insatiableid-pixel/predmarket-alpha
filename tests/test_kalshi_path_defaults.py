@@ -218,6 +218,26 @@ def test_contract_ev_ledger_defaults_do_not_hardcode_local_roots(monkeypatch, tm
     )
 
 
+def test_macro_unlock_scout_defaults_do_not_hardcode_local_roots(
+    monkeypatch, tmp_path: Path
+) -> None:
+    manual_root = tmp_path / "manual"
+    projects_root = tmp_path / "projects"
+    monkeypatch.setenv("PREDMARKET_MANUAL_DROPS_ROOT", str(manual_root))
+    monkeypatch.setenv("PREDMARKET_PROJECTS_ROOT", str(projects_root))
+
+    scout = load_script("scripts/codex_macro_unlock_scout.py", "_path_default_unlock_scout")
+    text = (REPO / "scripts" / "codex_macro_unlock_scout.py").read_text(encoding="utf-8")
+
+    assert "/home/mrwatson/manual_drops" not in text
+    assert "/home/mrwatson/projects" not in text
+    assert scout.DEFAULT_MANUAL_DROPS == manual_root
+    assert scout.DEFAULT_MLB_REPO == projects_root / "mlb-platform"
+    assert scout.local_make_command("atp-oracle", "macro-status") == (
+        f"cd {projects_root / 'atp-oracle'} && make macro-status"
+    )
+
+
 def test_crypto_weather_probability_defaults_do_not_hardcode_local_roots() -> None:
     paths = [
         "scripts/kalshi_crypto_proxy_feature_packet.py",
