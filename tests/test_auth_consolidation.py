@@ -404,6 +404,13 @@ class TestKalshiAuthErrorActionable:
         key = load_private_key(pem)
         assert isinstance(key, rsa.RSAPrivateKey)
 
+    def test_inline_pem_is_not_probed_as_filesystem_path(self) -> None:
+        """Inline multiline PEM values load directly instead of being treated as paths."""
+        _, pem = _generate_rsa_key_pem()
+        assert "\n" in pem
+        key = load_private_key(pem)
+        assert isinstance(key, rsa.RSAPrivateKey)
+
 
 # ---------------------------------------------------------------------------
 # VAL-AUTH-008: Config provides a single key path for all auth consumers

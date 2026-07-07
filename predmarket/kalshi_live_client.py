@@ -288,21 +288,35 @@ def load_private_key(value: str) -> rsa.RSAPrivateKey:
         raise KalshiAuthError(
             "Kalshi private key is required: set venues.kalshi.api_secret or KALSHI_API_SECRET"
         )
-    path = Path(text).expanduser()
-    if path.is_file():
+
+    path: Path | None = None
+    path_is_file = False
+    if "-----BEGIN " in text and "PRIVATE KEY-----" in text:
+        raw = text.encode("utf-8")
+    else:
         try:
-            raw = path.read_bytes()
+            path = Path(text).expanduser()
+            path_is_file = path.is_file()
         except OSError as exc:
             raise KalshiAuthError(
-                f"Kalshi private key file exists at {path} but could not be read: {exc}",
+                "Kalshi private key value is not a readable file path or valid PEM text",
                 detail=str(exc),
             ) from exc
-    else:
-        raw = text.encode("utf-8")
+        if path_is_file:
+            try:
+                raw = path.read_bytes()
+            except OSError as exc:
+                raise KalshiAuthError(
+                    f"Kalshi private key file exists at {path} but could not be read: {exc}",
+                    detail=str(exc),
+                ) from exc
+        else:
+            raw = text.encode("utf-8")
+
     try:
         private_key = serialization.load_pem_private_key(raw, password=None)
     except ValueError as exc:
-        if path.is_file():
+        if path_is_file:
             raise KalshiAuthError(
                 f"Kalshi private key file at {path} exists but is not valid PEM",
                 detail=str(exc),
@@ -314,7 +328,7 @@ def load_private_key(value: str) -> rsa.RSAPrivateKey:
             detail=str(exc),
         ) from exc
     except TypeError as exc:
-        if path.is_file():
+        if path_is_file:
             raise KalshiAuthError(
                 f"Kalshi private key file at {path} exists but could not be deserialized",
                 detail=str(exc),
