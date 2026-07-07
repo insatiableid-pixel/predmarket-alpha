@@ -171,6 +171,17 @@ def base_inputs(tmp_path: Path) -> dict[str, Path]:
                 gap_count=0,
             ),
         ),
+        "resolved_archive": write_json(
+            tmp_path / "resolved_archive.json",
+            safe_artifact(
+                "kalshi_resolved_archive_backfill_ready_no_fdr_survivors",
+                label_count=1184,
+                distinct_contract_count=1184,
+                observation_count=3552,
+                tested_hypothesis_count=2,
+                fdr_survivor_count=0,
+            ),
+        ),
     }
 
 
@@ -191,12 +202,13 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
         live_path=files["live"],
         line_move_path=files["line_move"],
         tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
         generated_utc="2026-07-06T02:40:00Z",
     )
 
     rows = {row["requirement_id"]: row for row in report["advice_rows"]}
     assert report["status"] == "claude_advice_audit_ready_with_open_clock_or_statistical_items"
-    assert report["summary"]["requirement_count"] == 12
+    assert report["summary"]["requirement_count"] == 13
     assert rows["CLAUDE-001"]["status"] == "satisfied"
     assert rows["CLAUDE-002"]["status"] == "satisfied"
     assert rows["CLAUDE-003"]["status"] == "satisfied"
@@ -213,7 +225,9 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
     assert rows["CLAUDE-011"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-012"]["status"] == "blocked_external"
     assert rows["CLAUDE-012"]["implementation_status"] == "satisfied"
-    assert report["summary"]["implementation_satisfied_count"] == 12
+    assert rows["CLAUDE-013"]["status"] == "satisfied"
+    assert rows["CLAUDE-013"]["implementation_status"] == "satisfied"
+    assert report["summary"]["implementation_satisfied_count"] == 13
     assert report["summary"]["implementation_open_requirement_ids"] == []
     assert report["next_action"]["name"] == "kalshi_tick_orderbook_delta_capture"
     assert report["execution_enabled"] is False
@@ -259,6 +273,7 @@ def test_claude_advice_audit_treats_price_null_rejection_as_implemented(
         live_path=files["live"],
         line_move_path=files["line_move"],
         tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
@@ -267,7 +282,7 @@ def test_claude_advice_audit_treats_price_null_rejection_as_implemented(
     assert rows["CLAUDE-001"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-002"]["status"] == "satisfied"
     assert rows["CLAUDE-002"]["implementation_status"] == "satisfied"
-    assert report["summary"]["implementation_satisfied_count"] == 12
+    assert report["summary"]["implementation_satisfied_count"] == 13
     assert report["summary"]["implementation_open_requirement_ids"] == []
 
 
@@ -298,12 +313,50 @@ def test_claude_advice_audit_satisfies_tick_capture_after_recording(tmp_path: Pa
         live_path=files["live"],
         line_move_path=files["line_move"],
         tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
     rows = {row["requirement_id"]: row for row in report["advice_rows"]}
     assert rows["CLAUDE-012"]["status"] == "satisfied"
     assert rows["CLAUDE-012"]["implementation_status"] == "satisfied"
+
+
+def test_claude_advice_audit_blocks_underpowered_resolved_archive(tmp_path: Path) -> None:
+    module = load_module()
+    files = base_inputs(tmp_path)
+    files["resolved_archive"] = write_json(
+        tmp_path / "resolved_archive_underpowered.json",
+        safe_artifact(
+            "kalshi_resolved_archive_backfill_ready_insufficient_test_power",
+            label_count=999,
+            distinct_contract_count=999,
+            observation_count=2997,
+            tested_hypothesis_count=0,
+            fdr_survivor_count=0,
+        ),
+    )
+
+    report = module.build_claude_advice_audit(
+        flow_gate_path=files["flow_gate"],
+        flow_replay_path=files["flow_replay"],
+        ev_ledger_path=files["ev"],
+        paper_path=files["paper"],
+        passive_fill_path=files["passive"],
+        atp_path=files["atp"],
+        world_cup_independence_path=files["world_cup"],
+        prior_only_path=files["prior"],
+        event_velocity_path=files["velocity"],
+        live_path=files["live"],
+        line_move_path=files["line_move"],
+        tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
+        generated_utc="2026-07-07T05:00:00Z",
+    )
+
+    rows = {row["requirement_id"]: row for row in report["advice_rows"]}
+    assert rows["CLAUDE-013"]["status"] == "blocked_clock"
+    assert rows["CLAUDE-013"]["implementation_status"] == "satisfied"
 
 
 def test_claude_advice_audit_temp_out_dir_does_not_write_latest(
