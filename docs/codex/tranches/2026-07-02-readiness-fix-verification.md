@@ -44,7 +44,7 @@ baselines match live counts (1422/94, 20, 2 files) and are not inflated.
 
 Re-scored all 82 criterion IDs against the working tree (N=1 single-app repo).
 Full table + per-flip file-path evidence in
-`COMPLETION_REPORT_2026-07-02_AGENT_READINESS_VERIFICATION.md`.
+`docs/audits/COMPLETION_REPORT_2026-07-02_AGENT_READINESS_VERIFICATION.md`.
 
 - ~41 criteria flipped FAIL/skip -> PASS (36 solid + 5 partial).
 - 10 remain FAIL (automated_pr_review, deployment_frequency,
