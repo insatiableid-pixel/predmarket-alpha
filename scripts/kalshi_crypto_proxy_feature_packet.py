@@ -28,11 +28,15 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 DEFAULT_BREADTH_SCOUT_PATH = MACRO_DIR / "latest-kalshi-probability-breadth-scout.json"
-DEFAULT_RAW_UNIVERSE_PATH = Path("/home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json")
-DEFAULT_RAW_PROXY_DIR = Path("/home/mrwatson/manual_drops/kalshi_crypto_proxy_features")
+DEFAULT_RAW_UNIVERSE_PATH = manual_drop_path(
+    "kalshi_universe", "kalshi_universe_scan_latest.json"
+)
+DEFAULT_RAW_PROXY_DIR = manual_drop_path("kalshi_crypto_proxy_features")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-crypto-proxy-feature-packet-latest"
 DEFAULT_MAX_CLOSE_HOURS = 6.0
 DEFAULT_MAX_CONTRACTS = 1500

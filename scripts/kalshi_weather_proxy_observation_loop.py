@@ -29,14 +29,16 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_FEATURE_PACKET_PATH = MACRO_DIR / "latest-kalshi-weather-proxy-feature-packet.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_oos_settlements/kalshi_settled_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_oos_settlements", "kalshi_settled_markets_latest.json"
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_oos_settlements")
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_labels")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_oos_settlements")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_weather_proxy_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_weather_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-weather-proxy-observation-loop-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 CSV_FIELDS = [

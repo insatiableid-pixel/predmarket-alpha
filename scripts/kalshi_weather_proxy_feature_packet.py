@@ -31,6 +31,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     counts,
     gate,
     gate_counts,
+    manual_drop_path,
     optional_float,
     read_json_or_empty,
     safe_research_artifact,
@@ -49,10 +50,10 @@ from predmarket.weather_family import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 DEFAULT_BREADTH_SCOUT_PATH = MACRO_DIR / "latest-kalshi-probability-breadth-scout.json"
-DEFAULT_RAW_UNIVERSE_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_universe/kalshi_universe_scan_latest.json"
+DEFAULT_RAW_UNIVERSE_PATH = manual_drop_path(
+    "kalshi_universe", "kalshi_universe_scan_latest.json"
 )
-DEFAULT_RAW_WEATHER_DIR = Path("/home/mrwatson/manual_drops/kalshi_weather_proxy_features")
+DEFAULT_RAW_WEATHER_DIR = manual_drop_path("kalshi_weather_proxy_features")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-weather-proxy-feature-packet-latest"
 DEFAULT_MAX_CLOSE_HOURS = 48.0  # Weather contracts often settle at end of day
 DEFAULT_MAX_CONTRACTS = 1500
@@ -260,7 +261,6 @@ def _select_weather_candidates(
         # Parse strike/bracket from raw market
         strike = optional_float(raw.get("floor_strike"))
         strike_type = str(raw.get("strike_type") or "")
-        bracket = strike if strike is not None else 0.0
         enriched = {
             "contract_ticker": ticker,
             "event_ticker": row.get("event_ticker") or raw.get("event_ticker"),
@@ -326,7 +326,6 @@ def _resolve_weather_data(
 
     station_index: dict[str, dict[str, Any]] = {}
     station_rows: list[dict[str, Any]] = []
-    raw_payloads: dict[str, Any] = {}
 
     for candidate in candidates:
         ticker = str(candidate.get("contract_ticker") or "")

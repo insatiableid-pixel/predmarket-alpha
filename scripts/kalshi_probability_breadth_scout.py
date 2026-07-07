@@ -28,10 +28,12 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-probability-breadth-scout-latest"
-DEFAULT_RAW_PROBE_DIR = Path("/home/mrwatson/manual_drops/kalshi_probability_sources")
+DEFAULT_RAW_PROBE_DIR = manual_drop_path("kalshi_probability_sources")
 DEFAULT_MAX_CLOSE_HOURS = 6.0
 CSV_FIELDS = [
     "rank",

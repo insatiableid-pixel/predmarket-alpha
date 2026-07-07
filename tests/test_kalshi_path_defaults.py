@@ -191,3 +191,25 @@ def test_ev_overlay_local_scout_defaults_do_not_hardcode_local_roots() -> None:
         text = (REPO / relative).read_text(encoding="utf-8")
         assert "/home/mrwatson/manual_drops" not in text, relative
         assert "/home/mrwatson/projects" not in text, relative
+
+
+def test_crypto_weather_probability_defaults_do_not_hardcode_local_roots() -> None:
+    paths = [
+        "scripts/kalshi_crypto_proxy_feature_packet.py",
+        "scripts/kalshi_crypto_proxy_observation_loop.py",
+        "scripts/kalshi_crypto_proxy_feature_model_falsification.py",
+        "scripts/kalshi_crypto_proxy_research_candidate_replay.py",
+        "scripts/kalshi_crypto_proxy_capacity_correlation_decay.py",
+        "scripts/kalshi_weather_proxy_feature_packet.py",
+        "scripts/kalshi_weather_proxy_observation_loop.py",
+        "scripts/kalshi_weather_proxy_feature_model_falsification.py",
+        "scripts/kalshi_weather_proxy_research_candidate_replay.py",
+        "scripts/kalshi_weather_proxy_capacity_correlation_decay.py",
+        "scripts/kalshi_probability_breadth_scout.py",
+        "scripts/kalshi_ev_queue_robustness.py",
+    ]
+
+    for relative in paths:
+        text = (REPO / relative).read_text(encoding="utf-8")
+        assert "/home/mrwatson/manual_drops" not in text, relative
+        assert "/home/mrwatson/projects" not in text, relative

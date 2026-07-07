@@ -22,8 +22,10 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
+
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_crypto_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_crypto_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-crypto-proxy-feature-model-falsification-latest"
 DEFAULT_MIN_INDEPENDENT_LABELS = 30
 DEFAULT_MIN_OOS_LABELS = 10

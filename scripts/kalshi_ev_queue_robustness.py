@@ -18,10 +18,11 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
+from predmarket.shared_helpers import manual_drop_path  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_QUEUE_PATH = MACRO_DIR / "latest-kalshi-ev-review-queue.json"
-DEFAULT_SNAPSHOT_DIR = Path("/home/mrwatson/manual_drops/kalshi")
+DEFAULT_SNAPSHOT_DIR = manual_drop_path("kalshi")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-ev-queue-robustness-latest"
 DEFAULT_MIN_ROBUST_MARGIN = 0.02
 CSV_FIELDS = [
