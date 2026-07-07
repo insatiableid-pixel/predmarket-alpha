@@ -53,6 +53,9 @@ DEFAULT_CONSENSUS_OBSERVATION_PATH = (
 DEFAULT_CONSENSUS_FALSIFICATION_PATH = (
     MACRO_DIR / "latest-kalshi-sports-consensus-falsification.json"
 )
+DEFAULT_CONSENSUS_SHARP_PROVIDER_CAPTURE_PATH = (
+    MACRO_DIR / "latest-kalshi-sports-consensus-sharp-provider-capture.json"
+)
 DEFAULT_CONSENSUS_PROVIDER_AUDIT_PATH = (
     MACRO_DIR / "latest-kalshi-sports-consensus-provider-audit.json"
 )
@@ -114,6 +117,7 @@ def build_sports_evidence_cycle_report(
     consensus_path: Path = DEFAULT_CONSENSUS_PATH,
     consensus_observation_path: Path = DEFAULT_CONSENSUS_OBSERVATION_PATH,
     consensus_falsification_path: Path = DEFAULT_CONSENSUS_FALSIFICATION_PATH,
+    consensus_sharp_provider_capture_path: Path = DEFAULT_CONSENSUS_SHARP_PROVIDER_CAPTURE_PATH,
     consensus_provider_audit_path: Path = DEFAULT_CONSENSUS_PROVIDER_AUDIT_PATH,
     soccer_asian_provider_path: Path = DEFAULT_SOCCER_ASIAN_PROVIDER_PATH,
     event_velocity_path: Path = DEFAULT_EVENT_VELOCITY_PATH,
@@ -148,6 +152,7 @@ def build_sports_evidence_cycle_report(
         "sports_consensus": artifact(consensus_path),
         "sports_consensus_observation": artifact(consensus_observation_path),
         "sports_consensus_falsification": artifact(consensus_falsification_path),
+        "sports_consensus_sharp_provider_capture": artifact(consensus_sharp_provider_capture_path),
         "sports_consensus_provider_audit": artifact(consensus_provider_audit_path),
         "soccer_asian_provider": artifact(soccer_asian_provider_path),
         "sports_event_velocity": artifact(event_velocity_path),
@@ -486,6 +491,9 @@ def build_summary(
     consensus_summary = artifacts["sports_consensus"].get("summary", {})
     consensus_observation_summary = artifacts["sports_consensus_observation"].get("summary", {})
     consensus_falsification_summary = artifacts["sports_consensus_falsification"].get("summary", {})
+    consensus_sharp_provider_capture_summary = artifacts[
+        "sports_consensus_sharp_provider_capture"
+    ].get("summary", {})
     consensus_provider_summary = artifacts["sports_consensus_provider_audit"].get("summary", {})
     soccer_asian_summary = artifacts["soccer_asian_provider"].get("summary", {})
     event_velocity_summary = artifacts["sports_event_velocity"].get("summary", {})
@@ -630,6 +638,27 @@ def build_summary(
         ),
         "sports_consensus_falsification_research_candidate_count": int_value(
             consensus_falsification_summary.get("fdr_survivor_count")
+        ),
+        "sports_consensus_sharp_provider_capture_status": artifacts[
+            "sports_consensus_sharp_provider_capture"
+        ].get("status"),
+        "sports_consensus_sharp_provider_capture_source_file_count": int_value(
+            consensus_sharp_provider_capture_summary.get("source_file_count")
+        ),
+        "sports_consensus_sharp_provider_capture_event_count": int_value(
+            consensus_sharp_provider_capture_summary.get("event_count")
+        ),
+        "sports_consensus_sharp_provider_capture_provider_count": int_value(
+            consensus_sharp_provider_capture_summary.get("provider_count")
+        ),
+        "sports_consensus_sharp_provider_capture_anchor_provider_count": int_value(
+            consensus_sharp_provider_capture_summary.get("anchor_provider_count")
+        ),
+        "sports_consensus_sharp_provider_capture_error_count": int_value(
+            consensus_sharp_provider_capture_summary.get("capture_error_count")
+        ),
+        "sports_consensus_sharp_provider_capture_sports_with_rows": (
+            consensus_sharp_provider_capture_summary.get("sports_with_provider_rows", [])
         ),
         "sports_consensus_provider_audit_status": artifacts["sports_consensus_provider_audit"].get(
             "status"
@@ -870,6 +899,19 @@ def build_gates(
             ),
         ),
         gate(
+            "sports_consensus_sharp_provider_capture_ready",
+            "pass"
+            if artifacts["sports_consensus_sharp_provider_capture"].get("safe")
+            else "blocked",
+            (
+                "Sharp-provider capture status: "
+                f"{summary.get('sports_consensus_sharp_provider_capture_status')}; "
+                f"{summary.get('sports_consensus_sharp_provider_capture_event_count')} event(s), "
+                f"{summary.get('sports_consensus_sharp_provider_capture_anchor_provider_count')} "
+                "anchor provider(s)."
+            ),
+        ),
+        gate(
             "sports_event_velocity_eta_ready",
             "pass" if artifacts["sports_event_velocity"].get("safe") else "blocked",
             f"Event-velocity ETA status: {summary.get('sports_event_velocity_status')}.",
@@ -1069,6 +1111,10 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Sports consensus opportunity contracts: `{summary.get('sports_consensus_falsification_accumulation_opportunity_distinct_contract_count')}`",
         f"- Sports consensus nearest hypothesis opportunities: `{summary.get('sports_consensus_falsification_nearest_hypothesis_current_opportunity_count')}`",
         f"- Sports consensus FDR survivors: `{summary.get('sports_consensus_falsification_fdr_survivor_count')}`",
+        f"- Sports consensus sharp-provider capture: `{summary.get('sports_consensus_sharp_provider_capture_status')}`",
+        f"- Sports consensus sharp-provider capture events: `{summary.get('sports_consensus_sharp_provider_capture_event_count')}`",
+        f"- Sports consensus sharp-provider capture anchors: `{summary.get('sports_consensus_sharp_provider_capture_anchor_provider_count')}`",
+        f"- Sports consensus sharp-provider capture sports: `{summary.get('sports_consensus_sharp_provider_capture_sports_with_rows')}`",
         f"- Sports consensus provider audit: `{summary.get('sports_consensus_provider_audit_status')}`",
         f"- Sports consensus target sports with strict rows: `{summary.get('sports_consensus_provider_strict_consensus_sport_count')}/{summary.get('sports_consensus_provider_sport_target_count')}`",
         f"- Sports consensus target sports covered: `{summary.get('sports_consensus_provider_sport_covered_count')}/{summary.get('sports_consensus_provider_sport_target_count')}`",
