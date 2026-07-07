@@ -24,6 +24,7 @@ if str(CONTROL_REPO) not in sys.path:
 
 from predmarket.shared_helpers import (  # noqa: E402
     path_is_within,
+    project_path,
     read_json_or_empty,
     safety_flags,
 )
@@ -32,7 +33,7 @@ MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_EVENT_VELOCITY_PATH = MACRO_DIR / "latest-kalshi-sports-event-velocity-eta.json"
 DEFAULT_ATP_GATE_PATH = MACRO_DIR / "latest-kalshi-atp-proxy-evidence-gate.json"
 DEFAULT_AUDIT_PATH = MACRO_DIR / "latest-kalshi-claude-advice-audit.json"
-DEFAULT_ATP_REPO = Path("/home/mrwatson/projects/atp-oracle")
+DEFAULT_ATP_REPO = project_path("atp-oracle")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-blocker-clearance-cycle-latest"
 
 

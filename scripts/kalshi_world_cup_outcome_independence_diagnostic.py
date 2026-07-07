@@ -41,6 +41,7 @@ from kalshi_world_cup_proxy_feature_model_falsification import (  # noqa: E402
 from predmarket.shared_helpers import (  # noqa: E402
     counts,
     gate_counts,
+    manual_drop_path,
     path_is_within,
     read_json_or_empty,
     safe_research_artifact,
@@ -49,7 +50,7 @@ from predmarket.shared_helpers import (  # noqa: E402
 )
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_world_cup_proxy_labels")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_world_cup_proxy_labels")
 DEFAULT_WORLD_CUP_MODEL_PATH = (
     MACRO_DIR / "latest-kalshi-world-cup-proxy-feature-model-falsification.json"
 )

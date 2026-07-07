@@ -30,6 +30,7 @@ if str(CONTROL_REPO) not in sys.path:
 from predmarket.kalshi_universe_scan import DEFAULT_WORLD_CUP_SOCCER_SERIES  # noqa: E402
 from predmarket.shared_helpers import (  # noqa: E402
     iso_from_timestamp,
+    manual_drop_path,
     optional_float,
     outside_repo,
     probability,
@@ -42,12 +43,12 @@ from predmarket.shared_helpers import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 DEFAULT_UNIVERSE_SCAN_PATH = MACRO_DIR / "latest-kalshi-universe-scan.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_world_cup_settlements/kalshi_observed_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_world_cup_settlements", "kalshi_observed_markets_latest.json"
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_world_cup_settlements")
-DEFAULT_OBSERVATION_DIR = Path("/home/mrwatson/manual_drops/kalshi_world_cup_proxy_observations")
-DEFAULT_LABEL_DIR = Path("/home/mrwatson/manual_drops/kalshi_world_cup_proxy_labels")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_world_cup_settlements")
+DEFAULT_OBSERVATION_DIR = manual_drop_path("kalshi_world_cup_proxy_observations")
+DEFAULT_LABEL_DIR = manual_drop_path("kalshi_world_cup_proxy_labels")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-world-cup-proxy-observation-loop-latest"
 DEFAULT_MAX_CONTRACTS = 300
 

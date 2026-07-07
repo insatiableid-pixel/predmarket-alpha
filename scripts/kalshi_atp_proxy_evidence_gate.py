@@ -21,21 +21,28 @@ CONTROL_REPO = Path(__file__).resolve().parents[1]
 if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
-from predmarket.shared_helpers import safe_research_artifact, sha256_or_none  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402
+    project_path,
+    safe_research_artifact,
+    sha256_or_none,
+)
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OBSERVATION_LOOP_PATH = MACRO_DIR / "latest-kalshi-atp-proxy-observation-loop.json"
-DEFAULT_FORWARD_OOS_PATH = Path(
-    "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-latest/report.json"
+DEFAULT_FORWARD_OOS_PATH = project_path(
+    "atp-oracle", "docs/codex/artifacts/kalshi-forward-oos-latest/report.json"
 )
-DEFAULT_LIQUIDITY_PATH = Path(
-    "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-liquidity-latest/liquidity.json"
+DEFAULT_LIQUIDITY_PATH = project_path(
+    "atp-oracle",
+    "docs/codex/artifacts/kalshi-forward-oos-liquidity-latest/liquidity.json",
 )
-DEFAULT_BETTABLE_GATE_PATH = Path(
-    "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-bettable-line-gate-latest/bettable-line-gate.json"
+DEFAULT_BETTABLE_GATE_PATH = project_path(
+    "atp-oracle",
+    "docs/codex/artifacts/kalshi-bettable-line-gate-latest/bettable-line-gate.json",
 )
-DEFAULT_PRICE_OBSERVATIONS_PATH = Path(
-    "/home/mrwatson/projects/atp-oracle/docs/codex/artifacts/kalshi-forward-oos-price-observations-latest/prices.json"
+DEFAULT_PRICE_OBSERVATIONS_PATH = project_path(
+    "atp-oracle",
+    "docs/codex/artifacts/kalshi-forward-oos-price-observations-latest/prices.json",
 )
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-atp-proxy-evidence-gate-latest"
 DEFAULT_MIN_SETTLED_LABELS = 10
