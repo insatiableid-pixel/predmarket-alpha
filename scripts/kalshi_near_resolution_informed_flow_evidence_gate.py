@@ -279,6 +279,7 @@ def build_flow_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:
                     "best_yes_ask": row.get("best_yes_ask"),
                     "best_no_bid": row.get("best_no_bid"),
                     "best_no_ask": row.get("best_no_ask"),
+                    "yes_mid_at_prediction": json_float(mid),
                     "yes_ask_depth_top1": row.get("yes_ask_depth_top1"),
                     "yes_bid_depth_top1": row.get("yes_bid_depth_top1"),
                     "no_ask_depth_top1": row.get("no_ask_depth_top1"),
@@ -357,10 +358,12 @@ def evaluate_flow_hypotheses(
     q_values = benjamini_hochberg(p_values)
     for index, q_value in q_values.items():
         evaluations[index]["q_value"] = json_float(q_value)
+        mean_null = evaluations[index].get("mean_price_implied_null_probability")
         if (
             evaluations[index]["status"] == "testable_research_candidate"
             and q_value <= fdr_alpha
-            and float(evaluations[index].get("oos_accuracy") or 0.0) > 0.5
+            and isinstance(mean_null, (int, float))
+            and float(evaluations[index].get("oos_accuracy") or 0.0) > float(mean_null)
         ):
             evaluations[index]["status"] = "research_candidate_fdr_passed"
     return evaluations
@@ -388,6 +391,9 @@ def evaluate_hypothesis(
                 "prediction": prediction,
                 "actual": actual,
                 "correct": int(prediction == actual),
+                "price_implied_correct_probability": json_float(
+                    price_implied_correct_probability(row, prediction)
+                ),
                 "decision_ts": timestamp(row.get("observed_at_utc")) or 0.0,
             }
         )
@@ -395,16 +401,34 @@ def evaluate_hypothesis(
     split_index = chronological_split_index(len(independent), test_fraction)
     oos_rows = independent[split_index:]
     wins = sum(int(row.get("correct") or 0) for row in oos_rows)
-    p_value = (
+    null_probabilities = [
+        float(row["price_implied_correct_probability"])
+        for row in oos_rows
+        if isinstance(row.get("price_implied_correct_probability"), (int, float))
+    ]
+    missing_null_count = max(0, len(oos_rows) - len(null_probabilities))
+    coin_flip_p_value = (
         binomial_survival(wins, len(oos_rows), 0.5)
         if len(independent) >= min_independent_labels and len(oos_rows) >= min_oos_labels
         else None
+    )
+    price_implied_p_value = (
+        poisson_binomial_survival(wins, null_probabilities)
+        if len(independent) >= min_independent_labels
+        and len(oos_rows) >= min_oos_labels
+        and len(null_probabilities) == len(oos_rows)
+        else None
+    )
+    mean_null_probability = (
+        sum(null_probabilities) / len(null_probabilities) if null_probabilities else None
     )
     status = "testable_research_candidate"
     if len(independent) < min_independent_labels:
         status = "blocked_insufficient_independent_labels"
     elif len(oos_rows) < min_oos_labels:
         status = "blocked_insufficient_oos_labels"
+    elif missing_null_count:
+        status = "blocked_missing_price_implied_null"
     return {
         "model_id": evaluator["model_id"],
         "label_type": evaluator["label_type"],
@@ -414,7 +438,11 @@ def evaluate_hypothesis(
         "oos_label_count": len(oos_rows),
         "oos_correct_count": wins,
         "oos_accuracy": json_float(wins / len(oos_rows) if oos_rows else None),
-        "p_value": json_float(p_value),
+        "null_model": "price_implied_selected_side_executable_or_mid_probability",
+        "mean_price_implied_null_probability": json_float(mean_null_probability),
+        "missing_price_implied_null_count": missing_null_count,
+        "coin_flip_p_value_legacy": json_float(coin_flip_p_value),
+        "p_value": json_float(price_implied_p_value),
         "q_value": None,
         "min_independent_labels": min_independent_labels,
         "min_oos_labels": min_oos_labels,
@@ -426,10 +454,53 @@ def evaluate_hypothesis(
                 "prediction": row.get("prediction"),
                 "actual": row.get("actual"),
                 "correct": row.get("correct"),
+                "price_implied_correct_probability": row.get("price_implied_correct_probability"),
             }
             for row in oos_rows[:10]
         ],
     }
+
+
+def price_implied_correct_probability(row: Mapping[str, Any], prediction: int) -> float | None:
+    """Return the Kalshi-implied probability that the predicted side wins.
+
+    For a YES prediction, the strict null is the executable YES ask when
+    present, otherwise the timestamped YES midpoint. For a NO prediction, use
+    the executable NO ask when present, otherwise ``1 - yes_mid``. This makes
+    near-resolution evidence beat the market-implied side, not a 50/50 coin.
+    """
+    if prediction == 1:
+        value = as_float(row.get("best_yes_ask"))
+        if value is None:
+            value = as_float(row.get("yes_mid_at_prediction"))
+    elif prediction == 0:
+        value = as_float(row.get("best_no_ask"))
+        if value is None:
+            yes_mid = as_float(row.get("yes_mid_at_prediction"))
+            value = 1.0 - yes_mid if yes_mid is not None else None
+    else:
+        return None
+    if value is None:
+        return None
+    return min(max(float(value), 0.0001), 0.9999)
+
+
+def poisson_binomial_survival(wins: int, probabilities: Sequence[float]) -> float:
+    """Exact P(X >= wins) for independent non-identical Bernoulli variables."""
+    if wins <= 0:
+        return 1.0
+    if not probabilities or wins > len(probabilities):
+        return 0.0
+    pmf = [1.0] + [0.0] * len(probabilities)
+    max_successes = 0
+    for probability in probabilities:
+        p = min(max(float(probability), 0.0), 1.0)
+        max_successes += 1
+        for successes in range(max_successes, -1, -1):
+            without_success = pmf[successes] * (1.0 - p)
+            with_success = pmf[successes - 1] * p if successes > 0 else 0.0
+            pmf[successes] = without_success + with_success
+    return float(min(max(sum(pmf[wins:]), 0.0), 1.0))
 
 
 def independent_flow_rows(rows: Sequence[Mapping[str, Any]]) -> list[dict[str, Any]]:

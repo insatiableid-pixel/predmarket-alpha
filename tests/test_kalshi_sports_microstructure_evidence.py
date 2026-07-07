@@ -885,3 +885,136 @@ def test_near_resolution_flow_falsification_can_find_preregistered_candidate(
     assert report["summary"]["research_candidate_count"] >= 1
     assert any(row["status"] == "research_candidate_fdr_passed" for row in report["evaluations"])
     assert report["summary"]["usable_row_count"] == 0
+
+
+def test_near_resolution_flow_uses_price_implied_null_not_coin_flip(
+    tmp_path: Path,
+) -> None:
+    flow = load_script("kalshi_near_resolution_informed_flow_evidence_gate")
+    rows: list[dict[str, object]] = []
+    for index in range(40):
+        ticker = f"KXPRICEIMPLIED-26JUL04-{index:03d}"
+        correct = index % 6 != 0
+        rows.extend(
+            [
+                {
+                    "snapshot_id": f"{ticker}-a",
+                    "contract_ticker": ticker,
+                    "observed_at_utc": f"2026-07-04T00:{index:02d}:00Z",
+                    "time_to_settlement_seconds": 1800,
+                    "yes_mid": 0.90,
+                    "best_yes_ask": 0.92,
+                    "depth_imbalance_yes": 0.85,
+                    "depth_imbalance_delta": None,
+                    "settlement_yes_outcome": 1 if correct else 0,
+                    "usable": False,
+                },
+                {
+                    "snapshot_id": f"{ticker}-b",
+                    "contract_ticker": ticker,
+                    "observed_at_utc": f"2026-07-04T01:{index:02d}:00Z",
+                    "time_to_settlement_seconds": 1200,
+                    "yes_mid": 0.91,
+                    "best_yes_ask": 0.93,
+                    "depth_imbalance_yes": 0.85,
+                    "depth_imbalance_delta": 0.4,
+                    "settlement_yes_outcome": 1 if correct else 0,
+                    "usable": False,
+                },
+            ]
+        )
+    micro_path = write_json(
+        tmp_path / "micro.json",
+        {
+            "schema_version": 1,
+            "status": "sports_microstructure_observation_loop_ready_with_settlement_labels",
+            "research_only": True,
+            "execution_enabled": False,
+            "market_execution": False,
+            "account_or_order_paths": False,
+            "database_writes": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "observation_packet": {"rows": rows},
+        },
+    )
+
+    report = flow.build_near_resolution_informed_flow_evidence_gate(
+        microstructure_path=micro_path,
+        generated_utc="2026-07-04T02:00:00Z",
+    )
+    depth_eval = next(
+        row
+        for row in report["evaluations"]
+        if row["model_id"] == "flow_depth_imbalance_settlement_directional"
+    )
+
+    assert depth_eval["status"] == "testable_research_candidate"
+    assert depth_eval["coin_flip_p_value_legacy"] < 0.05
+    assert depth_eval["p_value"] > 0.5
+    assert depth_eval["mean_price_implied_null_probability"] == 0.92
+    assert not any(
+        row["status"] == "research_candidate_fdr_passed" for row in report["evaluations"]
+    )
+
+
+def test_near_resolution_flow_blocks_when_price_implied_null_missing(
+    tmp_path: Path,
+) -> None:
+    flow = load_script("kalshi_near_resolution_informed_flow_evidence_gate")
+    rows: list[dict[str, object]] = []
+    for index in range(40):
+        ticker = f"KXMISSINGNULL-26JUL04-{index:03d}"
+        rows.append(
+            {
+                "snapshot_id": f"{ticker}-a",
+                "contract_ticker": ticker,
+                "observed_at_utc": f"2026-07-04T00:{index:02d}:00Z",
+                "time_to_settlement_seconds": 1800,
+                "depth_imbalance_yes": 0.85,
+                "settlement_yes_outcome": 1,
+                "usable": False,
+            }
+        )
+    micro_path = write_json(
+        tmp_path / "micro.json",
+        {
+            "schema_version": 1,
+            "status": "sports_microstructure_observation_loop_ready_with_settlement_labels",
+            "research_only": True,
+            "execution_enabled": False,
+            "market_execution": False,
+            "account_or_order_paths": False,
+            "database_writes": False,
+            "safety": {
+                "market_execution": False,
+                "account_or_order_paths": False,
+                "database_writes": False,
+            },
+            "observation_packet": {"rows": rows},
+        },
+    )
+
+    report = flow.build_near_resolution_informed_flow_evidence_gate(
+        microstructure_path=micro_path,
+        generated_utc="2026-07-04T02:00:00Z",
+    )
+    depth_eval = next(
+        row
+        for row in report["evaluations"]
+        if row["model_id"] == "flow_depth_imbalance_settlement_directional"
+    )
+
+    assert depth_eval["status"] == "blocked_missing_price_implied_null"
+    assert depth_eval["missing_price_implied_null_count"] == depth_eval["oos_label_count"]
+    assert depth_eval["p_value"] is None
+
+
+def test_makefile_exposes_near_resolution_flow_microstructure_path_override() -> None:
+    text = (Path(__file__).resolve().parents[1] / "Makefile").read_text(encoding="utf-8")
+
+    assert "KALSHI_NEAR_RESOLUTION_FLOW_MICROSTRUCTURE_PATH ?=" in text
+    assert "--microstructure-path $(KALSHI_NEAR_RESOLUTION_FLOW_MICROSTRUCTURE_PATH)" in text
