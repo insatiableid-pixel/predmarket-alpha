@@ -19,13 +19,15 @@ from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
+from predmarket.shared_helpers import manual_drop_path
+
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-ev-local-contract-evidence-scout-latest"
 DEFAULT_WORK_ORDER_PATH = MACRO_DIR / "latest-kalshi-ev-contract-mapping-work-order.json"
 DEFAULT_SEARCH_PATHS = (
-    Path("/home/mrwatson/manual_drops/kalshi"),
-    Path("/home/mrwatson/manual_drops/kalshi_ev_contract_mappings"),
+    manual_drop_path("kalshi"),
+    manual_drop_path("kalshi_ev_contract_mappings"),
     CONTROL_REPO / "data",
 )
 
@@ -536,8 +538,8 @@ def local_contract_evidence_next_action(
     if target_count and not nfl_contract_evidence_count:
         return (
             "Drop a local Kalshi NFL contract snapshot for one selected work-order game under "
-            "/home/mrwatson/manual_drops/kalshi/; it must include exact ticker/event_ticker, official rules, "
-            "and YES ask or ticket payout/cost evidence. Contract: "
+            "`PREDMARKET_MANUAL_DROPS_ROOT/kalshi/`; it must include exact ticker/event_ticker, "
+            "official rules, and YES ask or ticket payout/cost evidence. Contract: "
             "docs/codex/manual-drops/kalshi-ev-nfl-contract-snapshot-contract.md."
         )
     if target_count:

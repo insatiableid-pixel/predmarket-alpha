@@ -18,13 +18,15 @@ from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 
+from predmarket.shared_helpers import manual_drop_path
+
 CONTROL_REPO = Path(__file__).resolve().parents[1]
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-ev-nfl-overlay-assembler-latest"
 DEFAULT_SCOUT_PATH = MACRO_DIR / "latest-kalshi-ev-local-contract-evidence-scout.json"
 DEFAULT_WORK_ORDER_PATH = MACRO_DIR / "latest-kalshi-ev-contract-mapping-work-order.json"
-DEFAULT_MAPPING_OUTPUT_DIR = Path("/home/mrwatson/manual_drops/kalshi_ev_contract_mappings")
-DEFAULT_PROBABILITY_OUTPUT_DIR = Path("/home/mrwatson/manual_drops/kalshi_ev_probabilities")
+DEFAULT_MAPPING_OUTPUT_DIR = manual_drop_path("kalshi_ev_contract_mappings")
+DEFAULT_PROBABILITY_OUTPUT_DIR = manual_drop_path("kalshi_ev_probabilities")
 CLEAN_TIMING_STATUSES = {"clean", "pregame_clean", "not_applicable"}
 
 
