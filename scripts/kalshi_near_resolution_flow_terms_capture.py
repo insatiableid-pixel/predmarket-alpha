@@ -26,6 +26,7 @@ if str(CONTROL_REPO) not in sys.path:
     sys.path.insert(0, str(CONTROL_REPO))
 
 from predmarket.shared_helpers import (  # noqa: E402
+    manual_drop_path,
     outside_repo,
     read_json_or_empty,
     safe_stamp,
@@ -36,7 +37,7 @@ from predmarket.shared_helpers import (  # noqa: E402
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 DEFAULT_FLOW_REPLAY_PATH = MACRO_DIR / "latest-kalshi-near-resolution-flow-replay-gates.json"
-DEFAULT_RAW_TERMS_DIR = Path("/home/mrwatson/manual_drops/kalshi")
+DEFAULT_RAW_TERMS_DIR = manual_drop_path("kalshi")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-near-resolution-flow-terms-capture-latest"
 DEFAULT_MAX_MARKETS = 120
 DEFAULT_DELAY_SECONDS = 0.03

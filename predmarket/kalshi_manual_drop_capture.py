@@ -14,6 +14,7 @@ from typing import Any
 
 from predmarket.config import load_config
 from predmarket.kalshi_dataset import KalshiMarketDataClient
+from predmarket.shared_helpers import manual_drop_path
 
 DEFAULT_MLB_SERIES = (
     "KXMLBGAME",
@@ -292,10 +293,10 @@ def main(argv: Sequence[str] | None = None) -> int:
     parser.add_argument("--limit", type=int, default=100)
     parser.add_argument("--max-pages", type=int, default=1)
     parser.add_argument("--delay-seconds", type=float, default=0.75)
-    parser.add_argument("--output-dir", default="/home/mrwatson/manual_drops/kalshi")
+    parser.add_argument("--output-dir", default=manual_drop_path("kalshi"))
     parser.add_argument(
         "--latest-path",
-        default="/home/mrwatson/manual_drops/kalshi/kalshi_mlb_game_series_latest.json",
+        default=manual_drop_path("kalshi", "kalshi_mlb_game_series_latest.json"),
     )
     parser.add_argument(
         "--report-dir", default="docs/codex/artifacts/kalshi-manual-drop-capture-latest"

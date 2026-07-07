@@ -21,6 +21,8 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from predmarket.shared_helpers import manual_drop_path
+
 MLB_TEAM_TO_ABBR = {
     "Arizona Diamondbacks": "ARI",
     "Atlanta Braves": "ATL",
@@ -71,8 +73,8 @@ MONTHS = {
 
 THE_ODDS_API_ENDPOINT = "https://api.the-odds-api.com/v4/sports/{sport_key}/odds/"
 DEFAULT_REQUIRED_BOOKS = ("pinnacle", "betfair_ex_uk", "matchbook", "smarkets")
-DEFAULT_RAW_DIR = Path("/home/mrwatson/manual_drops/odds_api")
-DEFAULT_REFERENCE_JSON = Path("/home/mrwatson/manual_drops/predmarket/sports-no-vig-consensus.json")
+DEFAULT_RAW_DIR = manual_drop_path("odds_api")
+DEFAULT_REFERENCE_JSON = manual_drop_path("predmarket", "sports-no-vig-consensus.json")
 DEFAULT_KEY_FILE = Path("/mnt/c/Users/mrwat/OneDrive/Desktop/Welcome to The Odds API!.txt")
 
 Transport = Callable[[str, float], "HttpResponse"]

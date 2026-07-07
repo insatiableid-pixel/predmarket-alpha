@@ -25,6 +25,7 @@ from predmarket.shared_helpers import (  # noqa: E402
     gate,
     gate_counts,
     iso_time,
+    manual_drop_path,
     optional_float,
     probability,
     read_json_or_empty,
@@ -38,10 +39,10 @@ from predmarket.shared_helpers import (  # noqa: E402
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
 DEFAULT_PAPER_DECISIONS_PATH = MACRO_DIR / "latest-paper-decision-candidates.json"
-DEFAULT_SETTLED_SNAPSHOT_PATH = Path(
-    "/home/mrwatson/manual_drops/kalshi_paper_settlements/kalshi_paper_observed_markets_latest.json"
+DEFAULT_SETTLED_SNAPSHOT_PATH = manual_drop_path(
+    "kalshi_paper_settlements", "kalshi_paper_observed_markets_latest.json"
 )
-DEFAULT_SETTLED_RAW_DIR = Path("/home/mrwatson/manual_drops/kalshi_paper_settlements")
+DEFAULT_SETTLED_RAW_DIR = manual_drop_path("kalshi_paper_settlements")
 DEFAULT_OUT_DIR = MACRO_DIR / "paper-settlement-reconciliation-latest"
 KALSHI_PUBLIC_BASE_URL = "https://external-api.kalshi.com/trade-api/v2"
 

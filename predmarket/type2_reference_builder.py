@@ -15,6 +15,8 @@ from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
+from predmarket.shared_helpers import manual_drop_path
+
 TEAM_TO_ABBR = {
     "Arizona Diamondbacks": "ARI",
     "Atlanta Braves": "ATL",
@@ -523,18 +525,20 @@ def main(argv: Sequence[str] | None = None) -> int:
     )
     parser.add_argument(
         "--odds-raw-json",
-        default="/home/mrwatson/manual_drops/odds_api/baseball_mlb_current_20260620T225933Z.json",
+        default=manual_drop_path("odds_api", "baseball_mlb_current_20260620T225933Z.json"),
     )
     parser.add_argument(
         "--odds-meta-json",
-        default="/home/mrwatson/manual_drops/odds_api/baseball_mlb_current_20260620T225933Z.meta.json",
+        default=manual_drop_path(
+            "odds_api", "baseball_mlb_current_20260620T225933Z.meta.json"
+        ),
     )
     parser.add_argument(
         "--kalshi-json", default="data/kalshi_mlb_game_series_live_current_20260620T230203Z.json"
     )
     parser.add_argument(
         "--reference-json",
-        default="/home/mrwatson/manual_drops/predmarket/type2-sportsbook-reference.json",
+        default=manual_drop_path("predmarket", "type2-sportsbook-reference.json"),
     )
     parser.add_argument(
         "--report-dir", default="docs/codex/artifacts/type2-reference-builder-latest"
