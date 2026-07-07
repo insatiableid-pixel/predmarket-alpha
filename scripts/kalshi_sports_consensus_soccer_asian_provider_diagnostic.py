@@ -6,7 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-from collections.abc import Sequence
+from collections.abc import Mapping, Sequence
 from pathlib import Path
 from typing import Any
 
@@ -41,6 +41,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--include-defaults", action=argparse.BooleanOptionalAction, default=True)
     parser.add_argument("--max-raw-files", type=int, default=12)
     parser.add_argument("--capture-current", action="store_true")
+    parser.add_argument("--capture-current-if-needed", action="store_true")
     parser.add_argument("--api-key-file", type=Path, default=DEFAULT_KEY_FILE)
     parser.add_argument("--sport-key", default="soccer_fifa_world_cup")
     parser.add_argument("--target-providers", default=",".join(DEFAULT_TARGET_PROVIDERS))
@@ -94,7 +95,16 @@ def _load_sources(args: argparse.Namespace) -> list[dict[str, Any]]:
     meta_paths = list(args.raw_provider_meta_json)
     if args.include_defaults:
         raw_paths.extend(_latest_soccer_raw_files(DEFAULT_ODDS_API_DIR, limit=args.max_raw_files))
-    if args.capture_current:
+    sources = _json_sources(raw_paths, meta_paths)
+    should_capture = args.capture_current or (
+        args.capture_current_if_needed
+        and _target_probe_needed(
+            sources,
+            target_providers=_split_csv(args.target_providers),
+        )
+        and args.api_key_file.expanduser().is_file()
+    )
+    if should_capture:
         api_key = _read_api_key(args.api_key_file)
         payload, meta, raw_path = capture_the_odds_api_current(
             api_key=api_key,
@@ -105,7 +115,7 @@ def _load_sources(args: argparse.Namespace) -> list[dict[str, Any]]:
             timeout_seconds=float(args.timeout_seconds),
         )
         return [
-            *_json_sources(raw_paths, meta_paths),
+            *sources,
             {
                 "source_id": raw_path.stem,
                 "source_path": str(raw_path),
@@ -115,7 +125,24 @@ def _load_sources(args: argparse.Namespace) -> list[dict[str, Any]]:
                 "meta_path": str(raw_path.with_suffix(".meta.json")),
             },
         ]
-    return _json_sources(raw_paths, meta_paths)
+    return sources
+
+
+def _target_probe_needed(
+    sources: Sequence[Mapping[str, Any]],
+    *,
+    target_providers: Sequence[str],
+) -> bool:
+    if not sources:
+        return True
+    report = build_soccer_asian_provider_diagnostic(
+        sources=sources,
+        target_providers=target_providers,
+    )
+    summary = report.get("summary", {})
+    requested_count = int(summary.get("requested_target_provider_count") or 0)
+    observed_count = int(summary.get("observed_target_provider_count") or 0)
+    return requested_count <= 0 and observed_count <= 0
 
 
 def _json_sources(raw_paths: Sequence[Path], meta_paths: Sequence[Path]) -> list[dict[str, Any]]:

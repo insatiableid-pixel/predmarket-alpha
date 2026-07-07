@@ -1015,7 +1015,10 @@ kalshi-sports-consensus-soccer-asian-provider-diagnostic:
 		python3 scripts/kalshi_sports_consensus_soccer_asian_provider_diagnostic.py \
 			--out-dir $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDER_OUT_DIR) \
 			--target-providers $(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_PROVIDERS) \
-			--max-raw-files 20; \
+			--max-raw-files 20 \
+			--capture-current-if-needed \
+			--api-key-file "$(KALSHI_SPORTS_CONSENSUS_KEY_FILE)" \
+			--raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR); \
 	fi
 
 kalshi-sports-consensus-public-kalshi-refresh:
