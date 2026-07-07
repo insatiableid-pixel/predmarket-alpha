@@ -150,6 +150,23 @@ def test_sports_evidence_cycle_report_summarizes_safe_label_progress(tmp_path: P
                 fdr_survivor_count=0,
             ),
         ),
+        "sharp_provider_capture": write_json(
+            tmp_path / "sharp_provider_capture.json",
+            safe_artifact(
+                "sports_consensus_sharp_provider_capture_ready",
+                source_file_count=5,
+                event_count=99,
+                provider_count=4,
+                anchor_provider_count=4,
+                capture_error_count=0,
+                sports_with_provider_rows=[
+                    "baseball_mlb",
+                    "tennis_atp_wimbledon",
+                    "soccer_fifa_world_cup",
+                    "americanfootball_nfl",
+                ],
+            ),
+        ),
         "consensus_provider_audit": write_json(
             tmp_path / "consensus_provider_audit.json",
             safe_artifact(
@@ -313,6 +330,7 @@ def test_sports_evidence_cycle_report_summarizes_safe_label_progress(tmp_path: P
         consensus_path=files["consensus"],
         consensus_observation_path=files["consensus_observation"],
         consensus_falsification_path=files["consensus_falsification"],
+        consensus_sharp_provider_capture_path=files["sharp_provider_capture"],
         consensus_provider_audit_path=files["consensus_provider_audit"],
         soccer_asian_provider_path=files["soccer_asian_provider"],
         event_velocity_path=files["event_velocity"],
@@ -332,7 +350,7 @@ def test_sports_evidence_cycle_report_summarizes_safe_label_progress(tmp_path: P
     )
 
     assert report["status"] == "sports_evidence_cycle_ready_with_label_progress"
-    assert report["summary"]["safe_artifact_count"] == 30
+    assert report["summary"]["safe_artifact_count"] == 31
     assert report["summary"]["total_label_count"] == 9
     assert report["summary"]["total_paper_fill_label_count"] == 0
     assert report["summary"]["flow_terms_official_rules_market_count"] == 2
@@ -377,6 +395,20 @@ def test_sports_evidence_cycle_report_summarizes_safe_label_progress(tmp_path: P
     )
     assert report["summary"]["sports_consensus_falsification_fdr_survivor_count"] == 0
     assert report["summary"]["sports_consensus_falsification_research_candidate_count"] == 0
+    assert report["summary"]["sports_consensus_sharp_provider_capture_status"] == (
+        "sports_consensus_sharp_provider_capture_ready"
+    )
+    assert report["summary"]["sports_consensus_sharp_provider_capture_source_file_count"] == 5
+    assert report["summary"]["sports_consensus_sharp_provider_capture_event_count"] == 99
+    assert report["summary"]["sports_consensus_sharp_provider_capture_provider_count"] == 4
+    assert report["summary"]["sports_consensus_sharp_provider_capture_anchor_provider_count"] == 4
+    assert report["summary"]["sports_consensus_sharp_provider_capture_error_count"] == 0
+    assert report["summary"]["sports_consensus_sharp_provider_capture_sports_with_rows"] == [
+        "baseball_mlb",
+        "tennis_atp_wimbledon",
+        "soccer_fifa_world_cup",
+        "americanfootball_nfl",
+    ]
     assert report["summary"]["sports_consensus_provider_audit_status"] == (
         "sports_consensus_provider_audit_ready_with_per_sport_gaps"
     )
@@ -667,6 +699,9 @@ def test_sports_evidence_cycle_safety_failure_next_action(tmp_path: Path) -> Non
         "consensus_falsification": write_json(
             tmp_path / "consensus_falsification.json", safe_artifact()
         ),
+        "sharp_provider_capture": write_json(
+            tmp_path / "sharp_provider_capture.json", safe_artifact()
+        ),
         "consensus_provider_audit": write_json(
             tmp_path / "consensus_provider_audit.json", safe_artifact()
         ),
@@ -712,6 +747,7 @@ def test_sports_evidence_cycle_safety_failure_next_action(tmp_path: Path) -> Non
         consensus_path=files["consensus"],
         consensus_observation_path=files["consensus_observation"],
         consensus_falsification_path=files["consensus_falsification"],
+        consensus_sharp_provider_capture_path=files["sharp_provider_capture"],
         consensus_provider_audit_path=files["consensus_provider_audit"],
         soccer_asian_provider_path=files["soccer_asian_provider"],
         microstructure_path=files["micro"],

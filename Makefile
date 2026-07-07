@@ -992,18 +992,15 @@ kalshi-sports-consensus-reference-build:
 	python3 scripts/kalshi_sports_consensus_reference_build.py $$args
 
 kalshi-sports-consensus-sharp-provider-capture:
-	@python3 scripts/kalshi_sports_consensus_reference_build.py \
+	@python3 scripts/kalshi_sports_consensus_sharp_provider_capture.py \
 		--capture-current \
-		--kalshi-json docs/codex/macro/latest-kalshi-universe-scan.json \
-		--reference-json $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_JSON) \
-		--report-dir $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_OUT_DIR) \
+		--out-dir $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_PROBE_OUT_DIR) \
 		--api-key-file "$(KALSHI_SPORTS_CONSENSUS_KEY_FILE)" \
 		--sport-keys $(KALSHI_SPORTS_CONSENSUS_SHARP_PROVIDER_SPORT_KEYS) \
 		--bookmakers $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) \
 		--raw-output-dir $(KALSHI_SPORTS_CONSENSUS_RAW_DIR) \
-		--required-books $(KALSHI_SPORTS_CONSENSUS_SHARP_BOOKMAKERS) \
-		--max-event-delta-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_EVENT_DELTA_SECONDS) \
-		--max-source-age-seconds $(KALSHI_SPORTS_CONSENSUS_MAX_SOURCE_AGE_SECONDS)
+		--regions us \
+		--markets h2h
 
 kalshi-sports-consensus-soccer-asian-provider-diagnostic:
 	@if [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "1" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "true" ] || [ "$(KALSHI_SPORTS_CONSENSUS_SOCCER_ASIAN_CAPTURE)" = "yes" ]; then \
