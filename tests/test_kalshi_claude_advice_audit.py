@@ -203,6 +203,19 @@ def base_inputs(tmp_path: Path) -> dict[str, Path]:
                 fdr_survivor_count=0,
             ),
         ),
+        "provider_audit": write_json(
+            tmp_path / "provider_audit.json",
+            safe_artifact(
+                "sports_consensus_provider_audit_ready_with_per_sport_gaps",
+                sport_target_count=5,
+                strict_consensus_sport_count=4,
+                sport_covered_count=3,
+                sport_gap_count=1,
+                sport_deferred_count=1,
+                strict_consensus_provider_count=4,
+                strict_anchor_provider_count=4,
+            ),
+        ),
     }
 
 
@@ -226,12 +239,13 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
         resolved_archive_path=files["resolved_archive"],
         historical_feasibility_path=files["historical_feasibility"],
         historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
         generated_utc="2026-07-06T02:40:00Z",
     )
 
     rows = {row["requirement_id"]: row for row in report["advice_rows"]}
     assert report["status"] == "claude_advice_audit_ready_with_open_clock_or_statistical_items"
-    assert report["summary"]["requirement_count"] == 14
+    assert report["summary"]["requirement_count"] == 15
     assert rows["CLAUDE-001"]["status"] == "satisfied"
     assert rows["CLAUDE-002"]["status"] == "satisfied"
     assert rows["CLAUDE-003"]["status"] == "satisfied"
@@ -252,7 +266,9 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
     assert rows["CLAUDE-013"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-014"]["status"] == "blocked_external"
     assert rows["CLAUDE-014"]["implementation_status"] == "satisfied"
-    assert report["summary"]["implementation_satisfied_count"] == 14
+    assert rows["CLAUDE-015"]["status"] == "blocked_external"
+    assert rows["CLAUDE-015"]["implementation_status"] == "satisfied"
+    assert report["summary"]["implementation_satisfied_count"] == 15
     assert report["summary"]["implementation_open_requirement_ids"] == []
     assert report["next_action"]["name"] == "kalshi_tick_orderbook_delta_capture"
     assert report["execution_enabled"] is False
@@ -301,6 +317,7 @@ def test_claude_advice_audit_treats_price_null_rejection_as_implemented(
         resolved_archive_path=files["resolved_archive"],
         historical_feasibility_path=files["historical_feasibility"],
         historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
@@ -309,7 +326,7 @@ def test_claude_advice_audit_treats_price_null_rejection_as_implemented(
     assert rows["CLAUDE-001"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-002"]["status"] == "satisfied"
     assert rows["CLAUDE-002"]["implementation_status"] == "satisfied"
-    assert report["summary"]["implementation_satisfied_count"] == 14
+    assert report["summary"]["implementation_satisfied_count"] == 15
     assert report["summary"]["implementation_open_requirement_ids"] == []
 
 
@@ -343,6 +360,7 @@ def test_claude_advice_audit_satisfies_tick_capture_after_recording(tmp_path: Pa
         resolved_archive_path=files["resolved_archive"],
         historical_feasibility_path=files["historical_feasibility"],
         historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
@@ -382,6 +400,7 @@ def test_claude_advice_audit_blocks_underpowered_resolved_archive(tmp_path: Path
         resolved_archive_path=files["resolved_archive"],
         historical_feasibility_path=files["historical_feasibility"],
         historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
@@ -433,12 +452,55 @@ def test_claude_advice_audit_satisfies_historical_consensus_backfill(
         resolved_archive_path=files["resolved_archive"],
         historical_feasibility_path=files["historical_feasibility"],
         historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
         generated_utc="2026-07-07T05:00:00Z",
     )
 
     rows = {row["requirement_id"]: row for row in report["advice_rows"]}
     assert rows["CLAUDE-014"]["status"] == "satisfied"
     assert rows["CLAUDE-014"]["implementation_status"] == "satisfied"
+
+
+def test_claude_advice_audit_satisfies_provider_coverage(tmp_path: Path) -> None:
+    module = load_module()
+    files = base_inputs(tmp_path)
+    files["provider_audit"] = write_json(
+        tmp_path / "provider_audit_ready.json",
+        safe_artifact(
+            "sports_consensus_provider_audit_ready_all_target_sports_covered",
+            sport_target_count=5,
+            strict_consensus_sport_count=5,
+            sport_covered_count=5,
+            sport_gap_count=0,
+            sport_deferred_count=0,
+            strict_consensus_provider_count=4,
+            strict_anchor_provider_count=4,
+        ),
+    )
+
+    report = module.build_claude_advice_audit(
+        flow_gate_path=files["flow_gate"],
+        flow_replay_path=files["flow_replay"],
+        ev_ledger_path=files["ev"],
+        paper_path=files["paper"],
+        passive_fill_path=files["passive"],
+        atp_path=files["atp"],
+        world_cup_independence_path=files["world_cup"],
+        prior_only_path=files["prior"],
+        event_velocity_path=files["velocity"],
+        live_path=files["live"],
+        line_move_path=files["line_move"],
+        tick_recorder_path=files["tick_recorder"],
+        resolved_archive_path=files["resolved_archive"],
+        historical_feasibility_path=files["historical_feasibility"],
+        historical_backfill_path=files["historical_backfill"],
+        provider_audit_path=files["provider_audit"],
+        generated_utc="2026-07-07T05:00:00Z",
+    )
+
+    rows = {row["requirement_id"]: row for row in report["advice_rows"]}
+    assert rows["CLAUDE-015"]["status"] == "satisfied"
+    assert rows["CLAUDE-015"]["implementation_status"] == "satisfied"
 
 
 def test_claude_advice_audit_temp_out_dir_does_not_write_latest(

@@ -51,6 +51,7 @@ DEFAULT_HISTORICAL_FEASIBILITY_PATH = (
 DEFAULT_HISTORICAL_BACKFILL_PATH = (
     MACRO_DIR / "latest-kalshi-sports-historical-consensus-backfill.json"
 )
+DEFAULT_PROVIDER_AUDIT_PATH = MACRO_DIR / "latest-kalshi-sports-consensus-provider-audit.json"
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-claude-advice-audit-latest"
 
 CSV_FIELDS = [
@@ -93,6 +94,7 @@ def build_claude_advice_audit(
     resolved_archive_path: Path = DEFAULT_RESOLVED_ARCHIVE_PATH,
     historical_feasibility_path: Path = DEFAULT_HISTORICAL_FEASIBILITY_PATH,
     historical_backfill_path: Path = DEFAULT_HISTORICAL_BACKFILL_PATH,
+    provider_audit_path: Path = DEFAULT_PROVIDER_AUDIT_PATH,
     generated_utc: str | None = None,
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
@@ -112,6 +114,7 @@ def build_claude_advice_audit(
         "resolved_archive": artifact(resolved_archive_path),
         "historical_feasibility": artifact(historical_feasibility_path),
         "historical_backfill": artifact(historical_backfill_path),
+        "provider_audit": artifact(provider_audit_path),
     }
     rows = advice_rows(artifacts)
     gates = build_gates(artifacts, rows)
@@ -194,6 +197,7 @@ def advice_rows(artifacts: Mapping[str, Mapping[str, Any]]) -> list[dict[str, st
         historical_consensus_row(
             artifacts["historical_feasibility"], artifacts["historical_backfill"]
         ),
+        provider_coverage_row(artifacts["provider_audit"]),
     ]
 
 
@@ -591,6 +595,39 @@ def historical_consensus_row(
     )
 
 
+def provider_coverage_row(provider_audit: Mapping[str, Any]) -> dict[str, str]:
+    summary = provider_audit.get("summary", {})
+    status_text = str(provider_audit.get("status") or "")
+    target = int_value(summary.get("sport_target_count"))
+    strict_sports = int_value(summary.get("strict_consensus_sport_count"))
+    covered = int_value(summary.get("sport_covered_count"))
+    mature_gaps = int_value(summary.get("sport_gap_count"))
+    deferred = int_value(summary.get("sport_deferred_count"))
+    strict_providers = int_value(summary.get("strict_consensus_provider_count"))
+    anchor_providers = int_value(summary.get("strict_anchor_provider_count"))
+    strict_complete = target > 0 and strict_sports >= target
+    mature_complete = target > 0 and covered >= target and mature_gaps == 0 and deferred == 0
+    implemented = (
+        provider_audit.get("exists") is not False
+        and bool(status_text)
+        and strict_providers >= 4
+        and anchor_providers >= 4
+    )
+    return row(
+        "CLAUDE-015",
+        "sharp_consensus_provider_coverage",
+        "satisfied" if strict_complete and mature_complete else "blocked_external",
+        (
+            f"status={provider_audit.get('status')}; strict_sports={strict_sports}/{target}; "
+            f"mature_sports={covered}/{target}; gaps={mature_gaps}; deferred={deferred}; "
+            f"strict_providers={strict_providers}; anchors={anchor_providers}"
+        ),
+        "Close remaining sport/provider gaps with timestamp-matched sharp or exchange sources before claiming all-sport consensus coverage.",
+        "provider_coverage",
+        implementation_status="satisfied" if implemented else "warning",
+    )
+
+
 def row(
     requirement_id: str,
     advice_area: str,
@@ -681,6 +718,7 @@ def next_action(rows: Sequence[Mapping[str, str]]) -> dict[str, str]:
         "CLAUDE-002",
         "CLAUDE-004",
         "CLAUDE-012",
+        "CLAUDE-015",
         "CLAUDE-014",
         "CLAUDE-013",
         "CLAUDE-008",
