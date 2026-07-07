@@ -102,6 +102,7 @@ def test_makefile_uses_configurable_roots_for_local_data_paths() -> None:
     assert "PREDMARKET_PROJECTS_ROOT ?=" in text
     assert "/home/mrwatson/manual_drops" not in text
     assert "/home/mrwatson/projects" not in text
+    assert "/mnt/c/Users/mrwat" not in text
 
 
 def test_donor_bridge_defaults_do_not_hardcode_local_roots() -> None:
@@ -154,6 +155,30 @@ def test_core_capture_reference_defaults_do_not_hardcode_local_roots() -> None:
         text = (REPO / relative).read_text(encoding="utf-8")
         assert "/home/mrwatson/manual_drops" not in text, relative
         assert "/home/mrwatson/projects" not in text, relative
+        assert "/mnt/c/Users/mrwat" not in text, relative
+
+
+def test_sports_consensus_key_file_default_follows_manual_drop_root(
+    monkeypatch, tmp_path: Path
+) -> None:
+    root = tmp_path / "manual"
+    override = tmp_path / "secrets" / "odds-key.txt"
+    monkeypatch.setenv("PREDMARKET_MANUAL_DROPS_ROOT", str(root))
+
+    builder = load_script(
+        "predmarket/sports_consensus_reference_builder.py",
+        "_path_default_sports_consensus_builder",
+    )
+
+    assert builder.DEFAULT_KEY_FILE == root / "secrets" / "the_odds_api_key.txt"
+
+    monkeypatch.setenv("KALSHI_SPORTS_CONSENSUS_KEY_FILE", str(override))
+    overridden = load_script(
+        "predmarket/sports_consensus_reference_builder.py",
+        "_path_override_sports_consensus_builder",
+    )
+
+    assert overridden.DEFAULT_KEY_FILE == override
 
 
 def test_world_cup_atp_replay_defaults_do_not_hardcode_local_roots() -> None:

@@ -75,7 +75,11 @@ THE_ODDS_API_ENDPOINT = "https://api.the-odds-api.com/v4/sports/{sport_key}/odds
 DEFAULT_REQUIRED_BOOKS = ("pinnacle", "betfair_ex_uk", "matchbook", "smarkets")
 DEFAULT_RAW_DIR = manual_drop_path("odds_api")
 DEFAULT_REFERENCE_JSON = manual_drop_path("predmarket", "sports-no-vig-consensus.json")
-DEFAULT_KEY_FILE = Path("/mnt/c/Users/mrwat/OneDrive/Desktop/Welcome to The Odds API!.txt")
+DEFAULT_KEY_FILE = manual_drop_path(
+    "secrets",
+    "the_odds_api_key.txt",
+    env_vars=("KALSHI_SPORTS_CONSENSUS_KEY_FILE", "THE_ODDS_API_KEY_FILE"),
+)
 
 Transport = Callable[[str, float], "HttpResponse"]
 
