@@ -1,3 +1,4 @@
+from predmarket.shared_helpers import manual_drop_path
 from predmarket.type2_reference_builder import (
     build_type2_reference,
     parse_kalshi_game_start_utc,
@@ -61,7 +62,9 @@ def _kalshi_payload():
 def _meta():
     return {
         "created_at_utc": "2026-06-20T22:59:34Z",
-        "raw_path": "/home/mrwatson/manual_drops/odds_api/baseball_mlb_current_20260620T225933Z.json",
+        "raw_path": str(
+            manual_drop_path("odds_api", "baseball_mlb_current_20260620T225933Z.json")
+        ),
         "sport_key": "baseball_mlb",
         "api_key_printed": False,
     }
