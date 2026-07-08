@@ -1,4 +1,4 @@
-.PHONY: setup check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen feature-flags-check validate-agents sync-labels quality-metrics quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control kalshi-sports-proxy-feature-packet kalshi-sports-proxy-observation-loop kalshi-sports-proxy-observation-watch-once kalshi-atp-proxy-observation-loop kalshi-atp-proxy-evidence-gate kalshi-atp-proxy-observation-watch-once kalshi-world-cup-proxy-observation-loop kalshi-world-cup-proxy-feature-model-falsification kalshi-world-cup-outcome-independence-diagnostic kalshi-world-cup-proxy-observation-watch-once kalshi-ghost-listing-depth-diagnostic kalshi-sports-stack-sequencing kalshi-sports-consensus-reference-build kalshi-sports-consensus-sharp-provider-capture kalshi-sports-consensus-soccer-asian-provider-diagnostic kalshi-sports-consensus-public-kalshi-refresh kalshi-sports-consensus-atp-donor-adapter kalshi-sports-consensus-nfl-adapter kalshi-sports-consensus-soccer-adapter kalshi-sports-consensus-nba-adapter kalshi-sports-consensus-refresh kalshi-sports-consensus-preflight kalshi-sports-consensus-observation-loop kalshi-sports-consensus-observation-watch-once kalshi-sports-consensus-falsification kalshi-resolved-archive-backfill kalshi-sports-historical-consensus-feasibility kalshi-sports-historical-consensus-backfill kalshi-sports-consensus-provider-audit kalshi-sports-event-velocity-eta kalshi-claude-advice-audit kalshi-sports-blocker-clearance-cycle kalshi-sports-line-move-delta-logger kalshi-tick-recorder kalshi-sports-microstructure-observation-loop kalshi-sports-microstructure-observation-watch-once kalshi-near-resolution-informed-flow-evidence-gate kalshi-near-resolution-flow-replay-gates kalshi-near-resolution-flow-terms-capture kalshi-passive-liquidity-provision-evidence-gate kalshi-passive-liquidity-paper-fill-loop kalshi-passive-liquidity-paper-fill-falsification kalshi-passive-liquidity-fill-clock-diagnostic kalshi-sports-nondirectional-evidence-watch-once kalshi-sports-evidence-cycle-report kalshi-sports-evidence-cycle kalshi-sports-label-accumulation-cycle kalshi-sports-paper-burn-in-cycle kalshi-always-on-collector kalshi-always-on-collector-once kalshi-sports-proxy-feature-model-falsification kalshi-sports-proxy-research-candidate-replay kalshi-sports-proxy-capacity-correlation-decay kalshi-sports-proxy-correlation-cluster-control kalshi-weather-proxy-feature-packet kalshi-weather-proxy-feature-watch-once kalshi-weather-proxy-observation-loop kalshi-weather-proxy-observation-watch-once kalshi-weather-proxy-feature-model-falsification kalshi-weather-proxy-research-candidate-replay kalshi-weather-proxy-capacity-correlation-decay kalshi-weather-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-source-repo-inventory kalshi-external-artifact-wrap kalshi-external-artifact-preflight kalshi-signal-formula-registry kalshi-prior-only-donor-gate kalshi-paper-decision-candidates kalshi-paper-settlement-reconcile kalshi-signal-decay-retirement kalshi-jurisdiction-refresh kalshi-live-preflight kalshi-live-demo kalshi-live-trader kalshi-live-reconcile kalshi-live-risk-snapshot kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
+.PHONY: setup venv-ready check-env test test-unit test-integration lint lint-baseline-check lint-baseline-regen format typecheck modularize deadcode deptry dup-check tech-debt tech-debt-check tech-debt-regen file-sizes file-sizes-check file-sizes-regen feature-flags-check validate-agents sync-labels quality-metrics quality run clean coverage openapi kalshi-discovery kalshi-rank kalshi-cycle kalshi-ledger kalshi-desk kalshi-smoke kalshi-verify kalshi-manual-drop-capture kalshi-universe-scan kalshi-universe-watch-once kalshi-signal-factory-status kalshi-hypothesis-registry kalshi-labeled-observation-builder kalshi-labeled-observation-watch-once kalshi-labeled-oos-backtest kalshi-probability-breadth-scout kalshi-probability-breadth-watch-once kalshi-crypto-proxy-feature-packet kalshi-crypto-proxy-feature-watch-once kalshi-crypto-proxy-observation-loop kalshi-crypto-proxy-observation-watch-once kalshi-crypto-proxy-feature-model-falsification kalshi-crypto-proxy-research-candidate-replay kalshi-crypto-proxy-capacity-correlation-decay kalshi-crypto-proxy-correlation-cluster-control kalshi-sports-proxy-feature-packet kalshi-sports-proxy-observation-loop kalshi-sports-proxy-observation-watch-once kalshi-atp-proxy-observation-loop kalshi-atp-proxy-evidence-gate kalshi-atp-proxy-observation-watch-once kalshi-world-cup-proxy-observation-loop kalshi-world-cup-proxy-feature-model-falsification kalshi-world-cup-outcome-independence-diagnostic kalshi-world-cup-proxy-observation-watch-once kalshi-ghost-listing-depth-diagnostic kalshi-sports-stack-sequencing kalshi-sports-consensus-reference-build kalshi-sports-consensus-sharp-provider-capture kalshi-sports-consensus-soccer-asian-provider-diagnostic kalshi-sports-consensus-public-kalshi-refresh kalshi-sports-consensus-atp-donor-adapter kalshi-sports-consensus-nfl-adapter kalshi-sports-consensus-soccer-adapter kalshi-sports-consensus-nba-adapter kalshi-sports-consensus-refresh kalshi-sports-consensus-preflight kalshi-sports-consensus-observation-loop kalshi-sports-consensus-observation-watch-once kalshi-sports-consensus-falsification kalshi-resolved-archive-backfill kalshi-sports-historical-consensus-feasibility kalshi-sports-historical-consensus-backfill kalshi-sports-consensus-provider-audit kalshi-sports-event-velocity-eta kalshi-claude-advice-audit kalshi-sports-blocker-clearance-cycle kalshi-sports-line-move-delta-logger kalshi-tick-recorder kalshi-sports-microstructure-observation-loop kalshi-sports-microstructure-observation-watch-once kalshi-near-resolution-informed-flow-evidence-gate kalshi-near-resolution-flow-replay-gates kalshi-near-resolution-flow-terms-capture kalshi-passive-liquidity-provision-evidence-gate kalshi-passive-liquidity-paper-fill-loop kalshi-passive-liquidity-paper-fill-falsification kalshi-passive-liquidity-fill-clock-diagnostic kalshi-sports-nondirectional-evidence-watch-once kalshi-sports-evidence-cycle-report kalshi-sports-evidence-cycle kalshi-sports-label-accumulation-cycle kalshi-sports-paper-burn-in-cycle kalshi-always-on-collector kalshi-always-on-collector-once kalshi-sports-proxy-feature-model-falsification kalshi-sports-proxy-research-candidate-replay kalshi-sports-proxy-capacity-correlation-decay kalshi-sports-proxy-correlation-cluster-control kalshi-weather-proxy-feature-packet kalshi-weather-proxy-feature-watch-once kalshi-weather-proxy-observation-loop kalshi-weather-proxy-observation-watch-once kalshi-weather-proxy-feature-model-falsification kalshi-weather-proxy-research-candidate-replay kalshi-weather-proxy-capacity-correlation-decay kalshi-weather-proxy-correlation-cluster-control type2-reference-build type2-reference-preflight type2-paper-matcher type2-candidate-disposition type2-threshold-sensitivity kalshi-source-repo-inventory kalshi-external-artifact-wrap kalshi-external-artifact-preflight kalshi-signal-formula-registry kalshi-prior-only-donor-gate kalshi-paper-decision-candidates kalshi-paper-settlement-reconcile kalshi-signal-decay-retirement kalshi-jurisdiction-refresh kalshi-live-preflight kalshi-live-demo kalshi-live-trader kalshi-live-reconcile kalshi-live-risk-snapshot kalshi-ev-ledger kalshi-ev-overlay-preflight kalshi-ev-calibration-work-order kalshi-ev-contract-mapping-work-order kalshi-ev-local-contract-evidence-scout kalshi-ev-nfl-overlay-assembler kalshi-ev-review-queue kalshi-ev-queue-robustness macro-status macro-route macro-unlock-scout macro-blocker-audit
 
 # Default target
 help:
@@ -128,11 +128,11 @@ help:
 	@echo "  make docker    — Build Docker image"
 
 # ---- Environment ----
-VENV := .venv
-PYTHON := $(VENV)/bin/python
-PIP := $(VENV)/bin/pip
-PYTEST := $(VENV)/bin/pytest
-ALEMBIC := $(VENV)/bin/alembic
+VENV ?= .venv
+PYTHON ?= $(VENV)/bin/python
+PIP ?= $(VENV)/bin/pip
+PYTEST ?= $(VENV)/bin/pytest
+ALEMBIC ?= $(VENV)/bin/alembic
 TMPDIR := $(CURDIR)/.tmp
 PREDMARKET_MANUAL_DROPS_ROOT ?= $(HOME)/manual_drops
 PREDMARKET_PROJECTS_ROOT ?= $(HOME)/projects
@@ -579,7 +579,16 @@ $(VENV):
 	python3 -m venv $(VENV)
 	$(PIP) install --upgrade pip setuptools wheel
 
-setup: $(VENV)
+venv-ready:
+	@if [ ! -x "$(PYTHON)" ]; then \
+		echo "Python runtime $(PYTHON) is missing or not executable; recreating $(VENV)"; \
+		rm -rf "$(VENV)"; \
+		python3 -m venv "$(VENV)"; \
+		"$(PYTHON)" -m pip install --upgrade pip setuptools wheel; \
+		"$(PYTHON)" -m pip install -r requirements.txt; \
+	fi
+
+setup: venv-ready
 	$(PIP) install -r requirements.txt
 	$(PIP) install -r dev-requirements.txt
 	@echo "Setup complete. Activate with: source $(VENV)/bin/activate"
@@ -587,7 +596,7 @@ setup: $(VENV)
 $(TMPDIR):
 	mkdir -p $(TMPDIR)
 
-check-env: $(VENV)
+check-env: venv-ready
 	PYTHONPATH=. $(PYTHON) -c "import prometheus_client, aiohttp; from pythonjsonlogger.json import JsonFormatter; import predmarket.execution; print('runtime imports ok')"
 
 # ---- Testing ----
@@ -762,7 +771,7 @@ kalshi-manual-drop-capture:
 		--report-dir $(KALSHI_MANUAL_DROP_REPORT_DIR) \
 		--run-id $(KALSHI_MANUAL_DROP_RUN_ID)
 
-kalshi-universe-scan:
+kalshi-universe-scan: venv-ready
 	@PYTHONPATH=. $(PYTHON) -m predmarket.kalshi_universe_scan \
 		--write \
 		--min-close-hours $(KALSHI_UNIVERSE_MIN_CLOSE_HOURS) \
