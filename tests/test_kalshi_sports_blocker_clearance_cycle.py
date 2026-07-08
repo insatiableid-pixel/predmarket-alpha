@@ -236,7 +236,7 @@ def test_blocker_clearance_cycle_backs_off_after_recent_successful_due_run(
     assert "retry backoff is active" in event_task["reason"]
 
 
-def test_blocker_clearance_cycle_prefers_known_future_probe_over_short_cooldown(
+def test_blocker_clearance_cycle_does_not_use_unrelated_future_probe_for_due_backoff(
     tmp_path: Path,
 ) -> None:
     module = load_module()
@@ -284,9 +284,123 @@ def test_blocker_clearance_cycle_prefers_known_future_probe_over_short_cooldown(
     )
 
     assert report["status"] == "sports_blocker_clearance_cycle_waiting_for_next_clock"
+    assert report["summary"]["next_clock_utc"] == "2026-07-06T19:27:00Z"
+    assert report["tasks"][0]["backoff_until_utc"] == "2026-07-06T19:27:00Z"
+    assert report["tasks"][0]["fallback_retry_utc"] is None
+
+
+def test_blocker_clearance_cycle_prefers_same_surface_future_probe_over_short_cooldown(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    event_path = write_json(
+        tmp_path / "event.json",
+        {
+            **event_velocity("2026-07-06T19:35:00Z"),
+            "summary": {
+                **event_velocity("2026-07-06T19:35:00Z")["summary"],
+                "next_due_surface": {
+                    "surface_id": "sports_consensus_mlb",
+                    "next_probe_utc": "2026-07-06T19:10:00Z",
+                    "due_count": 6,
+                },
+                "next_probe_surface": {
+                    "surface_id": "sports_consensus_mlb",
+                    "next_probe_utc": "2026-07-06T19:35:00Z",
+                    "oos_deficit": 5,
+                },
+            },
+        },
+    )
+    atp_path = write_json(tmp_path / "atp.json", atp_gate(next_probe="2026-07-07T06:00:00Z"))
+    audit_path = write_json(tmp_path / "audit.json", audit())
+    previous_path = write_json(
+        tmp_path / "previous-cycle.json",
+        {
+            "status": "sports_blocker_clearance_cycle_ran_due_actions",
+            "generated_utc": "2026-07-06T19:12:00Z",
+            "command_results": [
+                {"task_id": "sports_consensus_settlement_probe", "returncode": 0},
+            ],
+        },
+    )
+
+    report = module.build_report(
+        event_velocity_path=event_path,
+        atp_gate_path=atp_path,
+        audit_path=audit_path,
+        atp_repo=tmp_path / "atp-oracle",
+        previous_cycle_path=previous_path,
+        now=datetime(2026, 7, 6, 19, 15, tzinfo=UTC),
+        run_due=False,
+        due_retry_cooldown_seconds=900,
+    )
+
+    assert report["status"] == "sports_blocker_clearance_cycle_waiting_for_next_clock"
     assert report["summary"]["next_clock_utc"] == "2026-07-06T19:35:00Z"
     assert report["tasks"][0]["backoff_until_utc"] == "2026-07-06T19:35:00Z"
     assert report["tasks"][0]["fallback_retry_utc"] == "2026-07-06T19:35:00Z"
+
+
+def test_blocker_clearance_cycle_does_not_perpetuate_stale_cross_surface_backoff(
+    tmp_path: Path,
+) -> None:
+    module = load_module()
+    event_path = write_json(
+        tmp_path / "event.json",
+        {
+            **event_velocity("2026-07-06T19:35:00Z"),
+            "summary": {
+                **event_velocity("2026-07-06T19:35:00Z")["summary"],
+                "next_due_surface": {
+                    "surface_id": "sports_consensus_mlb",
+                    "next_probe_utc": "2026-07-06T19:10:00Z",
+                    "due_count": 6,
+                },
+                "next_probe_surface": {
+                    "surface_id": "sports_consensus_nfl",
+                    "next_probe_utc": "2026-07-06T19:35:00Z",
+                    "oos_deficit": 5,
+                },
+            },
+        },
+    )
+    atp_path = write_json(tmp_path / "atp.json", atp_gate(next_probe="2026-07-07T06:00:00Z"))
+    audit_path = write_json(tmp_path / "audit.json", audit())
+    previous_path = write_json(
+        tmp_path / "previous-cycle.json",
+        {
+            "status": "sports_blocker_clearance_cycle_waiting_for_next_clock",
+            "generated_utc": "2026-07-06T19:15:00Z",
+            "tasks": [
+                {
+                    "task_id": "sports_consensus_settlement_probe",
+                    "surface_id": "sports_consensus_mlb",
+                    "due": False,
+                    "due_utc": "2026-07-06T19:35:00Z",
+                    "backoff_until_utc": "2026-07-06T19:35:00Z",
+                    "fallback_retry_utc": None,
+                }
+            ],
+            "command_results": [],
+        },
+    )
+
+    report = module.build_report(
+        event_velocity_path=event_path,
+        atp_gate_path=atp_path,
+        audit_path=audit_path,
+        atp_repo=tmp_path / "atp-oracle",
+        previous_cycle_path=previous_path,
+        now=datetime(2026, 7, 6, 19, 31, tzinfo=UTC),
+        run_due=False,
+        due_retry_cooldown_seconds=900,
+    )
+
+    assert report["status"] == "sports_blocker_clearance_cycle_due_actions_available"
+    assert report["summary"]["due_task_count"] == 1
+    assert report["tasks"][0]["backoff_until_utc"] is None
+    assert report["tasks"][0]["fallback_retry_utc"] is None
 
 
 def test_blocker_clearance_cycle_does_not_back_off_failed_due_run(tmp_path: Path) -> None:
