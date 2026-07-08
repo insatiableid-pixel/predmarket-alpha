@@ -228,13 +228,38 @@ def due_retry_time(
     ):
         retry_candidates.append(generated + timedelta(seconds=cooldown_seconds))
     previous_backoff = previous_backoff_until(previous_cycle, task_id=task.task_id)
-    if previous_backoff and previous_backoff > now:
+    if valid_previous_backoff(
+        previous_backoff,
+        previous_cycle=previous_cycle,
+        task=task,
+        now=now,
+        cooldown_seconds=cooldown_seconds,
+    ):
         retry_candidates.append(previous_backoff)
     fallback_retry = parse_utc(task.fallback_retry_utc)
     if retry_candidates and fallback_retry and fallback_retry > now:
         retry_candidates.append(fallback_retry)
     future = [candidate for candidate in retry_candidates if candidate > now]
     return max(future) if future else None
+
+
+def valid_previous_backoff(
+    previous_backoff: datetime | None,
+    *,
+    previous_cycle: Mapping[str, Any],
+    task: PlannedTask,
+    now: datetime,
+    cooldown_seconds: int,
+) -> bool:
+    if previous_backoff is None or previous_backoff <= now:
+        return False
+    fallback_retry = parse_utc(task.fallback_retry_utc)
+    if fallback_retry is not None and previous_backoff <= fallback_retry:
+        return True
+    generated = parse_utc(previous_cycle.get("generated_utc"))
+    if generated is None:
+        return False
+    return previous_backoff <= generated + timedelta(seconds=cooldown_seconds)
 
 
 def previous_backoff_until(previous_cycle: Mapping[str, Any], *, task_id: str) -> datetime | None:
@@ -298,8 +323,23 @@ def event_velocity_task(event_velocity: Mapping[str, Any], *, now: datetime) -> 
                 "KALSHI_SPORTS_PAPER_BURN_IN_FETCH=1",
             ),
         ),
-        fallback_retry_utc=first_text(probe_surface.get("next_probe_utc")) if due_surface else None,
+        fallback_retry_utc=same_surface_probe_retry_utc(
+            due_surface=due_surface,
+            probe_surface=probe_surface,
+        ),
     )
+
+
+def same_surface_probe_retry_utc(
+    *, due_surface: Mapping[str, Any], probe_surface: Mapping[str, Any]
+) -> str | None:
+    if not due_surface or not probe_surface:
+        return None
+    due_id = str(due_surface.get("surface_id") or "")
+    probe_id = str(probe_surface.get("surface_id") or "")
+    if not due_id or due_id != probe_id:
+        return None
+    return first_text(probe_surface.get("next_probe_utc"))
 
 
 def atp_forward_oos_task(
