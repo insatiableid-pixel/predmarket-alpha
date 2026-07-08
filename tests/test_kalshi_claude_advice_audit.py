@@ -169,6 +169,7 @@ def base_inputs(tmp_path: Path) -> dict[str, Path]:
                 channel_counts={"ticker": 1, "orderbook_delta": 1},
                 recorded_line_count=0,
                 gap_count=0,
+                error="KalshiAuthError: Kalshi private key value is not valid PEM.",
             ),
         ),
         "resolved_archive": write_json(
@@ -262,6 +263,7 @@ def test_claude_advice_audit_classifies_current_goal_state(tmp_path: Path) -> No
     assert rows["CLAUDE-011"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-012"]["status"] == "blocked_external"
     assert rows["CLAUDE-012"]["implementation_status"] == "satisfied"
+    assert "auth_error=invalid_private_key_pem" in rows["CLAUDE-012"]["evidence"]
     assert rows["CLAUDE-013"]["status"] == "satisfied"
     assert rows["CLAUDE-013"]["implementation_status"] == "satisfied"
     assert rows["CLAUDE-014"]["status"] == "blocked_external"

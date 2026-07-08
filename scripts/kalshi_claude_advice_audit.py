@@ -504,6 +504,7 @@ def tick_recorder_row(tick_recorder: Mapping[str, Any]) -> dict[str, str]:
     ticker_count = int_value(summary.get("ticker_count"))
     recorded = int_value(summary.get("recorded_line_count"))
     gaps = int_value(summary.get("gap_count"))
+    auth_error = tick_recorder_auth_error(summary.get("error"))
     has_required_channels = int_value(channels.get("ticker")) > 0 and int_value(
         channels.get("orderbook_delta")
     ) > 0
@@ -521,12 +522,28 @@ def tick_recorder_row(tick_recorder: Mapping[str, Any]) -> dict[str, str]:
         "satisfied" if ready else "blocked_external",
         (
             f"status={tick_recorder.get('status')}; tickers={ticker_count}; "
-            f"channels={dict(channels)}; recorded_lines={recorded}; gaps={gaps}"
+            f"channels={dict(channels)}; recorded_lines={recorded}; gaps={gaps}; "
+            f"auth_error={auth_error}"
         ),
         "Configure read-only Kalshi WebSocket auth and run the tick recorder until append-only ticker/orderbook_delta rows accrue.",
         "kalshi_market_data_auth" if auth_blocked else "market_data_capture",
         implementation_status="satisfied" if implemented else "warning",
     )
+
+
+def tick_recorder_auth_error(value: Any) -> str | None:
+    text = str(value or "").lower()
+    if not text:
+        return None
+    if "not valid pem" in text:
+        return "invalid_private_key_pem"
+    if "private key is required" in text:
+        return "missing_private_key"
+    if "no such file" in text or "not found" in text:
+        return "missing_private_key_path"
+    if "401" in text or "unauthorized" in text:
+        return "kalshi_auth_rejected"
+    return "kalshi_auth_or_websocket_error"
 
 
 def resolved_archive_backfill_row(resolved_archive: Mapping[str, Any]) -> dict[str, str]:

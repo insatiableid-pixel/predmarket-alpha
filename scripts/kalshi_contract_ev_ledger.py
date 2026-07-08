@@ -46,23 +46,17 @@ NEAR_RESOLUTION_FLOW_REPLAY_RELATIVE_PATH = Path(
 DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH = (
     MACRO_DIR / "latest-kalshi-near-resolution-flow-replay-gates.json"
 )
-DEFAULT_NFL_FAIR_LINE_REVIEW_PATH = (
-    project_path(
-        "nfl_quant_glm51_greenfield",
-        "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
-    )
+DEFAULT_NFL_FAIR_LINE_REVIEW_PATH = project_path(
+    "nfl_quant_glm51_greenfield",
+    "docs/codex/artifacts/nfl-line-readiness-latest/fair-line-review.json",
 )
-DEFAULT_NFL_HISTORICAL_LINE_BACKTEST_PATH = (
-    project_path(
-        "nfl_quant_glm51_greenfield",
-        "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
-    )
+DEFAULT_NFL_HISTORICAL_LINE_BACKTEST_PATH = project_path(
+    "nfl_quant_glm51_greenfield",
+    "docs/codex/artifacts/nfl-historical-line-backtest-latest/historical-line-backtest.json",
 )
-DEFAULT_NFL_HISTORICAL_LINE_VALIDATION_PATH = (
-    project_path(
-        "nfl_quant_glm51_greenfield",
-        "docs/codex/artifacts/nfl-historical-line-validation-latest/historical-line-validation-summary.json",
-    )
+DEFAULT_NFL_HISTORICAL_LINE_VALIDATION_PATH = project_path(
+    "nfl_quant_glm51_greenfield",
+    "docs/codex/artifacts/nfl-historical-line-validation-latest/historical-line-validation-summary.json",
 )
 SPORTS_PROJECTION_MODEL_BLOCKER = (
     "sports projection or strength-model probability is not the primary sports model; "
@@ -78,9 +72,7 @@ OFFICIAL_TERMS_SNAPSHOT_PATHS = (
     CONTROL_REPO / "data",
 )
 CALIBRATED_PROBABILITY_OVERLAY_PATHS = (
-    manual_drop_path(
-        "kalshi_ev_probabilities", env_vars=("KALSHI_EV_CALIBRATED_PROBABILITY_DIR",)
-    ),
+    manual_drop_path("kalshi_ev_probabilities", env_vars=("KALSHI_EV_CALIBRATED_PROBABILITY_DIR",)),
 )
 CONTRACT_MAPPING_OVERLAY_PATHS = (
     manual_drop_path("kalshi_ev_contract_mappings", env_vars=("KALSHI_EV_CONTRACT_MAPPING_DIR",)),
@@ -416,9 +408,7 @@ def adapt_repo(
                     "A new source-backed NBA signal or market dataset plus exact Kalshi ticker/side/rules/quote "
                     "mapping for the target contract class."
                 ),
-                "next_local_command": local_make_command(
-                    "nba-analytics-platform", "macro-status"
-                ),
+                "next_local_command": local_make_command("nba-analytics-platform", "macro-status"),
             },
         )
     if repo_id == "atp-oracle":
@@ -464,9 +454,7 @@ def adapt_repo(
                     "Fresh ATP validation/promotion evidence plus D3/G5/P5 external proof and exact Kalshi "
                     "ticker/side/rules/quote mapping."
                 ),
-                "next_local_command": local_make_command(
-                    "atp-oracle", "type2-g1g2-diagnostic"
-                ),
+                "next_local_command": local_make_command("atp-oracle", "type2-g1g2-diagnostic"),
             },
         )
     return blocked_feed(
@@ -596,6 +584,15 @@ def adapt_predmarket(
         )
     )
     rows.extend(
+        adapt_world_cup_ccd_paper_overlay_rows(
+            repo_id=repo_id,
+            repo_path=repo_path,
+            max_rows=max_rows,
+            official_terms=official_terms,
+            source_row_offset=len(rows),
+        )
+    )
+    rows.extend(
         adapt_near_resolution_flow_ev_rows(
             repo_id=repo_id,
             repo_path=repo_path,
@@ -621,6 +618,14 @@ def adapt_predmarket(
             str(
                 repo_path
                 / "docs/codex/macro/latest-kalshi-sports-proxy-correlation-cluster-control.json"
+            ),
+            str(
+                repo_path
+                / "docs/codex/macro/latest-kalshi-world-cup-proxy-capacity-correlation-decay.json"
+            ),
+            str(
+                repo_path
+                / "docs/codex/macro/latest-kalshi-world-cup-proxy-correlation-cluster-control.json"
             ),
             str(DEFAULT_NEAR_RESOLUTION_FLOW_REPLAY_PATH),
             *resolution_source_artifacts(rows),
@@ -857,6 +862,144 @@ def sports_ccd_paper_overlay_ev_row(
             "decay_gate_status": "decay_survival_pass",
             "decay_status": "decay_survival_pass",
             "sports_probability_source_gate_status": "blocked_projection_model_not_consensus",
+            "correlation_cluster_key": capacity.get("correlation_cluster_key"),
+            "close_time": capacity.get("close_time"),
+            "controlled_capacity_cost": json_float(
+                optional_float(capacity.get("controlled_depth_cost"))
+            ),
+            "controlled_capacity_contracts": json_float(
+                optional_float(capacity.get("controlled_depth_contracts"))
+            ),
+        }
+    )
+    return row
+
+
+def adapt_world_cup_ccd_paper_overlay_rows(
+    *,
+    repo_id: str,
+    repo_path: Path,
+    max_rows: int,
+    official_terms: dict[str, OfficialKalshiTerms],
+    source_row_offset: int = 0,
+) -> list[dict[str, Any]]:
+    cluster_path = (
+        repo_path
+        / "docs/codex/macro/latest-kalshi-world-cup-proxy-correlation-cluster-control.json"
+    )
+    cluster = read_json_or_none(cluster_path)
+    if not safe_research_report(cluster):
+        return []
+    if (
+        cluster.get("status")
+        != "world_cup_proxy_correlation_cluster_control_ready_for_paper_overlay"
+    ):
+        return []
+    controlled_rows = [
+        row
+        for row in cluster.get("controlled_rows", [])
+        if isinstance(row, dict)
+        and row.get("gate_status") == "pass"
+        and optional_float(row.get("controlled_depth_cost")) is not None
+        and float(row.get("controlled_depth_cost") or 0.0) > 0.0
+    ]
+    rows: list[dict[str, Any]] = []
+    for index, capacity in enumerate(controlled_rows[:max_rows]):
+        rows.append(
+            world_cup_ccd_paper_overlay_ev_row(
+                repo_id=repo_id,
+                source_artifact=cluster_path,
+                source_row_index=source_row_offset + index,
+                capacity=capacity,
+                official_terms=official_terms,
+            )
+        )
+    return rows
+
+
+def world_cup_signal_formula_key(model_id: str) -> str:
+    if model_id == "world_cup_longshot_fade_directional_accuracy":
+        return "world_cup_longshot_fade_price_bucket"
+    if model_id == "world_cup_market_consensus_directional_accuracy":
+        return "world_cup_market_consensus_price_bucket"
+    return "world_cup_market_structure_price_bucket"
+
+
+def world_cup_ccd_paper_overlay_ev_row(
+    *,
+    repo_id: str,
+    source_artifact: Path,
+    source_row_index: int,
+    capacity: dict[str, Any],
+    official_terms: dict[str, OfficialKalshiTerms],
+) -> dict[str, Any]:
+    contract_ticker = str(capacity.get("contract_ticker") or "").strip()
+    side = str(capacity.get("predicted_side") or "yes").lower()
+    calibrated_probability = optional_float(
+        capacity.get("conservative_calibrated_side_probability")
+    )
+    all_in_cost = optional_float(capacity.get("best_all_in_break_even_probability"))
+    source_model_id = str(
+        capacity.get("source_model_id") or "world_cup_proxy_fdr_wilson_replay_ccd"
+    )
+    resolution = resolution_rule_fields(
+        contract_ticker=contract_ticker,
+        inferred_rule=current_sports_resolution_rule(capacity),
+        inferred_source="inferred_from_world_cup_ccd_capacity_row",
+        official_terms=official_terms,
+    )
+    row = make_ev_row(
+        source_repo_id=repo_id,
+        source_artifact=source_artifact,
+        source_row_index=source_row_index,
+        contract_ticker=contract_ticker,
+        event_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        market_ticker=str(capacity.get("event_ticker") or event_from_contract(contract_ticker)),
+        side=side,
+        selection=side,
+        market_type="sports_world_cup_price_bucket_ccd_paper_overlay",
+        title=str(capacity.get("title") or ""),
+        resolution_rule=resolution["resolution_rule"] or "",
+        resolution_rule_source=resolution["resolution_rule_source"] or "",
+        resolution_rule_status=resolution["resolution_rule_status"] or "",
+        display_price=all_in_cost,
+        display_price_source="world_cup_ccd_best_all_in_break_even_probability",
+        executable_price_source="world_cup_ccd_best_all_in_break_even_probability",
+        fee_estimate=None,
+        slippage_buffer=None,
+        explicit_all_in_cost=all_in_cost,
+        all_in_payout_multiple=None,
+        kalshi_payout_multiple=None,
+        calibrated_probability=calibrated_probability,
+        calibrated_probability_source="world_cup_proxy_fdr_wilson_replay_ccd",
+        calibration_status="validated_calibrated_probability",
+        calibrated_probability_source_artifact=str(source_artifact),
+        calibrated_probability_source_sha256=sha256_file(source_artifact),
+        reference_probability=calibrated_probability,
+        reference_probability_source="world_cup_conservative_calibrated_side_probability",
+        probability_uncertainty=None,
+        kalshi_bid=None,
+        kalshi_ask=all_in_cost,
+        kalshi_midpoint=all_in_cost,
+        gate_status="pass",
+        gate_reasons=[],
+        review_status="world_cup_price_bucket_probability_validated_by_oos_fdr",
+        timing_status="pregame_clean",
+        mapping_confidence="exact_contract_ticker_from_world_cup_ccd",
+        resolution_rule_source_artifact=resolution["resolution_rule_source_artifact"],
+        resolution_rule_source_sha256=resolution["resolution_rule_source_sha256"],
+    )
+    row.update(
+        {
+            "family_id": "world_cup_soccer",
+            "model_id": source_model_id,
+            "signal_formula_key": world_cup_signal_formula_key(source_model_id),
+            "capacity_estimate": json_float(optional_float(capacity.get("controlled_depth_cost"))),
+            "capacity_gate_status": "pass",
+            "correlation_cluster_gate_status": "pass",
+            "decay_gate_status": "decay_survival_pass",
+            "decay_status": "decay_survival_pass",
+            "sports_probability_source_gate_status": "pass_price_bucket_bias_family",
             "correlation_cluster_key": capacity.get("correlation_cluster_key"),
             "close_time": capacity.get("close_time"),
             "controlled_capacity_cost": json_float(
