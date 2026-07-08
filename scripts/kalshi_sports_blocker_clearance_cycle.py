@@ -14,7 +14,7 @@ import subprocess
 import sys
 from collections.abc import Mapping, Sequence
 from dataclasses import dataclass
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -35,6 +35,8 @@ DEFAULT_ATP_GATE_PATH = MACRO_DIR / "latest-kalshi-atp-proxy-evidence-gate.json"
 DEFAULT_AUDIT_PATH = MACRO_DIR / "latest-kalshi-claude-advice-audit.json"
 DEFAULT_ATP_REPO = project_path("atp-oracle")
 DEFAULT_OUT_DIR = MACRO_DIR / "kalshi-sports-blocker-clearance-cycle-latest"
+DEFAULT_PREVIOUS_CYCLE_PATH = MACRO_DIR / "latest-kalshi-sports-blocker-clearance-cycle.json"
+DEFAULT_DUE_RETRY_COOLDOWN_SECONDS = 900
 
 
 @dataclass(frozen=True)
@@ -45,6 +47,8 @@ class PlannedTask:
     due: bool
     reason: str
     commands: tuple[tuple[str, ...], ...]
+    backoff_until_utc: str | None = None
+    fallback_retry_utc: str | None = None
 
 
 def utc_now() -> datetime:
@@ -78,19 +82,28 @@ def build_report(
     atp_gate_path: Path = DEFAULT_ATP_GATE_PATH,
     audit_path: Path = DEFAULT_AUDIT_PATH,
     atp_repo: Path = DEFAULT_ATP_REPO,
+    previous_cycle_path: Path | None = None,
     now: datetime | None = None,
     run_due: bool = False,
     command_timeout_seconds: int = 900,
+    due_retry_cooldown_seconds: int = DEFAULT_DUE_RETRY_COOLDOWN_SECONDS,
 ) -> dict[str, Any]:
     generated = now or utc_now()
     event_velocity = read_json_or_empty(event_velocity_path)
     atp_gate = read_json_or_empty(atp_gate_path)
     audit = read_json_or_empty(audit_path)
+    previous_cycle = read_json_or_empty(previous_cycle_path) if previous_cycle_path else {}
     tasks = build_tasks(
         event_velocity=event_velocity,
         atp_gate=atp_gate,
         atp_repo=atp_repo,
         now=generated,
+    )
+    tasks = apply_recent_due_backoff(
+        tasks,
+        previous_cycle=previous_cycle,
+        now=generated,
+        cooldown_seconds=due_retry_cooldown_seconds,
     )
     due_tasks = [task for task in tasks if task.due]
     results: list[dict[str, Any]] = []
@@ -128,6 +141,8 @@ def build_report(
             "atp_gate_path": str(atp_gate_path),
             "audit_path": str(audit_path),
             "atp_repo": str(atp_repo),
+            "previous_cycle_path": str(previous_cycle_path) if previous_cycle_path else None,
+            "due_retry_cooldown_seconds": due_retry_cooldown_seconds,
         },
         "summary": summary(tasks=tasks, results=results, run_due=run_due, audit=audit),
         "tasks": [task_to_dict(task) for task in tasks],
@@ -154,11 +169,111 @@ def build_tasks(
     return tasks
 
 
+def apply_recent_due_backoff(
+    tasks: Sequence[PlannedTask],
+    *,
+    previous_cycle: Mapping[str, Any],
+    now: datetime,
+    cooldown_seconds: int,
+) -> list[PlannedTask]:
+    if cooldown_seconds <= 0:
+        return list(tasks)
+    adjusted: list[PlannedTask] = []
+    for task in tasks:
+        retry_at = due_retry_time(
+            task,
+            previous_cycle=previous_cycle,
+            now=now,
+            cooldown_seconds=cooldown_seconds,
+        )
+        if task.due and retry_at is not None and retry_at > now:
+            retry_text = utc_string(retry_at)
+            adjusted.append(
+                PlannedTask(
+                    task_id=task.task_id,
+                    surface_id=task.surface_id,
+                    due_utc=retry_text,
+                    due=False,
+                    reason=(
+                        f"{task.reason} A recent successful due run or active backoff is present; "
+                        f"retry backoff is active until {retry_text}."
+                    ),
+                    commands=task.commands,
+                    backoff_until_utc=retry_text,
+                    fallback_retry_utc=task.fallback_retry_utc,
+                )
+            )
+        else:
+            adjusted.append(task)
+    return adjusted
+
+
+def due_retry_time(
+    task: PlannedTask,
+    *,
+    previous_cycle: Mapping[str, Any],
+    now: datetime,
+    cooldown_seconds: int,
+) -> datetime | None:
+    if not task.due:
+        return None
+    retry_candidates: list[datetime] = []
+    generated = parse_utc(previous_cycle.get("generated_utc"))
+    successful_task_ids = successful_due_task_ids(previous_cycle)
+    if (
+        generated is not None
+        and generated <= now
+        and previous_cycle.get("status") == "sports_blocker_clearance_cycle_ran_due_actions"
+        and task.task_id in successful_task_ids
+    ):
+        retry_candidates.append(generated + timedelta(seconds=cooldown_seconds))
+    previous_backoff = previous_backoff_until(previous_cycle, task_id=task.task_id)
+    if previous_backoff and previous_backoff > now:
+        retry_candidates.append(previous_backoff)
+    fallback_retry = parse_utc(task.fallback_retry_utc)
+    if retry_candidates and fallback_retry and fallback_retry > now:
+        retry_candidates.append(fallback_retry)
+    future = [candidate for candidate in retry_candidates if candidate > now]
+    return max(future) if future else None
+
+
+def previous_backoff_until(previous_cycle: Mapping[str, Any], *, task_id: str) -> datetime | None:
+    tasks = previous_cycle.get("tasks")
+    if not isinstance(tasks, Sequence) or isinstance(tasks, (str, bytes)):
+        return None
+    for item in tasks:
+        if not isinstance(item, Mapping) or item.get("task_id") != task_id:
+            continue
+        parsed = parse_utc(item.get("backoff_until_utc"))
+        if parsed is not None:
+            return parsed
+    return None
+
+
+def successful_due_task_ids(previous_cycle: Mapping[str, Any]) -> set[str]:
+    results = previous_cycle.get("command_results")
+    if not isinstance(results, Sequence) or isinstance(results, (str, bytes)):
+        return set()
+    succeeded: set[str] = set()
+    failed: set[str] = set()
+    for item in results:
+        if not isinstance(item, Mapping):
+            continue
+        task_id = str(item.get("task_id") or "")
+        if not task_id or task_id == "post_run_claude_advice_audit":
+            continue
+        if int_value(item.get("returncode")) == 0:
+            succeeded.add(task_id)
+        else:
+            failed.add(task_id)
+    return succeeded - failed
+
+
 def event_velocity_task(event_velocity: Mapping[str, Any], *, now: datetime) -> PlannedTask | None:
     summary = value_mapping(event_velocity.get("summary"))
-    surface = value_mapping(summary.get("next_due_surface")) or value_mapping(
-        summary.get("next_probe_surface")
-    )
+    due_surface = value_mapping(summary.get("next_due_surface"))
+    probe_surface = value_mapping(summary.get("next_probe_surface"))
+    surface = due_surface or probe_surface
     if not surface:
         return None
     due_text = first_text(
@@ -183,6 +298,7 @@ def event_velocity_task(event_velocity: Mapping[str, Any], *, now: datetime) -> 
                 "KALSHI_SPORTS_PAPER_BURN_IN_FETCH=1",
             ),
         ),
+        fallback_retry_utc=first_text(probe_surface.get("next_probe_utc")) if due_surface else None,
     )
 
 
@@ -224,6 +340,7 @@ def atp_forward_oos_task(
             ("make", "kalshi-atp-proxy-evidence-gate"),
             ("make", "kalshi-sports-event-velocity-eta"),
         ),
+        fallback_retry_utc=None,
     )
 
 
@@ -359,6 +476,8 @@ def task_to_dict(task: PlannedTask) -> dict[str, Any]:
         "due": task.due,
         "reason": task.reason,
         "commands": [list(command) for command in task.commands],
+        "backoff_until_utc": task.backoff_until_utc,
+        "fallback_retry_utc": task.fallback_retry_utc,
     }
 
 
@@ -462,9 +581,15 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser.add_argument("--atp-gate-path", type=Path, default=DEFAULT_ATP_GATE_PATH)
     parser.add_argument("--audit-path", type=Path, default=DEFAULT_AUDIT_PATH)
     parser.add_argument("--atp-repo", type=Path, default=DEFAULT_ATP_REPO)
+    parser.add_argument("--previous-cycle-path", type=Path, default=DEFAULT_PREVIOUS_CYCLE_PATH)
     parser.add_argument("--out-dir", type=Path, default=DEFAULT_OUT_DIR)
     parser.add_argument("--run-due", action="store_true")
     parser.add_argument("--command-timeout-seconds", type=int, default=900)
+    parser.add_argument(
+        "--due-retry-cooldown-seconds",
+        type=int,
+        default=DEFAULT_DUE_RETRY_COOLDOWN_SECONDS,
+    )
     parser.add_argument("--write", action="store_true")
     return parser.parse_args(argv)
 
@@ -476,8 +601,10 @@ def main(argv: Sequence[str] | None = None) -> int:
         atp_gate_path=args.atp_gate_path,
         audit_path=args.audit_path,
         atp_repo=args.atp_repo,
+        previous_cycle_path=args.previous_cycle_path,
         run_due=args.run_due,
         command_timeout_seconds=args.command_timeout_seconds,
+        due_retry_cooldown_seconds=args.due_retry_cooldown_seconds,
     )
     if args.write:
         paths = write_outputs(report, out_dir=args.out_dir)

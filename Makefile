@@ -46,6 +46,9 @@ help:
 	@echo "  make kalshi-sports-proxy-correlation-cluster-control — Apply cluster exposure controls to sports candidates before overlay"
 	@echo "  make kalshi-world-cup-proxy-observation-loop — Archive World Cup/FIFA soft-watch rows as research evidence"
 	@echo "  make kalshi-world-cup-proxy-feature-model-falsification — Falsify World Cup market-structure rules"
+	@echo "  make kalshi-world-cup-proxy-research-candidate-replay — Replay World Cup FDR candidates against all-in cost gates"
+	@echo "  make kalshi-world-cup-proxy-capacity-correlation-decay — Gate World Cup replay candidates on depth, clusters, and decay"
+	@echo "  make kalshi-world-cup-proxy-correlation-cluster-control — Apply cluster exposure controls to World Cup candidates before overlay"
 	@echo "  make kalshi-world-cup-outcome-independence-diagnostic — Diagnose World Cup outcome-family labels vs match correlation"
 	@echo "  make kalshi-ghost-listing-depth-diagnostic — Probe current public depth before cap_i lock"
 	@echo "  make kalshi-sports-stack-sequencing — Sequence sports lanes by current season/evidence"
@@ -404,6 +407,22 @@ KALSHI_WORLD_CUP_PROXY_MODEL_MIN_OOS_LABELS ?= 10
 KALSHI_WORLD_CUP_PROXY_MODEL_TEST_FRACTION ?= 0.30
 KALSHI_WORLD_CUP_PROXY_MODEL_FDR_ALPHA ?= 0.10
 KALSHI_WORLD_CUP_OUTCOME_INDEPENDENCE_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-outcome-independence-diagnostic-latest
+KALSHI_WORLD_CUP_PROXY_REPLAY_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-proxy-research-candidate-replay-latest
+KALSHI_WORLD_CUP_PROXY_REPLAY_MODEL_PATH ?= docs/codex/macro/latest-kalshi-world-cup-proxy-feature-model-falsification.json
+KALSHI_WORLD_CUP_PROXY_REPLAY_PREFERRED_MODEL_ID ?=
+KALSHI_WORLD_CUP_PROXY_CCD_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-proxy-capacity-correlation-decay-latest
+KALSHI_WORLD_CUP_PROXY_CCD_FEATURE_PACKET ?= docs/codex/macro/latest-kalshi-world-cup-proxy-observation-loop.json
+KALSHI_WORLD_CUP_PROXY_CCD_REPLAY ?= docs/codex/macro/latest-kalshi-world-cup-proxy-research-candidate-replay.json
+KALSHI_WORLD_CUP_PROXY_CCD_RAW_ORDERBOOK_DIR ?= $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_world_cup_proxy_orderbooks
+KALSHI_WORLD_CUP_PROXY_CCD_MAX_CLOSE_HOURS ?= 72
+KALSHI_WORLD_CUP_PROXY_CCD_MAX_TICKERS ?= 80
+KALSHI_WORLD_CUP_PROXY_CCD_DEPTH ?= 0
+KALSHI_WORLD_CUP_PROXY_CCD_DELAY_SECONDS ?= 0.05
+KALSHI_WORLD_CUP_PROXY_CCD_CAPTURE_ORDERBOOKS ?= 1
+KALSHI_WORLD_CUP_PROXY_CLUSTER_OUT_DIR ?= docs/codex/macro/kalshi-world-cup-proxy-correlation-cluster-control-latest
+KALSHI_WORLD_CUP_PROXY_CLUSTER_CCD ?= docs/codex/macro/latest-kalshi-world-cup-proxy-capacity-correlation-decay.json
+KALSHI_WORLD_CUP_PROXY_CLUSTER_MAX_SHARE ?= 0.35
+KALSHI_WORLD_CUP_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS ?= 0
 KALSHI_SPORTS_LABEL_ACCUMULATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-label-accumulation-cycle-latest
 KALSHI_GHOST_LISTING_DEPTH_OUT_DIR ?= docs/codex/macro/kalshi-ghost-listing-depth-diagnostic-latest
 KALSHI_GHOST_LISTING_DEPTH_RAW_DIR ?= $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_ghost_listing_depth
@@ -946,11 +965,46 @@ kalshi-world-cup-outcome-independence-diagnostic:
 		--min-independent-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_INDEPENDENT_LABELS) \
 		--min-oos-labels $(KALSHI_WORLD_CUP_PROXY_MODEL_MIN_OOS_LABELS)
 
+kalshi-world-cup-proxy-research-candidate-replay:
+	@python3 scripts/kalshi_world_cup_proxy_research_candidate_replay.py \
+		--write \
+		--label-dir $(KALSHI_WORLD_CUP_PROXY_LABEL_DIR) \
+		--model-falsification-path $(KALSHI_WORLD_CUP_PROXY_REPLAY_MODEL_PATH) \
+		--out-dir $(KALSHI_WORLD_CUP_PROXY_REPLAY_OUT_DIR) \
+		--min-side-oos-labels $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_SIDE_OOS_LABELS) \
+		--min-decay-buckets $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_BUCKETS) \
+		--min-decay-labels $(KALSHI_CRYPTO_PROXY_REPLAY_MIN_DECAY_LABELS) \
+		$(if $(KALSHI_WORLD_CUP_PROXY_REPLAY_PREFERRED_MODEL_ID),--preferred-model-id $(KALSHI_WORLD_CUP_PROXY_REPLAY_PREFERRED_MODEL_ID),)
+
+kalshi-world-cup-proxy-capacity-correlation-decay:
+	@python3 scripts/kalshi_world_cup_proxy_capacity_correlation_decay.py \
+		--write \
+		--feature-packet-path $(KALSHI_WORLD_CUP_PROXY_CCD_FEATURE_PACKET) \
+		--replay-path $(KALSHI_WORLD_CUP_PROXY_CCD_REPLAY) \
+		--raw-orderbook-dir $(KALSHI_WORLD_CUP_PROXY_CCD_RAW_ORDERBOOK_DIR) \
+		--out-dir $(KALSHI_WORLD_CUP_PROXY_CCD_OUT_DIR) \
+		--max-close-hours $(KALSHI_WORLD_CUP_PROXY_CCD_MAX_CLOSE_HOURS) \
+		--max-tickers $(KALSHI_WORLD_CUP_PROXY_CCD_MAX_TICKERS) \
+		--depth $(KALSHI_WORLD_CUP_PROXY_CCD_DEPTH) \
+		--delay-seconds $(KALSHI_WORLD_CUP_PROXY_CCD_DELAY_SECONDS) \
+		$(if $(filter 1 true yes,$(KALSHI_WORLD_CUP_PROXY_CCD_CAPTURE_ORDERBOOKS)),--capture-orderbooks,)
+
+kalshi-world-cup-proxy-correlation-cluster-control:
+	@python3 scripts/kalshi_world_cup_proxy_correlation_cluster_control.py \
+		--write \
+		--ccd-path $(KALSHI_WORLD_CUP_PROXY_CLUSTER_CCD) \
+		--out-dir $(KALSHI_WORLD_CUP_PROXY_CLUSTER_OUT_DIR) \
+		--max-cluster-share $(KALSHI_WORLD_CUP_PROXY_CLUSTER_MAX_SHARE) \
+		--min-positive-clusters $(KALSHI_WORLD_CUP_PROXY_CLUSTER_MIN_POSITIVE_CLUSTERS)
+
 kalshi-world-cup-proxy-observation-watch-once:
 	@$(MAKE) --no-print-directory kalshi-universe-scan
 	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-observation-loop
 	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-feature-model-falsification
 	@$(MAKE) --no-print-directory kalshi-world-cup-outcome-independence-diagnostic
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-research-candidate-replay
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-capacity-correlation-decay
+	@$(MAKE) --no-print-directory kalshi-world-cup-proxy-correlation-cluster-control
 	@$(MAKE) --no-print-directory kalshi-ghost-listing-depth-diagnostic
 	@$(MAKE) --no-print-directory kalshi-sports-stack-sequencing
 	@$(MAKE) --no-print-directory kalshi-signal-factory-status

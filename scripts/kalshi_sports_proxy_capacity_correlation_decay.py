@@ -101,11 +101,13 @@ def build_sports_proxy_capacity_correlation_decay(
     calibrated_probability = probability(
         summary(replay).get("conservative_calibrated_side_probability")
     )
+    selected_model_id = str(summary(replay).get("selected_replay_model_id") or "")
     selected = select_current_candidates(
         feature_packet=feature_packet,
         generated_ts=generated_ts,
         max_close_hours=max_close_hours,
         max_tickers=max_tickers,
+        selected_model_id=selected_model_id,
     )
     capture = (
         capture_public_orderbooks(
@@ -125,6 +127,7 @@ def build_sports_proxy_capacity_correlation_decay(
             row,
             orderbook=orderbooks.get(str(row.get("contract_ticker"))),
             calibrated_probability=calibrated_probability,
+            selected_model_id=selected_model_id,
         )
         for row in selected
     ]
@@ -208,6 +211,31 @@ def sports_strength_win_prob_prediction(row: Mapping[str, Any]) -> int | None:
     return None
 
 
+def side_prediction(value: Any) -> int | None:
+    side = str(value or "").strip().lower()
+    if side == "yes":
+        return 1
+    if side == "no":
+        return 0
+    return None
+
+
+def world_cup_market_consensus_prediction(row: Mapping[str, Any]) -> int | None:
+    return side_prediction(row.get("market_consensus_prediction"))
+
+
+def world_cup_longshot_fade_prediction(row: Mapping[str, Any]) -> int | None:
+    return side_prediction(row.get("longshot_fade_prediction"))
+
+
+def prediction_for_model(row: Mapping[str, Any], *, selected_model_id: str) -> int | None:
+    if selected_model_id == "world_cup_market_consensus_directional_accuracy":
+        return world_cup_market_consensus_prediction(row)
+    if selected_model_id == "world_cup_longshot_fade_directional_accuracy":
+        return world_cup_longshot_fade_prediction(row)
+    return sports_strength_win_prob_prediction(row)
+
+
 # ---------------------------------------------------------------------------
 # Candidate selection (sports-specific: uses sports prediction + cluster key)
 # ---------------------------------------------------------------------------
@@ -219,13 +247,14 @@ def select_current_candidates(
     generated_ts: float,
     max_close_hours: float,
     max_tickers: int,
+    selected_model_id: str = "",
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
-    for raw_row in feature_packet.get("feature_rows", []):
+    for raw_row in candidate_source_rows(feature_packet):
         if not isinstance(raw_row, Mapping):
             continue
         row = dict(raw_row)
-        prediction = sports_strength_win_prob_prediction(row)
+        prediction = prediction_for_model(row, selected_model_id=selected_model_id)
         horizon_ts = sports_horizon_timestamp(row)
         if prediction is None or horizon_ts is None:
             continue
@@ -234,9 +263,27 @@ def select_current_candidates(
             continue
         side = "yes" if prediction == 1 else "no"
         row["predicted_side"] = side
+        row["source_model_id"] = selected_model_id or row.get("source_model_id")
+        if not row.get("league"):
+            row["league"] = (
+                "WORLD_CUP" if str(row.get("series_ticker") or "").startswith("KXWC") else "MLB"
+            )
         row["hours_to_close"] = round(hours_to_close, 6)
         rows.append(row)
     return select_cluster_round_robin(rows, max_tickers=max_tickers)
+
+
+def candidate_source_rows(feature_packet: Mapping[str, Any]) -> list[Any]:
+    rows = feature_packet.get("feature_rows")
+    if isinstance(rows, list):
+        return rows
+    observation_packet = feature_packet.get("observation_packet")
+    if isinstance(observation_packet, Mapping) and isinstance(observation_packet.get("rows"), list):
+        return list(observation_packet["rows"])
+    rows = feature_packet.get("rows")
+    if isinstance(rows, list):
+        return rows
+    return []
 
 
 def select_cluster_round_robin(
@@ -363,6 +410,7 @@ def capacity_row(
     *,
     orderbook: Mapping[str, Any] | None,
     calibrated_probability: float | None,
+    selected_model_id: str = "",
 ) -> dict[str, Any]:
     side = str(row.get("predicted_side") or "")
     levels = ask_levels(orderbook or {}, side)
@@ -403,6 +451,8 @@ def capacity_row(
         "series_ticker": row.get("series_ticker"),
         "close_time": row.get("close_time"),
         "predicted_side": side,
+        "source_model_id": selected_model_id or row.get("source_model_id"),
+        "title": row.get("title"),
         "level_count": len(levels),
         "best_level_contracts": json_float(best_level_contracts),
         "best_all_in_break_even_probability": json_float(best_break_even),
@@ -561,7 +611,10 @@ def build_gates(
             "replay_candidate_ready",
             "pass"
             if summary_data.get("replay_status")
-            == "sports_proxy_research_candidate_replay_blocked_predeployment_gates"
+            in {
+                "sports_proxy_research_candidate_replay_blocked_predeployment_gates",
+                "world_cup_proxy_research_candidate_replay_blocked_predeployment_gates",
+            }
             else "blocked",
             f"Replay status is {summary_data.get('replay_status')}.",
         ),

@@ -90,9 +90,30 @@ def sports_mlb_platform_model_prediction(row: Mapping[str, Any]) -> int | None:
     return None
 
 
+def side_prediction(value: Any) -> int | None:
+    side = str(value or "").strip().lower()
+    if side == "yes":
+        return 1
+    if side == "no":
+        return 0
+    return None
+
+
+def world_cup_market_consensus_prediction(row: Mapping[str, Any]) -> int | None:
+    """World Cup proxy rule: follow the side implied by the captured Kalshi quote."""
+    return side_prediction(row.get("market_consensus_prediction"))
+
+
+def world_cup_longshot_fade_prediction(row: Mapping[str, Any]) -> int | None:
+    """World Cup proxy rule: fade low-priced YES or follow high-priced YES buckets."""
+    return side_prediction(row.get("longshot_fade_prediction"))
+
+
 PREDICTION_RULES: dict[str, Any] = {
     "strength_win_prob_directional_accuracy": sports_strength_win_prob_prediction,
     "mlb_platform_model_directional_accuracy": sports_mlb_platform_model_prediction,
+    "world_cup_market_consensus_directional_accuracy": world_cup_market_consensus_prediction,
+    "world_cup_longshot_fade_directional_accuracy": world_cup_longshot_fade_prediction,
 }
 
 

@@ -29,7 +29,7 @@ if str(SCRIPTS_DIR) not in sys.path:
 
 # Single-sourced shared helpers from the engine.
 from predmarket.kalshi_execution_cost import normalize_kalshi_execution_cost  # noqa: E402
-from predmarket.shared_helpers import (  # noqa: E402
+from predmarket.shared_helpers import (  # noqa: E402, F401
     benjamini_hochberg,
     binomial_survival,
     chronological_split_index,
@@ -50,10 +50,10 @@ from predmarket.shared_helpers import (  # noqa: E402
     timestamp,
     wilson_lower_bound,
 )
-from predmarket.shared_helpers import (
+from predmarket.shared_helpers import (  # noqa: E402
     bucket_time as _shared_bucket_time,
 )
-from predmarket.shared_helpers import (
+from predmarket.shared_helpers import (  # noqa: E402
     outside_repo as _shared_outside_repo,
 )
 
@@ -153,6 +153,11 @@ def normalize_label_rows(
                 "selected_code": row.get("selected_code"),
                 "win_probability": optional_float(row.get("win_probability")),
                 "predicted_side": row.get("predicted_side"),
+                "market_type": row.get("market_type"),
+                "selection_token": row.get("selection_token"),
+                "market_consensus_prediction": row.get("market_consensus_prediction"),
+                "longshot_fade_prediction": row.get("longshot_fade_prediction"),
+                "yes_mid": probability(row.get("yes_mid")),
                 "mlb_platform_model_probability": optional_float(
                     row.get("mlb_platform_model_probability")
                 ),
@@ -439,14 +444,6 @@ def research_candidate_evaluation(
         ):
             return dict(item)
     return None
-
-
-def outside_repo(path: Path) -> bool:
-    try:
-        path.expanduser().resolve().relative_to(CONTROL_REPO.resolve())
-    except ValueError:
-        return True
-    return False
 
 
 # ---------------------------------------------------------------------------
