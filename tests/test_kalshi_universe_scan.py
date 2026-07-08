@@ -514,6 +514,19 @@ def test_makefile_exposes_universe_scan_targets() -> None:
     assert "predmarket.kalshi_universe_scan" in content
 
 
+def test_makefile_repairs_broken_venv_before_universe_scan() -> None:
+    content = MAKEFILE_PATH.read_text(encoding="utf-8")
+
+    assert "VENV ?= .venv" in content
+    assert "PYTHON ?= $(VENV)/bin/python" in content
+    assert ".PHONY: setup venv-ready check-env" in content
+    assert "venv-ready:" in content
+    assert "Python runtime $(PYTHON) is missing or not executable" in content
+    assert "setup: venv-ready" in content
+    assert "check-env: venv-ready" in content
+    assert "kalshi-universe-scan: venv-ready" in content
+
+
 def test_universe_candidate_schema_loads() -> None:
     schema = json.loads(SCHEMA_PATH.read_text(encoding="utf-8"))
 
