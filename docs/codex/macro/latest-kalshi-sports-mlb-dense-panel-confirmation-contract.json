@@ -1,0 +1,74 @@
+{
+  "candidate": {
+    "clock_name": "T-60m",
+    "clock_offset_seconds": 3600,
+    "direction": "gt_and_spread_le",
+    "feature": "p_hat",
+    "formula_sha256": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+    "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+    "model_id": "tight_spread_favorite_buy_yes_t60m",
+    "side": "yes",
+    "spread_max": 0.03,
+    "threshold": 0.62
+  },
+  "candidate_data_quality": {
+    "exact_public_kalshi_settlements_required": true,
+    "exact_series_fee_required": true,
+    "executable_depth_share_min": 0.9,
+    "max_staleness_seconds": 300,
+    "public_orderbook_source_share_min": 0.95
+  },
+  "candidate_performance_revealed_before_final": false,
+  "contract_sha256": "306d226da9679b33011d44e31f239a1a57cc4ec27a9ef3eb90a9988265d403be",
+  "contract_version": "mlb_dense_panel_single_shot_confirmation_v1",
+  "durability": {
+    "attempt_manifest_created_exclusively": true,
+    "final_result_idempotent": true,
+    "final_result_may_not_be_overwritten": true,
+    "interrupted_attempt_resumes_same_sample": true
+  },
+  "execution_enabled": false,
+  "implementation_files": [
+    {
+      "path": "predmarket/sports_mlb_dense_panel_confirmation.py",
+      "sha256": "9fca0ab8203d127f1996a9297b601edab996a7a8e62a81a8f86c342652393257"
+    },
+    {
+      "path": "scripts/kalshi_sports_mlb_dense_panel_confirmation.py",
+      "sha256": "afd49098833de73251742880f001dfbc48d04dd4cbec452c918170cafcb90188"
+    }
+  ],
+  "inference": {
+    "alpha": 0.05,
+    "bootstrap_lower_bound_required_above_zero": true,
+    "cluster_unit": "mlb_slate_date_utc",
+    "event_unit": "event_ticker",
+    "n_resamples": 2000,
+    "p_calibration": "slate_cluster_sign_flip mean selected residual > 0",
+    "p_economic": "slate_cluster_sign_flip mean fee-adjusted net > 0",
+    "p_joint": "max(p_economic,p_calibration)",
+    "seed": 11,
+    "single_candidate_q_value": "q_value=p_joint",
+    "temporal_survival": "at least 3 positive chronological buckets and recent >= 0"
+  },
+  "outcomes": {
+    "fail": "confirmation_failed",
+    "invalid_or_incomplete": "confirmation_pending_no_final_result",
+    "pass": "research_ready_survivor_research_only"
+  },
+  "panel_family_id": "sports_mlb_dense_fixed_clock_panel_v1",
+  "panel_registration_sha256": "553135d7d1456aeda4a9115784aa423b81931cceed4d2a2f707b5ca8dcbe816e",
+  "registered_at_utc": "2026-07-10T06:35:42Z",
+  "research_only": true,
+  "sample_freeze": {
+    "freeze_only_after_all_preflight_gates": true,
+    "maximum_largest_candidate_slate_share": 0.2,
+    "minimum_candidate_events": 15,
+    "minimum_candidate_slate_dates": 8,
+    "outcome_blind": true,
+    "sample_may_never_expand_after_attempt": true,
+    "settlement_buffer_seconds": 43200,
+    "strictly_post_registration": true
+  },
+  "schema_version": 1
+}
