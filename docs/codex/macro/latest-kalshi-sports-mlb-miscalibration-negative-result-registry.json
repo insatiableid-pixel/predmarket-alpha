@@ -1,0 +1,58 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
+  "payload": [
+    {
+      "do_not_repeat": "Cosmetic threshold/bucket renames of the same consensus divergence specs",
+      "family": "sports_consensus_historical",
+      "spec_id": "historical_mlb_multi_book_consensus_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same mid-direction forward labels with cosmetic momentum/imbalance renames",
+      "family": "near_resolution_informed_flow",
+      "spec_id": "near_resolution_simple_flow_forward_mid_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same maker paper-fill specs on public snapshots without new fill truth",
+      "family": "passive_liquidity_provision",
+      "spec_id": "passive_liquidity_public_snapshot_paper_fill_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Resurrecting settlement-direction depth imbalance without new mechanism",
+      "family": "near_resolution_informed_flow",
+      "spec_id": "flow_depth_imbalance_settlement_directional_v1",
+      "status": "confirmation_failed"
+    },
+    {
+      "do_not_repeat": "Short-horizon next-mid / executable round-trip microstructure retunes",
+      "family": "sports_executable_horizon_microstructure_v1",
+      "spec_id": "sports_executable_horizon_microstructure_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Cross-contract short-horizon lead-lag retunes",
+      "family": "sports_cross_contract_leadlag_v1",
+      "spec_id": "sports_cross_contract_leadlag_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Thin-book short-horizon fade retunes",
+      "family": "sports_thin_book_fade_v1",
+      "spec_id": "sports_thin_book_fade_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Static favorite-longshot buckets may be retained only as baseline/negative control; cosmetic bucket renames are not novel candidates",
+      "family": "sports_consensus_price_bucket_bias",
+      "spec_id": "sports_consensus_price_bucket_bias",
+      "status": "baseline_only"
+    }
+  ],
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
+}

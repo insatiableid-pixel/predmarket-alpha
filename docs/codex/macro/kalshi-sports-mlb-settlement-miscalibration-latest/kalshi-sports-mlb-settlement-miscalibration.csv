@@ -1,0 +1,12 @@
+model_id,status,clock_name,side,feature,oos_event_count,oos_slate_count,oos_mean_net_return,oos_mean_calibration_residual,p_economic,p_calibration,p_joint,q_value,bootstrap_mean_net_lower_95,power_state,largest_slate_cluster_share,negative_control,baseline_only
+baseline_static_longshot_buy_yes_t60m,underpowered,T-60m,yes,p_hat,1,1,-0.2942,-0.2760510605,1.0,1.0,1.0,,-0.2942,underpowered,1.0,False,True
+baseline_static_favorite_buy_yes_t60m,underpowered,T-60m,yes,p_hat,3,1,0.1604666667,0.1789319121,0.5002498751,0.5002498751,0.5002498751,,0.1604666667,underpowered,1.0,False,True
+clock_x_price_fade_favorite_t60m,underpowered,T-60m,no,p_hat,19,6,-0.1060052632,-0.0970911641,1.0,1.0,1.0,,-0.1193315789,underpowered,0.5263157895,False,False
+clock_x_price_buy_underdog_t6h,underpowered,T-6h,yes,p_hat,2,2,-0.36585,-0.3453727588,1.0,1.0,1.0,,-0.36585,underpowered,0.5,False,False
+listing_age_cold_start_fade_extreme_t24h,underpowered,T-24h,no,listing_age_hours,0,0,,,1.0,1.0,1.0,,,underpowered,0.0,False,False
+path_slope_reversion_buy_no_t60m,underpowered,T-60m,no,path_mid_slope_per_hour,23,6,-0.1584086957,-0.1612345018,1.0,1.0,1.0,,-0.1922,underpowered,0.5217391304,False,False
+path_slope_continuation_buy_yes_t60m,underpowered,T-60m,yes,path_mid_slope_per_hour,21,5,0.1465952381,0.1612345018,0.0004997501,0.0004997501,0.0004997501,,0.1012833333,underpowered,0.5714285714,False,False
+clock_geometry_drift_fade_t15m,underpowered,T-15m,no,clock_delta_6h_to_60m,23,4,-0.0326782609,-0.0256521146,1.0,1.0,1.0,,-0.0326782609,underpowered,0.3913043478,False,False
+tight_spread_favorite_buy_yes_t60m,frozen_candidate_waiting_multi_slate_confirmation,T-60m,yes,p_hat,20,6,0.094615,0.1076245857,0.0004997501,0.0004997501,0.0004997501,0.0004997501,0.07132,powered,0.5,False,False
+negctrl_trade_against_path_slope_t60m,underpowered,T-60m,yes,path_mid_slope_per_hour,24,6,-0.1316,-0.1278975355,1.0,1.0,1.0,,-0.1943,underpowered,0.5,True,False
+negctrl_always_buy_yes_t60m,testable,T-60m,yes,p_hat,27,7,-0.0530592593,-0.0383528724,1.0,1.0,1.0,,-0.1176636364,powered,0.4444444444,True,False

@@ -1,0 +1,52 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
+  "payload": {
+    "evidence_incomplete": false,
+    "family_status": "confirmation_pending",
+    "fdr_survivor_count": 1,
+    "frozen_waiting_multi_slate_count": 1,
+    "no_accounts_orders_live": true,
+    "no_paper_stake": true,
+    "no_sizing": true,
+    "outcome_b_claimed": false,
+    "powered_falsified_count": 0,
+    "powered_novel_count": 1,
+    "research_ready_count": 0,
+    "resolution_counts": {
+      "confirmation_failed_count": 0,
+      "confirmation_pending_count": 0,
+      "formula_hashes": {
+        "clock_geometry_drift_fade_t15m": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
+        "clock_x_price_buy_underdog_t6h": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
+        "clock_x_price_fade_favorite_t60m": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
+        "listing_age_cold_start_fade_extreme_t24h": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
+        "path_slope_continuation_buy_yes_t60m": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
+        "path_slope_reversion_buy_no_t60m": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
+        "tight_spread_favorite_buy_yes_t60m": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
+      },
+      "frozen_waiting_multi_slate_count": 1,
+      "novel_count": 7,
+      "novel_spec_ids": [
+        "clock_x_price_fade_favorite_t60m",
+        "clock_x_price_buy_underdog_t6h",
+        "listing_age_cold_start_fade_extreme_t24h",
+        "path_slope_reversion_buy_no_t60m",
+        "path_slope_continuation_buy_yes_t60m",
+        "clock_geometry_drift_fade_t15m",
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "powered_count": 1,
+      "powered_falsified_count": 0,
+      "research_ready_survivor_count": 0,
+      "structurally_untestable_count": 0,
+      "underpowered_count": 6
+    },
+    "synthetic_tests_passed": true,
+    "underpowered_novel_count": 6
+  },
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
+}

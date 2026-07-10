@@ -1,0 +1,66 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
+  "payload": {
+    "capture_infrastructure_ready": true,
+    "clock_coverage": {
+      "T-15m": {
+        "censored_stale_book": 150,
+        "matched": 197
+      },
+      "T-24h": {
+        "censored_missing_book": 15,
+        "censored_stale_book": 8,
+        "matched": 324
+      },
+      "T-60m": {
+        "censored_stale_book": 22,
+        "matched": 325
+      },
+      "T-6h": {
+        "censored_missing_book": 3,
+        "censored_stale_book": 22,
+        "matched": 322
+      }
+    },
+    "clocks": {
+      "T-15m": 900,
+      "T-24h": 86400,
+      "T-60m": 3600,
+      "T-6h": 21600
+    },
+    "dense_capture_note": "Dense read-only MLB moneyline books remain mandatory input-quality work; collector readiness is not evidence-panel readiness.",
+    "events_by_clock": {
+      "T-15m": 100,
+      "T-24h": 169,
+      "T-60m": 168,
+      "T-6h": 169
+    },
+    "evidence_panel_ready": false,
+    "observation_dirs": [
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration"
+    ],
+    "observation_row_count": 26039,
+    "panel_distinct_events": 175,
+    "panel_max_slates_any_clock": 14,
+    "slates_by_clock": {
+      "T-15m": 13,
+      "T-24h": 14,
+      "T-60m": 14,
+      "T-6h": 14
+    },
+    "staleness_seconds": {
+      "T-15m": 1800,
+      "T-24h": 21600,
+      "T-60m": 2700,
+      "T-6h": 7200
+    },
+    "status": "capture_infrastructure_ready_panel_insufficient_slate_breadth"
+  },
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
+}

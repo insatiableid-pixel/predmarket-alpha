@@ -1,54 +1,50 @@
 [
   {
     "do_not_repeat": "Cosmetic threshold/bucket renames of the same consensus divergence specs",
-    "evidence": "1108 exact rows, 1098 public-Kalshi labels, 5 hypotheses, max OOS 186, 0 FDR survivors",
     "family": "sports_consensus_historical",
     "spec_id": "historical_mlb_multi_book_consensus_v1",
     "status": "falsified"
   },
   {
     "do_not_repeat": "Same mid-direction forward labels with cosmetic momentum/imbalance renames",
-    "evidence": "11061 obs, 7951 forward-quote labels, 3 testable simple forward candidates, best q~0.999",
     "family": "near_resolution_informed_flow",
     "spec_id": "near_resolution_simple_flow_forward_mid_v1",
     "status": "falsified"
   },
   {
     "do_not_repeat": "Same maker paper-fill specs on public snapshots without new fill truth",
-    "evidence": "9301 valid labels, 3 hypotheses, best q=1.0, best net EV ~-0.0183",
     "family": "passive_liquidity_provision",
     "spec_id": "passive_liquidity_public_snapshot_paper_fill_v1",
     "status": "falsified"
   },
   {
     "do_not_repeat": "Resurrecting settlement-direction depth imbalance without new mechanism",
-    "evidence": "Retired after 18 paper labels: 8 correct, accuracy 0.4444, mean calibration error ~0.5288",
     "family": "near_resolution_informed_flow",
     "spec_id": "flow_depth_imbalance_settlement_directional_v1",
     "status": "confirmation_failed"
   },
   {
-    "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
-    "evidence": "executable_labels=3584 candidates=12 best_model=tight_spread_imbalance_buy_yes_h900 best_q=None best_mean_net=-0.0197865385 best_oos_events=52",
+    "do_not_repeat": "Short-horizon next-mid / executable round-trip microstructure retunes",
     "family": "sports_executable_horizon_microstructure_v1",
-    "generated_utc": "2026-07-10T04:45:54Z",
     "spec_id": "sports_executable_horizon_microstructure_v1",
     "status": "falsified"
   },
   {
-    "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
-    "evidence": "executable_labels=3584 candidates=8 best_model=peer_imbalance_gap_buy_yes_h300 best_q=1.0 best_mean_net=-0.0917141844 best_oos_events=141",
+    "do_not_repeat": "Cross-contract short-horizon lead-lag retunes",
     "family": "sports_cross_contract_leadlag_v1",
-    "generated_utc": "2026-07-10T04:45:54Z",
     "spec_id": "sports_cross_contract_leadlag_v1",
     "status": "falsified"
   },
   {
-    "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
-    "evidence": "executable_labels=3584 candidates=6 best_model=thin_imbalance_fade_yes_h900 best_q=None best_mean_net=-0.2446 best_oos_events=1",
+    "do_not_repeat": "Thin-book short-horizon fade retunes",
     "family": "sports_thin_book_fade_v1",
-    "generated_utc": "2026-07-10T04:45:54Z",
     "spec_id": "sports_thin_book_fade_v1",
     "status": "falsified"
+  },
+  {
+    "do_not_repeat": "Static favorite-longshot buckets may be retained only as baseline/negative control; cosmetic bucket renames are not novel candidates",
+    "family": "sports_consensus_price_bucket_bias",
+    "spec_id": "sports_consensus_price_bucket_bias",
+    "status": "baseline_only"
   }
 ]

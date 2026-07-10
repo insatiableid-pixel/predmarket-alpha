@@ -1,51 +1,43 @@
 [
   {
-    "censored_labels": 29119,
-    "decision_value": "Primary sports short-horizon promotion surface",
-    "expected_time_to_next_labels_minutes": 15,
-    "independent_labels_now": 3584,
-    "lane": "executable_horizon_microstructure_v1",
-    "next_action": "Retire family if complete FDR failure; else densify 5/15m capture",
+    "decision_value": "Fixed-clock MLB moneyline settlement miscalibration",
+    "events_by_clock": {
+      "T-15m": 100,
+      "T-24h": 169,
+      "T-60m": 168,
+      "T-6h": 169
+    },
+    "independent_labels_now": 175,
+    "lane": "sports_mlb_settlement_miscalibration_v1",
+    "next_action": "Hold frozen candidates fixed; accumulate multi-slate dense fixed-clock panel for independent confirmation; do not retune",
     "rank": 1,
-    "status": "falsified"
+    "slates_by_clock": {
+      "T-15m": 13,
+      "T-24h": 14,
+      "T-60m": 14,
+      "T-6h": 14
+    },
+    "status": "confirmation_pending"
   },
   {
-    "decision_value": "Unlock true 60s executable labels (current snapshot median gap ~27m)",
-    "expected_time_to_next_labels_minutes": 30,
-    "independent_labels_now": 2,
-    "lane": "tick_recorder_dense_mlb_orderbook",
-    "next_action": "Run read-only tick recorder on MLB moneyline books during live slate",
+    "decision_value": "Next distinct surface: multi-week dense orderbook fixed-clock panel with pre-registered slate-breadth power (not cosmetic retune of v1 thresholds)",
+    "lane": "mlb_multiweek_dense_fixed_clock_panel_v2",
+    "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering primary T-60m/T-15m clocks across >=10 chronological slates before confirmation",
     "rank": 2,
     "status": "discovery_pending"
   },
   {
-    "decision_value": "Distinct family if executable horizon microstructure falsifies",
-    "independent_labels_now": 0,
-    "lane": "cross_contract_within_event_coherence",
-    "next_action": "Retired on discovery FDR; densify ticks or park",
+    "decision_value": "Distinct settlement-miscalibration mechanism only where market terms prove complementary moneyline identity within event",
+    "lane": "sports_exact_cross_contract_moneyline_coherence",
+    "next_action": "Park until multi-week dense panel exists; do not mix with v1 retunes",
     "rank": 3,
-    "status": "falsified"
+    "status": "parked"
   },
   {
-    "decision_value": "Liquidity-reversion family distinct from informed-flow imbalance continuation",
-    "independent_labels_now": 3584,
-    "lane": "thin_book_fade",
-    "next_action": "Retired on discovery FDR; densify ticks or park",
+    "decision_value": "Do not resurrect short-horizon next-mid families",
+    "lane": "retired_short_horizon_microstructure",
+    "next_action": "Parked permanently under negative registry",
     "rank": 4,
     "status": "falsified"
-  },
-  {
-    "decision_value": "Clock-bound; do not block main loop",
-    "lane": "atp_forward_oos_and_settlement_velocity",
-    "next_action": "Parked monitor only",
-    "rank": 5,
-    "status": "calendar_monitor"
-  },
-  {
-    "decision_value": "Explicitly out of scope",
-    "lane": "asian_sharp_soccer",
-    "next_action": "Do not pursue under this directive",
-    "rank": 6,
-    "status": "blocked_external_deferred"
   }
 ]
