@@ -1331,6 +1331,15 @@ kalshi-sports-mlb-dense-book-capture:
 		--out-dir $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_sports_mlb_fixed_clock_books \
 		--limit 200
 
+kalshi-sports-mlb-dense-panel-confirmation-contract:
+	@PYTHONPATH=. $(PYTHON) scripts/kalshi_sports_mlb_dense_panel_confirmation.py contract
+
+kalshi-sports-mlb-dense-panel-confirmation-preflight:
+	@PYTHONPATH=. $(PYTHON) scripts/kalshi_sports_mlb_dense_panel_confirmation.py preflight
+
+kalshi-sports-mlb-dense-panel-confirmation-run:
+	@PYTHONPATH=. $(PYTHON) scripts/kalshi_sports_mlb_dense_panel_confirmation.py run
+
 kalshi-sports-mlb-settlement-miscalibration:
 	@python3 scripts/kalshi_sports_mlb_settlement_miscalibration.py \
 		--out-dir $(KALSHI_SPORTS_MLB_MISCALIBRATION_OUT_DIR) \
