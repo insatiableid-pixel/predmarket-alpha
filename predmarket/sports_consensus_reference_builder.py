@@ -461,6 +461,29 @@ def _mlb_h2h_rows(
     return rows, skipped
 
 
+def build_mlb_h2h_reference_rows(
+    odds_payload: Sequence[Mapping[str, Any]],
+    *,
+    meta: Mapping[str, Any],
+    kalshi_events: Mapping[str, Mapping[str, Any]],
+    capture_time: datetime,
+    required_books: Sequence[str] = (),
+    max_event_delta_seconds: float = 900.0,
+    max_source_age_seconds: float = 1800.0,
+) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+    """Map an MLB odds snapshot to exact Kalshi contracts without writing raw data."""
+    return _mlb_h2h_rows(
+        odds_payload,
+        meta=meta,
+        raw_path=None,
+        kalshi_events=kalshi_events,
+        capture_time=capture_time,
+        required_books=required_books,
+        max_event_delta_seconds=max_event_delta_seconds,
+        max_source_age_seconds=max_source_age_seconds,
+    )
+
+
 def _mlb_event_rows(
     event: Mapping[str, Any],
     *,
@@ -576,6 +599,13 @@ def _index_mlb_game_events(kalshi_payload: Mapping[str, Any]) -> dict[str, dict[
     return out
 
 
+def index_mlb_game_events(
+    kalshi_payload: Mapping[str, Any],
+) -> dict[str, dict[str, Any]]:
+    """Index exact KXMLBGAME event/team contracts for historical replay."""
+    return _index_mlb_game_events(kalshi_payload)
+
+
 def _kalshi_rows(payload: Mapping[str, Any]) -> list[Mapping[str, Any]]:
     for key in ("all_scored", "candidates", "markets", "rows", "top_50"):
         rows = payload.get(key)
@@ -681,9 +711,7 @@ def _odds_api_url(
     odds_format: str,
 ) -> str:
     provider_param = (
-        {"bookmakers": ",".join(bookmakers)}
-        if bookmakers
-        else {"regions": ",".join(regions)}
+        {"bookmakers": ",".join(bookmakers)} if bookmakers else {"regions": ",".join(regions)}
     )
     query = urllib.parse.urlencode(
         {
