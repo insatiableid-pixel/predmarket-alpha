@@ -1,0 +1,110 @@
+{
+  "candidate_performance_revealed": false,
+  "capture": {
+    "append_stats": {
+      "skipped_duplicates": 0,
+      "written": 30
+    },
+    "lock": "acquired pid=336072",
+    "market_count": 30,
+    "row_count": 30
+  },
+  "coverage": {
+    "candidate_performance_revealed": false,
+    "capture_infrastructure_ready": true,
+    "depth_share": 0.0,
+    "distinct_events": 15,
+    "distinct_slate_dates": 1,
+    "evidence_panel_ready": false,
+    "executable_side_share": 0.0,
+    "execution_enabled": false,
+    "gates": {
+      "executable_depth_share": "fail",
+      "min_distinct_events_overall": "fail",
+      "min_distinct_slate_dates": "fail",
+      "min_events_t15m": "fail",
+      "min_events_t60m": "fail",
+      "p90_staleness_t15m": "fail",
+      "p90_staleness_t60m": "fail",
+      "public_orderbook_source_share": "pass"
+    },
+    "p90_staleness_seconds": {
+      "T-15m": null,
+      "T-60m": null
+    },
+    "primary_event_counts": {
+      "T-15m": 0,
+      "T-60m": 0
+    },
+    "public_orderbook_source_share": 1.0,
+    "research_only": true,
+    "settlement_complete_for_all_events": null,
+    "settlement_labeled_events": null,
+    "slate_dates": [
+      "2026-07-12"
+    ],
+    "snapshot_count": 30,
+    "source_counts": {
+      "dense_public_orderbook": 30
+    },
+    "status": "capture_infrastructure_ready_panel_accumulating"
+  },
+  "execution_enabled": false,
+  "frozen_confirmation": {
+    "candidates": [
+      {
+        "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
+        "as_of_rule": "strict_latest_book_at_or_before_clock_within_staleness",
+        "clock_name": "T-60m",
+        "confirmation_reason": "panel_or_confirmation_power_not_met",
+        "confirmation_status": "confirmation_pending",
+        "direction": "gt_and_spread_le",
+        "do_not_retune": true,
+        "feature": "p_hat",
+        "fee_rule": "executable_ask_plus_series_resolved_taker_entry_fee",
+        "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+        "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "model_id": "tight_spread_favorite_buy_yes_t60m",
+        "side": "yes",
+        "source_family": "sports_mlb_settlement_miscalibration_v1",
+        "spread_max": 0.03,
+        "status": "frozen_candidate_waiting_multi_slate_confirmation",
+        "threshold": 0.62
+      }
+    ],
+    "confirmation_power_met": false,
+    "evidence_panel_ready": false,
+    "execution_enabled": false,
+    "research_only": true
+  },
+  "generated_utc": "2026-07-10T05:49:34Z",
+  "health": {
+    "evidence_ready": false,
+    "execution_enabled": false,
+    "infrastructure_ready": true,
+    "last_capture_utc": "2026-07-10T05:49:34Z",
+    "panel_accumulation": {
+      "distinct_events": 15,
+      "distinct_slate_dates": 1,
+      "primary_event_counts": {
+        "T-15m": 0,
+        "T-60m": 0
+      },
+      "raw_exists": true,
+      "raw_path": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_raw/mlb_dense_panel_snapshots.jsonl",
+      "raw_sha256": "7498223f3b7f723e972575178baddf46fdc50bdbf058e805a3b61a1eb588d7c2",
+      "snapshot_count": 30
+    },
+    "process_health": {
+      "duplicate_collector_blocked": true,
+      "lock_holder_alive": true,
+      "lock_path": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_raw/collector.lock",
+      "lock_pid": 336072
+    },
+    "research_only": true,
+    "status": "capture_infrastructure_ready_panel_accumulating"
+  },
+  "panel_family_id": "sports_mlb_dense_fixed_clock_panel_v1",
+  "research_only": true
+}
