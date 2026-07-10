@@ -1,0 +1,119 @@
+{
+  "book_quality_gates": {
+    "executable_side_and_depth_share_min": 0.9,
+    "p90_staleness_seconds": {
+      "T-15m": 120,
+      "T-60m": 300
+    },
+    "public_orderbook_source_share_min": 0.95
+  },
+  "capture": {
+    "append_only_raw": true,
+    "atomic_writes": true,
+    "auth": "public_read_only",
+    "cadence_seconds": 60,
+    "duplicate_suppression": "snapshot_id_and_payload_hash",
+    "request_delay_seconds": 0.08,
+    "source": "public_kalshi_rest_orderbook_and_markets"
+  },
+  "clocks": {
+    "missing_long_horizon_listings_do_not_block_primary_readiness": true,
+    "primary": {
+      "T-15m": 900,
+      "T-60m": 3600
+    },
+    "primary_staleness_seconds": {
+      "T-15m": 120,
+      "T-60m": 300
+    },
+    "secondary": {
+      "T-24h": 86400,
+      "T-6h": 21600
+    },
+    "secondary_staleness_seconds": {
+      "T-24h": 1800,
+      "T-6h": 900
+    }
+  },
+  "event_identity": {
+    "complementary_contracts": "collapse_to_one_event_for_independence",
+    "doubleheaders": "distinct event_ticker per listing; slate_date from game_start",
+    "multiple_clocks_same_game": "repeated_measures_not_independent",
+    "postponements_relistings": "track by event_ticker; reschedule updates game_start_ts",
+    "primary_key": "event_ticker"
+  },
+  "execution_enabled": false,
+  "failure_continuation": {
+    "calendar_pending": "not a blocker; keep collector restart-safe and report forecast",
+    "do_not_retune_frozen_candidates": true,
+    "do_not_weaken_gates": true,
+    "v2_family_only_after_frozen_resolution_and_panel_ready": true
+  },
+  "fee_rules": {
+    "mode": "taker_entry_only_hold_to_settlement",
+    "resolver": "resolve_kxmlbgame_taker_fee with offline conservative quadratic fallback",
+    "series": "KXMLBGAME",
+    "uncertainty_blocks_research_ready": true
+  },
+  "frozen_candidates": [
+    {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
+      "as_of_rule": "strict_latest_book_at_or_before_clock_within_staleness",
+      "clock_name": "T-60m",
+      "direction": "gt_and_spread_le",
+      "do_not_retune": true,
+      "feature": "p_hat",
+      "fee_rule": "executable_ask_plus_series_resolved_taker_entry_fee",
+      "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+      "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+      "model_id": "tight_spread_favorite_buy_yes_t60m",
+      "side": "yes",
+      "source_family": "sports_mlb_settlement_miscalibration_v1",
+      "spread_max": 0.03,
+      "status": "frozen_candidate_waiting_multi_slate_confirmation",
+      "threshold": 0.62
+    }
+  ],
+  "generated_utc": "2026-07-10T05:49:31.502399Z",
+  "inference": {
+    "cluster_unit": "mlb_slate_date_utc",
+    "evaluation_policy": "single_evaluation_at_preregistered_power_not_continuous_peeking",
+    "independence_unit": "event_ticker",
+    "method": "slate_cluster_sign_flip + BH on p_joint for novel families",
+    "no_modeling_before_evidence_panel_ready": true
+  },
+  "market_family": {
+    "scope_note": "KXMLBGAME only unless a later distinct family is separately registered",
+    "series_allowlist": [
+      "KXMLBGAME"
+    ],
+    "ticker_prefix": "KXMLBGAME"
+  },
+  "panel_family_id": "sports_mlb_dense_fixed_clock_panel_v1",
+  "panel_readiness_gates": {
+    "complete_settlement_provenance_for_labeled_inference": true,
+    "max_largest_slate_share": 0.2,
+    "min_distinct_events_overall": 120,
+    "min_distinct_slate_dates": 10,
+    "min_eligible_events_per_primary_clock": 100,
+    "min_independent_slates_per_tested_candidate": 8,
+    "zero_unhandled_duplicates_complements_lookahead": true
+  },
+  "registration_sha256": "553135d7d1456aeda4a9115784aa423b81931cceed4d2a2f707b5ca8dcbe816e",
+  "registration_version": "mlb_dense_panel_registration_v1",
+  "research_only": true,
+  "roles": {
+    "confirmation": "frozen_candidates_only_on_strictly_post_registration_events",
+    "discovery": "not_started_until_panel_ready_and_frozen_candidates_resolved"
+  },
+  "schema_version": 1,
+  "states": {
+    "accumulating": "panel gates not yet met; coverage diagnostics only",
+    "confirmation_failed": "frozen candidate failed at preregistered power",
+    "confirmation_pending": "frozen candidate awaiting powered confirmation sample",
+    "evidence_panel_ready": "all preregistered coverage/quality gates pass",
+    "outcome_b": "all members resolved without survivor at full power",
+    "research_ready_survivor": "passed discovery+confirmation; research only"
+  }
+}
