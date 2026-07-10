@@ -120,6 +120,45 @@ def test_panel_coverage_gates_fail_on_sparse_and_no_pnl() -> None:
     assert confirmation_power_met(coverage) is False
 
 
+def test_panel_coverage_uses_latest_observed_reschedule() -> None:
+    event = "KXMLBGAME-26JUL12POSTPONED"
+    ticker = f"{event}-AAA"
+    rows = []
+    for schedule, game_start, observations in (
+        (
+            "original",
+            "2026-07-12T20:00:00Z",
+            ("2026-07-12T19:00:00Z", "2026-07-12T19:45:00Z"),
+        ),
+        (
+            "rescheduled",
+            "2026-07-13T20:00:00Z",
+            ("2026-07-13T19:00:00Z", "2026-07-13T19:45:00Z"),
+        ),
+    ):
+        for index, observed in enumerate(observations):
+            rows.append(
+                {
+                    "snapshot_id": f"{schedule}-{index}",
+                    "contract_ticker": ticker,
+                    "event_ticker": event,
+                    "observed_at_utc": observed,
+                    "occurrence_datetime": game_start,
+                    "best_yes_bid": 0.54,
+                    "best_yes_ask": 0.56,
+                    "yes_ask_depth_top1": 10,
+                    "entry_source": "dense_public_orderbook",
+                }
+            )
+
+    coverage = assess_panel_coverage(rows)
+
+    assert coverage["schedule_resolution"] == "latest_observed_start_per_event"
+    assert coverage["schedule_revision_event_count"] == 1
+    assert coverage["slate_dates"] == ["2026-07-13"]
+    assert coverage["primary_event_counts"] == {"T-60m": 1, "T-15m": 1}
+
+
 def test_ops_register_and_replay_offline(tmp_path: Path) -> None:
     module = load_ops()
     reg_out = module.cmd_register(out_dir=tmp_path / "reg")
@@ -186,6 +225,44 @@ def test_capture_window_filter_uses_only_registered_asof_windows() -> None:
     )
     assert len(selected) == 1
     assert selected[0]["_eligible_capture_clocks"] == ["T-15m"]
+
+
+def test_schedule_revision_marker_invalidates_old_clock_without_book() -> None:
+    module = load_ops()
+    event = "KXMLBGAME-26JUL12POSTPONED"
+    old_row = {
+        "snapshot_id": "old-t60",
+        "contract_ticker": f"{event}-AAA",
+        "event_ticker": event,
+        "observed_at_utc": "2026-07-12T19:00:00Z",
+        "occurrence_datetime": "2026-07-12T20:00:00Z",
+        "best_yes_bid": 0.54,
+        "best_yes_ask": 0.56,
+        "yes_ask_depth_top1": 10,
+        "entry_source": "dense_public_orderbook",
+    }
+    markets = [
+        {
+            "ticker": f"{event}-{team}",
+            "event_ticker": event,
+            "occurrence_datetime": "2026-07-13T20:00:00Z",
+        }
+        for team in ("AAA", "BBB")
+    ]
+
+    revisions = module.build_schedule_revision_rows(
+        markets,
+        [old_row],
+        generated_utc="2026-07-12T19:30:00Z",
+    )
+    coverage = assess_panel_coverage([old_row, *revisions])
+
+    assert len(revisions) == 1
+    assert revisions[0]["schedule_revision"] is True
+    assert revisions[0]["previous_game_start_ts"] < revisions[0]["game_start_ts"]
+    assert coverage["schedule_revision_event_count"] == 1
+    assert coverage["slate_dates"] == ["2026-07-13"]
+    assert coverage["primary_event_counts"]["T-60m"] == 0
 
 
 def test_capture_cycle_skips_out_of_window_books_and_repo_latest(

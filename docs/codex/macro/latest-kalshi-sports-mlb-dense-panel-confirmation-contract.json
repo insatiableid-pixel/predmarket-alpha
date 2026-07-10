@@ -19,8 +19,8 @@
     "public_orderbook_source_share_min": 0.95
   },
   "candidate_performance_revealed_before_final": false,
-  "contract_sha256": "306d226da9679b33011d44e31f239a1a57cc4ec27a9ef3eb90a9988265d403be",
-  "contract_version": "mlb_dense_panel_single_shot_confirmation_v1",
+  "contract_sha256": "cbfa0635b006cf451b02f2cb99a16a03c0e5d7e7326f73113968f8e071ca674c",
+  "contract_version": "mlb_dense_panel_single_shot_confirmation_v2",
   "durability": {
     "attempt_manifest_created_exclusively": true,
     "final_result_idempotent": true,
@@ -30,12 +30,24 @@
   "execution_enabled": false,
   "implementation_files": [
     {
+      "path": "predmarket/sports_mlb_dense_panel.py",
+      "sha256": "59771a1130c782409d3c89d1b860fbb6b321fe7a05658651910b75bf46d3b7a6"
+    },
+    {
       "path": "predmarket/sports_mlb_dense_panel_confirmation.py",
-      "sha256": "9fca0ab8203d127f1996a9297b601edab996a7a8e62a81a8f86c342652393257"
+      "sha256": "b3ab4d8e3947b4f2afc2dd4ef96000c8ef4aaa1e918dccc4c77638876d5b93bf"
+    },
+    {
+      "path": "scripts/kalshi_sports_mlb_dense_book_capture.py",
+      "sha256": "85124bec3bdf9e8fc4e19002d686cd96629a978f2deb32376a0181f6a251eec4"
+    },
+    {
+      "path": "scripts/kalshi_sports_mlb_dense_panel_ops.py",
+      "sha256": "98f9c7d466fcfcfffa02eec894cf5abbdeacd7ffa42ced55ca23aa2e0fb137a2"
     },
     {
       "path": "scripts/kalshi_sports_mlb_dense_panel_confirmation.py",
-      "sha256": "afd49098833de73251742880f001dfbc48d04dd4cbec452c918170cafcb90188"
+      "sha256": "7b9dcb94da5d2da07e824f124cbd6771e07abb8b6819dafefc430180f7cf205b"
     }
   ],
   "inference": {
@@ -58,7 +70,7 @@
   },
   "panel_family_id": "sports_mlb_dense_fixed_clock_panel_v1",
   "panel_registration_sha256": "553135d7d1456aeda4a9115784aa423b81931cceed4d2a2f707b5ca8dcbe816e",
-  "registered_at_utc": "2026-07-10T06:35:42Z",
+  "registered_at_utc": "2026-07-10T07:10:59Z",
   "research_only": true,
   "sample_freeze": {
     "freeze_only_after_all_preflight_gates": true,

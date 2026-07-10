@@ -92,6 +92,47 @@ def slate_date_from_ts(ts: float | None) -> str | None:
     return datetime.fromtimestamp(float(ts), tz=UTC).strftime("%Y-%m-%d")
 
 
+def row_game_start_ts(row: Mapping[str, Any]) -> float | None:
+    """Return the schedule carried by one raw market observation."""
+    return optional_float(row.get("game_start_ts")) or timestamp(
+        row.get("occurrence_datetime") or row.get("expected_expiration_time")
+    )
+
+
+def latest_observed_event_schedule(
+    rows: Sequence[Mapping[str, Any]],
+) -> tuple[float | None, list[dict[str, Any]]]:
+    """Resolve an event's current schedule from its latest observed market row.
+
+    MLB postponements can retain an event ticker while Kalshi updates the game
+    time.  Earlier schedule revisions remain useful audit evidence, but they
+    must not define later fixed-clock decisions.  The latest timestamped row
+    carrying a valid start determines the effective schedule; only rows that
+    carry that same schedule are eligible at its clocks.
+    """
+    scheduled: list[tuple[float, str, str, float, dict[str, Any]]] = []
+    for raw in rows:
+        start = row_game_start_ts(raw)
+        observed = timestamp(raw.get("observed_at_utc")) or optional_float(raw.get("observed_ts"))
+        if start is None or observed is None:
+            continue
+        item = dict(raw)
+        scheduled.append(
+            (
+                float(observed),
+                str(raw.get("snapshot_id") or ""),
+                str(raw.get("contract_ticker") or ""),
+                float(start),
+                item,
+            )
+        )
+    if not scheduled:
+        return None, []
+    effective_start = max(scheduled, key=lambda item: (item[0], item[1], item[2]))[3]
+    current_rows = [item[4] for item in scheduled if item[3] == effective_start]
+    return effective_start, current_rows
+
+
 def build_panel_registration(*, generated_utc: str | None = None) -> dict[str, Any]:
     generated = generated_utc or utc_now_iso()
     registration = {
@@ -392,20 +433,27 @@ def assess_panel_coverage(  # noqa: C901
         by_event[event].append(item)
         source_counts[str(row.get("entry_source") or "unknown")] += 1
 
-    # Event-level dedupe for independence accounting.
+    # Event-level dedupe for independence accounting.  Resolve schedule
+    # revisions before clock selection so a postponed game cannot retain its
+    # original decision clock or slate.
     events = sorted(by_event)
+    effective_start_by_event: dict[str, float] = {}
+    current_rows_by_event: dict[str, list[dict[str, Any]]] = {}
+    schedule_revision_event_count = 0
     slate_dates: set[str] = set()
     for _event, rows in by_event.items():
-        starts = [
-            optional_float(r.get("game_start_ts"))
-            or timestamp(r.get("occurrence_datetime") or r.get("expected_expiration_time"))
-            for r in rows
-        ]
-        starts = [s for s in starts if s is not None]
-        if starts:
-            slate = slate_date_from_ts(min(starts))
-            if slate:
-                slate_dates.add(slate)
+        unique_starts = {row_game_start_ts(row) for row in rows}
+        unique_starts.discard(None)
+        if len(unique_starts) > 1:
+            schedule_revision_event_count += 1
+        game_start, current_rows = latest_observed_event_schedule(rows)
+        if game_start is None:
+            continue
+        effective_start_by_event[_event] = game_start
+        current_rows_by_event[_event] = current_rows
+        slate = slate_date_from_ts(game_start)
+        if slate:
+            slate_dates.add(slate)
 
     primary_event_counts: dict[str, int] = {}
     primary_staleness: dict[str, list[float]] = {name: [] for name in PRIMARY_CLOCKS_SECONDS}
@@ -415,20 +463,16 @@ def assess_panel_coverage(  # noqa: C901
     eligible_primary = 0
     for clock_name, offset in PRIMARY_CLOCKS_SECONDS.items():
         count = 0
-        for _event, rows in by_event.items():
-            starts = [
-                optional_float(r.get("game_start_ts"))
-                or timestamp(r.get("occurrence_datetime") or r.get("expected_expiration_time"))
-                for r in rows
-            ]
-            starts = [s for s in starts if s is not None]
-            if not starts:
+        for _event, rows in current_rows_by_event.items():
+            game_start = effective_start_by_event.get(_event)
+            if game_start is None:
                 continue
-            game_start = min(starts)
             clock_ts = float(game_start) - float(offset)
             # Strict as-of: latest observation <= clock.
             candidates = []
             for row in rows:
+                if row.get("schedule_revision") is True:
+                    continue
                 obs = timestamp(row.get("observed_at_utc")) or optional_float(
                     row.get("observed_ts")
                 )
@@ -504,6 +548,8 @@ def assess_panel_coverage(  # noqa: C901
         "distinct_events": len(events),
         "distinct_slate_dates": len(slate_dates),
         "slate_dates": sorted(slate_dates),
+        "schedule_resolution": "latest_observed_start_per_event",
+        "schedule_revision_event_count": schedule_revision_event_count,
         "primary_event_counts": primary_event_counts,
         "source_counts": dict(source_counts),
         "public_orderbook_source_share": json_float(source_share),
