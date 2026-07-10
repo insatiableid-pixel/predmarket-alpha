@@ -19,10 +19,16 @@ import re
 import statistics
 from collections import Counter, defaultdict
 from collections.abc import Mapping, Sequence
+from decimal import Decimal
 from pathlib import Path
 from typing import Any
 
-from predmarket.kalshi_execution_cost import GENERAL_TAKER_FEE_RATE, kalshi_trade_fee
+from predmarket.kalshi_execution_cost import (
+    GENERAL_TAKER_FEE_RATE,
+    FeeType,
+    kalshi_trade_fee,
+    resolve_fee_type,
+)
 from predmarket.shared_helpers import (
     json_float,
     optional_float,
@@ -50,11 +56,19 @@ DEFAULT_STALENESS_SECONDS: dict[str, int] = {
     "T-15m": 30 * 60,
 }
 
-# Pre-registered power gates (event-level independence unit).
+# Pre-registered power gates (event-level independence unit; slate clusters for inference).
 MIN_DISCOVERY_EVENTS = 40
 MIN_OOS_EVENTS = 20
+MIN_OOS_SLATES = 4
+MIN_INFERENCE_SLATES = 6
 MIN_CONFIRMATION_EVENTS = 15
+MIN_CONFIRMATION_SLATES = 4
 FDR_ALPHA = 0.05
+MAX_SLATE_SHARE = 0.35
+INFERENCE_SEED = 11
+INFERENCE_RESAMPLES = 2000
+ANALYSIS_CONTRACT_VERSION = "mlb_settlement_miscalibration_inference_v2"
+FEE_SERIES_TICKER = "KXMLBGAME"
 
 MONTHS = {
     "JAN": 1,
@@ -144,14 +158,87 @@ def sha256_text(text: str) -> str:
     return hashlib.sha256(text.encode("utf-8")).hexdigest()
 
 
-def taker_fee(price: float, *, contract_count: float = 1.0) -> float:
-    return float(
+def resolve_kxmlbgame_taker_fee(
+    price: float,
+    *,
+    contract_count: float = 1.0,
+    series_ticker: str = FEE_SERIES_TICKER,
+    as_of_ts: float | None = None,
+    fee_type: FeeType | None = None,
+    allow_network: bool = False,
+    fee_rate_override: float | None = None,
+) -> dict[str, Any]:
+    """Resolve applicable taker fee with explicit provenance.
+
+    Offline-by-default: without local fee_type evidence, use the official general
+    quadratic taker schedule labeled as a conservative fallback. Network fee_changes
+    lookup is opt-in so replay remains deterministic.
+    """
+    from datetime import UTC, datetime
+
+    lookup_time = (
+        datetime.fromtimestamp(float(as_of_ts), tz=UTC)
+        if as_of_ts is not None
+        else datetime.now(UTC)
+    )
+    resolved = fee_type
+    fee_source = "explicit_fee_type"
+    fallback_state = "none"
+    if resolved is None and fee_rate_override is None and allow_network:
+        try:
+            resolved = resolve_fee_type(series_ticker, now=lookup_time)
+            fee_source = "series_fee_changes_api_or_cache"
+        except Exception:
+            resolved = None
+            fee_source = "fee_changes_unavailable"
+    if resolved is None and fee_rate_override is None:
+        resolved = FeeType(kind="quadratic", multiplier=Decimal("1.0"), scheduled_ts=None)
+        fee_source = "conservative_general_quadratic_fallback"
+        fallback_state = "conservative_general_quadratic"
+
+    kind = resolved.kind if resolved is not None else "quadratic"
+    multiplier = float(resolved.multiplier) if resolved is not None else 1.0
+    scheduled = None
+    if resolved is not None and resolved.scheduled_ts is not None:
+        scheduled = resolved.scheduled_ts.isoformat().replace("+00:00", "Z")
+
+    if fee_rate_override is not None and fee_rate_override >= 0:
+        rate = Decimal(str(fee_rate_override))
+        fee_source = "fee_rate_override"
+        fallback_state = "none"
+    elif kind == "flat":
+        # Flat schedules are series-specific; without an explicit flat amount we
+        # refuse to invent one and fall back conservatively to general quadratic.
+        rate = GENERAL_TAKER_FEE_RATE * Decimal(str(multiplier))
+        fee_source = "flat_unavailable_used_quadratic_fallback"
+        fallback_state = "flat_to_quadratic_conservative"
+        kind = "quadratic"
+    else:
+        rate = GENERAL_TAKER_FEE_RATE * Decimal(str(multiplier))
+
+    fee = float(
         kalshi_trade_fee(
             price=price,
             contract_count=contract_count,
-            fee_rate=GENERAL_TAKER_FEE_RATE,
+            fee_rate=rate,
         )
     )
+    return {
+        "fee": fee,
+        "fee_rate": float(rate),
+        "fee_type": kind,
+        "fee_multiplier": multiplier,
+        "fee_source": fee_source,
+        "fee_effective_scheduled_ts": scheduled,
+        "fee_lookup_time_utc": lookup_time.isoformat().replace("+00:00", "Z"),
+        "fee_series_ticker": series_ticker,
+        "fee_fallback_state": fallback_state,
+        "fee_mode": "taker",
+    }
+
+
+def taker_fee(price: float, *, contract_count: float = 1.0) -> float:
+    return float(resolve_kxmlbgame_taker_fee(price, contract_count=contract_count)["fee"])
 
 
 def validate_book(bid: float | None, ask: float | None) -> tuple[bool, str | None]:
@@ -517,6 +604,10 @@ def hold_to_settlement_economics(
     yes_outcome: int,
     yes_ask_depth: float | None,
     no_ask_depth: float | None,
+    as_of_ts: float | None = None,
+    series_ticker: str = FEE_SERIES_TICKER,
+    fee_type: FeeType | None = None,
+    allow_network_fee: bool = False,
 ) -> dict[str, Any]:
     """Enter at contemporaneous executable ask; hold to settlement; one taker fee."""
     side_norm = side.lower().strip()
@@ -535,7 +626,14 @@ def hold_to_settlement_economics(
     ask_f = float(ask)
     if not (0.0 < ask_f < 1.0):
         return _blocked_econ("ask_not_tradable")
-    fee = taker_fee(ask_f)
+    fee_meta = resolve_kxmlbgame_taker_fee(
+        ask_f,
+        series_ticker=series_ticker,
+        as_of_ts=as_of_ts,
+        fee_type=fee_type,
+        allow_network=allow_network_fee,
+    )
+    fee = float(fee_meta["fee"])
     net = payoff - ask_f - fee
     gross = payoff - ask_f
     return {
@@ -548,6 +646,15 @@ def hold_to_settlement_economics(
         "net_payoff_per_contract": json_float(net),
         "capacity_contracts": json_float(depth),
         "blocker": None,
+        "fee_rate": json_float(fee_meta["fee_rate"]),
+        "fee_type": fee_meta["fee_type"],
+        "fee_multiplier": json_float(fee_meta["fee_multiplier"]),
+        "fee_source": fee_meta["fee_source"],
+        "fee_effective_scheduled_ts": fee_meta["fee_effective_scheduled_ts"],
+        "fee_lookup_time_utc": fee_meta["fee_lookup_time_utc"],
+        "fee_series_ticker": fee_meta["fee_series_ticker"],
+        "fee_fallback_state": fee_meta["fee_fallback_state"],
+        "fee_mode": fee_meta["fee_mode"],
     }
 
 
@@ -562,6 +669,15 @@ def _blocked_econ(reason: str) -> dict[str, Any]:
         "net_payoff_per_contract": None,
         "capacity_contracts": None,
         "blocker": reason,
+        "fee_rate": None,
+        "fee_type": None,
+        "fee_multiplier": None,
+        "fee_source": None,
+        "fee_effective_scheduled_ts": None,
+        "fee_lookup_time_utc": None,
+        "fee_series_ticker": None,
+        "fee_fallback_state": None,
+        "fee_mode": None,
     }
 
 
@@ -681,6 +797,8 @@ def build_fixed_clock_labels(
                 listing_age_hours = max(0.0, (float(book["observed_ts"]) - open_ts) / 3600.0)
             book_age = float(clock_ts) - float(book["observed_ts"])
 
+            as_of_fee_ts = float(book.get("observed_ts") or clock_ts)
+            series_ticker = series_from_ticker(ticker)
             yes_econ = hold_to_settlement_economics(
                 side="yes",
                 yes_ask=yes_ask,
@@ -688,6 +806,8 @@ def build_fixed_clock_labels(
                 yes_outcome=int(yes_outcome),
                 yes_ask_depth=optional_float(book.get("yes_ask_depth_top1")),
                 no_ask_depth=optional_float(book.get("no_ask_depth_top1")),
+                as_of_ts=as_of_fee_ts,
+                series_ticker=series_ticker,
             )
             no_econ = hold_to_settlement_economics(
                 side="no",
@@ -696,6 +816,8 @@ def build_fixed_clock_labels(
                 yes_outcome=int(yes_outcome),
                 yes_ask_depth=optional_float(book.get("yes_ask_depth_top1")),
                 no_ask_depth=optional_float(book.get("no_ask_depth_top1")),
+                as_of_ts=as_of_fee_ts,
+                series_ticker=series_ticker,
             )
 
             label_status = "labeled"
@@ -770,6 +892,20 @@ def build_fixed_clock_labels(
                     "no_net_payoff": no_econ["net_payoff_per_contract"],
                     "no_capacity": no_econ["capacity_contracts"],
                     "no_blocker": no_econ["blocker"],
+                    "fee_rate": yes_econ.get("fee_rate") or no_econ.get("fee_rate"),
+                    "fee_type": yes_econ.get("fee_type") or no_econ.get("fee_type"),
+                    "fee_multiplier": yes_econ.get("fee_multiplier")
+                    or no_econ.get("fee_multiplier"),
+                    "fee_source": yes_econ.get("fee_source") or no_econ.get("fee_source"),
+                    "fee_effective_scheduled_ts": yes_econ.get("fee_effective_scheduled_ts")
+                    or no_econ.get("fee_effective_scheduled_ts"),
+                    "fee_lookup_time_utc": yes_econ.get("fee_lookup_time_utc")
+                    or no_econ.get("fee_lookup_time_utc"),
+                    "fee_series_ticker": yes_econ.get("fee_series_ticker")
+                    or no_econ.get("fee_series_ticker"),
+                    "fee_fallback_state": yes_econ.get("fee_fallback_state")
+                    or no_econ.get("fee_fallback_state"),
+                    "fee_mode": yes_econ.get("fee_mode") or no_econ.get("fee_mode"),
                     "label_status": label_status,
                     "usable": False,
                     "research_only": True,
@@ -780,21 +916,47 @@ def build_fixed_clock_labels(
     # Attach clock-to-clock geometry after first pass.
     labels = attach_clock_geometry(labels)
 
+    labeled_only = [row for row in labels if row.get("label_status") == "labeled"]
+    slate_by_clock: dict[str, set[str]] = {name: set() for name in clock_map}
+    for row in labeled_only:
+        clock_name = str(row.get("clock_name") or "")
+        if clock_name not in slate_by_clock:
+            continue
+        ts = optional_float(row.get("game_start_ts")) or optional_float(row.get("decision_ts"))
+        if ts is None:
+            continue
+        from datetime import UTC, datetime
+
+        slate_by_clock[clock_name].add(
+            datetime.fromtimestamp(float(ts), tz=UTC).strftime("%Y-%m-%d")
+        )
     summary = {
         "observation_row_count": len(observations),
         "settlement_ticker_count": len(settlements),
         "label_row_count": len(labels),
-        "labeled_row_count": sum(1 for row in labels if row.get("label_status") == "labeled"),
+        "labeled_row_count": len(labeled_only),
         "clocks_seconds": clock_map,
         "staleness_seconds": stale_map,
         "quality_counts": dict(quality),
         "clock_coverage": {name: dict(counter) for name, counter in clock_coverage.items()},
         "events_by_clock": {name: len(values) for name, values in events_by_clock.items()},
+        "slates_by_clock": {name: len(values) for name, values in slate_by_clock.items()},
         "distinct_contract_count": len({row.get("contract_ticker") for row in labels}),
         "distinct_event_count": len(
             {row.get("event_ticker") for row in labels if row.get("event_ticker")}
         ),
         "discovery_cutoff_utc": discovery_cutoff_utc,
+        "historical_discovery_data_cutoff_utc": discovery_cutoff_utc,
+        "independence_notes": {
+            "event_unit": "event_ticker",
+            "cluster_unit": "mlb_slate_date_utc",
+            "complementary_contracts": "collapsed_to_one_event",
+            "multiple_clocks_same_game": "repeated_measures_not_independent",
+            "doubleheaders_postponements": (
+                "distinct event_ticker + game_start slate date; relistings share event when "
+                "Kalshi event_ticker is stable"
+            ),
+        },
     }
     return labels, summary
 

@@ -42,28 +42,34 @@ from predmarket.shared_helpers import (  # noqa: E402
     utc_now,
 )
 from predmarket.sports_mlb_settlement_miscalibration import (  # noqa: E402
+    ANALYSIS_CONTRACT_VERSION,
     DEFAULT_CLOCKS_SECONDS,
     DEFAULT_STALENESS_SECONDS,
     FAMILY_ID,
     FDR_ALPHA,
+    INFERENCE_RESAMPLES,
+    INFERENCE_SEED,
     MIN_OOS_EVENTS,
     build_fixed_clock_labels,
     hypothesis_registry,
     load_observation_packets,
     load_settlement_markets,
     sha256_file,
+    sha256_text,
 )
 from predmarket.sports_mlb_settlement_miscalibration_eval import (  # noqa: E402
     apply_fdr,
     calibration_summary,
     evaluate_confirmation,
     evaluate_hypothesis,
+    family_resolution_counts,
     hard_gate_assessment,
     lifecycle_status,
     negative_registry_update,
     phase0_audit,
     power_analysis,
     research_frontier,
+    resolve_spec_status,
 )
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
@@ -319,31 +325,46 @@ def write_csv(path: Path, rows: Sequence[Mapping[str, Any]], fieldnames: Sequenc
 
 def render_markdown(report: Mapping[str, Any]) -> str:
     summary = report.get("summary") or {}
+    resolution = report.get("resolution_counts") or summary.get("resolution_counts") or {}
+    capture = report.get("capture_readiness") or {}
     lines = [
         "# Kalshi Sports MLB Settlement Miscalibration",
         "",
         f"- Status: `{report.get('status')}`",
         f"- Family status: `{report.get('family_status')}`",
         f"- Family: `{FAMILY_ID}`",
+        f"- Schema: `{report.get('schema_version')}` (`{report.get('analysis_contract_version')}`)",
         f"- Observations: `{summary.get('observation_row_count')}`",
         f"- Settlement tickers: `{summary.get('settlement_ticker_count')}`",
         f"- Labeled rows: `{summary.get('labeled_row_count')}`",
         f"- Distinct events: `{summary.get('distinct_event_count')}`",
         f"- Pre-registered candidates: `{summary.get('registry_count')}`",
-        f"- Testable candidates: `{summary.get('testable_count')}`",
-        f"- FDR survivors: `{summary.get('fdr_survivor_count')}`",
-        f"- Research-ready: `{summary.get('research_ready_count')}`",
-        f"- Discovery cutoff: `{report.get('discovery_cutoff_utc')}`",
+        f"- Powered novel: `{resolution.get('powered_count')}`",
+        f"- Underpowered novel: `{resolution.get('underpowered_count')}`",
+        f"- Powered falsified: `{resolution.get('powered_falsified_count')}`",
+        f"- Frozen multi-slate confirmation: `{resolution.get('frozen_waiting_multi_slate_count')}`",
+        f"- FDR survivors (incl. frozen/pending): `{summary.get('fdr_survivor_count')}`",
+        f"- Research-ready survivors: `{summary.get('research_ready_count')}`",
+        f"- Historical discovery data cutoff: `{report.get('historical_discovery_data_cutoff_utc')}`",
+        f"- Cutoff provenance: `{report.get('discovery_cutoff_provenance')}`",
+        f"- Forward confirmation registered at: `{report.get('forward_confirmation_registered_at_utc')}`",
+        f"- Capture infrastructure ready: `{capture.get('capture_infrastructure_ready')}`",
+        f"- Evidence panel ready: `{capture.get('evidence_panel_ready')}`",
+        f"- Capture/panel status: `{capture.get('status')}`",
         f"- Public market fetches: `{report.get('public_market_data_calls')}`",
         "",
         "## Decision",
         "",
         str(report.get("decision") or ""),
         "",
-        "## Power",
+        "## Power (per-specification)",
         "",
-        f"- Discovery power met: `{((report.get('power') or {}).get('discovery_power_met'))}`",
+        f"- Panel event coverage met: `{((report.get('power') or {}).get('panel_event_coverage_met'))}`",
+        f"- Family-wide discovery power met: `{((report.get('power') or {}).get('discovery_power_met'))}`",
         f"- Events by clock: `{(report.get('power') or {}).get('events_by_clock')}`",
+        f"- Slates by clock: `{(report.get('power') or {}).get('slates_by_clock')}`",
+        f"- Powered novel count: `{(report.get('power') or {}).get('powered_novel_count')}`",
+        f"- Underpowered novel count: `{(report.get('power') or {}).get('underpowered_novel_count')}`",
         "",
         "## Calibration",
         "",
@@ -358,15 +379,29 @@ def render_markdown(report: Mapping[str, Any]) -> str:
     for row in report.get("evaluations") or []:
         lines.append(
             f"- `{row.get('model_id')}` status=`{row.get('status')}` "
-            f"oos=`{row.get('oos_event_count')}` mean_net=`{row.get('oos_mean_net_return')}` "
-            f"mean_resid=`{row.get('oos_mean_calibration_residual')}` q=`{row.get('q_value')}` "
+            f"oos_events=`{row.get('oos_event_count')}` oos_slates=`{row.get('oos_slate_count')}` "
+            f"mean_net=`{row.get('oos_mean_net_return')}` "
+            f"mean_resid=`{row.get('oos_mean_calibration_residual')}` "
+            f"p_econ=`{row.get('p_economic')}` p_cal=`{row.get('p_calibration')}` "
+            f"p_joint=`{row.get('p_joint')}` q=`{row.get('q_value')}` "
+            f"slate_share=`{row.get('largest_slate_cluster_share')}` "
             f"negctrl=`{row.get('negative_control')}` baseline=`{row.get('baseline_only')}`"
         )
+    frozen = report.get("frozen_candidates") or []
+    if frozen:
+        lines.extend(["", "## Frozen candidates (exact; do not retune)", ""])
+        for row in frozen:
+            lines.append(
+                f"- `{row.get('model_id')}` formula_hash=`{row.get('formula_hash')}` "
+                f"clock=`{row.get('clock_name')}` side=`{row.get('side')}` "
+                f"registered=`{row.get('forward_confirmation_registered_at_utc')}`"
+            )
     lines.extend(["", "## Confirmation", ""])
     for row in report.get("confirmation_ledger") or []:
         lines.append(
             f"- `{row.get('model_id')}` status=`{row.get('status')}` "
-            f"events=`{row.get('event_count')}` mean_net=`{row.get('mean_net_return')}`"
+            f"events=`{row.get('event_count')}` slates=`{row.get('slate_count')}` "
+            f"mean_net=`{row.get('mean_net_return')}`"
         )
     lines.extend(["", "## Frontier", ""])
     for row in report.get("frontier") or []:
@@ -484,7 +519,6 @@ def build_report(
         settlements,
         discovery_cutoff_utc=None,
     )
-    power = power_analysis(all_summary)
     calib = calibration_summary(all_labels)
     registry = hypothesis_registry()
 
@@ -499,129 +533,133 @@ def build_report(
     ]
     evaluations = apply_fdr(evaluations, alpha=fdr_alpha)
 
+    # Honest timestamps: runtime cutoff censors historical discovery but is NOT a
+    # pre-outcome preregistration. Forward confirmation freezes only when a candidate
+    # is actually frozen for future evaluation.
+    historical_cutoff = cutoff
+    forward_registration = generated  # freeze time for any confirmation-pending candidates
     confirmation_ledger = [
-        evaluate_confirmation(all_labels, spec, cutoff_utc=cutoff) for spec in registry
+        evaluate_confirmation(
+            all_labels,
+            spec,
+            cutoff_utc=historical_cutoff,
+            registration_utc=None,  # no candidate frozen until after resolution pass
+        )
+        for spec in registry
     ]
     confirmation_by_id = {row["model_id"]: row for row in confirmation_ledger}
 
     gated: list[dict[str, Any]] = []
+    frozen_candidates: list[dict[str, Any]] = []
     for row in evaluations:
-        item = dict(row)
-        conf = confirmation_by_id.get(str(item.get("model_id")))
+        conf = confirmation_by_id.get(str(row.get("model_id")))
         assessment = hard_gate_assessment(
-            item,
+            row,
             min_oos=min_oos_events,
             confirmation=conf,
         )
-        item["hard_gates"] = assessment
-        if item.get("status") == "research_candidate_fdr_passed":
-            if assessment["research_ready"]:
-                item["status"] = "research_ready"
-            elif assessment["discovery_gates_pass"]:
-                item["status"] = "confirmation_pending"
-            else:
-                item["status"] = "testable_fdr_pass_hard_gate_fail"
-        elif item.get("status") == "testable":
-            mean_net = item.get("oos_mean_net_return")
-            if mean_net is not None and float(mean_net) <= 0:
-                item["status"] = "falsified"
-        gated.append(item)
+        resolved = resolve_spec_status(row, assessment, confirmation=conf)
+        resolved["hard_gates"] = assessment
+        if resolved.get("status") == "frozen_candidate_waiting_multi_slate_confirmation":
+            freeze = {
+                "model_id": resolved.get("model_id"),
+                "formula_hash": resolved.get("formula_hash"),
+                "side": resolved.get("side"),
+                "clock_name": resolved.get("clock_name"),
+                "feature": resolved.get("feature"),
+                "direction": resolved.get("direction"),
+                "threshold": resolved.get("threshold"),
+                "range": resolved.get("range"),
+                "p_threshold": resolved.get("p_threshold") if "p_threshold" in resolved else None,
+                "spread_max": resolved.get("spread_max") if "spread_max" in resolved else None,
+                "fee_rule": "executable_ask_plus_series_resolved_taker_entry_fee",
+                "as_of_rule": "strict_latest_book_at_or_before_clock_within_staleness",
+                "split_rule": "event_grouped_walk_forward_or_chronological_30pct_holdout",
+                "inference_contract": {
+                    "version": ANALYSIS_CONTRACT_VERSION,
+                    "p_economic": "slate_cluster_sign_flip mean fee-adjusted net > 0",
+                    "p_calibration": "slate_cluster_sign_flip mean side residual > 0",
+                    "p_joint": "max(p_economic, p_calibration)",
+                    "fdr": f"BH on p_joint novel family alpha={fdr_alpha}",
+                    "seed": INFERENCE_SEED,
+                    "n_resamples": INFERENCE_RESAMPLES,
+                },
+                "historical_discovery_data_cutoff_utc": historical_cutoff,
+                "forward_confirmation_registered_at_utc": forward_registration,
+                "analysis_contract_version": ANALYSIS_CONTRACT_VERSION,
+                "registry_hash": None,  # filled below
+                "code_sha_placeholder": "filled_at_write_time",
+                "p_economic": resolved.get("p_economic"),
+                "p_calibration": resolved.get("p_calibration"),
+                "p_joint": resolved.get("p_joint"),
+                "q_value": resolved.get("q_value"),
+                "oos_event_count": resolved.get("oos_event_count"),
+                "oos_slate_count": resolved.get("oos_slate_count"),
+                "largest_slate_cluster_share": resolved.get("largest_slate_cluster_share"),
+            }
+            frozen_candidates.append(freeze)
+            resolved["freeze_record"] = freeze
+        gated.append(resolved)
+
+    registry_hash = sha256_text(str(registry))
+    for freeze in frozen_candidates:
+        freeze["registry_hash"] = registry_hash
+
+    # Re-run confirmation ledger with registration boundary for frozen candidates only.
+    frozen_ids = {item["model_id"] for item in frozen_candidates}
+    confirmation_ledger = []
+    for spec in registry:
+        reg_ts = forward_registration if spec["model_id"] in frozen_ids else None
+        confirmation_ledger.append(
+            evaluate_confirmation(
+                all_labels,
+                spec,
+                cutoff_utc=historical_cutoff,
+                registration_utc=reg_ts,
+            )
+        )
+    confirmation_by_id = {row["model_id"]: row for row in confirmation_ledger}
+    for row in gated:
+        conf = confirmation_by_id.get(str(row.get("model_id")))
+        if conf is not None:
+            row["confirmation"] = conf
+            # If already confirmation_pending with powered confirmation sample, leave
+            # evaluation to a single preregistered confirmation pass (not continuous).
+            if (
+                row.get("status") == "confirmation_pending"
+                and conf.get("status") == "confirmation_ready"
+            ):
+                conf_mean = conf.get("mean_net_return")
+                if conf_mean is not None and float(conf_mean) > 0:
+                    row["status"] = "research_ready_survivor"
+                    row["resolution"] = "research_ready_survivor"
+                elif conf_mean is not None:
+                    row["status"] = "confirmation_failed"
+                    row["resolution"] = "confirmation_failed"
 
     family_status = lifecycle_status(gated)
-    novel = [
-        row for row in gated if not row.get("negative_control") and not row.get("baseline_only")
-    ]
-    powered_novel = [row for row in novel if int(row.get("oos_event_count") or 0) >= min_oos_events]
-    # Mark powered novel specs with non-positive economics as falsified.
-    for row in gated:
-        if (
-            not row.get("negative_control")
-            and not row.get("baseline_only")
-            and row.get("status") == "testable"
-            and int(row.get("oos_event_count") or 0) >= min_oos_events
-        ):
-            mean_net = row.get("oos_mean_net_return")
-            q_value = row.get("q_value")
-            if mean_net is not None and float(mean_net) <= 0:
-                row["status"] = "falsified"
-            elif q_value is not None and float(q_value) > fdr_alpha:
-                row["status"] = "falsified"
-
-    fdr_pass_blocked = [
-        row for row in novel if row.get("status") == "testable_fdr_pass_hard_gate_fail"
-    ]
-    true_survivors = [
-        row
-        for row in novel
-        if row.get("status")
-        in {"research_candidate_fdr_passed", "confirmation_pending", "research_ready"}
-    ]
-    if true_survivors and any(row.get("status") == "research_ready" for row in true_survivors):
-        family_status = "research_ready"
-    elif true_survivors and any(
-        row.get("status") == "confirmation_pending" for row in true_survivors
-    ):
-        family_status = "confirmation_pending"
-    elif fdr_pass_blocked and power.get("discovery_power_met"):
-        # At pre-registered power, FDR hits that still fail non-confirmation hard gates
-        # (concentration, capacity, orderbook share, temporal) are not survivors.
-        # Retire them rather than leaving an open retune surface.
-        only_waiting_confirmation = True
-        for row in fdr_pass_blocked:
-            hard = row.get("hard_gates") or {}
-            fails = [
-                gate
-                for gate in hard.get("gates") or []
-                if gate.get("status") != "pass"
-                and gate.get("name") != "untouched_confirmation"
-            ]
-            if fails:
-                only_waiting_confirmation = False
-                row["status"] = "falsified"
-                row["retirement_reason"] = (
-                    "fdr_pass_but_hard_gates_failed:"
-                    + ",".join(str(gate.get("name")) for gate in fails)
-                )
-        if only_waiting_confirmation:
-            family_status = "confirmation_pending"
-            for row in fdr_pass_blocked:
-                row["status"] = "confirmation_pending"
-        else:
-            family_status = "falsified"
-    elif power.get("discovery_power_met") and powered_novel and not true_survivors:
-        family_status = "falsified"
-    elif not power.get("discovery_power_met"):
-        family_status = "discovery_pending"
-
+    resolution_counts = family_resolution_counts(gated)
+    power = power_analysis(all_summary, gated)
     neg = negative_registry_update(gated, family_status=family_status)
     frontier = research_frontier(family_status, all_summary)
 
-    testable_count = sum(
-        1
-        for row in gated
-        if row.get("status")
-        in {
-            "testable",
-            "falsified",
-            "research_candidate_fdr_passed",
-            "confirmation_pending",
-            "research_ready",
-            "testable_fdr_pass_hard_gate_fail",
-        }
-        and int(row.get("oos_event_count") or 0) >= min_oos_events
-    )
+    novel = [
+        row for row in gated if not row.get("negative_control") and not row.get("baseline_only")
+    ]
+    powered_novel = [row for row in novel if row.get("power_met")]
+    testable_count = sum(1 for row in novel if row.get("power_met"))
     fdr_survivor_count = sum(
         1
-        for row in gated
+        for row in novel
         if row.get("status")
         in {
             "research_candidate_fdr_passed",
             "confirmation_pending",
-            "research_ready",
-            "testable_fdr_pass_hard_gate_fail",
+            "research_ready_survivor",
+            "frozen_candidate_waiting_multi_slate_confirmation",
         }
     )
-    research_ready_count = sum(1 for row in gated if row.get("status") == "research_ready")
+    research_ready_count = sum(1 for row in novel if row.get("status") == "research_ready_survivor")
 
     if family_status == "research_ready":
         status = "mlb_settlement_miscalibration_research_ready"
@@ -632,28 +670,20 @@ def build_report(
     elif family_status == "falsified":
         status = "mlb_settlement_miscalibration_family_falsified"
         decision = (
-            "Outcome B: finite family tested at pre-registered power with no survivor. "
+            "Outcome B: every preregistered novel member is resolved without a survivor. "
             "Record negative evidence and do not retune cosmetically."
         )
     elif family_status == "confirmation_pending":
         status = "mlb_settlement_miscalibration_confirmation_pending"
         decision = (
-            "Discovery FDR survivor present; waiting for untouched post-cutoff confirmation "
-            "sample. Continue dense capture; do not retune."
-        )
-    elif fdr_pass_blocked:
-        status = "mlb_settlement_miscalibration_discovery_pending_hard_gate_blockers"
-        blocked_ids = [str(row.get("model_id")) for row in fdr_pass_blocked]
-        decision = (
-            "Statistical FDR survivors exist but hard gates block research-readiness "
-            f"({', '.join(blocked_ids)}). Continue dense orderbook capture and "
-            "untouched confirmation; do not retune thresholds on holdout."
+            "Corrected discovery inference produced frozen/confirmation-pending candidate(s). "
+            "Hold formulas fixed; accumulate multi-slate dense panel for independent confirmation."
         )
     else:
-        status = "mlb_settlement_miscalibration_discovery_pending"
+        status = "mlb_settlement_miscalibration_evidence_incomplete"
         decision = (
-            "Discovery incomplete: insufficient independent fixed-clock event labels and/or "
-            "no powered testable novel candidates yet. Continue dense capture and settlement joins."
+            "Evidence incomplete: one or more novel members remain underpowered or unresolved. "
+            "Do not declare Outcome B; continue dense multi-slate capture without retuning."
         )
 
     gates = [
@@ -681,22 +711,48 @@ def build_report(
             f"{all_summary.get('labeled_row_count')} labeled rows",
         ),
         gate(
-            "event_power",
-            "pass" if power.get("discovery_power_met") else "blocked",
-            f"max_clock_events={power.get('max_clock_events')} min={power.get('min_discovery_events')}",
+            "per_spec_power_accounting",
+            "pass" if resolution_counts.get("novel_count", 0) > 0 else "blocked",
+            (
+                f"powered={resolution_counts.get('powered_count')} "
+                f"underpowered={resolution_counts.get('underpowered_count')} "
+                f"falsified={resolution_counts.get('powered_falsified_count')} "
+                f"frozen={resolution_counts.get('frozen_waiting_multi_slate_count')}"
+            ),
         ),
         gate(
             "research_only_boundary",
             "pass",
             "usable=false; no paper stake, sizing, accounts, orders, or live execution",
         ),
+        gate(
+            "honest_family_outcome",
+            "pass"
+            if not (
+                family_status == "falsified"
+                and int(resolution_counts.get("underpowered_count") or 0) > 0
+            )
+            else "blocked",
+            f"family_status={family_status}; underpowered members cannot yield Outcome B",
+        ),
     ]
 
+    # Collector can run; panel breadth/independence gates are not yet met on sparse history.
+    panel_slates = max((all_summary.get("slates_by_clock") or {}).values() or [0])
+    panel_events = int(all_summary.get("distinct_event_count") or 0)
+    evidence_panel_ready = False  # hard multi-slate panel gates not claimed in v1 repair
+    capture_infrastructure_ready = True
     capture_readiness = {
+        "capture_infrastructure_ready": capture_infrastructure_ready,
+        "evidence_panel_ready": evidence_panel_ready,
         "status": (
-            "fixed_clock_capture_ready_with_labels"
-            if int(all_summary.get("labeled_row_count") or 0) > 0
-            else "fixed_clock_capture_waiting_for_books_or_settlements"
+            "capture_infrastructure_ready_panel_insufficient_slate_breadth"
+            if capture_infrastructure_ready and not evidence_panel_ready
+            else (
+                "evidence_panel_ready"
+                if evidence_panel_ready
+                else "capture_infrastructure_not_ready"
+            )
         ),
         "clocks": DEFAULT_CLOCKS_SECONDS,
         "staleness_seconds": DEFAULT_STALENESS_SECONDS,
@@ -704,9 +760,12 @@ def build_report(
         "observation_row_count": len(observations),
         "clock_coverage": all_summary.get("clock_coverage"),
         "events_by_clock": all_summary.get("events_by_clock"),
+        "slates_by_clock": all_summary.get("slates_by_clock"),
+        "panel_distinct_events": panel_events,
+        "panel_max_slates_any_clock": panel_slates,
         "dense_capture_note": (
             "Dense read-only MLB moneyline books remain mandatory input-quality work; "
-            "this program must not become another next-mid microstructure experiment."
+            "collector readiness is not evidence-panel readiness."
         ),
     }
 
@@ -719,16 +778,32 @@ def build_report(
         "research_ready_count": research_ready_count,
         "gate_counts": gate_counts(gates),
         "family_status": family_status,
+        "resolution_counts": resolution_counts,
     }
 
     return {
-        "schema_version": 1,
+        "schema_version": 2,
+        "schema_migration_note": (
+            "v2: slate-clustered mean-net economic test; inferential calibration; "
+            "p_joint=max(p_economic,p_calibration); BH on novel family only; "
+            "per-spec power; frozen multi-slate confirmation; honest discovery vs "
+            "forward-registration timestamps; fee provenance; capture vs panel readiness."
+        ),
         "generated_utc": generated,
         "status": status,
         "family_id": FAMILY_ID,
         "family_status": family_status,
         "decision": decision,
-        "discovery_cutoff_utc": cutoff,
+        "discovery_cutoff_utc": historical_cutoff,
+        "historical_discovery_data_cutoff_utc": historical_cutoff,
+        "forward_confirmation_registered_at_utc": (
+            forward_registration if frozen_candidates else None
+        ),
+        "discovery_cutoff_provenance": (
+            "runtime_censor_of_historical_labels_not_pre_outcome_preregistration"
+        ),
+        "analysis_contract_version": ANALYSIS_CONTRACT_VERSION,
+        "registry_hash": registry_hash,
         "research_only": True,
         "execution_enabled": False,
         "market_execution": False,
@@ -752,21 +827,34 @@ def build_report(
             "join_rule": "strict as-of latest book at or before clock within staleness",
             "label_rule": "exact public Kalshi settlement by contract_ticker",
             "calibration_estimator": "microprice if available else two-sided mid",
-            "economics": "hold-to-settlement: payoff - executable_ask - single taker entry fee",
+            "economics": (
+                "hold-to-settlement: payoff - executable_ask - series-resolved taker entry fee"
+            ),
             "independence_unit": "event_ticker",
+            "cluster_unit": "mlb_slate_date_utc",
+            "economic_null": "E[fee-adjusted net payoff] <= 0",
+            "calibration_null": "E[direction-adjusted settlement residual] <= 0",
+            "p_joint": "max(p_economic, p_calibration)",
+            "fdr_family": "novel_discovery_only",
             "fdr_alpha": fdr_alpha,
+            "inference_seed": INFERENCE_SEED,
+            "inference_resamples": INFERENCE_RESAMPLES,
             "min_oos_events": min_oos_events,
+            "analysis_contract_version": ANALYSIS_CONTRACT_VERSION,
         },
         "summary": summary,
         "gates": gates,
         "phase0_audit": audit,
         "power": power,
+        "resolution_counts": resolution_counts,
+        "frozen_candidates": frozen_candidates,
         "capture_readiness": capture_readiness,
         "hypothesis_registry": registry,
         "calibration": calib,
         "label_manifest": {
             "discovery_summary": discovery_summary,
             "full_summary": all_summary,
+            "historical_discovery_data_cutoff_utc": historical_cutoff,
             "labeled_sample": [row for row in all_labels if row.get("label_status") == "labeled"][
                 :50
             ],
@@ -780,12 +868,20 @@ def build_report(
             "research_ready_count": research_ready_count,
             "fdr_survivor_count": fdr_survivor_count,
             "powered_novel_count": len(powered_novel),
+            "underpowered_novel_count": resolution_counts.get("underpowered_count"),
+            "powered_falsified_count": resolution_counts.get("powered_falsified_count"),
+            "frozen_waiting_multi_slate_count": resolution_counts.get(
+                "frozen_waiting_multi_slate_count"
+            ),
+            "resolution_counts": resolution_counts,
             "synthetic_tests_passed": all(
                 item.get("passed") for item in audit.get("synthetic_tests") or []
             ),
             "no_paper_stake": True,
             "no_sizing": True,
             "no_accounts_orders_live": True,
+            "outcome_b_claimed": family_status == "falsified",
+            "evidence_incomplete": family_status == "evidence_incomplete",
         },
         "next_action": frontier[0]["next_action"] if frontier else None,
         "safety": safety_flags(public_market_data_calls=public_calls),
@@ -795,9 +891,15 @@ def build_report(
                     "model_id": row.get("model_id"),
                     "status": row.get("status"),
                     "oos_event_count": row.get("oos_event_count"),
+                    "oos_slate_count": row.get("oos_slate_count"),
                     "oos_mean_net_return": row.get("oos_mean_net_return"),
                     "oos_mean_calibration_residual": row.get("oos_mean_calibration_residual"),
+                    "p_economic": row.get("p_economic"),
+                    "p_calibration": row.get("p_calibration"),
+                    "p_joint": row.get("p_joint"),
                     "q_value": row.get("q_value"),
+                    "power_state": row.get("power_state"),
+                    "formula_hash": row.get("formula_hash"),
                     "negative_control": row.get("negative_control"),
                     "baseline_only": row.get("baseline_only"),
                     "usable": False,
@@ -828,10 +930,16 @@ def write_outputs(report: Mapping[str, Any], *, out_dir: Path) -> dict[str, str]
             "side",
             "feature",
             "oos_event_count",
+            "oos_slate_count",
             "oos_mean_net_return",
             "oos_mean_calibration_residual",
+            "p_economic",
+            "p_calibration",
+            "p_joint",
             "q_value",
             "bootstrap_mean_net_lower_95",
+            "power_state",
+            "largest_slate_cluster_share",
             "negative_control",
             "baseline_only",
         ],

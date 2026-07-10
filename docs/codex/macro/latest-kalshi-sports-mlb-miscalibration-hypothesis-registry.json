@@ -1,8 +1,8 @@
 {
   "execution_enabled": false,
   "family_id": "sports_mlb_settlement_miscalibration_v1",
-  "family_status": "falsified",
-  "generated_utc": "2026-07-10T05:18:29Z",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
   "payload": [
     {
       "baseline_only": true,
@@ -171,5 +171,5 @@
     }
   ],
   "research_only": true,
-  "status": "mlb_settlement_miscalibration_family_falsified"
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
 }

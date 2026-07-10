@@ -3,11 +3,13 @@ from __future__ import annotations
 import importlib.util
 from pathlib import Path
 
+from predmarket.shared_helpers import benjamini_hochberg
 from predmarket.sports_mlb_settlement_miscalibration import (
     build_fixed_clock_labels,
     hold_to_settlement_economics,
     hypothesis_registry,
     normalize_observation_row,
+    resolve_kxmlbgame_taker_fee,
     select_asof_book,
     taker_fee,
     validate_book,
@@ -17,6 +19,11 @@ from predmarket.sports_mlb_settlement_miscalibration_eval import (
     collapse_event_independence,
     eligible_signal_rows,
     evaluate_hypothesis,
+    family_resolution_counts,
+    hard_gate_assessment,
+    lifecycle_status,
+    resolve_spec_status,
+    slate_cluster_sign_flip_test,
     synthetic_tests,
 )
 
@@ -73,12 +80,18 @@ def _obs(
     return row
 
 
-def test_validate_book_and_fee() -> None:
+def test_validate_book_and_fee_provenance() -> None:
     ok, reason = validate_book(0.6, 0.5)
     assert not ok
     assert reason == "crossed_book"
     fee = taker_fee(0.5)
     assert fee > 0
+    meta = resolve_kxmlbgame_taker_fee(0.5)
+    assert meta["fee"] == fee
+    assert meta["fee_type"] == "quadratic"
+    assert meta["fee_source"]
+    assert meta["fee_fallback_state"] == "conservative_general_quadratic"
+    assert meta["fee_series_ticker"] == "KXMLBGAME"
     econ = hold_to_settlement_economics(
         side="yes",
         yes_ask=0.5,
@@ -90,6 +103,30 @@ def test_validate_book_and_fee() -> None:
     assert econ["label_status"] == "hold_to_settlement_labeled"
     assert econ["net_payoff_per_contract"] == econ["gross_payoff_per_contract"] - econ["entry_fee"]
     assert econ["entry_fee"] == fee
+    assert econ["fee_source"] == meta["fee_source"]
+    assert econ["fee_mode"] == "taker"
+
+
+def test_fee_multiplier_and_flat_fallback() -> None:
+    from decimal import Decimal
+
+    from predmarket.kalshi_execution_cost import FeeType
+
+    doubled = resolve_kxmlbgame_taker_fee(
+        0.5,
+        fee_type=FeeType(kind="quadratic", multiplier=Decimal("2.0")),
+    )
+    base = resolve_kxmlbgame_taker_fee(0.5)
+    assert doubled["fee"] > base["fee"]
+    assert doubled["fee_multiplier"] == 2.0
+    assert doubled["fee_fallback_state"] == "none"
+
+    flat = resolve_kxmlbgame_taker_fee(
+        0.5,
+        fee_type=FeeType(kind="flat", multiplier=Decimal("1.0")),
+    )
+    assert flat["fee_type"] == "quadratic"
+    assert "fallback" in flat["fee_fallback_state"] or flat["fee_source"].startswith("flat")
 
 
 def test_asof_never_future_and_staleness() -> None:
@@ -109,7 +146,6 @@ def test_asof_never_future_and_staleness() -> None:
             snapshot_id="future",
         ),
     ]
-    # clock at 22:00 — prior book is 5m old; future book must not win.
     clock_ts = books[0]["observed_ts"] + 300
     selected, status = select_asof_book(books, clock_ts=clock_ts, max_staleness_seconds=900)
     assert status == "matched"
@@ -170,10 +206,11 @@ def test_fixed_clock_labels_and_independence() -> None:
     labeled = [row for row in labels if row["label_status"] == "labeled"]
     assert labeled
     assert summary["labeled_row_count"] == len(labeled)
-    # Fees applied on yes side for winner.
+    assert "slates_by_clock" in summary
     yes_row = next(row for row in labeled if row["contract_ticker"].endswith("-BOS"))
     assert yes_row["yes_net_payoff"] < yes_row["yes_gross_payoff"]
     assert yes_row["yes_settlement_payoff"] == 1.0
+    assert yes_row.get("fee_source")
 
     fired = eligible_signal_rows(
         labeled,
@@ -187,6 +224,212 @@ def test_fixed_clock_labels_and_independence() -> None:
     )
     collapsed = collapse_event_independence(fired)
     assert len(collapsed) == 1
+
+
+def test_slate_sign_flip_hand_computable_and_deterministic() -> None:
+    # 6 slates, each with one +1 event: observed mean = 1.0.
+    # Any cluster flip reduces the mean, so only the all-positive flip matches.
+    rows = [
+        {
+            "event_ticker": f"E{i}",
+            "game_start_ts": 1_720_000_000 + i * 86400,
+            "selected_net_return": 1.0,
+            "selected_calibration_residual": 1.0,
+        }
+        for i in range(6)
+    ]
+    a = slate_cluster_sign_flip_test(
+        rows, "selected_net_return", n_resamples=200, seed=42, min_clusters=6
+    )
+    b = slate_cluster_sign_flip_test(
+        rows, "selected_net_return", n_resamples=200, seed=42, min_clusters=6
+    )
+    assert a["p_value"] == b["p_value"]
+    assert a["observed_mean"] == 1.0
+    assert a["method"] == "slate_cluster_sign_flip"
+    assert a["null"] == "E[value] <= 0"
+    # With 200 resamples, chance of all 6 signs positive is 1/64; p is small.
+    assert float(a["p_value"]) < 0.1
+    # Zero-mean should not reject.
+    zeros = [{**row, "selected_net_return": 0.0} for row in rows]
+    z = slate_cluster_sign_flip_test(
+        zeros, "selected_net_return", n_resamples=200, seed=7, min_clusters=6
+    )
+    assert float(z["p_value"]) > 0.2
+
+
+def test_complements_and_duplicates_do_not_inflate_power() -> None:
+    complements = [
+        {
+            "event_ticker": "EVT0",
+            "contract_ticker": "EVT0-A",
+            "decision_ts": 1.0,
+            "selected_net_return": 0.9,
+            "game_start_ts": 1_720_000_000,
+        },
+        {
+            "event_ticker": "EVT0",
+            "contract_ticker": "EVT0-B",
+            "decision_ts": 2.0,
+            "selected_net_return": -0.9,
+            "game_start_ts": 1_720_000_000,
+        },
+    ]
+    collapsed = collapse_event_independence(complements)
+    assert len(collapsed) == 1
+    assert collapsed[0]["contract_ticker"] == "EVT0-A"
+    # Duplicated snapshots collapse by event.
+    dups = complements + complements
+    assert len(collapse_event_independence(dups)) == 1
+
+
+def test_bh_on_p_joint_hand_computable() -> None:
+    # Hand-check BH ranks for three novel p_joint values.
+    indexed = [(0, 0.01), (1, 0.04), (2, 0.20)]
+    q_map = benjamini_hochberg(indexed)
+    # largest p: q = min(1, 0.20 * 3/3) = 0.20
+    # mid: min(0.20, 0.04 * 3/2) = 0.06
+    # small: min(0.06, 0.01 * 3/1) = 0.03
+    assert abs(q_map[2] - 0.20) < 1e-12
+    assert abs(q_map[1] - 0.06) < 1e-12
+    assert abs(q_map[0] - 0.03) < 1e-12
+
+    evaluations = [
+        {
+            "model_id": "novel_a",
+            "status": "testable",
+            "p_joint": 0.01,
+            "p_economic": 0.01,
+            "p_calibration": 0.005,
+            "oos_mean_net_return": 0.05,
+            "oos_mean_calibration_residual": 0.04,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+        {
+            "model_id": "control_b",
+            "status": "testable",
+            "p_joint": 0.001,
+            "p_economic": 0.001,
+            "p_calibration": 0.001,
+            "oos_mean_net_return": 0.2,
+            "oos_mean_calibration_residual": 0.2,
+            "negative_control": True,
+            "baseline_only": False,
+        },
+        {
+            "model_id": "novel_c",
+            "status": "underpowered",
+            "p_joint": 0.02,
+            "p_economic": 0.02,
+            "p_calibration": 0.01,
+            "oos_mean_net_return": 0.05,
+            "oos_mean_calibration_residual": 0.04,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+    ]
+    out = apply_fdr(evaluations, alpha=0.05)
+    # Only novel_a enters FDR family.
+    assert out[0]["fdr_family_size"] == 1
+    assert out[0]["status"] == "research_candidate_fdr_passed"
+    assert out[1]["q_value"] is None  # control excluded
+    assert out[2]["q_value"] is None  # underpowered excluded
+
+
+def test_lifecycle_underpowered_blocks_outcome_b() -> None:
+    evaluations = [
+        {
+            "model_id": "a",
+            "status": "powered_falsified",
+            "power_met": True,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+        {
+            "model_id": "b",
+            "status": "underpowered",
+            "power_met": False,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+    ]
+    assert lifecycle_status(evaluations) == "evidence_incomplete"
+    counts = family_resolution_counts(evaluations)
+    assert counts["underpowered_count"] == 1
+    assert counts["powered_falsified_count"] == 1
+
+    all_falsified = [
+        {
+            "model_id": "a",
+            "status": "powered_falsified",
+            "power_met": True,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+        {
+            "model_id": "b",
+            "status": "powered_falsified",
+            "power_met": True,
+            "negative_control": False,
+            "baseline_only": False,
+        },
+    ]
+    assert lifecycle_status(all_falsified) == "falsified"
+
+
+def test_breadth_failure_freezes_not_falsifies() -> None:
+    evaluation = {
+        "model_id": "path_slope_continuation_buy_yes_t60m",
+        "status": "research_candidate_fdr_passed",
+        "power_met": True,
+        "negative_control": False,
+        "baseline_only": False,
+        "oos_mean_net_return": 0.1,
+        "oos_mean_calibration_residual": 0.1,
+        "p_economic": 0.01,
+        "p_calibration": 0.01,
+        "p_joint": 0.01,
+        "q_value": 0.02,
+    }
+    assessment = {
+        "research_ready": False,
+        "discovery_gates_pass": False,
+        "breadth_only_failure": True,
+        "failed_non_confirmation_gates": ["cluster_share_le_max"],
+        "gates": [],
+    }
+    resolved = resolve_spec_status(evaluation, assessment)
+    assert resolved["status"] == "frozen_candidate_waiting_multi_slate_confirmation"
+    assert lifecycle_status([resolved]) == "confirmation_pending"
+
+
+def test_hard_gate_uses_joint_inference_fields() -> None:
+    evaluation = {
+        "oos_event_count": 25,
+        "oos_slate_count": 8,
+        "oos_mean_net_return": 0.05,
+        "oos_mean_calibration_residual": 0.04,
+        "p_economic": 0.01,
+        "p_calibration": 0.02,
+        "p_joint": 0.02,
+        "q_value": 0.03,
+        "bootstrap_mean_net_lower_95": 0.01,
+        "positive_temporal_buckets": 4,
+        "recent_bucket_mean_net": 0.02,
+        "positive_capacity_event_count": 5,
+        "mean_capacity_contracts": 10.0,
+        "orderbook_entry_share": 0.9,
+        "largest_slate_cluster_share": 0.2,
+        "negative_control": False,
+        "baseline_only": False,
+    }
+    assessment = hard_gate_assessment(evaluation, min_oos=20, confirmation=None)
+    assert assessment["discovery_gates_pass"] is True
+    names = {gate["name"] for gate in assessment["gates"]}
+    assert "economic_inference" in names
+    assert "calibration_inference" in names
+    assert "fdr_q_le_alpha_on_p_joint" in names
 
 
 def test_registry_finite_and_evaluation_runs() -> None:
@@ -203,7 +446,6 @@ def test_registry_finite_and_evaluation_runs() -> None:
         <= 10
     )
 
-    # Build a tiny multi-event panel with known economics for evaluation plumbing.
     labels = []
     for index in range(30):
         event = f"KXMLBGAME-26JUL{index:02d}1800AAAABB"
@@ -234,13 +476,16 @@ def test_registry_finite_and_evaluation_runs() -> None:
         labels.extend(built)
 
     evaluations = [
-        evaluate_hypothesis(labels, spec, min_oos_labels=5, min_events=5)
+        evaluate_hypothesis(labels, spec, min_oos_labels=5, min_events=5, min_oos_slates=2)
         for spec in registry
         if spec["clock_name"] == "T-60m"
     ]
     evaluations = apply_fdr(evaluations, alpha=0.05)
     assert evaluations
-    assert all("status" in row for row in evaluations)
+    assert all("p_economic" in row for row in evaluations)
+    assert all("p_calibration" in row for row in evaluations)
+    assert all("p_joint" in row for row in evaluations)
+    assert all(row.get("p_value_mean_net_positive") == row.get("p_economic") for row in evaluations)
 
 
 def test_script_builds_report_without_network(tmp_path: Path) -> None:
@@ -249,7 +494,6 @@ def test_script_builds_report_without_network(tmp_path: Path) -> None:
     sett_dir = tmp_path / "sett"
     obs_dir.mkdir()
     sett_dir.mkdir()
-    # Minimal packet.
     packet = {
         "rows": [
             {
@@ -297,6 +541,23 @@ def test_script_builds_report_without_network(tmp_path: Path) -> None:
     assert report["research_only"] is True
     assert report["execution_enabled"] is False
     assert report["family_id"] == "sports_mlb_settlement_miscalibration_v1"
+    assert report["schema_version"] == 2
+    assert "historical_discovery_data_cutoff_utc" in report
+    assert report["discovery_cutoff_provenance"].startswith("runtime_censor")
+    assert report["capture_readiness"]["capture_infrastructure_ready"] is True
+    assert report["capture_readiness"]["evidence_panel_ready"] is False
+    assert "panel_insufficient" in report["capture_readiness"]["status"]
+    assert (
+        report["family_status"] != "falsified"
+        or report["resolution_counts"]["underpowered_count"] == 0
+    )
+    # With tiny sample, honest state is evidence incomplete / discovery pending-like.
+    assert report["family_status"] in {
+        "evidence_incomplete",
+        "confirmation_pending",
+        "research_ready",
+        "falsified",
+    }
     assert "evaluations" in report
     written = module.write_outputs(report, out_dir=tmp_path / "out")
     assert Path(written["json"]).is_file()

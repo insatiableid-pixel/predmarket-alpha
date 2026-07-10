@@ -1,8 +1,8 @@
 {
   "execution_enabled": false,
   "family_id": "sports_mlb_settlement_miscalibration_v1",
-  "family_status": "falsified",
-  "generated_utc": "2026-07-10T05:18:29Z",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
   "payload": [
     {
       "decision_value": "Fixed-clock MLB moneyline settlement miscalibration",
@@ -14,21 +14,27 @@
       },
       "independent_labels_now": 175,
       "lane": "sports_mlb_settlement_miscalibration_v1",
-      "next_action": "Retired: do not retune thresholds/buckets; require multi-week dense orderbook panel as a new pre-registered evidence surface before reopening",
+      "next_action": "Hold frozen candidates fixed; accumulate multi-slate dense fixed-clock panel for independent confirmation; do not retune",
       "rank": 1,
-      "status": "falsified"
+      "slates_by_clock": {
+        "T-15m": 13,
+        "T-24h": 14,
+        "T-60m": 14,
+        "T-6h": 14
+      },
+      "status": "confirmation_pending"
     },
     {
       "decision_value": "Next distinct surface: multi-week dense orderbook fixed-clock panel with pre-registered slate-breadth power (not cosmetic retune of v1 thresholds)",
       "lane": "mlb_multiweek_dense_fixed_clock_panel_v2",
-      "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering T-24h/T-6h/T-60m/T-15m across >=4 chronological slates before re-registering",
+      "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering primary T-60m/T-15m clocks across >=10 chronological slates before confirmation",
       "rank": 2,
       "status": "discovery_pending"
     },
     {
       "decision_value": "Distinct settlement-miscalibration mechanism only where market terms prove complementary moneyline identity within event",
       "lane": "sports_exact_cross_contract_moneyline_coherence",
-      "next_action": "Park until multi-week dense panel exists; do not mix with retired v1",
+      "next_action": "Park until multi-week dense panel exists; do not mix with v1 retunes",
       "rank": 3,
       "status": "parked"
     },
@@ -41,5 +47,5 @@
     }
   ],
   "research_only": true,
-  "status": "mlb_settlement_miscalibration_family_falsified"
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
 }

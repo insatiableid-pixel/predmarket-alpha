@@ -1,8 +1,8 @@
 {
   "execution_enabled": false,
   "family_id": "sports_mlb_settlement_miscalibration_v1",
-  "family_status": "falsified",
-  "generated_utc": "2026-07-10T05:18:29Z",
+  "family_status": "confirmation_pending",
+  "generated_utc": "2026-07-10T05:37:38Z",
   "payload": {
     "book_orientation": {
       "complementary_contracts": "same event_ticker collapsed for independence",
@@ -17,7 +17,7 @@
     ],
     "crossed_yes_book_count": 0,
     "family_id": "sports_mlb_settlement_miscalibration_v1",
-    "missing_yes_book_count": 135,
+    "missing_yes_book_count": 45,
     "novelty_map": {
       "baseline_only": [
         "static price buckets"
@@ -40,7 +40,7 @@
       ],
       "this_family": "sports_mlb_settlement_miscalibration_v1"
     },
-    "observation_row_count": 26219,
+    "observation_row_count": 26039,
     "observation_source_hashes_sample": {
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010108Z.json": "80ae9b1df9618bc0d2d447fb8b0f176c6ff224e7bcf50fd628ddce8635224be2",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010256Z.json": "6dff1648b647437e99f5f71d372423e1cf4edf86bf95e0e7ba5a6e4ffb532b79",
@@ -72,9 +72,6 @@
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T201049Z.json": "28842ef9c98cd59f0c2973fdc1c06a1081b3e694515396bc51fafdda9b3334b0",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T202645Z.json": "5bc63554c845e92bde47c1a56f18d872cc63f909f18770393056eb65a684d832",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T205502Z.json": "441168be6c085058acc1addb5c6258b544930614113b3d85462943b3e0ff1528",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051608.424933Z.json": "738cc8054a3c0c1f10d5fdfb48988025c7b33c4a1160686734163d701c7e02da",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051811Z.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_latest.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_20260710T051217Z.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_latest.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candlesticks_20260710T051217Z.json": "cf0bafd069d2ba311fe7f184c7f29db1ca1a27817274506f0a4538dd305cc2dc",
@@ -217,6 +214,15 @@
           "event_ticker": "KXMLBGAME-26JUL081805BOSNYY",
           "execution_enabled": false,
           "feature_family": "sports_mlb_settlement_miscalibration_v1",
+          "fee_effective_scheduled_ts": null,
+          "fee_fallback_state": "conservative_general_quadratic",
+          "fee_lookup_time_utc": "2026-07-08T22:03:00Z",
+          "fee_mode": "taker",
+          "fee_multiplier": 1.0,
+          "fee_rate": 0.07,
+          "fee_series_ticker": "KXMLBGAME",
+          "fee_source": "conservative_general_quadratic_fallback",
+          "fee_type": "quadratic",
           "game_start_source": "occurrence_datetime",
           "game_start_ts": 1783551900.0,
           "label_id": "KXMLBGAME-26JUL081805BOSNYY-BOS|T-60m|past",
@@ -302,6 +308,37 @@
         "detail": 1,
         "name": "duplicate_books_do_not_double_count_clock_rows",
         "passed": true
+      },
+      {
+        "detail": {
+          "collapsed": 1
+        },
+        "name": "complements_do_not_inflate_effective_n",
+        "passed": true
+      },
+      {
+        "detail": {
+          "alternative": "E[value] > 0",
+          "cluster_unit": "mlb_slate_date_utc",
+          "method": "slate_cluster_sign_flip",
+          "n_clusters": 4,
+          "n_events": 12,
+          "n_resamples": 200,
+          "null": "E[value] <= 0",
+          "observed_mean": 0.015,
+          "p_value": 0.0049751244,
+          "seed": 3,
+          "slate_ids": [
+            "2024-07-03",
+            "2024-07-04",
+            "2024-07-05",
+            "2024-07-06"
+          ],
+          "underpowered": false,
+          "underpowered_reason": null
+        },
+        "name": "economic_p_value_is_mean_net_not_win_rate",
+        "passed": true
       }
     ],
     "timestamp_semantics": {
@@ -321,5 +358,5 @@
     }
   },
   "research_only": true,
-  "status": "mlb_settlement_miscalibration_family_falsified"
+  "status": "mlb_settlement_miscalibration_confirmation_pending"
 }

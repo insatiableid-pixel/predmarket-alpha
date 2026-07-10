@@ -57,9 +57,7 @@ def list_open_mlb(*, limit: int = 200) -> list[dict[str, Any]]:
         }
         if cursor:
             params["cursor"] = cursor
-        payload = fetch_json(
-            f"{KALSHI_PUBLIC_BASE_URL}/markets?{urllib.parse.urlencode(params)}"
-        )
+        payload = fetch_json(f"{KALSHI_PUBLIC_BASE_URL}/markets?{urllib.parse.urlencode(params)}")
         batch = payload.get("markets") or []
         if not isinstance(batch, list) or not batch:
             break
@@ -187,9 +185,7 @@ def capture_rows(
                 "no_ask_depth_top1": quotes.get("no_ask_depth_top1"),
                 "yes_mid": mid,
                 "yes_spread": (
-                    None
-                    if yes_bid is None or yes_ask is None
-                    else float(yes_ask) - float(yes_bid)
+                    None if yes_bid is None or yes_ask is None else float(yes_ask) - float(yes_bid)
                 ),
                 "open_time": market.get("open_time"),
                 "created_time": market.get("created_time"),
@@ -241,14 +237,20 @@ def main(argv: Sequence[str] | None = None) -> int:
             request_delay_seconds=float(args.request_delay_seconds),
             generated_utc=generated,
         )
-    except (OSError, urllib.error.URLError, urllib.error.HTTPError, TimeoutError, ValueError) as exc:
+    except (
+        OSError,
+        urllib.error.URLError,
+        urllib.error.HTTPError,
+        TimeoutError,
+        ValueError,
+    ) as exc:
         print(f"error: {exc}", file=sys.stderr)
         return 2
     path = write_packet(rows, out_dir=args.out_dir, generated_utc=generated)
     print(
         json.dumps(
             {
-                "status": "mlb_dense_book_capture_ready",
+                "status": "capture_infrastructure_ready_panel_status_unknown",
                 "generated_utc": generated,
                 "market_count": len(markets),
                 "row_count": len(rows),

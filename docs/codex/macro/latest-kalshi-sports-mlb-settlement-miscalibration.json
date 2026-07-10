@@ -1,5 +1,6 @@
 {
   "account_or_order_paths": false,
+  "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
   "authenticated_api_calls": false,
   "calibration": {
     "by_clock": {
@@ -179,6 +180,7 @@
     "labeled_rows": 1148
   },
   "capture_readiness": {
+    "capture_infrastructure_ready": true,
     "clock_coverage": {
       "T-15m": {
         "censored_stale_book": 150,
@@ -205,139 +207,305 @@
       "T-60m": 3600,
       "T-6h": 21600
     },
-    "dense_capture_note": "Dense read-only MLB moneyline books remain mandatory input-quality work; this program must not become another next-mid microstructure experiment.",
+    "dense_capture_note": "Dense read-only MLB moneyline books remain mandatory input-quality work; collector readiness is not evidence-panel readiness.",
     "events_by_clock": {
       "T-15m": 100,
       "T-24h": 169,
       "T-60m": 168,
       "T-6h": 169
     },
+    "evidence_panel_ready": false,
     "observation_dirs": [
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations",
       "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books"
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration"
     ],
-    "observation_row_count": 26219,
+    "observation_row_count": 26039,
+    "panel_distinct_events": 175,
+    "panel_max_slates_any_clock": 14,
+    "slates_by_clock": {
+      "T-15m": 13,
+      "T-24h": 14,
+      "T-60m": 14,
+      "T-6h": 14
+    },
     "staleness_seconds": {
       "T-15m": 1800,
       "T-24h": 21600,
       "T-60m": 2700,
       "T-6h": 7200
     },
-    "status": "fixed_clock_capture_ready_with_labels"
+    "status": "capture_infrastructure_ready_panel_insufficient_slate_breadth"
   },
   "confirmation_ledger": [
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "baseline_static_longshot_buy_yes_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "baseline_static_favorite_buy_yes_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "clock_x_price_fade_favorite_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "clock_x_price_buy_underdog_t6h",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "listing_age_cold_start_fade_extreme_t24h",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "path_slope_reversion_buy_no_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "path_slope_continuation_buy_yes_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "clock_geometry_drift_fade_t15m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:37:38Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "tight_spread_favorite_buy_yes_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "negctrl_trade_against_path_slope_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     },
     {
-      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
       "event_count": 0,
+      "forward_confirmation_registered_at_utc": null,
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
       "mean_calibration_residual": null,
       "mean_net_return": null,
       "model_id": "negctrl_always_buy_yes_t60m",
       "positive_rate": null,
+      "slate_count": 0,
       "status": "confirmation_insufficient_sample"
     }
   ],
   "database_writes": false,
-  "decision": "Outcome B: finite family tested at pre-registered power with no survivor. Record negative evidence and do not retune cosmetically.",
+  "decision": "Corrected discovery inference produced frozen/confirmation-pending candidate(s). Hold formulas fixed; accumulate multi-slate dense panel for independent confirmation.",
+  "discovery_cutoff_provenance": "runtime_censor_of_historical_labels_not_pre_outcome_preregistration",
   "discovery_cutoff_utc": "2026-07-10T05:18:29Z",
   "evaluations": [
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": true,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.2942,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 1,
+        "n_events": 1,
+        "seed": 11,
+        "underpowered": true
+      },
       "bootstrap_mean_net_lower_95": -0.2942,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 1,
+        "n_events": 1,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.2760510605,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=1 < min_inference_slates=6"
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "baseline_static_longshot_buy_yes_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "in_range",
+      "discovery_event_count": 3,
+      "discovery_slate_cluster_counts": {
+        "2026-07-05": 1,
+        "2026-07-08": 2
+      },
+      "discovery_slate_count": 2,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 1,
+        "n_events": 1,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.2942,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=1 < min_inference_slates=6"
+      },
+      "effective_n_events": 1,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 3,
@@ -349,12 +517,33 @@
           "oos_event_count": 1
         }
       ],
+      "formula_hash": "69d38b81de63877986380a602058d3196f911490cb7a865756e2d6afbfbdba77",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "min_oos_events",
+          "min_oos_slates",
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "capacity_events",
+          "cluster_share_le_max",
+          "not_baseline_only"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=1 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=1 min=4",
             "status": "fail"
           },
           {
@@ -368,8 +557,18 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=None",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
@@ -379,7 +578,7 @@
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=None",
+            "reason": "positive_buckets=0 recent=-0.2942",
             "status": "fail"
           },
           {
@@ -393,8 +592,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=1.0",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=1.0 max=0.35",
             "status": "fail"
           },
           {
@@ -409,7 +608,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -428,17 +627,25 @@
       "oos_mean_net_return": -0.2942,
       "oos_positive_event_count": 0,
       "oos_positive_rate": 0.0,
+      "oos_slate_count": 1,
       "orderbook_entry_share": 1.0,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
       "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 1,
       "positive_temporal_buckets": 0,
+      "power_met": false,
+      "power_reason": "oos_events=1 min_events=20; oos_slates=1 min_slates=4",
+      "power_state": "underpowered",
       "q_value": null,
       "range": [
         0.15,
         0.3
       ],
-      "recent_bucket_mean_net": null,
+      "recent_bucket_mean_net": -0.2942,
       "research_only": true,
+      "resolution": "descriptive_control",
       "series_cluster_counts": {
         "KXMLBGAME": 1
       },
@@ -446,22 +653,151 @@
       "slate_cluster_counts": {
         "2026-07-08": 1
       },
-      "status": "insufficient_sample",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        -0.2942,
-        null,
-        null,
-        null
+        -0.2942
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        1
+      ],
+      "testing_family_role": "descriptive_control",
       "threshold": null,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": true,
-      "bootstrap_mean_net_lower_95": 0.1063,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": 0.1604666667,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 1,
+        "n_events": 3,
+        "seed": 11,
+        "underpowered": true
+      },
+      "bootstrap_mean_net_lower_95": 0.1604666667,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 1,
+        "n_events": 3,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.1789319121,
+        "p_value": 0.5002498751,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=1 < min_inference_slates=6"
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "baseline_static_favorite_buy_yes_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "in_range",
+      "discovery_event_count": 8,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 1,
+        "2026-07-05": 1,
+        "2026-07-07": 1,
+        "2026-07-08": 5
+      },
+      "discovery_slate_count": 4,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 1,
+        "n_events": 3,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.1604666667,
+        "p_value": 0.5002498751,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=1 < min_inference_slates=6"
+      },
+      "effective_n_events": 3,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 8,
@@ -473,12 +809,29 @@
           "oos_event_count": 3
         }
       ],
+      "formula_hash": "746364687ef7e049937859f469d684d1a762db2e62e9adea23771042a526d8f9",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "min_oos_events",
+          "min_oos_slates",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "temporal_survival",
+          "cluster_share_le_max",
+          "not_baseline_only"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=3 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=1 min=4",
             "status": "fail"
           },
           {
@@ -492,19 +845,29 @@
             "status": "pass"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=None",
+            "name": "economic_inference",
+            "reason": "p_economic=0.5002498751",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=0.5002498751",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=0.5002498751 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=0.1063",
+            "reason": "lb=0.1604666667",
             "status": "pass"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=3 recent=None",
-            "status": "pass"
+            "reason": "positive_buckets=1 recent=0.1604666667",
+            "status": "fail"
           },
           {
             "name": "capacity_events",
@@ -517,8 +880,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=1.0",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=1.0 max=0.35",
             "status": "fail"
           },
           {
@@ -533,7 +896,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -552,17 +915,25 @@
       "oos_mean_net_return": 0.1604666667,
       "oos_positive_event_count": 3,
       "oos_positive_rate": 1.0,
+      "oos_slate_count": 1,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 0.125,
+      "p_calibration": 0.5002498751,
+      "p_economic": 0.5002498751,
+      "p_joint": 0.5002498751,
+      "p_value_mean_net_positive": 0.5002498751,
       "positive_capacity_event_count": 3,
-      "positive_temporal_buckets": 3,
+      "positive_temporal_buckets": 1,
+      "power_met": false,
+      "power_reason": "oos_events=3 min_events=20; oos_slates=1 min_slates=4",
+      "power_state": "underpowered",
       "q_value": null,
       "range": [
         0.7,
         0.9
       ],
-      "recent_bucket_mean_net": null,
+      "recent_bucket_mean_net": 0.1604666667,
       "research_only": true,
+      "resolution": "descriptive_control",
       "series_cluster_counts": {
         "KXMLBGAME": 3
       },
@@ -570,22 +941,163 @@
       "slate_cluster_counts": {
         "2026-07-08": 3
       },
-      "status": "insufficient_sample",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        0.2562,
-        0.1315,
-        0.0937,
-        null
+        0.1604666667
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        1
+      ],
+      "testing_family_role": "descriptive_control",
       "threshold": null,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 1.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": -0.1337684211,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.1193315789,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 6,
+        "n_events": 19,
+        "seed": 11,
+        "underpowered": false
+      },
+      "bootstrap_mean_net_lower_95": -0.1193315789,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 19,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.0970911641,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "clock_x_price_fade_favorite_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt",
+      "discovery_event_count": 19,
+      "discovery_slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 3,
+        "2026-07-05": 2,
+        "2026-07-07": 1,
+        "2026-07-08": 10,
+        "2026-07-10": 2
+      },
+      "discovery_slate_count": 6,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 19,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.1060052632,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
+      "effective_n_events": 19,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 19,
@@ -615,13 +1127,31 @@
           "oos_event_count": 7
         }
       ],
+      "formula_hash": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "min_oos_events",
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=19 min=20",
             "status": "fail"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=6 min=4",
+            "status": "pass"
           },
           {
             "name": "positive_mean_net",
@@ -634,18 +1164,28 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=None",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=-0.1337684211",
+            "reason": "lb=-0.1193315789",
             "status": "fail"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=-0.0760142857",
+            "reason": "positive_buckets=0 recent=-0.1121333333",
             "status": "fail"
           },
           {
@@ -659,8 +1199,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5263157895",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5263157895 max=0.35",
             "status": "fail"
           },
           {
@@ -675,7 +1215,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -694,14 +1234,23 @@
       "oos_mean_net_return": -0.1060052632,
       "oos_positive_event_count": 0,
       "oos_positive_rate": 0.0,
+      "oos_slate_count": 6,
       "orderbook_entry_share": 1.0,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
       "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 17,
       "positive_temporal_buckets": 0,
+      "power_met": false,
+      "power_reason": "oos_events=19 min_events=20; oos_slates=6 min_slates=4",
+      "power_state": "underpowered",
       "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": -0.0760142857,
+      "recent_bucket_mean_net": -0.1121333333,
       "research_only": true,
+      "resolution": "underpowered",
+      "resolution_reason": "oos_events=19 min_events=20; oos_slates=6 min_slates=4",
       "series_cluster_counts": {
         "KXMLBGAME": 19
       },
@@ -714,22 +1263,157 @@
         "2026-07-08": 10,
         "2026-07-10": 2
       },
-      "status": "insufficient_sample",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
         -0.069125,
-        -0.156025,
-        -0.14535,
-        -0.0760142857
+        -0.1306666667,
+        -0.1121333333
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        2
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": 0.72,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.36585,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 2,
+        "n_events": 2,
+        "seed": 11,
+        "underpowered": true
+      },
       "bootstrap_mean_net_lower_95": -0.36585,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 2,
+        "n_events": 2,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.3453727588,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-08",
+          "2026-07-09"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=2 < min_inference_slates=6"
+      },
       "clock_name": "T-6h",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "clock_x_price_buy_underdog_t6h",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "in_range",
+      "discovery_event_count": 5,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 1,
+        "2026-07-06": 1,
+        "2026-07-08": 2,
+        "2026-07-09": 1
+      },
+      "discovery_slate_count": 4,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 2,
+        "n_events": 2,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.36585,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-08",
+          "2026-07-09"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=2 < min_inference_slates=6"
+      },
+      "effective_n_events": 2,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 5,
@@ -741,12 +1425,32 @@
           "oos_event_count": 2
         }
       ],
+      "formula_hash": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "min_oos_events",
+          "min_oos_slates",
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "capacity_events",
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=2 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=2 min=4",
             "status": "fail"
           },
           {
@@ -760,8 +1464,18 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=None",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
@@ -771,7 +1485,7 @@
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=None",
+            "reason": "positive_buckets=0 recent=-0.325",
             "status": "fail"
           },
           {
@@ -785,8 +1499,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5 max=0.35",
             "status": "fail"
           },
           {
@@ -801,7 +1515,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -820,17 +1534,26 @@
       "oos_mean_net_return": -0.36585,
       "oos_positive_event_count": 0,
       "oos_positive_rate": 0.0,
+      "oos_slate_count": 2,
       "orderbook_entry_share": 1.0,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
       "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 2,
       "positive_temporal_buckets": 0,
+      "power_met": false,
+      "power_reason": "oos_events=2 min_events=20; oos_slates=2 min_slates=4",
+      "power_state": "underpowered",
       "q_value": null,
       "range": [
         0.28,
         0.42
       ],
-      "recent_bucket_mean_net": null,
+      "recent_bucket_mean_net": -0.325,
       "research_only": true,
+      "resolution": "underpowered",
+      "resolution_reason": "oos_events=2 min_events=20; oos_slates=2 min_slates=4",
       "series_cluster_counts": {
         "KXMLBGAME": 2
       },
@@ -839,32 +1562,171 @@
         "2026-07-08": 1,
         "2026-07-09": 1
       },
-      "status": "insufficient_sample",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
         -0.4067,
-        -0.325,
-        null,
-        null
+        -0.325
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        1,
+        1
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": null,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "lower_bound": null,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 0,
+        "n_events": 0,
+        "seed": 11,
+        "underpowered": true
+      },
       "bootstrap_mean_net_lower_95": null,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 0,
+        "n_events": 0,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": null,
+        "p_value": 1.0,
+        "seed": 28,
+        "underpowered": true,
+        "underpowered_reason": "no_event_values"
+      },
       "clock_name": "T-24h",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "listing_age_cold_start_fade_extreme_t24h",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "lt_and_p_gt",
+      "discovery_event_count": 0,
+      "discovery_slate_cluster_counts": {},
+      "discovery_slate_count": 0,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 0,
+        "n_events": 0,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": null,
+        "p_value": 1.0,
+        "seed": 11,
+        "underpowered": true,
+        "underpowered_reason": "no_event_values"
+      },
+      "effective_n_events": 0,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "listing_age_hours",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 0,
       "fold_stats": [],
+      "formula_hash": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "min_oos_events",
+          "min_oos_slates",
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "capacity_events",
+          "orderbook_entry_truth"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=0 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=0 min=4",
             "status": "fail"
           },
           {
@@ -878,8 +1740,18 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=None",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
@@ -903,8 +1775,8 @@
             "status": "fail"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.0",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.0 max=0.35",
             "status": "pass"
           },
           {
@@ -919,7 +1791,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -938,28 +1810,178 @@
       "oos_mean_net_return": null,
       "oos_positive_event_count": 0,
       "oos_positive_rate": null,
+      "oos_slate_count": 0,
       "orderbook_entry_share": null,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
       "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 0,
       "positive_temporal_buckets": 0,
+      "power_met": false,
+      "power_reason": "oos_events=0 min_events=20; oos_slates=0 min_slates=4",
+      "power_state": "underpowered",
       "q_value": null,
       "range": null,
       "recent_bucket_mean_net": null,
       "research_only": true,
+      "resolution": "underpowered",
+      "resolution_reason": "oos_events=0 min_events=20; oos_slates=0 min_slates=4",
       "series_cluster_counts": {},
       "side": "no",
       "slate_cluster_counts": {},
-      "status": "insufficient_sample",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [],
+      "testing_family_role": "novel_discovery",
       "threshold": 18.0,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": null
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": -0.2193,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.1922,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 6,
+        "n_events": 23,
+        "seed": 11,
+        "underpowered": false
+      },
+      "bootstrap_mean_net_lower_95": -0.1922,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 5,
+        "n_events": 21,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.1612345018,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=5 < min_inference_slates=6"
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "path_slope_reversion_buy_no_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt",
+      "discovery_event_count": 23,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 2,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "discovery_slate_count": 6,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 23,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.1584086957,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
+      "effective_n_events": 23,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "path_mid_slope_per_hour",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 23,
@@ -989,12 +2011,29 @@
           "oos_event_count": 8
         }
       ],
+      "formula_hash": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=23 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=6 min=4",
             "status": "pass"
           },
           {
@@ -1008,18 +2047,28 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=1.0",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=-0.2193",
+            "reason": "lb=-0.1922",
             "status": "fail"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=-0.0745125",
+            "reason": "positive_buckets=0 recent=-0.1599857143",
             "status": "fail"
           },
           {
@@ -1033,8 +2082,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5217391304",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5217391304 max=0.35",
             "status": "fail"
           },
           {
@@ -1049,7 +2098,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1068,14 +2117,23 @@
       "oos_mean_net_return": -0.1584086957,
       "oos_positive_event_count": 0,
       "oos_positive_rate": 0.0,
+      "oos_slate_count": 6,
       "orderbook_entry_share": 1.0,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
       "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 21,
       "positive_temporal_buckets": 0,
-      "q_value": 1.0,
+      "power_met": false,
+      "power_reason": "n_clusters=5 < min_inference_slates=6",
+      "power_state": "underpowered",
+      "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": -0.0745125,
+      "recent_bucket_mean_net": -0.1599857143,
       "research_only": true,
+      "resolution": "underpowered",
+      "resolution_reason": "n_clusters=5 < min_inference_slates=6",
       "series_cluster_counts": {
         "KXMLBGAME": 23
       },
@@ -1088,22 +2146,164 @@
         "2026-07-08": 12,
         "2026-07-10": 2
       },
-      "status": "falsified",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        -0.15826,
-        -0.2038,
-        -0.2474,
-        -0.0745125
+        -0.1407833333,
+        -0.1863,
+        -0.1599857143
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        2
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": 0.015,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": 0.1017952381,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": 0.1012833333,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 5,
+        "n_events": 21,
+        "seed": 11,
+        "underpowered": true
+      },
+      "bootstrap_mean_net_lower_95": 0.1012833333,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 5,
+        "n_events": 21,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.1612345018,
+        "p_value": 0.0004997501,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=5 < min_inference_slates=6"
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "path_slope_continuation_buy_yes_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt",
+      "discovery_event_count": 21,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "discovery_slate_count": 5,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 5,
+        "n_events": 21,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.1465952381,
+        "p_value": 0.0004997501,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=5 < min_inference_slates=6"
+      },
+      "effective_n_events": 21,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "path_mid_slope_per_hour",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 21,
@@ -1133,12 +2333,23 @@
           "oos_event_count": 6
         }
       ],
+      "formula_hash": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "fdr_q_le_alpha_on_p_joint",
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=21 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=5 min=4",
             "status": "pass"
           },
           {
@@ -1152,18 +2363,28 @@
             "status": "pass"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=2.8608e-06",
+            "name": "economic_inference",
+            "reason": "p_economic=0.0004997501",
             "status": "pass"
           },
           {
+            "name": "calibration_inference",
+            "reason": "p_calibration=0.0004997501",
+            "status": "pass"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=0.0004997501 alpha=0.05",
+            "status": "fail"
+          },
+          {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=0.1017952381",
+            "reason": "lb=0.1012833333",
             "status": "pass"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=4 recent=0.0451333333",
+            "reason": "positive_buckets=3 recent=0.04195",
             "status": "pass"
           },
           {
@@ -1177,8 +2398,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5714285714",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5714285714 max=0.35",
             "status": "fail"
           },
           {
@@ -1193,7 +2414,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1212,15 +2433,23 @@
       "oos_mean_net_return": 0.1465952381,
       "oos_positive_event_count": 21,
       "oos_positive_rate": 1.0,
+      "oos_slate_count": 5,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 4.768e-07,
+      "p_calibration": 0.0004997501,
+      "p_economic": 0.0004997501,
+      "p_joint": 0.0004997501,
+      "p_value_mean_net_positive": 0.0004997501,
       "positive_capacity_event_count": 19,
-      "positive_temporal_buckets": 4,
-      "q_value": 2.8608e-06,
+      "positive_temporal_buckets": 3,
+      "power_met": false,
+      "power_reason": "n_clusters=5 < min_inference_slates=6",
+      "power_state": "underpowered",
+      "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": 0.0451333333,
+      "recent_bucket_mean_net": 0.04195,
       "research_only": true,
-      "retirement_reason": "fdr_pass_but_hard_gates_failed:cluster_share_le_0_35",
+      "resolution": "underpowered",
+      "resolution_reason": "n_clusters=5 < min_inference_slates=6",
       "series_cluster_counts": {
         "KXMLBGAME": 21
       },
@@ -1232,22 +2461,161 @@
         "2026-07-08": 12,
         "2026-07-10": 2
       },
-      "status": "falsified",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        0.13224,
-        0.2314,
-        0.1979,
-        0.0451333333
+        0.1164166667,
+        0.1766230769,
+        0.04195
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        1
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": 0.015,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 1.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": -0.1400391304,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.0326782609,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 4,
+        "n_events": 23,
+        "seed": 11,
+        "underpowered": true
+      },
+      "bootstrap_mean_net_lower_95": -0.0326782609,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 4,
+        "n_events": 17,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.0256521146,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=4 < min_inference_slates=6"
+      },
       "clock_name": "T-15m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "clock_geometry_drift_fade_t15m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt",
+      "discovery_event_count": 23,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 9,
+        "2026-07-07": 1,
+        "2026-07-08": 9
+      },
+      "discovery_slate_count": 4,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 4,
+        "n_events": 23,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.0326782609,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=4 < min_inference_slates=6"
+      },
+      "effective_n_events": 23,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "clock_delta_6h_to_60m",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 23,
@@ -1277,12 +2645,29 @@
           "oos_event_count": 8
         }
       ],
+      "formula_hash": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=23 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=4 min=4",
             "status": "pass"
           },
           {
@@ -1296,18 +2681,28 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=1.0",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=-0.1400391304",
+            "reason": "lb=-0.0326782609",
             "status": "fail"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=1 recent=-0.032",
+            "reason": "positive_buckets=2 recent=-0.0414333333",
             "status": "fail"
           },
           {
@@ -1321,8 +2716,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.3913043478",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.3913043478 max=0.35",
             "status": "fail"
           },
           {
@@ -1337,7 +2732,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1356,14 +2751,23 @@
       "oos_mean_net_return": -0.0326782609,
       "oos_positive_event_count": 2,
       "oos_positive_rate": 0.0869565217,
+      "oos_slate_count": 4,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 0.999997139,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
+      "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 18,
-      "positive_temporal_buckets": 1,
-      "q_value": 1.0,
+      "positive_temporal_buckets": 2,
+      "power_met": false,
+      "power_reason": "n_clusters=4 < min_inference_slates=6",
+      "power_state": "underpowered",
+      "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": -0.032,
+      "recent_bucket_mean_net": -0.0414333333,
       "research_only": true,
+      "resolution": "underpowered",
+      "resolution_reason": "n_clusters=4 < min_inference_slates=6",
       "series_cluster_counts": {
         "KXMLBGAME": 23
       },
@@ -1374,22 +2778,169 @@
         "2026-07-07": 1,
         "2026-07-08": 9
       },
-      "status": "falsified",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        0.05864,
-        -0.091,
-        -0.06676,
-        -0.032
+        0.075975,
+        0.0089555556,
+        -0.7632,
+        -0.0414333333
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        1,
+        1,
+        1,
+        1
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": 0.04,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0869565217
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": 0.065185,
+      "bh_rank": 1,
+      "bh_threshold": 0.05,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": 0.07132,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 6,
+        "n_events": 20,
+        "seed": 11,
+        "underpowered": false
+      },
+      "bootstrap_mean_net_lower_95": 0.07132,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 20,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.1076245857,
+        "p_value": 0.0004997501,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:37:38Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "tight_spread_favorite_buy_yes_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt_and_spread_le",
+      "discovery_event_count": 20,
+      "discovery_slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-07": 1,
+        "2026-07-08": 10,
+        "2026-07-10": 2
+      },
+      "discovery_slate_count": 6,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 20,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": 0.094615,
+        "p_value": 0.0004997501,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
+      "effective_n_events": 20,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 20,
@@ -1419,12 +2970,58 @@
           "oos_event_count": 5
         }
       ],
+      "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+      "freeze_record": {
+        "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
+        "as_of_rule": "strict_latest_book_at_or_before_clock_within_staleness",
+        "clock_name": "T-60m",
+        "code_sha_placeholder": "filled_at_write_time",
+        "direction": "gt_and_spread_le",
+        "feature": "p_hat",
+        "fee_rule": "executable_ask_plus_series_resolved_taker_entry_fee",
+        "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+        "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "inference_contract": {
+          "fdr": "BH on p_joint novel family alpha=0.05",
+          "n_resamples": 2000,
+          "p_calibration": "slate_cluster_sign_flip mean side residual > 0",
+          "p_economic": "slate_cluster_sign_flip mean fee-adjusted net > 0",
+          "p_joint": "max(p_economic, p_calibration)",
+          "seed": 11,
+          "version": "mlb_settlement_miscalibration_inference_v2"
+        },
+        "largest_slate_cluster_share": 0.5,
+        "model_id": "tight_spread_favorite_buy_yes_t60m",
+        "oos_event_count": 20,
+        "oos_slate_count": 6,
+        "p_calibration": 0.0004997501,
+        "p_economic": 0.0004997501,
+        "p_joint": 0.0004997501,
+        "p_threshold": null,
+        "q_value": 0.0004997501,
+        "range": null,
+        "registry_hash": "0b811826056c1229772dcef0439a19b3005ac5f210dd274bf08c9ff4b09989ee",
+        "side": "yes",
+        "split_rule": "event_grouped_walk_forward_or_chronological_30pct_holdout",
+        "spread_max": null,
+        "threshold": 0.62
+      },
       "hard_gates": {
+        "breadth_only_failure": true,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "cluster_share_le_max"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=20 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=6 min=4",
             "status": "pass"
           },
           {
@@ -1438,18 +3035,28 @@
             "status": "pass"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=2.8611e-06",
+            "name": "economic_inference",
+            "reason": "p_economic=0.0004997501",
+            "status": "pass"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=0.0004997501",
+            "status": "pass"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=0.0004997501 p_joint=0.0004997501 alpha=0.05",
             "status": "pass"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=0.065185",
+            "reason": "lb=0.07132",
             "status": "pass"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=4 recent=0.04484",
+            "reason": "positive_buckets=3 recent=0.0901166667",
             "status": "pass"
           },
           {
@@ -1463,8 +3070,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5 max=0.35",
             "status": "fail"
           },
           {
@@ -1479,7 +3086,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1498,15 +3105,23 @@
       "oos_mean_net_return": 0.094615,
       "oos_positive_event_count": 20,
       "oos_positive_rate": 1.0,
+      "oos_slate_count": 6,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 9.537e-07,
+      "p_calibration": 0.0004997501,
+      "p_economic": 0.0004997501,
+      "p_joint": 0.0004997501,
+      "p_value_mean_net_positive": 0.0004997501,
       "positive_capacity_event_count": 18,
-      "positive_temporal_buckets": 4,
-      "q_value": 2.8611e-06,
+      "positive_temporal_buckets": 3,
+      "power_met": true,
+      "power_reason": "per_spec_event_and_slate_power_met",
+      "power_state": "powered",
+      "q_value": 0.0004997501,
       "range": null,
-      "recent_bucket_mean_net": 0.04484,
+      "recent_bucket_mean_net": 0.0901166667,
       "research_only": true,
-      "retirement_reason": "fdr_pass_but_hard_gates_failed:cluster_share_le_0_35",
+      "resolution": "frozen_candidate_waiting_multi_slate_confirmation",
+      "resolution_reason": "passes_corrected_joint_inference_fails_slate_breadth",
       "series_cluster_counts": {
         "KXMLBGAME": 20
       },
@@ -1519,22 +3134,166 @@
         "2026-07-08": 10,
         "2026-07-10": 2
       },
-      "status": "falsified",
+      "status": "frozen_candidate_waiting_multi_slate_confirmation",
       "temporal_bucket_mean_net": [
         0.09826,
-        0.11666,
-        0.1187,
-        0.04484
+        0.1065333333,
+        0.0901166667
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        2
+      ],
+      "testing_family_role": "novel_discovery",
       "threshold": 0.62,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 1.0
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": -0.185075,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.1943,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 6,
+        "n_events": 24,
+        "seed": 11,
+        "underpowered": false
+      },
+      "bootstrap_mean_net_lower_95": -0.1943,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 5,
+        "n_events": 22,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.1278975355,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": true,
+        "underpowered_reason": "n_clusters=5 < min_inference_slates=6"
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "negctrl_trade_against_path_slope_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "lt",
+      "discovery_event_count": 24,
+      "discovery_slate_cluster_counts": {
+        "2026-07-04": 5,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 2,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "discovery_slate_count": 6,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 6,
+        "n_events": 24,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.1316,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
+      "effective_n_events": 24,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "path_mid_slope_per_hour",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 24,
@@ -1564,12 +3323,30 @@
           "oos_event_count": 6
         }
       ],
+      "formula_hash": "865a0dacde448047716724f01654eddc13639f7de4585c58ce2c1209069c9526",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "cluster_share_le_max",
+          "not_negative_control"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=24 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=6 min=4",
             "status": "pass"
           },
           {
@@ -1583,18 +3360,28 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=1.0",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=-0.185075",
+            "reason": "lb=-0.1943",
             "status": "fail"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=-0.0657",
+            "reason": "positive_buckets=0 recent=-0.1614714286",
             "status": "fail"
           },
           {
@@ -1608,8 +3395,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.5",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.5 max=0.35",
             "status": "fail"
           },
           {
@@ -1624,7 +3411,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1643,14 +3430,22 @@
       "oos_mean_net_return": -0.1316,
       "oos_positive_event_count": 1,
       "oos_positive_rate": 0.0416666667,
+      "oos_slate_count": 6,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 0.9999999404,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
+      "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 22,
       "positive_temporal_buckets": 0,
-      "q_value": 1.0,
+      "power_met": false,
+      "power_reason": "n_clusters=5 < min_inference_slates=6",
+      "power_state": "underpowered",
+      "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": -0.0657,
+      "recent_bucket_mean_net": -0.1614714286,
       "research_only": true,
+      "resolution": "descriptive_control",
       "series_cluster_counts": {
         "KXMLBGAME": 24
       },
@@ -1663,22 +3458,170 @@
         "2026-07-08": 12,
         "2026-07-10": 2
       },
-      "status": "falsified",
+      "status": "underpowered",
       "temporal_bucket_mean_net": [
-        -0.0458166667,
-        -0.212,
-        -0.2028833333,
-        -0.0657
+        -0.0484142857,
+        -0.1863,
+        -0.1614714286
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        2
+      ],
+      "testing_family_role": "descriptive_control",
       "threshold": -0.015,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.0416666667
     },
     {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
       "baseline_only": false,
-      "bootstrap_mean_net_lower_95": -0.1301814815,
+      "bh_rank": null,
+      "bh_threshold": null,
+      "bootstrap_inference": {
+        "alpha": 0.05,
+        "lower_bound": -0.1176636364,
+        "method": "slate_cluster_bootstrap",
+        "n_bootstrap": 400,
+        "n_clusters": 7,
+        "n_events": 27,
+        "seed": 11,
+        "underpowered": false
+      },
+      "bootstrap_mean_net_lower_95": -0.1176636364,
+      "calibration_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 7,
+        "n_events": 27,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.0383528724,
+        "p_value": 1.0,
+        "seed": 28,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
       "clock_name": "T-60m",
+      "confirmation": {
+        "confirmation_boundary_utc": "2026-07-10T05:18:29Z",
+        "event_count": 0,
+        "forward_confirmation_registered_at_utc": null,
+        "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+        "mean_calibration_residual": null,
+        "mean_net_return": null,
+        "model_id": "negctrl_always_buy_yes_t60m",
+        "positive_rate": null,
+        "slate_count": 0,
+        "status": "confirmation_insufficient_sample"
+      },
       "direction": "gt",
+      "discovery_event_count": 27,
+      "discovery_slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 7,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 1,
+        "2026-07-08": 12,
+        "2026-07-10": 3
+      },
+      "discovery_slate_count": 7,
+      "economic_inference": {
+        "alternative": "E[value] > 0",
+        "cluster_unit": "mlb_slate_date_utc",
+        "method": "slate_cluster_sign_flip",
+        "n_clusters": 7,
+        "n_events": 27,
+        "n_resamples": 2000,
+        "null": "E[value] <= 0",
+        "observed_mean": -0.0530592593,
+        "p_value": 1.0,
+        "seed": 11,
+        "slate_ids": [
+          "2026-07-03",
+          "2026-07-04",
+          "2026-07-05",
+          "2026-07-06",
+          "2026-07-07",
+          "2026-07-08",
+          "2026-07-10"
+        ],
+        "underpowered": false,
+        "underpowered_reason": null
+      },
+      "effective_n_events": 27,
       "execution_enabled": false,
+      "fdr_alpha": 0.05,
+      "fdr_excluded_members": [
+        {
+          "model_id": "baseline_static_longshot_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "baseline_static_favorite_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "clock_x_price_fade_favorite_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_x_price_buy_underdog_t6h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "listing_age_cold_start_fade_extreme_t24h",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_reversion_buy_no_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "path_slope_continuation_buy_yes_t60m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "clock_geometry_drift_fade_t15m",
+          "power_state": "underpowered",
+          "reason": "not_eligible_status=underpowered"
+        },
+        {
+          "model_id": "negctrl_trade_against_path_slope_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        },
+        {
+          "model_id": "negctrl_always_buy_yes_t60m",
+          "reason": "descriptive_control_not_in_novel_fdr_family",
+          "role": "descriptive_control"
+        }
+      ],
+      "fdr_family": "novel_discovery",
+      "fdr_family_member_ids": [
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "fdr_family_size": 1,
       "feature": "p_hat",
       "feature_family": "sports_mlb_settlement_miscalibration_v1",
       "fired_row_count": 50,
@@ -1708,12 +3651,30 @@
           "oos_event_count": 9
         }
       ],
+      "formula_hash": "5b51f026ac8147e5a319bc5ba49507bd003cbf97d8d332af756666230c9b7fcd",
       "hard_gates": {
+        "breadth_only_failure": false,
         "discovery_gates_pass": false,
+        "failed_non_confirmation_gates": [
+          "positive_mean_net",
+          "calibration_direction",
+          "economic_inference",
+          "calibration_inference",
+          "fdr_q_le_alpha_on_p_joint",
+          "bootstrap_lb_above_0",
+          "temporal_survival",
+          "cluster_share_le_max",
+          "not_negative_control"
+        ],
         "gates": [
           {
             "name": "min_oos_events",
             "reason": "oos_event_count=27 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "min_oos_slates",
+            "reason": "oos_slate_count=7 min=4",
             "status": "pass"
           },
           {
@@ -1727,18 +3688,28 @@
             "status": "fail"
           },
           {
-            "name": "fdr_q_le_0_05",
-            "reason": "q=1.0",
+            "name": "economic_inference",
+            "reason": "p_economic=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_inference",
+            "reason": "p_calibration=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_alpha_on_p_joint",
+            "reason": "q=None p_joint=1.0 alpha=0.05",
             "status": "fail"
           },
           {
             "name": "bootstrap_lb_above_0",
-            "reason": "lb=-0.1301814815",
+            "reason": "lb=-0.1176636364",
             "status": "fail"
           },
           {
             "name": "temporal_survival",
-            "reason": "positive_buckets=0 recent=-0.0791",
+            "reason": "positive_buckets=0 recent=-0.1479666667",
             "status": "fail"
           },
           {
@@ -1752,8 +3723,8 @@
             "status": "pass"
           },
           {
-            "name": "cluster_share_le_0_35",
-            "reason": "largest_slate_share=0.4444444444",
+            "name": "cluster_share_le_max",
+            "reason": "largest_slate_share=0.4444444444 max=0.35",
             "status": "fail"
           },
           {
@@ -1768,7 +3739,7 @@
           },
           {
             "name": "untouched_confirmation",
-            "reason": "events=0 mean_net=None min_events=15",
+            "reason": "events=0 slates=0 mean_net=None min_events=15 min_slates=4",
             "status": "fail"
           }
         ],
@@ -1787,14 +3758,22 @@
       "oos_mean_net_return": -0.0530592593,
       "oos_positive_event_count": 12,
       "oos_positive_rate": 0.4444444444,
+      "oos_slate_count": 7,
       "orderbook_entry_share": 1.0,
-      "p_value_mean_net_positive": 0.7789658308,
+      "p_calibration": 1.0,
+      "p_economic": 1.0,
+      "p_joint": 1.0,
+      "p_value_mean_net_positive": 1.0,
       "positive_capacity_event_count": 22,
       "positive_temporal_buckets": 0,
-      "q_value": 1.0,
+      "power_met": true,
+      "power_reason": "per_spec_event_and_slate_power_met",
+      "power_state": "powered",
+      "q_value": null,
       "range": null,
-      "recent_bucket_mean_net": -0.0791,
+      "recent_bucket_mean_net": -0.1479666667,
       "research_only": true,
+      "resolution": "descriptive_control",
       "series_cluster_counts": {
         "KXMLBGAME": 27
       },
@@ -1808,30 +3787,74 @@
         "2026-07-08": 12,
         "2026-07-10": 3
       },
-      "status": "falsified",
+      "status": "testable",
       "temporal_bucket_mean_net": [
-        -0.06945,
-        -0.0235166667,
-        -0.02715,
-        -0.0791
+        -0.029825,
+        -0.1407666667,
+        -0.0252153846,
+        -0.1479666667
       ],
+      "temporal_bucket_method": "chronological_slate_date_buckets",
+      "temporal_bucket_slate_counts": [
+        2,
+        2,
+        2,
+        1
+      ],
+      "testing_family_role": "descriptive_control",
       "threshold": 0.01,
-      "usable": false
+      "usable": false,
+      "win_rate_descriptive_only": 0.4444444444
     }
   ],
   "execution_enabled": false,
   "family_id": "sports_mlb_settlement_miscalibration_v1",
-  "family_status": "falsified",
+  "family_status": "confirmation_pending",
   "final_audit": {
-    "family_status": "falsified",
-    "fdr_survivor_count": 0,
+    "evidence_incomplete": false,
+    "family_status": "confirmation_pending",
+    "fdr_survivor_count": 1,
+    "frozen_waiting_multi_slate_count": 1,
     "no_accounts_orders_live": true,
     "no_paper_stake": true,
     "no_sizing": true,
-    "powered_novel_count": 4,
+    "outcome_b_claimed": false,
+    "powered_falsified_count": 0,
+    "powered_novel_count": 1,
     "research_ready_count": 0,
-    "synthetic_tests_passed": true
+    "resolution_counts": {
+      "confirmation_failed_count": 0,
+      "confirmation_pending_count": 0,
+      "formula_hashes": {
+        "clock_geometry_drift_fade_t15m": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
+        "clock_x_price_buy_underdog_t6h": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
+        "clock_x_price_fade_favorite_t60m": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
+        "listing_age_cold_start_fade_extreme_t24h": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
+        "path_slope_continuation_buy_yes_t60m": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
+        "path_slope_reversion_buy_no_t60m": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
+        "tight_spread_favorite_buy_yes_t60m": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
+      },
+      "frozen_waiting_multi_slate_count": 1,
+      "novel_count": 7,
+      "novel_spec_ids": [
+        "clock_x_price_fade_favorite_t60m",
+        "clock_x_price_buy_underdog_t6h",
+        "listing_age_cold_start_fade_extreme_t24h",
+        "path_slope_reversion_buy_no_t60m",
+        "path_slope_continuation_buy_yes_t60m",
+        "clock_geometry_drift_fade_t15m",
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "powered_count": 1,
+      "powered_falsified_count": 0,
+      "research_ready_survivor_count": 0,
+      "structurally_untestable_count": 0,
+      "underpowered_count": 6
+    },
+    "synthetic_tests_passed": true,
+    "underpowered_novel_count": 6
   },
+  "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
   "frontier": [
     {
       "decision_value": "Fixed-clock MLB moneyline settlement miscalibration",
@@ -1843,21 +3866,27 @@
       },
       "independent_labels_now": 175,
       "lane": "sports_mlb_settlement_miscalibration_v1",
-      "next_action": "Retired: do not retune thresholds/buckets; require multi-week dense orderbook panel as a new pre-registered evidence surface before reopening",
+      "next_action": "Hold frozen candidates fixed; accumulate multi-slate dense fixed-clock panel for independent confirmation; do not retune",
       "rank": 1,
-      "status": "falsified"
+      "slates_by_clock": {
+        "T-15m": 13,
+        "T-24h": 14,
+        "T-60m": 14,
+        "T-6h": 14
+      },
+      "status": "confirmation_pending"
     },
     {
       "decision_value": "Next distinct surface: multi-week dense orderbook fixed-clock panel with pre-registered slate-breadth power (not cosmetic retune of v1 thresholds)",
       "lane": "mlb_multiweek_dense_fixed_clock_panel_v2",
-      "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering T-24h/T-6h/T-60m/T-15m across >=4 chronological slates before re-registering",
+      "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering primary T-60m/T-15m clocks across >=10 chronological slates before confirmation",
       "rank": 2,
       "status": "discovery_pending"
     },
     {
       "decision_value": "Distinct settlement-miscalibration mechanism only where market terms prove complementary moneyline identity within event",
       "lane": "sports_exact_cross_contract_moneyline_coherence",
-      "next_action": "Park until multi-week dense panel exists; do not mix with retired v1",
+      "next_action": "Park until multi-week dense panel exists; do not mix with v1 retunes",
       "rank": 3,
       "status": "parked"
     },
@@ -1869,10 +3898,48 @@
       "status": "falsified"
     }
   ],
+  "frozen_candidates": [
+    {
+      "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
+      "as_of_rule": "strict_latest_book_at_or_before_clock_within_staleness",
+      "clock_name": "T-60m",
+      "code_sha_placeholder": "filled_at_write_time",
+      "direction": "gt_and_spread_le",
+      "feature": "p_hat",
+      "fee_rule": "executable_ask_plus_series_resolved_taker_entry_fee",
+      "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+      "forward_confirmation_registered_at_utc": "2026-07-10T05:37:38Z",
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+      "inference_contract": {
+        "fdr": "BH on p_joint novel family alpha=0.05",
+        "n_resamples": 2000,
+        "p_calibration": "slate_cluster_sign_flip mean side residual > 0",
+        "p_economic": "slate_cluster_sign_flip mean fee-adjusted net > 0",
+        "p_joint": "max(p_economic, p_calibration)",
+        "seed": 11,
+        "version": "mlb_settlement_miscalibration_inference_v2"
+      },
+      "largest_slate_cluster_share": 0.5,
+      "model_id": "tight_spread_favorite_buy_yes_t60m",
+      "oos_event_count": 20,
+      "oos_slate_count": 6,
+      "p_calibration": 0.0004997501,
+      "p_economic": 0.0004997501,
+      "p_joint": 0.0004997501,
+      "p_threshold": null,
+      "q_value": 0.0004997501,
+      "range": null,
+      "registry_hash": "0b811826056c1229772dcef0439a19b3005ac5f210dd274bf08c9ff4b09989ee",
+      "side": "yes",
+      "split_rule": "event_grouped_walk_forward_or_chronological_30pct_holdout",
+      "spread_max": null,
+      "threshold": 0.62
+    }
+  ],
   "gates": [
     {
       "name": "phase0_synthetic_suite",
-      "reason": "7/7 synthetic tests passed",
+      "reason": "9/9 synthetic tests passed",
       "status": "pass"
     },
     {
@@ -1891,17 +3958,23 @@
       "status": "pass"
     },
     {
-      "name": "event_power",
-      "reason": "max_clock_events=169 min=40",
+      "name": "per_spec_power_accounting",
+      "reason": "powered=1 underpowered=6 falsified=0 frozen=1",
       "status": "pass"
     },
     {
       "name": "research_only_boundary",
       "reason": "usable=false; no paper stake, sizing, accounts, orders, or live execution",
       "status": "pass"
+    },
+    {
+      "name": "honest_family_outcome",
+      "reason": "family_status=confirmation_pending; underpowered members cannot yield Outcome B",
+      "status": "pass"
     }
   ],
-  "generated_utc": "2026-07-10T05:18:29Z",
+  "generated_utc": "2026-07-10T05:37:38Z",
+  "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
   "hypothesis_registry": [
     {
       "baseline_only": true,
@@ -2075,14 +4148,13 @@
     "observation_dirs": [
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations",
       "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books"
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration"
     ],
     "proxy_label_dir": "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels",
     "settlement_dirs": [
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_settlements",
-      "/home/mrwatson/manual_drops/kalshi_sports_settlements"
+      "/home/mrwatson/manual_drops/kalshi_sports_settlements",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration"
     ]
   },
   "label_manifest": {
@@ -2122,17 +4194,31 @@
         "T-60m": 168,
         "T-6h": 169
       },
+      "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
+      "independence_notes": {
+        "cluster_unit": "mlb_slate_date_utc",
+        "complementary_contracts": "collapsed_to_one_event",
+        "doubleheaders_postponements": "distinct event_ticker + game_start slate date; relistings share event when Kalshi event_ticker is stable",
+        "event_unit": "event_ticker",
+        "multiple_clocks_same_game": "repeated_measures_not_independent"
+      },
       "label_row_count": 1388,
       "labeled_row_count": 1168,
-      "observation_row_count": 26219,
+      "observation_row_count": 26039,
       "quality_counts": {
         "censored_missing_book": 18,
         "censored_stale_book": 202,
         "labeled": 1168,
-        "missing_settlement": 90,
+        "missing_settlement": 46,
         "yes_two_sided_missing_bid_or_ask": 20
       },
       "settlement_ticker_count": 1774,
+      "slates_by_clock": {
+        "T-15m": 13,
+        "T-24h": 14,
+        "T-60m": 14,
+        "T-6h": 14
+      },
       "staleness_seconds": {
         "T-15m": 1800,
         "T-24h": 21600,
@@ -2176,17 +4262,31 @@
         "T-60m": 168,
         "T-6h": 169
       },
+      "historical_discovery_data_cutoff_utc": null,
+      "independence_notes": {
+        "cluster_unit": "mlb_slate_date_utc",
+        "complementary_contracts": "collapsed_to_one_event",
+        "doubleheaders_postponements": "distinct event_ticker + game_start slate date; relistings share event when Kalshi event_ticker is stable",
+        "event_unit": "event_ticker",
+        "multiple_clocks_same_game": "repeated_measures_not_independent"
+      },
       "label_row_count": 1388,
       "labeled_row_count": 1168,
-      "observation_row_count": 26219,
+      "observation_row_count": 26039,
       "quality_counts": {
         "censored_missing_book": 18,
         "censored_stale_book": 202,
         "labeled": 1168,
-        "missing_settlement": 90,
+        "missing_settlement": 46,
         "yes_two_sided_missing_bid_or_ask": 20
       },
       "settlement_ticker_count": 1774,
+      "slates_by_clock": {
+        "T-15m": 13,
+        "T-24h": 14,
+        "T-60m": 14,
+        "T-6h": 14
+      },
       "staleness_seconds": {
         "T-15m": 1800,
         "T-24h": 21600,
@@ -2194,6 +4294,7 @@
         "T-6h": 7200
       }
     },
+    "historical_discovery_data_cutoff_utc": "2026-07-10T05:18:29Z",
     "labeled_sample": [
       {
         "abs_clock_delta_6h_to_60m": 0.11,
@@ -2217,6 +4318,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-BAL|T-24h|candle|KXMLBGAME-26JUL011235CWSBAL-BAL|1782846000",
@@ -2283,6 +4393,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T13:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-BAL|T-6h|candle|KXMLBGAME-26JUL011235CWSBAL-BAL|1782910800",
@@ -2349,6 +4468,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T18:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-BAL|T-60m|candle|KXMLBGAME-26JUL011235CWSBAL-BAL|1782928800",
@@ -2415,6 +4543,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-BAL|T-15m|candle|KXMLBGAME-26JUL011235CWSBAL-BAL|1782932400",
@@ -2481,6 +4618,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-CWS|T-24h|candle|KXMLBGAME-26JUL011235CWSBAL-CWS|1782846000",
@@ -2547,6 +4693,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T13:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-CWS|T-6h|candle|KXMLBGAME-26JUL011235CWSBAL-CWS|1782910800",
@@ -2613,6 +4768,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T18:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-CWS|T-60m|candle|KXMLBGAME-26JUL011235CWSBAL-CWS|1782928800",
@@ -2679,6 +4843,15 @@
         "event_ticker": "KXMLBGAME-26JUL011235CWSBAL",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782934500.0,
         "label_id": "KXMLBGAME-26JUL011235CWSBAL-CWS|T-15m|candle|KXMLBGAME-26JUL011235CWSBAL-CWS|1782932400",
@@ -2745,6 +4918,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-CLE|T-24h|candle|KXMLBGAME-26JUL011310TEXCLE-CLE|1782849600",
@@ -2811,6 +4993,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-CLE|T-6h|candle|KXMLBGAME-26JUL011310TEXCLE-CLE|1782914400",
@@ -2877,6 +5068,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-CLE|T-60m|candle|KXMLBGAME-26JUL011310TEXCLE-CLE|1782932400",
@@ -2943,6 +5143,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-TEX|T-24h|candle|KXMLBGAME-26JUL011310TEXCLE-TEX|1782849600",
@@ -3009,6 +5218,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-TEX|T-6h|candle|KXMLBGAME-26JUL011310TEXCLE-TEX|1782914400",
@@ -3075,6 +5293,15 @@
         "event_ticker": "KXMLBGAME-26JUL011310TEXCLE",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782936600.0,
         "label_id": "KXMLBGAME-26JUL011310TEXCLE-TEX|T-60m|candle|KXMLBGAME-26JUL011310TEXCLE-TEX|1782932400",
@@ -3141,6 +5368,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-DET|T-24h|candle|KXMLBGAME-26JUL011335DETNYY-DET|1782849600",
@@ -3207,6 +5443,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-DET|T-6h|candle|KXMLBGAME-26JUL011335DETNYY-DET|1782914400",
@@ -3273,6 +5518,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-DET|T-60m|candle|KXMLBGAME-26JUL011335DETNYY-DET|1782932400",
@@ -3339,6 +5593,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-DET|T-15m|candle|KXMLBGAME-26JUL011335DETNYY-DET|1782936000",
@@ -3405,6 +5668,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-NYY|T-24h|candle|KXMLBGAME-26JUL011335DETNYY-NYY|1782849600",
@@ -3471,6 +5743,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-NYY|T-6h|candle|KXMLBGAME-26JUL011335DETNYY-NYY|1782914400",
@@ -3537,6 +5818,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-NYY|T-60m|candle|KXMLBGAME-26JUL011335DETNYY-NYY|1782932400",
@@ -3603,6 +5893,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335DETNYY",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335DETNYY-NYY|T-15m|candle|KXMLBGAME-26JUL011335DETNYY-NYY|1782936000",
@@ -3669,6 +5968,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-BOS|T-24h|candle|KXMLBGAME-26JUL011335WSHBOS-BOS|1782849600",
@@ -3735,6 +6043,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-BOS|T-6h|candle|KXMLBGAME-26JUL011335WSHBOS-BOS|1782914400",
@@ -3801,6 +6118,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-BOS|T-60m|candle|KXMLBGAME-26JUL011335WSHBOS-BOS|1782932400",
@@ -3867,6 +6193,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-BOS|T-15m|candle|KXMLBGAME-26JUL011335WSHBOS-BOS|1782936000",
@@ -3933,6 +6268,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-WSH|T-24h|candle|KXMLBGAME-26JUL011335WSHBOS-WSH|1782849600",
@@ -3999,6 +6343,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T14:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-WSH|T-6h|candle|KXMLBGAME-26JUL011335WSHBOS-WSH|1782914400",
@@ -4065,6 +6418,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-WSH|T-60m|candle|KXMLBGAME-26JUL011335WSHBOS-WSH|1782932400",
@@ -4131,6 +6493,15 @@
         "event_ticker": "KXMLBGAME-26JUL011335WSHBOS",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782938100.0,
         "label_id": "KXMLBGAME-26JUL011335WSHBOS-WSH|T-15m|candle|KXMLBGAME-26JUL011335WSHBOS-WSH|1782936000",
@@ -4197,6 +6568,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-CHC|T-24h|candle|KXMLBGAME-26JUL011420SDCHC-CHC|1782853200",
@@ -4263,6 +6643,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T15:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-CHC|T-6h|candle|KXMLBGAME-26JUL011420SDCHC-CHC|1782918000",
@@ -4329,6 +6718,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-CHC|T-60m|candle|KXMLBGAME-26JUL011420SDCHC-CHC|1782936000",
@@ -4395,6 +6793,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-CHC|T-15m|candle|KXMLBGAME-26JUL011420SDCHC-CHC|1782939600",
@@ -4461,6 +6868,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-SD|T-24h|candle|KXMLBGAME-26JUL011420SDCHC-SD|1782853200",
@@ -4527,6 +6943,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T15:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-SD|T-6h|candle|KXMLBGAME-26JUL011420SDCHC-SD|1782918000",
@@ -4593,6 +7018,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T20:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-SD|T-60m|candle|KXMLBGAME-26JUL011420SDCHC-SD|1782936000",
@@ -4659,6 +7093,15 @@
         "event_ticker": "KXMLBGAME-26JUL011420SDCHC",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782940800.0,
         "label_id": "KXMLBGAME-26JUL011420SDCHC-SD|T-15m|candle|KXMLBGAME-26JUL011420SDCHC-SD|1782939600",
@@ -4725,6 +7168,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T22:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-NYM|T-24h|candle|KXMLBGAME-26JUL011507NYMTOR-NYM|1782856800",
@@ -4791,6 +7243,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T16:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-NYM|T-6h|candle|KXMLBGAME-26JUL011507NYMTOR-NYM|1782921600",
@@ -4857,6 +7318,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-NYM|T-60m|candle|KXMLBGAME-26JUL011507NYMTOR-NYM|1782939600",
@@ -4923,6 +7393,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-06-30T22:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-TOR|T-24h|candle|KXMLBGAME-26JUL011507NYMTOR-TOR|1782856800",
@@ -4989,6 +7468,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T16:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-TOR|T-6h|candle|KXMLBGAME-26JUL011507NYMTOR-TOR|1782921600",
@@ -5055,6 +7543,15 @@
         "event_ticker": "KXMLBGAME-26JUL011507NYMTOR",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T21:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782943620.0,
         "label_id": "KXMLBGAME-26JUL011507NYMTOR-TOR|T-60m|candle|KXMLBGAME-26JUL011507NYMTOR-TOR|1782939600",
@@ -5121,6 +7618,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T01:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PHI|T-24h|candle|KXMLBGAME-26JUL011840PITPHI-PHI|1782867600",
@@ -5187,6 +7693,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PHI|T-6h|candle|KXMLBGAME-26JUL011840PITPHI-PHI|1782932400",
@@ -5253,6 +7768,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-02T00:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PHI|T-60m|candle|KXMLBGAME-26JUL011840PITPHI-PHI|1782950400",
@@ -5319,6 +7843,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-02T01:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PHI|T-15m|candle|KXMLBGAME-26JUL011840PITPHI-PHI|1782954000",
@@ -5385,6 +7918,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T01:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PIT|T-24h|candle|KXMLBGAME-26JUL011840PITPHI-PIT|1782867600",
@@ -5451,6 +7993,15 @@
         "event_ticker": "KXMLBGAME-26JUL011840PITPHI",
         "execution_enabled": false,
         "feature_family": "sports_mlb_settlement_miscalibration_v1",
+        "fee_effective_scheduled_ts": null,
+        "fee_fallback_state": "conservative_general_quadratic",
+        "fee_lookup_time_utc": "2026-07-01T19:00:00Z",
+        "fee_mode": "taker",
+        "fee_multiplier": 1.0,
+        "fee_rate": 0.07,
+        "fee_series_ticker": "KXMLBGAME",
+        "fee_source": "conservative_general_quadratic_fallback",
+        "fee_type": "quadratic",
         "game_start_source": "occurrence_datetime",
         "game_start_ts": 1782956400.0,
         "label_id": "KXMLBGAME-26JUL011840PITPHI-PIT|T-6h|candle|KXMLBGAME-26JUL011840PITPHI-PIT|1782932400",
@@ -5499,19 +8050,27 @@
   },
   "market_execution": false,
   "method": {
+    "analysis_contract_version": "mlb_settlement_miscalibration_inference_v2",
     "calibration_estimator": "microprice if available else two-sided mid",
+    "calibration_null": "E[direction-adjusted settlement residual] <= 0",
     "clocks": {
       "T-15m": 900,
       "T-24h": 86400,
       "T-60m": 3600,
       "T-6h": 21600
     },
-    "economics": "hold-to-settlement: payoff - executable_ask - single taker entry fee",
+    "cluster_unit": "mlb_slate_date_utc",
+    "economic_null": "E[fee-adjusted net payoff] <= 0",
+    "economics": "hold-to-settlement: payoff - executable_ask - series-resolved taker entry fee",
     "fdr_alpha": 0.05,
+    "fdr_family": "novel_discovery_only",
     "independence_unit": "event_ticker",
+    "inference_resamples": 2000,
+    "inference_seed": 11,
     "join_rule": "strict as-of latest book at or before clock within staleness",
     "label_rule": "exact public Kalshi settlement by contract_ticker",
     "min_oos_events": 20,
+    "p_joint": "max(p_economic, p_calibration)",
     "staleness_seconds": {
       "T-15m": 1800,
       "T-24h": 21600,
@@ -5567,168 +8126,9 @@
       "family": "sports_consensus_price_bucket_bias",
       "spec_id": "sports_consensus_price_bucket_bias",
       "status": "baseline_only"
-    },
-    {
-      "do_not_repeat": "Do not retune fixed-clock thresholds/buckets cosmetically; require a genuinely new settlement-miscalibration mechanism or mapped sports surface",
-      "evidence": {
-        "evaluations": [
-          {
-            "model_id": "baseline_static_longshot_buy_yes_t60m",
-            "oos_event_count": 1,
-            "oos_mean_net_return": -0.2942,
-            "q_value": null,
-            "status": "insufficient_sample"
-          },
-          {
-            "model_id": "baseline_static_favorite_buy_yes_t60m",
-            "oos_event_count": 3,
-            "oos_mean_net_return": 0.1604666667,
-            "q_value": null,
-            "status": "insufficient_sample"
-          },
-          {
-            "model_id": "clock_x_price_fade_favorite_t60m",
-            "oos_event_count": 19,
-            "oos_mean_net_return": -0.1060052632,
-            "q_value": null,
-            "status": "insufficient_sample"
-          },
-          {
-            "model_id": "clock_x_price_buy_underdog_t6h",
-            "oos_event_count": 2,
-            "oos_mean_net_return": -0.36585,
-            "q_value": null,
-            "status": "insufficient_sample"
-          },
-          {
-            "model_id": "listing_age_cold_start_fade_extreme_t24h",
-            "oos_event_count": 0,
-            "oos_mean_net_return": null,
-            "q_value": null,
-            "status": "insufficient_sample"
-          },
-          {
-            "model_id": "path_slope_reversion_buy_no_t60m",
-            "oos_event_count": 23,
-            "oos_mean_net_return": -0.1584086957,
-            "q_value": 1.0,
-            "status": "falsified"
-          },
-          {
-            "model_id": "path_slope_continuation_buy_yes_t60m",
-            "oos_event_count": 21,
-            "oos_mean_net_return": 0.1465952381,
-            "q_value": 2.8608e-06,
-            "status": "falsified"
-          },
-          {
-            "model_id": "clock_geometry_drift_fade_t15m",
-            "oos_event_count": 23,
-            "oos_mean_net_return": -0.0326782609,
-            "q_value": 1.0,
-            "status": "falsified"
-          },
-          {
-            "model_id": "tight_spread_favorite_buy_yes_t60m",
-            "oos_event_count": 20,
-            "oos_mean_net_return": 0.094615,
-            "q_value": 2.8611e-06,
-            "status": "falsified"
-          },
-          {
-            "model_id": "negctrl_trade_against_path_slope_t60m",
-            "oos_event_count": 24,
-            "oos_mean_net_return": -0.1316,
-            "q_value": 1.0,
-            "status": "falsified"
-          },
-          {
-            "model_id": "negctrl_always_buy_yes_t60m",
-            "oos_event_count": 27,
-            "oos_mean_net_return": -0.0530592593,
-            "q_value": 1.0,
-            "status": "falsified"
-          }
-        ]
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "sports_mlb_settlement_miscalibration_v1",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for path_slope_reversion_buy_no_t60m",
-      "evidence": {
-        "oos_event_count": 23,
-        "oos_mean_calibration_residual": -0.1612345018,
-        "oos_mean_net_return": -0.1584086957,
-        "q_value": 1.0
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "path_slope_reversion_buy_no_t60m",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for path_slope_continuation_buy_yes_t60m",
-      "evidence": {
-        "oos_event_count": 21,
-        "oos_mean_calibration_residual": 0.1612345018,
-        "oos_mean_net_return": 0.1465952381,
-        "q_value": 2.8608e-06
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "path_slope_continuation_buy_yes_t60m",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for clock_geometry_drift_fade_t15m",
-      "evidence": {
-        "oos_event_count": 23,
-        "oos_mean_calibration_residual": -0.0256521146,
-        "oos_mean_net_return": -0.0326782609,
-        "q_value": 1.0
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "clock_geometry_drift_fade_t15m",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for tight_spread_favorite_buy_yes_t60m",
-      "evidence": {
-        "oos_event_count": 20,
-        "oos_mean_calibration_residual": 0.1076245857,
-        "oos_mean_net_return": 0.094615,
-        "q_value": 2.8611e-06
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "tight_spread_favorite_buy_yes_t60m",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for negctrl_trade_against_path_slope_t60m",
-      "evidence": {
-        "oos_event_count": 24,
-        "oos_mean_calibration_residual": -0.1278975355,
-        "oos_mean_net_return": -0.1316,
-        "q_value": 1.0
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "negctrl_trade_against_path_slope_t60m",
-      "status": "falsified"
-    },
-    {
-      "do_not_repeat": "Failed or non-positive OOS economics for negctrl_always_buy_yes_t60m",
-      "evidence": {
-        "oos_event_count": 27,
-        "oos_mean_calibration_residual": -0.0383528724,
-        "oos_mean_net_return": -0.0530592593,
-        "q_value": 1.0
-      },
-      "family": "sports_mlb_settlement_miscalibration_v1",
-      "spec_id": "negctrl_always_buy_yes_t60m",
-      "status": "falsified"
     }
   ],
-  "next_action": "Retired: do not retune thresholds/buckets; require multi-week dense orderbook panel as a new pre-registered evidence surface before reopening",
+  "next_action": "Hold frozen candidates fixed; accumulate multi-slate dense fixed-clock panel for independent confirmation; do not retune",
   "paid_calls": false,
   "phase0_audit": {
     "book_orientation": {
@@ -5744,7 +8144,7 @@
     ],
     "crossed_yes_book_count": 0,
     "family_id": "sports_mlb_settlement_miscalibration_v1",
-    "missing_yes_book_count": 135,
+    "missing_yes_book_count": 45,
     "novelty_map": {
       "baseline_only": [
         "static price buckets"
@@ -5767,7 +8167,7 @@
       ],
       "this_family": "sports_mlb_settlement_miscalibration_v1"
     },
-    "observation_row_count": 26219,
+    "observation_row_count": 26039,
     "observation_source_hashes_sample": {
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010108Z.json": "80ae9b1df9618bc0d2d447fb8b0f176c6ff224e7bcf50fd628ddce8635224be2",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010256Z.json": "6dff1648b647437e99f5f71d372423e1cf4edf86bf95e0e7ba5a6e4ffb532b79",
@@ -5799,9 +8199,6 @@
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T201049Z.json": "28842ef9c98cd59f0c2973fdc1c06a1081b3e694515396bc51fafdda9b3334b0",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T202645Z.json": "5bc63554c845e92bde47c1a56f18d872cc63f909f18770393056eb65a684d832",
       "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T205502Z.json": "441168be6c085058acc1addb5c6258b544930614113b3d85462943b3e0ff1528",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051608.424933Z.json": "738cc8054a3c0c1f10d5fdfb48988025c7b33c4a1160686734163d701c7e02da",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051811Z.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
-      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_latest.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_20260710T051217Z.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_latest.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
       "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candlesticks_20260710T051217Z.json": "cf0bafd069d2ba311fe7f184c7f29db1ca1a27817274506f0a4538dd305cc2dc",
@@ -5944,6 +8341,15 @@
           "event_ticker": "KXMLBGAME-26JUL081805BOSNYY",
           "execution_enabled": false,
           "feature_family": "sports_mlb_settlement_miscalibration_v1",
+          "fee_effective_scheduled_ts": null,
+          "fee_fallback_state": "conservative_general_quadratic",
+          "fee_lookup_time_utc": "2026-07-08T22:03:00Z",
+          "fee_mode": "taker",
+          "fee_multiplier": 1.0,
+          "fee_rate": 0.07,
+          "fee_series_ticker": "KXMLBGAME",
+          "fee_source": "conservative_general_quadratic_fallback",
+          "fee_type": "quadratic",
           "game_start_source": "occurrence_datetime",
           "game_start_ts": 1783551900.0,
           "label_id": "KXMLBGAME-26JUL081805BOSNYY-BOS|T-60m|past",
@@ -6029,6 +8435,37 @@
         "detail": 1,
         "name": "duplicate_books_do_not_double_count_clock_rows",
         "passed": true
+      },
+      {
+        "detail": {
+          "collapsed": 1
+        },
+        "name": "complements_do_not_inflate_effective_n",
+        "passed": true
+      },
+      {
+        "detail": {
+          "alternative": "E[value] > 0",
+          "cluster_unit": "mlb_slate_date_utc",
+          "method": "slate_cluster_sign_flip",
+          "n_clusters": 4,
+          "n_events": 12,
+          "n_resamples": 200,
+          "null": "E[value] <= 0",
+          "observed_mean": 0.015,
+          "p_value": 0.0049751244,
+          "seed": 3,
+          "slate_ids": [
+            "2024-07-03",
+            "2024-07-04",
+            "2024-07-05",
+            "2024-07-06"
+          ],
+          "underpowered": false,
+          "underpowered_reason": null
+        },
+        "name": "economic_p_value_is_mean_net_not_win_rate",
+        "passed": true
       }
     ],
     "timestamp_semantics": {
@@ -6048,7 +8485,8 @@
     }
   },
   "power": {
-    "discovery_power_met": true,
+    "cluster_unit": "mlb_slate_date_utc",
+    "discovery_power_met": false,
     "events_by_clock": {
       "T-15m": 100,
       "T-24h": 169,
@@ -6057,14 +8495,157 @@
     },
     "independence_unit": "event_ticker",
     "max_clock_events": 169,
+    "max_clock_slates": 14,
     "min_confirmation_events": 15,
+    "min_confirmation_slates": 4,
     "min_discovery_events": 40,
+    "min_inference_slates": 6,
     "min_oos_events": 20,
-    "notes": "Power is event-level. Complementary contracts and multiple clocks from one game are not independent evidence."
+    "min_oos_slates": 4,
+    "notes": "Power is per-specification at the event level with slate-cluster inference. Complementary contracts and multiple clocks from one game are not independent. Do not pool clocks or take max-clock events as a surrogate for per-spec power.",
+    "panel_event_coverage_met": true,
+    "per_spec_power": [
+      {
+        "clock_name": "T-60m",
+        "discovery_event_count": 19,
+        "discovery_slate_count": 6,
+        "formula_hash": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
+        "largest_slate_cluster_share": 0.5263157895,
+        "model_id": "clock_x_price_fade_favorite_t60m",
+        "oos_event_count": 19,
+        "oos_slate_count": 6,
+        "power_met": false,
+        "power_reason": "oos_events=19 min_events=20; oos_slates=6 min_slates=4",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-6h",
+        "discovery_event_count": 5,
+        "discovery_slate_count": 4,
+        "formula_hash": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
+        "largest_slate_cluster_share": 0.5,
+        "model_id": "clock_x_price_buy_underdog_t6h",
+        "oos_event_count": 2,
+        "oos_slate_count": 2,
+        "power_met": false,
+        "power_reason": "oos_events=2 min_events=20; oos_slates=2 min_slates=4",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-24h",
+        "discovery_event_count": 0,
+        "discovery_slate_count": 0,
+        "formula_hash": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
+        "largest_slate_cluster_share": 0.0,
+        "model_id": "listing_age_cold_start_fade_extreme_t24h",
+        "oos_event_count": 0,
+        "oos_slate_count": 0,
+        "power_met": false,
+        "power_reason": "oos_events=0 min_events=20; oos_slates=0 min_slates=4",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-60m",
+        "discovery_event_count": 23,
+        "discovery_slate_count": 6,
+        "formula_hash": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
+        "largest_slate_cluster_share": 0.5217391304,
+        "model_id": "path_slope_reversion_buy_no_t60m",
+        "oos_event_count": 23,
+        "oos_slate_count": 6,
+        "power_met": false,
+        "power_reason": "n_clusters=5 < min_inference_slates=6",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-60m",
+        "discovery_event_count": 21,
+        "discovery_slate_count": 5,
+        "formula_hash": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
+        "largest_slate_cluster_share": 0.5714285714,
+        "model_id": "path_slope_continuation_buy_yes_t60m",
+        "oos_event_count": 21,
+        "oos_slate_count": 5,
+        "power_met": false,
+        "power_reason": "n_clusters=5 < min_inference_slates=6",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-15m",
+        "discovery_event_count": 23,
+        "discovery_slate_count": 4,
+        "formula_hash": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
+        "largest_slate_cluster_share": 0.3913043478,
+        "model_id": "clock_geometry_drift_fade_t15m",
+        "oos_event_count": 23,
+        "oos_slate_count": 4,
+        "power_met": false,
+        "power_reason": "n_clusters=4 < min_inference_slates=6",
+        "power_state": "underpowered",
+        "status": "underpowered"
+      },
+      {
+        "clock_name": "T-60m",
+        "discovery_event_count": 20,
+        "discovery_slate_count": 6,
+        "formula_hash": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d",
+        "largest_slate_cluster_share": 0.5,
+        "model_id": "tight_spread_favorite_buy_yes_t60m",
+        "oos_event_count": 20,
+        "oos_slate_count": 6,
+        "power_met": true,
+        "power_reason": "per_spec_event_and_slate_power_met",
+        "power_state": "powered",
+        "status": "frozen_candidate_waiting_multi_slate_confirmation"
+      }
+    ],
+    "powered_novel_count": 1,
+    "slates_by_clock": {
+      "T-15m": 13,
+      "T-24h": 14,
+      "T-60m": 14,
+      "T-6h": 14
+    },
+    "underpowered_novel_count": 6
   },
   "provider_api_calls": false,
   "public_market_data_calls": false,
+  "registry_hash": "0b811826056c1229772dcef0439a19b3005ac5f210dd274bf08c9ff4b09989ee",
   "research_only": true,
+  "resolution_counts": {
+    "confirmation_failed_count": 0,
+    "confirmation_pending_count": 0,
+    "formula_hashes": {
+      "clock_geometry_drift_fade_t15m": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
+      "clock_x_price_buy_underdog_t6h": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
+      "clock_x_price_fade_favorite_t60m": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
+      "listing_age_cold_start_fade_extreme_t24h": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
+      "path_slope_continuation_buy_yes_t60m": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
+      "path_slope_reversion_buy_no_t60m": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
+      "tight_spread_favorite_buy_yes_t60m": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
+    },
+    "frozen_waiting_multi_slate_count": 1,
+    "novel_count": 7,
+    "novel_spec_ids": [
+      "clock_x_price_fade_favorite_t60m",
+      "clock_x_price_buy_underdog_t6h",
+      "listing_age_cold_start_fade_extreme_t24h",
+      "path_slope_reversion_buy_no_t60m",
+      "path_slope_continuation_buy_yes_t60m",
+      "clock_geometry_drift_fade_t15m",
+      "tight_spread_favorite_buy_yes_t60m"
+    ],
+    "powered_count": 1,
+    "powered_falsified_count": 0,
+    "research_ready_survivor_count": 0,
+    "structurally_untestable_count": 0,
+    "underpowered_count": 6
+  },
   "rows": false,
   "safety": {
     "account_or_order_paths": false,
@@ -6079,9 +8660,10 @@
     "research_only": true,
     "staking_or_sizing_guidance": false
   },
-  "schema_version": 1,
+  "schema_migration_note": "v2: slate-clustered mean-net economic test; inferential calibration; p_joint=max(p_economic,p_calibration); BH on novel family only; per-spec power; frozen multi-slate confirmation; honest discovery vs forward-registration timestamps; fee provenance; capture vs panel readiness.",
+  "schema_version": 2,
   "staking_or_sizing_guidance": false,
-  "status": "mlb_settlement_miscalibration_family_falsified",
+  "status": "mlb_settlement_miscalibration_confirmation_pending",
   "summary": {
     "clock_coverage": {
       "T-15m": {
@@ -6119,33 +8701,76 @@
       "T-60m": 168,
       "T-6h": 169
     },
-    "family_status": "falsified",
-    "fdr_survivor_count": 0,
+    "family_status": "confirmation_pending",
+    "fdr_survivor_count": 1,
     "gate_counts": {
       "blocked": 0,
       "fail": 0,
-      "pass": 6,
+      "pass": 7,
       "warn": 0
+    },
+    "historical_discovery_data_cutoff_utc": null,
+    "independence_notes": {
+      "cluster_unit": "mlb_slate_date_utc",
+      "complementary_contracts": "collapsed_to_one_event",
+      "doubleheaders_postponements": "distinct event_ticker + game_start slate date; relistings share event when Kalshi event_ticker is stable",
+      "event_unit": "event_ticker",
+      "multiple_clocks_same_game": "repeated_measures_not_independent"
     },
     "label_row_count": 1388,
     "labeled_row_count": 1168,
-    "observation_row_count": 26219,
+    "observation_row_count": 26039,
     "quality_counts": {
       "censored_missing_book": 18,
       "censored_stale_book": 202,
       "labeled": 1168,
-      "missing_settlement": 90,
+      "missing_settlement": 46,
       "yes_two_sided_missing_bid_or_ask": 20
     },
     "registry_count": 11,
     "research_ready_count": 0,
+    "resolution_counts": {
+      "confirmation_failed_count": 0,
+      "confirmation_pending_count": 0,
+      "formula_hashes": {
+        "clock_geometry_drift_fade_t15m": "a75aa4be92f1b373d8ca36f66442751821b13df2862653448fe156594aa99a55",
+        "clock_x_price_buy_underdog_t6h": "028e0bdf7409018b44cb37dab7d6acb320cf466ab49eba5b454982e1d5b1b4c9",
+        "clock_x_price_fade_favorite_t60m": "57b4bb78da8fc6804c0346bc3a51916a30eeec1154cf41d7fb1b3af20562a9b9",
+        "listing_age_cold_start_fade_extreme_t24h": "0a584b491012a3087a565dcdc7f473cf7a7a3d68e5b2a40a58b8638986d86ec5",
+        "path_slope_continuation_buy_yes_t60m": "fc969c63150e3e08e09fcda173df6d573890664c15c5c79b82a89f1b776b2a07",
+        "path_slope_reversion_buy_no_t60m": "671695679923bf276ad55829293cf1c003cb1de2130bf530399589c819e6d4c5",
+        "tight_spread_favorite_buy_yes_t60m": "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
+      },
+      "frozen_waiting_multi_slate_count": 1,
+      "novel_count": 7,
+      "novel_spec_ids": [
+        "clock_x_price_fade_favorite_t60m",
+        "clock_x_price_buy_underdog_t6h",
+        "listing_age_cold_start_fade_extreme_t24h",
+        "path_slope_reversion_buy_no_t60m",
+        "path_slope_continuation_buy_yes_t60m",
+        "clock_geometry_drift_fade_t15m",
+        "tight_spread_favorite_buy_yes_t60m"
+      ],
+      "powered_count": 1,
+      "powered_falsified_count": 0,
+      "research_ready_survivor_count": 0,
+      "structurally_untestable_count": 0,
+      "underpowered_count": 6
+    },
     "settlement_ticker_count": 1774,
+    "slates_by_clock": {
+      "T-15m": 13,
+      "T-24h": 14,
+      "T-60m": 14,
+      "T-6h": 14
+    },
     "staleness_seconds": {
       "T-15m": 1800,
       "T-24h": 21600,
       "T-60m": 2700,
       "T-6h": 7200
     },
-    "testable_count": 6
+    "testable_count": 1
   }
 }
