@@ -1,0 +1,51 @@
+[
+  {
+    "censored_labels": 29119,
+    "decision_value": "Primary sports short-horizon promotion surface",
+    "expected_time_to_next_labels_minutes": 15,
+    "independent_labels_now": 3584,
+    "lane": "executable_horizon_microstructure_v1",
+    "next_action": "Retire family if complete FDR failure; else densify 5/15m capture",
+    "rank": 1,
+    "status": "falsified"
+  },
+  {
+    "decision_value": "Unlock true 60s executable labels (current snapshot median gap ~27m)",
+    "expected_time_to_next_labels_minutes": 30,
+    "independent_labels_now": 2,
+    "lane": "tick_recorder_dense_mlb_orderbook",
+    "next_action": "Run read-only tick recorder on MLB moneyline books during live slate",
+    "rank": 2,
+    "status": "discovery_pending"
+  },
+  {
+    "decision_value": "Distinct family if executable horizon microstructure falsifies",
+    "independent_labels_now": 0,
+    "lane": "cross_contract_within_event_coherence",
+    "next_action": "Retired on discovery FDR; densify ticks or park",
+    "rank": 3,
+    "status": "falsified"
+  },
+  {
+    "decision_value": "Liquidity-reversion family distinct from informed-flow imbalance continuation",
+    "independent_labels_now": 3584,
+    "lane": "thin_book_fade",
+    "next_action": "Retired on discovery FDR; densify ticks or park",
+    "rank": 4,
+    "status": "falsified"
+  },
+  {
+    "decision_value": "Clock-bound; do not block main loop",
+    "lane": "atp_forward_oos_and_settlement_velocity",
+    "next_action": "Parked monitor only",
+    "rank": 5,
+    "status": "calendar_monitor"
+  },
+  {
+    "decision_value": "Explicitly out of scope",
+    "lane": "asian_sharp_soccer",
+    "next_action": "Do not pursue under this directive",
+    "rank": 6,
+    "status": "blocked_external_deferred"
+  }
+]

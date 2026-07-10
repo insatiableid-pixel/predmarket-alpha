@@ -1,0 +1,3625 @@
+{
+  "account_or_order_paths": false,
+  "directive_id": "kalshi-sports-max-leverage-20260710T043157Z",
+  "evaluations": [
+    {
+      "bootstrap_mean_net_lower_95": -0.0768164706,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "spread_normalized_imbalance",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 158,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.06468095238095238,
+          "oos_event_count": 21,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.07569999999999999,
+          "oos_event_count": 21,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.07461904761904761,
+          "oos_event_count": 21,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.04973636363636364,
+          "oos_event_count": 22,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=85 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0659905882",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0768164706",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0497363636",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=85",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3411764706",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 85,
+      "largest_series_cluster_share": 0.3411764706,
+      "mean_capacity_contracts": 4086.3549411765,
+      "mechanism": "Depth imbalance large relative to spread predicts short-horizon upward pressure.",
+      "model_id": "spread_norm_imbalance_buy_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 85,
+      "oos_mean_gross_return": -0.0368235294,
+      "oos_mean_net_return": -0.0659905882,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 85,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0497363636,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 1,
+        "KXATPSETWINNER": 19,
+        "KXKBOGAME": 4,
+        "KXKBORFI": 1,
+        "KXKBOSPREAD": 3,
+        "KXKBOTOTAL": 4,
+        "KXLMBGAME": 4,
+        "KXMLBGAME": 29,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 4,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 1,
+        "KXWCSPREAD": 5,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 20,
+        "mlb": 52,
+        "world_cup_soccer": 13
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.0646809524,
+        -0.0757,
+        -0.0746190476,
+        -0.0497363636
+      ],
+      "threshold": 2.0,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0542769585,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "spread_normalized_imbalance",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 827,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.05286481481481481,
+          "oos_event_count": 54,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.05076666666666667,
+          "oos_event_count": 54,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.051677777777777774,
+          "oos_event_count": 54,
+          "positive_rate": 0.018518518518518517
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.047352727272727275,
+          "oos_event_count": 55,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=217 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0506502304",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0542769585",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0473527273",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=217",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3087557604",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 217,
+      "largest_series_cluster_share": 0.3087557604,
+      "mean_capacity_contracts": 6081.33640553,
+      "mechanism": "Negative spread-normalized imbalance predicts downward pressure.",
+      "model_id": "spread_norm_imbalance_buy_no_h300",
+      "negative_control": false,
+      "oos_event_count": 217,
+      "oos_mean_gross_return": -0.0196313364,
+      "oos_mean_net_return": -0.0506502304,
+      "oos_positive_event_count": 1,
+      "oos_positive_rate": 0.0046082949,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 217,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0473527273,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 20,
+        "KXATPSETWINNER": 42,
+        "KXKBOGAME": 21,
+        "KXKBORFI": 3,
+        "KXKBOSPREAD": 5,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 10,
+        "KXMLBEXTRAS": 1,
+        "KXMLBGAME": 67,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 18,
+        "KXWC1H": 4,
+        "KXWC1HSPREAD": 2,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 2,
+        "KXWCCORNERS": 3,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 3,
+        "KXWCTOTAL": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 62,
+        "mlb": 134,
+        "world_cup_soccer": 21
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0528648148,
+        -0.0507666667,
+        -0.0516777778,
+        -0.0473527273
+      ],
+      "threshold": -2.0,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1291234043,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "microprice_delta_from_previous",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 152,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.18759565217391305,
+          "oos_event_count": 23,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.1206,
+          "oos_event_count": 23,
+          "positive_rate": 0.08695652173913043
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.04829130434782609,
+          "oos_event_count": 23,
+          "positive_rate": 0.13043478260869565
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05236,
+          "oos_event_count": 25,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=94 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1011510638",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1291234043",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.05236",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=94",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4574468085",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 94,
+      "largest_series_cluster_share": 0.4574468085,
+      "mean_capacity_contracts": 8998.1962765957,
+      "mechanism": "Microprice momentum conditioned on prior snapshot continues briefly.",
+      "model_id": "microprice_momentum_buy_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 94,
+      "oos_mean_gross_return": -0.0728723404,
+      "oos_mean_net_return": -0.1011510638,
+      "oos_positive_event_count": 5,
+      "oos_positive_rate": 0.0531914894,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 94,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.05236,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 3,
+        "KXATPSETWINNER": 9,
+        "KXKBOGAME": 13,
+        "KXKBOSPREAD": 1,
+        "KXKBOTOTAL": 2,
+        "KXLMBGAME": 9,
+        "KXMLBEXTRAS": 1,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 43,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXNPBGAME": 3,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 1,
+        "KXWC2HSPREAD": 1,
+        "KXWCCORNERS": 2
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 12,
+        "mlb": 77,
+        "world_cup_soccer": 5
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.1875956522,
+        -0.1206,
+        -0.0482913043,
+        -0.05236
+      ],
+      "threshold": 0.005,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1328434783,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "microprice_delta_from_previous",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 149,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.18846521739130434,
+          "oos_event_count": 23,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.11597391304347825,
+          "oos_event_count": 23,
+          "positive_rate": 0.13043478260869565
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.041865217391304346,
+          "oos_event_count": 23,
+          "positive_rate": 0.17391304347826086
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05511304347826087,
+          "oos_event_count": 23,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=92 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1003543478",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1328434783",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0551130435",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=92",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4891304348",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 92,
+      "largest_series_cluster_share": 0.4891304348,
+      "mean_capacity_contracts": 8560.595,
+      "mechanism": "Negative microprice momentum continues briefly.",
+      "model_id": "microprice_momentum_buy_no_h300",
+      "negative_control": false,
+      "oos_event_count": 92,
+      "oos_mean_gross_return": -0.0722826087,
+      "oos_mean_net_return": -0.1003543478,
+      "oos_positive_event_count": 7,
+      "oos_positive_rate": 0.0760869565,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 92,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0551130435,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 5,
+        "KXATPSETWINNER": 5,
+        "KXKBOGAME": 13,
+        "KXKBOSPREAD": 2,
+        "KXKBOTOTAL": 3,
+        "KXLMBGAME": 8,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 45,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 2,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 3,
+        "KXWC1HSPREAD": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 10,
+        "mlb": 81,
+        "world_cup_soccer": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.1884652174,
+        -0.115973913,
+        -0.0418652174,
+        -0.0551130435
+      ],
+      "threshold": -0.005,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0923794326,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "microprice_minus_mid",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 288,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.07904571428571429,
+          "oos_event_count": 35,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.10871142857142857,
+          "oos_event_count": 35,
+          "positive_rate": 0.02857142857142857
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.055522857142857145,
+          "oos_event_count": 35,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.047125,
+          "oos_event_count": 36,
+          "positive_rate": 0.05555555555555555
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=141 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0724205674",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0923794326",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.047125",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=141",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3687943262",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 141,
+      "largest_series_cluster_share": 0.3687943262,
+      "mean_capacity_contracts": 2437.0280851064,
+      "mechanism": "Microprice above mid implies latent bid pressure not yet in mid.",
+      "model_id": "microprice_mid_gap_fade_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 141,
+      "oos_mean_gross_return": -0.0419148936,
+      "oos_mean_net_return": -0.0724205674,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 0.0212765957,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 141,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.047125,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 11,
+        "KXATPSETWINNER": 26,
+        "KXKBOGAME": 8,
+        "KXKBORFI": 1,
+        "KXKBOSPREAD": 5,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 9,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 52,
+        "KXMLBHIT": 2,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 10,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 1,
+        "KXWCCORNERS": 3,
+        "KXWCSPREAD": 3,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 37,
+        "mlb": 94,
+        "world_cup_soccer": 10
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0790457143,
+        -0.1087114286,
+        -0.0555228571,
+        -0.047125
+      ],
+      "threshold": 0.002,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0920475728,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "microprice_minus_mid",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 559,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.10745686274509804,
+          "oos_event_count": 51,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.05681764705882353,
+          "oos_event_count": 51,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.09305490196078431,
+          "oos_event_count": 51,
+          "positive_rate": 0.0196078431372549
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.049564150943396224,
+          "oos_event_count": 53,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=206 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0764597087",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0920475728",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0495641509",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=206",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3252427184",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 206,
+      "largest_series_cluster_share": 0.3252427184,
+      "mean_capacity_contracts": 4912.4254368932,
+      "mechanism": "Microprice below mid implies latent ask pressure.",
+      "model_id": "microprice_mid_gap_fade_no_h300",
+      "negative_control": false,
+      "oos_event_count": 206,
+      "oos_mean_gross_return": -0.0460194175,
+      "oos_mean_net_return": -0.0764597087,
+      "oos_positive_event_count": 1,
+      "oos_positive_rate": 0.0048543689,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 206,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0495641509,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 19,
+        "KXATPSETWINNER": 32,
+        "KXKBOGAME": 20,
+        "KXKBORFI": 1,
+        "KXKBOSPREAD": 5,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 11,
+        "KXMLBEXTRAS": 1,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 67,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 2,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 18,
+        "KXWC1H": 4,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 2,
+        "KXWCCORNERS": 2,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 4,
+        "KXWCTOTAL": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 51,
+        "mlb": 135,
+        "world_cup_soccer": 20
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.1074568627,
+        -0.0568176471,
+        -0.093054902,
+        -0.0495641509
+      ],
+      "threshold": -0.002,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0789470588,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_delta",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 368,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.07684411764705881,
+          "oos_event_count": 34,
+          "positive_rate": 0.08823529411764706
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.053105882352941176,
+          "oos_event_count": 34,
+          "positive_rate": 0.058823529411764705
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.07915294117647058,
+          "oos_event_count": 34,
+          "positive_rate": 0.029411764705882353
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05667647058823529,
+          "oos_event_count": 34,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=136 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0664448529",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0789470588",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0566764706",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=136",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3823529412",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 136,
+      "largest_series_cluster_share": 0.3823529412,
+      "mean_capacity_contracts": 18158.2745588235,
+      "mechanism": "Improving YES depth imbalance forecasts 15m executable drift.",
+      "model_id": "depth_delta_buy_yes_h900",
+      "negative_control": false,
+      "oos_event_count": 136,
+      "oos_mean_gross_return": -0.0358823529,
+      "oos_mean_net_return": -0.0664448529,
+      "oos_positive_event_count": 6,
+      "oos_positive_rate": 0.0441176471,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 136,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0566764706,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 3,
+        "KXATPSETWINNER": 17,
+        "KXKBOGAME": 15,
+        "KXLMBGAME": 17,
+        "KXMLBEXTRAS": 1,
+        "KXMLBF5": 1,
+        "KXMLBF5SPREAD": 1,
+        "KXMLBF5TOTAL": 1,
+        "KXMLBGAME": 52,
+        "KXMLBHIT": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 9,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 1,
+        "KXWC2HSPREAD": 1,
+        "KXWC2HTOTAL": 1,
+        "KXWCCORNERS": 3,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 1,
+        "KXWCTCORNERS": 2,
+        "KXWCTOTAL": 4
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 20,
+        "mlb": 100,
+        "world_cup_soccer": 16
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0768441176,
+        -0.0531058824,
+        -0.0791529412,
+        -0.0566764706
+      ],
+      "threshold": 0.05,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0830492857,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_delta",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 385,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.08044857142857142,
+          "oos_event_count": 35,
+          "positive_rate": 0.05714285714285714
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.06362571428571429,
+          "oos_event_count": 35,
+          "positive_rate": 0.05714285714285714
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.059068571428571436,
+          "oos_event_count": 35,
+          "positive_rate": 0.02857142857142857
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.07127714285714286,
+          "oos_event_count": 35,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=140 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.068605",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0830492857",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0712771429",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=140",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3642857143",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 140,
+      "largest_series_cluster_share": 0.3642857143,
+      "mean_capacity_contracts": 8975.8705,
+      "mechanism": "Deteriorating YES depth imbalance forecasts 15m downward drift.",
+      "model_id": "depth_delta_buy_no_h900",
+      "negative_control": false,
+      "oos_event_count": 140,
+      "oos_mean_gross_return": -0.0382142857,
+      "oos_mean_net_return": -0.068605,
+      "oos_positive_event_count": 5,
+      "oos_positive_rate": 0.0357142857,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 140,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0712771429,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 2,
+        "KXATPSETWINNER": 18,
+        "KXKBOGAME": 13,
+        "KXKBORFI": 1,
+        "KXLMBGAME": 20,
+        "KXMLBEXTRAS": 1,
+        "KXMLBF5": 1,
+        "KXMLBF5SPREAD": 1,
+        "KXMLBF5TOTAL": 1,
+        "KXMLBGAME": 51,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 7,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 3,
+        "KXWC1HTOTAL": 2,
+        "KXWC2H": 2,
+        "KXWC2HTOTAL": 3,
+        "KXWCCORNERS": 3,
+        "KXWCSPREAD": 1,
+        "KXWCTCORNERS": 1,
+        "KXWCTOTAL": 4
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 20,
+        "mlb": 100,
+        "world_cup_soccer": 20
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0804485714,
+        -0.0636257143,
+        -0.0590685714,
+        -0.0712771429
+      ],
+      "threshold": -0.05,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0424153846,
+      "direction": "long_if_feature_gt_and_tight_spread",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_yes",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 104,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.031507692307692306,
+          "oos_event_count": 13,
+          "positive_rate": 0.15384615384615385
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": 0.03366923076923078,
+          "oos_event_count": 13,
+          "positive_rate": 0.15384615384615385
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.044715384615384615,
+          "oos_event_count": 13,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.036592307692307695,
+          "oos_event_count": 13,
+          "positive_rate": 0.07692307692307693
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=52 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0197865385",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0424153846",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=1 recent=-0.0365923077",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=52",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4423076923",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 52,
+      "largest_series_cluster_share": 0.4423076923,
+      "mean_capacity_contracts": 3961.61,
+      "mechanism": "Large imbalance with tight spread is more informative than wide-spread noise.",
+      "model_id": "tight_spread_imbalance_buy_yes_h900",
+      "negative_control": false,
+      "oos_event_count": 52,
+      "oos_mean_gross_return": 0.0084615385,
+      "oos_mean_net_return": -0.0197865385,
+      "oos_positive_event_count": 5,
+      "oos_positive_rate": 0.0961538462,
+      "p_value_mean_net_positive": 0.9999999999,
+      "positive_capacity_event_count": 52,
+      "positive_temporal_buckets": 1,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0365923077,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPSETWINNER": 7,
+        "KXKBOGAME": 1,
+        "KXKBORFI": 1,
+        "KXKBOSPREAD": 1,
+        "KXKBOTOTAL": 1,
+        "KXLMBGAME": 2,
+        "KXMLBF5": 1,
+        "KXMLBF5SPREAD": 1,
+        "KXMLBGAME": 23,
+        "KXNPBGAME": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC1HTOTAL": 1,
+        "KXWC2H": 1,
+        "KXWC2HSPREAD": 1,
+        "KXWC2HTOTAL": 2,
+        "KXWCCORNERS": 1,
+        "KXWCSPREAD": 2,
+        "KXWCTCORNERS": 2,
+        "KXWCTOTAL": 2
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 7,
+        "mlb": 32,
+        "world_cup_soccer": 13
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.0315076923,
+        0.0336692308,
+        -0.0447153846,
+        -0.0365923077
+      ],
+      "threshold": 0.25,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0505312139,
+      "direction": "long_if_feature_lt_and_tight_spread",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_yes",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 1236,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.04456046511627907,
+          "oos_event_count": 43,
+          "positive_rate": 0.023255813953488372
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.04952790697674419,
+          "oos_event_count": 43,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.04553953488372093,
+          "oos_event_count": 43,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.04755227272727272,
+          "oos_event_count": 44,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=173 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.046799422",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0505312139",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0475522727",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=173",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3583815029",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 173,
+      "largest_series_cluster_share": 0.3583815029,
+      "mean_capacity_contracts": 7233.5839884393,
+      "mechanism": "Negative imbalance with tight spread forecasts NO-side edge.",
+      "model_id": "tight_spread_imbalance_buy_no_h900",
+      "negative_control": false,
+      "oos_event_count": 173,
+      "oos_mean_gross_return": -0.0171676301,
+      "oos_mean_net_return": -0.046799422,
+      "oos_positive_event_count": 1,
+      "oos_positive_rate": 0.0057803468,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 173,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0475522727,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 18,
+        "KXATPSETWINNER": 18,
+        "KXKBOGAME": 18,
+        "KXKBORFI": 2,
+        "KXKBOSPREAD": 4,
+        "KXKBOTOTAL": 2,
+        "KXLMBGAME": 9,
+        "KXMLBF5": 1,
+        "KXMLBF5SPREAD": 1,
+        "KXMLBF5TOTAL": 1,
+        "KXMLBGAME": 62,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXNPBGAME": 14,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 3,
+        "KXWC1HTOTAL": 2,
+        "KXWC2H": 2,
+        "KXWC2HSPREAD": 1,
+        "KXWC2HTOTAL": 2,
+        "KXWCCORNERS": 2,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 1,
+        "KXWCTCORNERS": 2,
+        "KXWCTOTAL": 4
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 36,
+        "mlb": 116,
+        "world_cup_soccer": 21
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0445604651,
+        -0.049527907,
+        -0.0455395349,
+        -0.0475522727
+      ],
+      "threshold": -0.25,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1079589286,
+      "direction": "time_reversed_long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_yes",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 84,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.11067857142857142,
+          "oos_event_count": 14,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.10540000000000001,
+          "oos_event_count": 14,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.09296428571428571,
+          "oos_event_count": 14,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.042064285714285714,
+          "oos_event_count": 14,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=56 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0877767857",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1079589286",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0420642857",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=56",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3571428571",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 56,
+      "largest_series_cluster_share": 0.3571428571,
+      "mean_capacity_contracts": 3506.3896428571,
+      "mechanism": "Negative control: use next-row feature as if known at decision time.",
+      "model_id": "negctrl_time_reversed_imbalance_h300",
+      "negative_control": true,
+      "oos_event_count": 56,
+      "oos_mean_gross_return": -0.0607142857,
+      "oos_mean_net_return": -0.0877767857,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 56,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0420642857,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPSETWINNER": 10,
+        "KXKBOGAME": 4,
+        "KXKBORFI": 1,
+        "KXKBOSPREAD": 1,
+        "KXKBOTOTAL": 4,
+        "KXLMBGAME": 4,
+        "KXMLBGAME": 20,
+        "KXMLBHR": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 3,
+        "KXWC2HSPREAD": 1,
+        "KXWCSPREAD": 3,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 10,
+        "mlb": 37,
+        "world_cup_soccer": 9
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.1106785714,
+        -0.1054,
+        -0.0929642857,
+        -0.0420642857
+      ],
+      "threshold": 0.25,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0995180952,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "mid_delta_from_previous",
+      "feature_family": "sports_executable_horizon_microstructure_v1",
+      "fired_row_count": 169,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.12828461538461539,
+          "oos_event_count": 26,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.10167692307692307,
+          "oos_event_count": 26,
+          "positive_rate": 0.07692307692307693
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.053538461538461535,
+          "oos_event_count": 26,
+          "positive_rate": 0.11538461538461539
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.03903703703703704,
+          "oos_event_count": 27,
+          "positive_rate": 0.037037037037037035
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=105 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0802380952",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0995180952",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.039037037",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=105",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4761904762",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 105,
+      "largest_series_cluster_share": 0.4761904762,
+      "mean_capacity_contracts": 6789.8283809524,
+      "mechanism": "Negative control: trade against observed mid delta.",
+      "model_id": "negctrl_impossible_mid_delta_sign_flip_h300",
+      "negative_control": true,
+      "oos_event_count": 105,
+      "oos_mean_gross_return": -0.0515238095,
+      "oos_mean_net_return": -0.0802380952,
+      "oos_positive_event_count": 6,
+      "oos_positive_rate": 0.0571428571,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 105,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.039037037,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 6,
+        "KXATPSETWINNER": 10,
+        "KXKBOGAME": 14,
+        "KXKBOSPREAD": 2,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 8,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 50,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 2,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 2,
+        "KXWC1HSPREAD": 1,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 16,
+        "mlb": 87,
+        "world_cup_soccer": 2
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.1282846154,
+        -0.1016769231,
+        -0.0535384615,
+        -0.039037037
+      ],
+      "threshold": 0.0,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1113148936,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "peer_self_imbalance_gap",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 234,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.13672285714285715,
+          "oos_event_count": 35,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.08334571428571429,
+          "oos_event_count": 35,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.09562571428571427,
+          "oos_event_count": 35,
+          "positive_rate": 0.05714285714285714
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05228888888888889,
+          "oos_event_count": 36,
+          "positive_rate": 0.027777777777777776
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=141 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0917141844",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1113148936",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0522888889",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=141",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.2765957447",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 141,
+      "largest_series_cluster_share": 0.2765957447,
+      "mean_capacity_contracts": 4081.7856028369,
+      "mechanism": "Peers on the same event show more YES pressure than self; self catches up.",
+      "model_id": "peer_imbalance_gap_buy_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 141,
+      "oos_mean_gross_return": -0.0631914894,
+      "oos_mean_net_return": -0.0917141844,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 0.0212765957,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 141,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0522888889,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 12,
+        "KXATPSETWINNER": 33,
+        "KXKBOGAME": 12,
+        "KXKBOSPREAD": 4,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 10,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 39,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 2,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 7,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 2,
+        "KXWCCORNERS": 2,
+        "KXWCSPREAD": 2,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 45,
+        "mlb": 83,
+        "world_cup_soccer": 13
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.1367228571,
+        -0.0833457143,
+        -0.0956257143,
+        -0.0522888889
+      ],
+      "threshold": 0.2,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.095717037,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "peer_self_imbalance_gap",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 207,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.09883939393939394,
+          "oos_event_count": 33,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.06646363636363636,
+          "oos_event_count": 33,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.09088484848484848,
+          "oos_event_count": 33,
+          "positive_rate": 0.12121212121212122
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05314166666666667,
+          "oos_event_count": 36,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=135 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0767948148",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.095717037",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0531416667",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=135",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.2888888889",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 135,
+      "largest_series_cluster_share": 0.2888888889,
+      "mean_capacity_contracts": 8057.7232592593,
+      "mechanism": "Peers show more NO pressure than self; self catches down.",
+      "model_id": "peer_imbalance_gap_buy_no_h300",
+      "negative_control": false,
+      "oos_event_count": 135,
+      "oos_mean_gross_return": -0.0476296296,
+      "oos_mean_net_return": -0.0767948148,
+      "oos_positive_event_count": 4,
+      "oos_positive_rate": 0.0296296296,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 135,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0531416667,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 12,
+        "KXATPSETWINNER": 32,
+        "KXKBOGAME": 12,
+        "KXKBOSPREAD": 4,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 10,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 39,
+        "KXMLBHR": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 5,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 1,
+        "KXWCCORNERS": 2,
+        "KXWCSPREAD": 2,
+        "KXWCTOTAL": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 44,
+        "mlb": 78,
+        "world_cup_soccer": 13
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0988393939,
+        -0.0664636364,
+        -0.0908848485,
+        -0.0531416667
+      ],
+      "threshold": -0.2,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0766629032,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "peer_max_depth_imbalance_delta",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 404,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.05350322580645161,
+          "oos_event_count": 31,
+          "positive_rate": 0.12903225806451613
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.05370967741935484,
+          "oos_event_count": 31,
+          "positive_rate": 0.03225806451612903
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.06916129032258064,
+          "oos_event_count": 31,
+          "positive_rate": 0.06451612903225806
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.06551290322580645,
+          "oos_event_count": 31,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=124 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0604717742",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0766629032",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0655129032",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=124",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4032258065",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 124,
+      "largest_series_cluster_share": 0.4032258065,
+      "mean_capacity_contracts": 11947.0817741935,
+      "mechanism": "Largest sibling depth-delta increase leads follower YES demand over 15m.",
+      "model_id": "peer_max_delta_follow_yes_h900",
+      "negative_control": false,
+      "oos_event_count": 124,
+      "oos_mean_gross_return": -0.0298387097,
+      "oos_mean_net_return": -0.0604717742,
+      "oos_positive_event_count": 7,
+      "oos_positive_rate": 0.0564516129,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 124,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0655129032,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 2,
+        "KXATPSETWINNER": 15,
+        "KXKBOGAME": 14,
+        "KXLMBGAME": 14,
+        "KXMLBF5": 1,
+        "KXMLBF5TOTAL": 1,
+        "KXMLBGAME": 50,
+        "KXMLBHIT": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 8,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 2,
+        "KXWC2H": 1,
+        "KXWC2HTOTAL": 1,
+        "KXWCCORNERS": 3,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 1,
+        "KXWCTCORNERS": 2,
+        "KXWCTOTAL": 4
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 17,
+        "mlb": 91,
+        "world_cup_soccer": 16
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0535032258,
+        -0.0537096774,
+        -0.0691612903,
+        -0.0655129032
+      ],
+      "threshold": 0.08,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0970634146,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "peer_min_depth_imbalance_delta",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 390,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.07755333333333334,
+          "oos_event_count": 30,
+          "positive_rate": 0.06666666666666667
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.09043,
+          "oos_event_count": 30,
+          "positive_rate": 0.03333333333333333
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.06706999999999999,
+          "oos_event_count": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.07430606060606061,
+          "oos_event_count": 33,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=123 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0772658537",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0970634146",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0743060606",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=123",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3577235772",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 123,
+      "largest_series_cluster_share": 0.3577235772,
+      "mean_capacity_contracts": 2965.4556097561,
+      "mechanism": "Largest sibling depth-delta decrease leads follower NO demand over 15m.",
+      "model_id": "peer_min_delta_follow_no_h900",
+      "negative_control": false,
+      "oos_event_count": 123,
+      "oos_mean_gross_return": -0.0466666667,
+      "oos_mean_net_return": -0.0772658537,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 0.0243902439,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 123,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0743060606,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 2,
+        "KXATPSETWINNER": 16,
+        "KXKBOGAME": 13,
+        "KXLMBGAME": 20,
+        "KXMLBF5": 1,
+        "KXMLBF5SPREAD": 1,
+        "KXMLBF5TOTAL": 1,
+        "KXMLBGAME": 44,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXNPBGAME": 6,
+        "KXWC1HSPREAD": 2,
+        "KXWC1HTOTAL": 2,
+        "KXWC2H": 1,
+        "KXWC2HTOTAL": 2,
+        "KXWCCORNERS": 3,
+        "KXWCTCORNERS": 2,
+        "KXWCTOTAL": 4
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 18,
+        "mlb": 89,
+        "world_cup_soccer": 16
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0775533333,
+        -0.09043,
+        -0.06707,
+        -0.0743060606
+      ],
+      "threshold": -0.08,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1163923913,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "peer_mean_microprice_delta",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 154,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.12265652173913043,
+          "oos_event_count": 23,
+          "positive_rate": 0.043478260869565216
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.12621304347826087,
+          "oos_event_count": 23,
+          "positive_rate": 0.08695652173913043
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.05472608695652174,
+          "oos_event_count": 23,
+          "positive_rate": 0.08695652173913043
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05303913043478261,
+          "oos_event_count": 23,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=92 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0891586957",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1163923913",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0530391304",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=92",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4673913043",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 92,
+      "largest_series_cluster_share": 0.4673913043,
+      "mean_capacity_contracts": 6449.3239130435,
+      "mechanism": "Peer microprice momentum leads related contract executable YES returns.",
+      "model_id": "peer_microprice_lead_buy_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 92,
+      "oos_mean_gross_return": -0.0602173913,
+      "oos_mean_net_return": -0.0891586957,
+      "oos_positive_event_count": 5,
+      "oos_positive_rate": 0.0543478261,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 92,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0530391304,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 4,
+        "KXATPSETWINNER": 10,
+        "KXKBOGAME": 13,
+        "KXKBOTOTAL": 2,
+        "KXLMBGAME": 9,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 43,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXNPBGAME": 4,
+        "KXWC2H": 1,
+        "KXWC2HSPREAD": 1,
+        "KXWCCORNERS": 2
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 14,
+        "mlb": 74,
+        "world_cup_soccer": 4
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.1226565217,
+        -0.1262130435,
+        -0.054726087,
+        -0.0530391304
+      ],
+      "threshold": 0.004,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1003265306,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "peer_mean_microprice_delta",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 187,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.12277083333333333,
+          "oos_event_count": 24,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.09467916666666666,
+          "oos_event_count": 24,
+          "positive_rate": 0.16666666666666666
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.05272916666666667,
+          "oos_event_count": 24,
+          "positive_rate": 0.125
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.043423076923076925,
+          "oos_event_count": 26,
+          "positive_rate": 0.038461538461538464
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=98 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0776867347",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1003265306",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0434230769",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=98",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4795918367",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 98,
+      "largest_series_cluster_share": 0.4795918367,
+      "mean_capacity_contracts": 8488.4136734694,
+      "mechanism": "Peer microprice decline leads related contract executable NO returns.",
+      "model_id": "peer_microprice_lead_buy_no_h300",
+      "negative_control": false,
+      "oos_event_count": 98,
+      "oos_mean_gross_return": -0.0483673469,
+      "oos_mean_net_return": -0.0776867347,
+      "oos_positive_event_count": 8,
+      "oos_positive_rate": 0.0816326531,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 98,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": -0.0434230769,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 5,
+        "KXATPSETWINNER": 7,
+        "KXKBOGAME": 13,
+        "KXKBOSPREAD": 1,
+        "KXKBOTOTAL": 3,
+        "KXLMBGAME": 12,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 47,
+        "KXMLBHIT": 1,
+        "KXMLBHR": 1,
+        "KXMLBSPREAD": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 4,
+        "KXWC1HSPREAD": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 12,
+        "mlb": 85,
+        "world_cup_soccer": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.1227708333,
+        -0.0946791667,
+        -0.0527291667,
+        -0.0434230769
+      ],
+      "threshold": -0.004,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0879355556,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "peer_self_imbalance_gap",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 207,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.07759090909090909,
+          "oos_event_count": 33,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.0643151515151515,
+          "oos_event_count": 33,
+          "positive_rate": 0.030303030303030304
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.10253030303030304,
+          "oos_event_count": 33,
+          "positive_rate": 0.030303030303030304
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.04675,
+          "oos_event_count": 36,
+          "positive_rate": 0.027777777777777776
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=135 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0722177778",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0879355556",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.04675",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=135",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.2888888889",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 135,
+      "largest_series_cluster_share": 0.2888888889,
+      "mean_capacity_contracts": 5911.5625185185,
+      "mechanism": "Negative control: fade peer-lead gap instead of following it.",
+      "model_id": "negctrl_anti_peer_gap_h300",
+      "negative_control": true,
+      "oos_event_count": 135,
+      "oos_mean_gross_return": -0.043037037,
+      "oos_mean_net_return": -0.0722177778,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 0.0222222222,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 135,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.04675,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 12,
+        "KXATPSETWINNER": 32,
+        "KXKBOGAME": 12,
+        "KXKBOSPREAD": 4,
+        "KXKBOTOTAL": 5,
+        "KXLMBGAME": 10,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 39,
+        "KXMLBHR": 1,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 5,
+        "KXWC1H": 1,
+        "KXWC1HSPREAD": 1,
+        "KXWC2H": 5,
+        "KXWC2HSPREAD": 1,
+        "KXWCCORNERS": 2,
+        "KXWCSPREAD": 2,
+        "KXWCTOTAL": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 44,
+        "mlb": 78,
+        "world_cup_soccer": 13
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.0775909091,
+        -0.0643151515,
+        -0.102530303,
+        -0.04675
+      ],
+      "threshold": -0.2,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0806594203,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "peer_max_depth_imbalance_delta",
+      "feature_family": "sports_cross_contract_leadlag_v1",
+      "fired_row_count": 756,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.10453823529411765,
+          "oos_event_count": 34,
+          "positive_rate": 0.029411764705882353
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.02717941176470588,
+          "oos_event_count": 34,
+          "positive_rate": 0.058823529411764705
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.04866764705882353,
+          "oos_event_count": 34,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.07947222222222222,
+          "oos_event_count": 36,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=138 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0651746377",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0806594203",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0794722222",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=138",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.3913043478",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 138,
+      "largest_series_cluster_share": 0.3913043478,
+      "mean_capacity_contracts": 4915.4594202899,
+      "mechanism": "Negative control: trade against peer max delta sign.",
+      "model_id": "negctrl_random_peer_sign_h900",
+      "negative_control": true,
+      "oos_event_count": 138,
+      "oos_mean_gross_return": -0.0336231884,
+      "oos_mean_net_return": -0.0651746377,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 0.0217391304,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 138,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0794722222,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 10,
+        "KXATPSETWINNER": 17,
+        "KXKBOGAME": 15,
+        "KXLMBGAME": 20,
+        "KXMLBF5": 1,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 54,
+        "KXNPBGAME": 9,
+        "KXWC1HSPREAD": 2,
+        "KXWC1HTOTAL": 2,
+        "KXWC2HSPREAD": 2,
+        "KXWC2HTOTAL": 2,
+        "KXWCTCORNERS": 1,
+        "KXWCTOTAL": 2
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 27,
+        "mlb": 100,
+        "world_cup_soccer": 11
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.1045382353,
+        -0.0271794118,
+        -0.0486676471,
+        -0.0794722222
+      ],
+      "threshold": 0.0,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.2446,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "thin_book_fade_yes_pressure",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 4,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.2446,
+          "oos_event_count": 1,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=1 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.2446",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.2446",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=1",
+            "status": "fail"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 3,
+      "largest_series_cluster_share": 1.0,
+      "mean_capacity_contracts": 15.0,
+      "mechanism": "Thin YES-heavy books fade; buy NO for after-cost 15m reversion.",
+      "model_id": "thin_imbalance_fade_yes_h900",
+      "negative_control": false,
+      "oos_event_count": 1,
+      "oos_mean_gross_return": -0.23,
+      "oos_mean_net_return": -0.2446,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 1,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBHIT": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "mlb": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.2446,
+        null,
+        null,
+        null
+      ],
+      "threshold": 0.0005,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.0739,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "thin_book_fade_yes_pressure",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 40,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.06266666666666666,
+          "oos_event_count": 3,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=3 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0626666667",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.0739",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=3",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 10,
+      "largest_series_cluster_share": 1.0,
+      "mean_capacity_contracts": 18.3133333333,
+      "mechanism": "Thin NO-heavy books fade; buy YES for after-cost 15m reversion.",
+      "model_id": "thin_imbalance_fade_no_h900",
+      "negative_control": false,
+      "oos_event_count": 3,
+      "oos_mean_gross_return": -0.03,
+      "oos_mean_net_return": -0.0626666667,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 3,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXKBOGAME": 3
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "mlb": 3
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.0617,
+        -0.0739,
+        -0.0524,
+        null
+      ],
+      "threshold": -0.0005,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1838,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "thin_book_fade_yes_pressure",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 7,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.18380000000000002,
+          "oos_event_count": 2,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=2 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1838",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1838",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=2",
+            "status": "fail"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.5",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 6,
+      "largest_series_cluster_share": 0.5,
+      "mean_capacity_contracts": 3.795,
+      "mechanism": "Thin YES-heavy books fade over 5m; buy NO after costs.",
+      "model_id": "thin_imbalance_fade_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 2,
+      "oos_mean_gross_return": -0.16,
+      "oos_mean_net_return": -0.1838,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 2,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXLMBGAME": 1,
+        "KXMLBGAME": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "mlb": 2
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.2559,
+        -0.1117,
+        null,
+        null
+      ],
+      "threshold": 0.0003,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.1111628788,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "abs_depth_imbalance_yes",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 386,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.12559393939393937,
+          "oos_event_count": 33,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.10583636363636363,
+          "oos_event_count": 33,
+          "positive_rate": 0.030303030303030304
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.08317272727272727,
+          "oos_event_count": 33,
+          "positive_rate": 0.06060606060606061
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.03764242424242424,
+          "oos_event_count": 33,
+          "positive_rate": 0.06060606060606061
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=132 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0880613636",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1111628788",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0376424242",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=132",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4318181818",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 132,
+      "largest_series_cluster_share": 0.4318181818,
+      "mean_capacity_contracts": 8383.9778030303,
+      "mechanism": "Extreme absolute imbalance fades over 5m on the YES-heavy side.",
+      "model_id": "abs_imbalance_fade_no_h300",
+      "negative_control": false,
+      "oos_event_count": 132,
+      "oos_mean_gross_return": -0.0593939394,
+      "oos_mean_net_return": -0.0880613636,
+      "oos_positive_event_count": 5,
+      "oos_positive_rate": 0.0378787879,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 132,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0376424242,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 6,
+        "KXATPSETWINNER": 18,
+        "KXKBOGAME": 10,
+        "KXKBOSPREAD": 3,
+        "KXKBOTOTAL": 4,
+        "KXLMBGAME": 10,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 57,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 2,
+        "KXMLBTOTAL": 1,
+        "KXNPBGAME": 6,
+        "KXWC1H": 2,
+        "KXWC2H": 2,
+        "KXWC2HSPREAD": 2,
+        "KXWCCORNERS": 2,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 2,
+        "KXWCTOTAL": 1
+      },
+      "side": "no",
+      "sport_surface_counts": {
+        "atp": 24,
+        "mlb": 96,
+        "world_cup_soccer": 12
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.1255939394,
+        -0.1058363636,
+        -0.0831727273,
+        -0.0376424242
+      ],
+      "threshold": 0.45,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.12218,
+      "direction": "long_if_feature_lt",
+      "execution_enabled": false,
+      "feature": "depth_imbalance_yes",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 351,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_net_return": -0.14362999999999998,
+          "oos_event_count": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 1,
+          "mean_net_return": -0.11326,
+          "oos_event_count": 30,
+          "positive_rate": 0.0
+        },
+        {
+          "fold_index": 2,
+          "mean_net_return": -0.08189,
+          "oos_event_count": 30,
+          "positive_rate": 0.03333333333333333
+        },
+        {
+          "fold_index": 3,
+          "mean_net_return": -0.05367333333333334,
+          "oos_event_count": 30,
+          "positive_rate": 0.03333333333333333
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=120 min=100",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0981133333",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.12218",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0536733333",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=120",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=0.4583333333",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 300,
+      "independent_event_count": 120,
+      "largest_series_cluster_share": 0.4583333333,
+      "mean_capacity_contracts": 9495.86375,
+      "mechanism": "Extreme negative imbalance fades over 5m toward YES.",
+      "model_id": "abs_imbalance_fade_yes_h300",
+      "negative_control": false,
+      "oos_event_count": 120,
+      "oos_mean_gross_return": -0.0694166667,
+      "oos_mean_net_return": -0.0981133333,
+      "oos_positive_event_count": 2,
+      "oos_positive_rate": 0.0166666667,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 120,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "recent_bucket_mean_net": -0.0536733333,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXATPMATCH": 6,
+        "KXATPSETWINNER": 14,
+        "KXKBOGAME": 9,
+        "KXKBOSPREAD": 3,
+        "KXKBOTOTAL": 3,
+        "KXLMBGAME": 9,
+        "KXMLBF7": 1,
+        "KXMLBGAME": 55,
+        "KXMLBHIT": 2,
+        "KXMLBHR": 2,
+        "KXNPBGAME": 6,
+        "KXWC1H": 2,
+        "KXWC2H": 2,
+        "KXWC2HSPREAD": 2,
+        "KXWCCORNERS": 2,
+        "KXWCGAME": 1,
+        "KXWCSPREAD": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "atp": 20,
+        "mlb": 90,
+        "world_cup_soccer": 10
+      },
+      "status": "testable",
+      "temporal_bucket_mean_net": [
+        -0.14363,
+        -0.11326,
+        -0.08189,
+        -0.0536733333
+      ],
+      "threshold": -0.45,
+      "usable": false
+    },
+    {
+      "bootstrap_mean_net_lower_95": -0.3474,
+      "direction": "long_if_feature_gt",
+      "execution_enabled": false,
+      "feature": "thin_book_fade_yes_pressure",
+      "feature_family": "sports_thin_book_fade_v1",
+      "fired_row_count": 4,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.3474,
+          "oos_event_count": 1,
+          "positive_rate": 0.0
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=1 min=100",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.3474",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.3474",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=1",
+            "status": "fail"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_share=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "discovery-only surface; confirmation requires post-cutoff ticks",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "horizon_seconds": 900,
+      "independent_event_count": 3,
+      "largest_series_cluster_share": 1.0,
+      "mean_capacity_contracts": 1.0,
+      "mechanism": "Negative control: follow thin YES pressure instead of fading it.",
+      "model_id": "negctrl_thin_momentum_h900",
+      "negative_control": true,
+      "oos_event_count": 1,
+      "oos_mean_gross_return": -0.33,
+      "oos_mean_net_return": -0.3474,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 1,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBHIT": 1
+      },
+      "side": "yes",
+      "sport_surface_counts": {
+        "mlb": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.3474,
+        null,
+        null,
+        null
+      ],
+      "threshold": 0.0005,
+      "usable": false
+    }
+  ],
+  "execution_enabled": false,
+  "family_statuses": {
+    "sports_cross_contract_leadlag_v1": "falsified",
+    "sports_executable_horizon_microstructure_v1": "falsified",
+    "sports_thin_book_fade_v1": "falsified"
+  },
+  "generated_utc": "2026-07-10T04:46:26Z",
+  "live_eligible": 0,
+  "market_execution": false,
+  "negative_result_registry": [
+    {
+      "do_not_repeat": "Cosmetic threshold/bucket renames of the same consensus divergence specs",
+      "evidence": "1108 exact rows, 1098 public-Kalshi labels, 5 hypotheses, max OOS 186, 0 FDR survivors",
+      "family": "sports_consensus_historical",
+      "spec_id": "historical_mlb_multi_book_consensus_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same mid-direction forward labels with cosmetic momentum/imbalance renames",
+      "evidence": "11061 obs, 7951 forward-quote labels, 3 testable simple forward candidates, best q~0.999",
+      "family": "near_resolution_informed_flow",
+      "spec_id": "near_resolution_simple_flow_forward_mid_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same maker paper-fill specs on public snapshots without new fill truth",
+      "evidence": "9301 valid labels, 3 hypotheses, best q=1.0, best net EV ~-0.0183",
+      "family": "passive_liquidity_provision",
+      "spec_id": "passive_liquidity_public_snapshot_paper_fill_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Resurrecting settlement-direction depth imbalance without new mechanism",
+      "evidence": "Retired after 18 paper labels: 8 correct, accuracy 0.4444, mean calibration error ~0.5288",
+      "family": "near_resolution_informed_flow",
+      "spec_id": "flow_depth_imbalance_settlement_directional_v1",
+      "status": "confirmation_failed"
+    },
+    {
+      "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
+      "evidence": "executable_labels=3584 candidates=12 best_model=tight_spread_imbalance_buy_yes_h900 best_q=None best_mean_net=-0.0197865385 best_oos_events=52",
+      "family": "sports_executable_horizon_microstructure_v1",
+      "generated_utc": "2026-07-10T04:45:54Z",
+      "spec_id": "sports_executable_horizon_microstructure_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
+      "evidence": "executable_labels=3584 candidates=8 best_model=peer_imbalance_gap_buy_yes_h300 best_q=1.0 best_mean_net=-0.0917141844 best_oos_events=141",
+      "family": "sports_cross_contract_leadlag_v1",
+      "generated_utc": "2026-07-10T04:45:54Z",
+      "spec_id": "sports_cross_contract_leadlag_v1",
+      "status": "falsified"
+    },
+    {
+      "do_not_repeat": "Same feature/threshold set without denser books or a distinct mechanical family",
+      "evidence": "executable_labels=3584 candidates=6 best_model=thin_imbalance_fade_yes_h900 best_q=None best_mean_net=-0.2446 best_oos_events=1",
+      "family": "sports_thin_book_fade_v1",
+      "generated_utc": "2026-07-10T04:45:54Z",
+      "spec_id": "sports_thin_book_fade_v1",
+      "status": "falsified"
+    }
+  ],
+  "outcome": "B_declared_testable_families_exhausted",
+  "packet_type": "kalshi_sports_max_leverage_final_audit",
+  "paper_stake": 0,
+  "research_frontier": [
+    {
+      "censored_labels": 29119,
+      "decision_value": "Primary sports short-horizon promotion surface",
+      "expected_time_to_next_labels_minutes": 15,
+      "independent_labels_now": 3584,
+      "lane": "executable_horizon_microstructure_v1",
+      "next_action": "Retire family if complete FDR failure; else densify 5/15m capture",
+      "rank": 1,
+      "status": "falsified"
+    },
+    {
+      "decision_value": "Unlock true 60s executable labels (current snapshot median gap ~27m)",
+      "expected_time_to_next_labels_minutes": 30,
+      "independent_labels_now": 2,
+      "lane": "tick_recorder_dense_mlb_orderbook",
+      "next_action": "Run read-only tick recorder on MLB moneyline books during live slate",
+      "rank": 2,
+      "status": "discovery_pending"
+    },
+    {
+      "decision_value": "Distinct family if executable horizon microstructure falsifies",
+      "independent_labels_now": 0,
+      "lane": "cross_contract_within_event_coherence",
+      "next_action": "Retired on discovery FDR; densify ticks or park",
+      "rank": 3,
+      "status": "falsified"
+    },
+    {
+      "decision_value": "Liquidity-reversion family distinct from informed-flow imbalance continuation",
+      "independent_labels_now": 3584,
+      "lane": "thin_book_fade",
+      "next_action": "Retired on discovery FDR; densify ticks or park",
+      "rank": 4,
+      "status": "falsified"
+    },
+    {
+      "decision_value": "Clock-bound; do not block main loop",
+      "lane": "atp_forward_oos_and_settlement_velocity",
+      "next_action": "Parked monitor only",
+      "rank": 5,
+      "status": "calendar_monitor"
+    },
+    {
+      "decision_value": "Explicitly out of scope",
+      "lane": "asian_sharp_soccer",
+      "next_action": "Do not pursue under this directive",
+      "rank": 6,
+      "status": "blocked_external_deferred"
+    }
+  ],
+  "research_only": true,
+  "research_ready_survivor": false,
+  "safety": {
+    "account_or_order_paths": false,
+    "authenticated_api_calls": false,
+    "database_writes": false,
+    "execution_enabled": false,
+    "market_execution": false,
+    "paid_calls": false,
+    "provider_api_calls": false,
+    "public_market_data_calls": false,
+    "raw_payloads_copied_to_repo": false,
+    "research_only": true,
+    "staking_or_sizing_guidance": false
+  },
+  "schema_version": 1,
+  "status": "executable_horizon_research_family_falsified",
+  "summary": {
+    "best_model_id": "tight_spread_imbalance_buy_yes_h900",
+    "best_oos_event_count": 52,
+    "best_oos_mean_net_return": -0.0197865385,
+    "best_q_value": null,
+    "censored_label_count": 29119,
+    "distinct_contracts": 2227,
+    "distinct_events": 525,
+    "executable_label_count": 3584,
+    "family_status": "falsified",
+    "family_statuses": {
+      "sports_cross_contract_leadlag_v1": "falsified",
+      "sports_executable_horizon_microstructure_v1": "falsified",
+      "sports_thin_book_fade_v1": "falsified"
+    },
+    "fdr_alpha": 0.05,
+    "fdr_survivor_count": 0,
+    "feature_family": "sports_executable_horizon_microstructure_v1",
+    "frontier_top_lane": "executable_horizon_microstructure_v1",
+    "label_row_count": 33183,
+    "live_eligible": 0,
+    "min_events": 20,
+    "min_oos_labels": 100,
+    "observation_rows": 11061,
+    "paper_stake": 0,
+    "pre_registered_candidate_count": 26,
+    "research_ready_count": 0,
+    "synthetic_tests_passed": true,
+    "testable_candidate_count": 15,
+    "unresolved_label_semantic_defect_count": 0,
+    "untouched_confirmation_cutoff_utc": "2026-07-10T04:45:54Z",
+    "usable_row_count": 0
+  },
+  "untouched_confirmation_cutoff_utc": "2026-07-10T04:45:54Z"
+}
