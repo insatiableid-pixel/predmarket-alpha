@@ -28,9 +28,7 @@ from predmarket.sports_mlb_dense_panel_confirmation import (  # noqa: E402
 )
 
 MACRO_DIR = CONTROL_REPO / "docs" / "codex" / "macro"
-DEFAULT_REGISTRATION_PATH = (
-    MACRO_DIR / "latest-kalshi-sports-mlb-dense-panel-registration.json"
-)
+DEFAULT_REGISTRATION_PATH = MACRO_DIR / "latest-kalshi-sports-mlb-dense-panel-registration.json"
 DEFAULT_CONTRACT_PATH = (
     MACRO_DIR / "latest-kalshi-sports-mlb-dense-panel-confirmation-contract.json"
 )
@@ -46,7 +44,10 @@ DEFAULT_STATE_DIR = manual_drop_path(
     env_vars=("KALSHI_SPORTS_MLB_DENSE_PANEL_CONFIRMATION_DIR",),
 )
 IMPLEMENTATION_PATHS = (
+    CONTROL_REPO / "predmarket" / "sports_mlb_dense_panel.py",
     CONTROL_REPO / "predmarket" / "sports_mlb_dense_panel_confirmation.py",
+    CONTROL_REPO / "scripts" / "kalshi_sports_mlb_dense_book_capture.py",
+    CONTROL_REPO / "scripts" / "kalshi_sports_mlb_dense_panel_ops.py",
     Path(__file__).resolve(),
 )
 
@@ -154,9 +155,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     for name in ("preflight", "run"):
         command = sub.add_parser(name, help=f"{name.title()} single-shot confirmation")
         command.add_argument("--raw-path", type=Path, default=DEFAULT_RAW_PATH)
-        command.add_argument(
-            "--registration-path", type=Path, default=DEFAULT_REGISTRATION_PATH
-        )
+        command.add_argument("--registration-path", type=Path, default=DEFAULT_REGISTRATION_PATH)
         command.add_argument("--contract-path", type=Path, default=DEFAULT_CONTRACT_PATH)
         command.add_argument("--state-dir", type=Path, default=DEFAULT_STATE_DIR)
         command.add_argument("--now-utc", default=None)

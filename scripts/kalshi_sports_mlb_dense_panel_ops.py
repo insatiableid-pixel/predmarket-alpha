@@ -43,8 +43,10 @@ from predmarket.sports_mlb_dense_panel import (  # noqa: E402
     build_panel_registration,
     frozen_candidate_confirmation_state,
     health_status,
+    latest_observed_event_schedule,
     load_raw_snapshots,
     registration_markdown,
+    row_game_start_ts,
     snapshot_payload_hash,
 )
 
@@ -78,9 +80,7 @@ DEFAULT_BOOK_DIR = manual_drop_path(
 )
 
 
-def eligible_capture_clocks(
-    market: Mapping[str, Any], *, observed_utc: str
-) -> tuple[str, ...]:
+def eligible_capture_clocks(market: Mapping[str, Any], *, observed_utc: str) -> tuple[str, ...]:
     """Return preregistered as-of windows that need an order-book request."""
     observed_ts = timestamp(observed_utc)
     game_start = timestamp(
@@ -93,9 +93,7 @@ def eligible_capture_clocks(
     return tuple(
         name
         for name, offset in clocks.items()
-        if 0.0
-        <= float(game_start) - float(offset) - float(observed_ts)
-        <= float(staleness[name])
+        if 0.0 <= float(game_start) - float(offset) - float(observed_ts) <= float(staleness[name])
     )
 
 
@@ -195,6 +193,63 @@ def enrich_capture_rows(
     return enriched
 
 
+def build_schedule_revision_rows(
+    markets: Sequence[Mapping[str, Any]],
+    existing_rows: Sequence[Mapping[str, Any]],
+    *,
+    generated_utc: str,
+) -> list[dict[str, Any]]:
+    """Persist changed starts for known events without requesting an order book."""
+    existing_by_event: dict[str, list[dict[str, Any]]] = {}
+    for raw in existing_rows:
+        ticker = str(raw.get("contract_ticker") or "")
+        event = str(raw.get("event_ticker") or ticker.rsplit("-", 1)[0])
+        if event:
+            existing_by_event.setdefault(event, []).append(dict(raw))
+    known_starts = {
+        event: latest_observed_event_schedule(rows)[0] for event, rows in existing_by_event.items()
+    }
+
+    revisions: list[dict[str, Any]] = []
+    handled_events: set[str] = set()
+    for market in markets:
+        ticker = str(market.get("ticker") or "")
+        event = str(market.get("event_ticker") or ticker.rsplit("-", 1)[0])
+        current_start = row_game_start_ts(market)
+        previous_start = known_starts.get(event)
+        if (
+            not event
+            or event in handled_events
+            or current_start is None
+            or previous_start is None
+            or float(current_start) == float(previous_start)
+        ):
+            continue
+        handled_events.add(event)
+        marker = {
+            "snapshot_id": f"schedule-revision|{event}|{int(float(current_start))}",
+            "contract_ticker": ticker,
+            "event_ticker": event,
+            "series_ticker": "KXMLBGAME",
+            "observed_at_utc": generated_utc,
+            "request_timestamp_utc": generated_utc,
+            "capture_generated_utc": generated_utc,
+            "game_start_ts": float(current_start),
+            "previous_game_start_ts": float(previous_start),
+            "occurrence_datetime": market.get("occurrence_datetime"),
+            "expected_expiration_time": market.get("expected_expiration_time"),
+            "entry_source": "public_kalshi_market_schedule_revision",
+            "schedule_revision": True,
+            "orderbook_fetch_succeeded": False,
+            "usable": False,
+            "research_only": True,
+            "execution_enabled": False,
+        }
+        marker["raw_payload_hash"] = snapshot_payload_hash(marker)
+        revisions.append(marker)
+    return revisions
+
+
 def cmd_capture(
     *,
     raw_dir: Path,
@@ -217,6 +272,13 @@ def cmd_capture(
     try:
         generated = utc_now()
         markets = list_open_mlb(limit=limit)
+        raw_path = raw_dir / "mlb_dense_panel_snapshots.jsonl"
+        existing = load_raw_snapshots(raw_path)
+        schedule_revisions = build_schedule_revision_rows(
+            markets,
+            existing,
+            generated_utc=generated,
+        )
         eligible_markets, window_diagnostics = select_capture_window_markets(
             markets, observed_utc=generated
         )
@@ -226,11 +288,13 @@ def cmd_capture(
             request_delay_seconds=request_delay,
         )
         enriched = enrich_capture_rows(rows, generated_utc=generated)
-        raw_path = raw_dir / "mlb_dense_panel_snapshots.jsonl"
         # Load existing hashes for idempotent restart.
-        existing = load_raw_snapshots(raw_path)
         seen = {str(row.get("raw_payload_hash") or snapshot_payload_hash(row)) for row in existing}
-        append_stats = append_raw_snapshot_jsonl(raw_path, enriched, seen_hashes=seen)
+        append_stats = append_raw_snapshot_jsonl(
+            raw_path,
+            [*schedule_revisions, *enriched],
+            seen_hashes=seen,
+        )
         # Compact latest packet for compatibility with dense book helper consumers.
         packet_written = False
         if enriched:
@@ -268,6 +332,7 @@ def cmd_capture(
                 "market_count": len(markets),
                 **window_diagnostics,
                 "row_count": len(enriched),
+                "schedule_revision_row_count": len(schedule_revisions),
                 "append_stats": append_stats,
                 "lock": lock_msg,
                 "packet_written": packet_written,
@@ -291,6 +356,7 @@ def cmd_capture(
             "markets": len(markets),
             **window_diagnostics,
             "rows": len(enriched),
+            "schedule_revision_rows": len(schedule_revisions),
             "append_stats": append_stats,
             "distinct_events": coverage.get("distinct_events"),
             "distinct_slate_dates": coverage.get("distinct_slate_dates"),
@@ -386,16 +452,12 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     cap.add_argument("--limit", type=int, default=200)
     cap.add_argument("--fetch-orderbook", action=argparse.BooleanOptionalAction, default=True)
     cap.add_argument("--request-delay-seconds", type=float, default=0.08)
-    cap.add_argument(
-        "--write-repo-latest", action=argparse.BooleanOptionalAction, default=False
-    )
+    cap.add_argument("--write-repo-latest", action=argparse.BooleanOptionalAction, default=False)
 
     st = sub.add_parser("status", help="Panel health/readiness without P&L")
     st.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
     st.add_argument("--status-dir", type=Path, default=DEFAULT_STATUS_DIR)
-    st.add_argument(
-        "--write-repo-latest", action=argparse.BooleanOptionalAction, default=False
-    )
+    st.add_argument("--write-repo-latest", action=argparse.BooleanOptionalAction, default=False)
 
     rp = sub.add_parser("replay", help="Offline replay from raw JSONL")
     rp.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)

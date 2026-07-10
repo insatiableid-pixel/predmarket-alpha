@@ -1,8 +1,8 @@
 # MLB Dense-Panel Single-Shot Confirmation Contract
 
-- Contract: `mlb_dense_panel_single_shot_confirmation_v1`
-- Registered: `2026-07-10T06:35:42Z`
-- Contract hash: `306d226da9679b33011d44e31f239a1a57cc4ec27a9ef3eb90a9988265d403be`
+- Contract: `mlb_dense_panel_single_shot_confirmation_v2`
+- Registered: `2026-07-10T07:10:59Z`
+- Contract hash: `cbfa0635b006cf451b02f2cb99a16a03c0e5d7e7326f73113968f8e071ca674c`
 - Panel registration hash: `553135d7d1456aeda4a9115784aa423b81931cceed4d2a2f707b5ca8dcbe816e`
 - Candidate: `tight_spread_favorite_buy_yes_t60m`
 - Formula hash: `9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d`

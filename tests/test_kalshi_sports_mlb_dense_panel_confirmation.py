@@ -12,12 +12,16 @@ from predmarket.sports_mlb_dense_panel_confirmation import (
     confirmation_preflight,
     evaluate_frozen_attempt,
     run_single_shot_confirmation,
+    select_frozen_candidate_rows,
     validate_contract,
 )
 
 ROOT = Path(__file__).resolve().parents[1]
 REGISTRATION = ROOT / "docs/codex/macro/latest-kalshi-sports-mlb-dense-panel-registration.json"
+DENSE_PANEL_IMPLEMENTATION = ROOT / "predmarket/sports_mlb_dense_panel.py"
 IMPLEMENTATION = ROOT / "predmarket/sports_mlb_dense_panel_confirmation.py"
+DENSE_BOOK_CAPTURE_SCRIPT = ROOT / "scripts/kalshi_sports_mlb_dense_book_capture.py"
+DENSE_PANEL_OPS_SCRIPT = ROOT / "scripts/kalshi_sports_mlb_dense_panel_ops.py"
 SCRIPT = ROOT / "scripts/kalshi_sports_mlb_dense_panel_confirmation.py"
 
 
@@ -81,7 +85,13 @@ def contract_payload() -> dict:
     return build_confirmation_contract(
         repo_root=ROOT,
         registered_at_utc="2026-07-10T06:30:00Z",
-        implementation_paths=(IMPLEMENTATION, SCRIPT),
+        implementation_paths=(
+            DENSE_PANEL_IMPLEMENTATION,
+            IMPLEMENTATION,
+            DENSE_BOOK_CAPTURE_SCRIPT,
+            DENSE_PANEL_OPS_SCRIPT,
+            SCRIPT,
+        ),
     )
 
 
@@ -121,9 +131,84 @@ def test_contract_pins_registration_formula_and_implementation() -> None:
     contract = contract_payload()
     assert contract["panel_registration_sha256"] == EXPECTED_PANEL_REGISTRATION_SHA256
     assert contract["candidate"]["formula_sha256"] == EXPECTED_FORMULA_SHA256
+    assert {row["path"] for row in contract["implementation_files"]} == {
+        "predmarket/sports_mlb_dense_panel.py",
+        "predmarket/sports_mlb_dense_panel_confirmation.py",
+        "scripts/kalshi_sports_mlb_dense_book_capture.py",
+        "scripts/kalshi_sports_mlb_dense_panel_ops.py",
+        "scripts/kalshi_sports_mlb_dense_panel_confirmation.py",
+    }
     validation = validate_contract(contract, repo_root=ROOT)
     assert validation["passed"] is True
     assert all(row["passed"] for row in validation["implementation_checks"])
+
+
+def test_candidate_selection_uses_latest_observed_reschedule() -> None:
+    event = "KXMLBGAME-26JUL12POSTPONED"
+    ticker = f"{event}-AAA"
+    rows = []
+    for schedule, game_start, observed in (
+        ("original", "2026-07-12T20:00:00Z", "2026-07-12T18:59:00Z"),
+        ("rescheduled", "2026-07-13T20:00:00Z", "2026-07-13T18:59:00Z"),
+    ):
+        row = {
+            "snapshot_id": schedule,
+            "contract_ticker": ticker,
+            "event_ticker": event,
+            "observed_at_utc": observed,
+            "occurrence_datetime": game_start,
+            "best_yes_bid": 0.64,
+            "best_yes_ask": 0.66,
+            "yes_bid_depth_top1": 10,
+            "yes_ask_depth_top1": 12,
+            "yes_spread": 0.02,
+            "entry_source": "dense_public_orderbook",
+        }
+        row["raw_payload_hash"] = snapshot_payload_hash(row)
+        rows.append(row)
+
+    selected = select_frozen_candidate_rows(
+        rows,
+        registration_utc="2026-07-10T05:37:38Z",
+    )
+
+    assert len(selected) == 1
+    assert selected[0]["snapshot_id"] == "rescheduled"
+    assert selected[0]["slate_date"] == "2026-07-13"
+    assert selected[0]["game_start_resolution"] == "latest_observed_start_per_event"
+
+
+def test_schedule_revision_marker_blocks_old_candidate_until_new_book() -> None:
+    event = "KXMLBGAME-26JUL12POSTPONED"
+    old_book = {
+        "snapshot_id": "original-t60",
+        "contract_ticker": f"{event}-AAA",
+        "event_ticker": event,
+        "observed_at_utc": "2026-07-12T18:59:00Z",
+        "occurrence_datetime": "2026-07-12T20:00:00Z",
+        "best_yes_bid": 0.64,
+        "best_yes_ask": 0.66,
+        "yes_bid_depth_top1": 10,
+        "yes_ask_depth_top1": 12,
+        "yes_spread": 0.02,
+        "entry_source": "dense_public_orderbook",
+    }
+    marker = {
+        "snapshot_id": "schedule-revision",
+        "contract_ticker": f"{event}-AAA",
+        "event_ticker": event,
+        "observed_at_utc": "2026-07-12T19:30:00Z",
+        "game_start_ts": datetime(2026, 7, 13, 20, tzinfo=UTC).timestamp(),
+        "schedule_revision": True,
+        "entry_source": "public_kalshi_market_schedule_revision",
+    }
+
+    selected = select_frozen_candidate_rows(
+        [old_book, marker],
+        registration_utc="2026-07-10T05:37:38Z",
+    )
+
+    assert selected == []
 
 
 def test_outcome_blind_preflight_passes_only_at_registered_power(tmp_path: Path) -> None:
@@ -194,7 +279,7 @@ def test_attempt_freezes_sample_resumes_and_final_is_idempotent(tmp_path: Path) 
     expanded = dict(preflight)
     expanded["_candidate_rows"] = [
         *preflight["_candidate_rows"],
-        {**preflight["_candidate_rows"][0], "event_ticker": "SHOULD-NOT-ENTER"}
+        {**preflight["_candidate_rows"][0], "event_ticker": "SHOULD-NOT-ENTER"},
     ]
 
     def settled_yes(ticker: str) -> dict:

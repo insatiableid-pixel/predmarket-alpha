@@ -32,6 +32,7 @@ from predmarket.sports_mlb_dense_panel import (
     PRIMARY_STALENESS_SECONDS,
     assess_panel_coverage,
     atomic_write_json,
+    latest_observed_event_schedule,
     public_orderbook_source_ok,
     snapshot_payload_hash,
 )
@@ -53,14 +54,12 @@ from predmarket.sports_mlb_settlement_miscalibration_eval import (
     slate_cluster_sign_flip_test,
 )
 
-CONTRACT_VERSION = "mlb_dense_panel_single_shot_confirmation_v1"
+CONTRACT_VERSION = "mlb_dense_panel_single_shot_confirmation_v2"
 EXPECTED_PANEL_REGISTRATION_SHA256 = (
     "553135d7d1456aeda4a9115784aa423b81931cceed4d2a2f707b5ca8dcbe816e"
 )
 EXPECTED_MODEL_ID = "tight_spread_favorite_buy_yes_t60m"
-EXPECTED_FORMULA_SHA256 = (
-    "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
-)
+EXPECTED_FORMULA_SHA256 = "9cd76b9703cd167988fd94d53a9cc82ed9b37a7e3b30f316796f9dbb46cfa56d"
 CONFIRMATION_CLOCK_SECONDS = 3600
 CONFIRMATION_STALENESS_SECONDS = PRIMARY_STALENESS_SECONDS["T-60m"]
 SETTLEMENT_BUFFER_SECONDS = 12 * 3600
@@ -207,9 +206,7 @@ def build_confirmation_contract(
     return contract
 
 
-def validate_contract(
-    contract: Mapping[str, Any], *, repo_root: Path
-) -> dict[str, Any]:
+def validate_contract(contract: Mapping[str, Any], *, repo_root: Path) -> dict[str, Any]:
     contract_hash_ok, computed_hash = validate_hashed_payload(
         contract, hash_field="contract_sha256"
     )
@@ -264,9 +261,7 @@ def load_raw_jsonl_strict(path: Path) -> tuple[list[dict[str, Any]], dict[str, A
                 non_objects.append(line_number)
                 continue
             rows.append(dict(payload))
-    digests = [
-        str(row.get("raw_payload_hash") or snapshot_payload_hash(row)) for row in rows
-    ]
+    digests = [str(row.get("raw_payload_hash") or snapshot_payload_hash(row)) for row in rows]
     duplicates = {key: count for key, count in Counter(digests).items() if count > 1}
     return rows, {
         "path": str(path),
@@ -292,7 +287,7 @@ def select_frozen_candidate_rows(  # noqa: C901
     boundary = timestamp(registration_utc)
     if boundary is None:
         raise ValueError("Invalid forward registration timestamp")
-    by_ticker: dict[str, list[dict[str, Any]]] = {}
+    by_event: dict[str, list[dict[str, Any]]] = {}
     for raw in rows:
         ticker = str(raw.get("contract_ticker") or "")
         observed_ts = timestamp(raw.get("observed_at_utc"))
@@ -300,84 +295,88 @@ def select_frozen_candidate_rows(  # noqa: C901
             continue
         item = dict(raw)
         item["observed_ts"] = observed_ts
-        by_ticker.setdefault(ticker, []).append(item)
+        event = str(raw.get("event_ticker") or ticker.rsplit("-", 1)[0])
+        item["event_ticker"] = event
+        by_event.setdefault(event, []).append(item)
 
     candidates: list[dict[str, Any]] = []
-    for ticker in sorted(by_ticker):
-        books = by_ticker[ticker]
-        starts = [
-            timestamp(row.get("occurrence_datetime") or row.get("expected_expiration_time"))
-            for row in books
-        ]
-        starts = [value for value in starts if value is not None]
-        if not starts:
+    for event in sorted(by_event):
+        game_start, current_schedule_rows = latest_observed_event_schedule(by_event[event])
+        if game_start is None:
             continue
-        game_start = min(float(value) for value in starts)
         decision_ts = game_start - CONFIRMATION_CLOCK_SECONDS
         if decision_ts <= float(boundary):
             continue
-        eligible = [
-            row
-            for row in books
-            if float(row["observed_ts"]) <= decision_ts
-            and decision_ts - float(row["observed_ts"]) <= CONFIRMATION_STALENESS_SECONDS
-        ]
-        if not eligible:
-            continue
-        book = max(eligible, key=lambda row: (float(row["observed_ts"]), str(row.get("snapshot_id"))))
-        yes_bid = optional_float(book.get("best_yes_bid"))
-        yes_ask = optional_float(book.get("best_yes_ask"))
-        if yes_bid is None or yes_ask is None or not (0 < yes_bid <= yes_ask < 1):
-            continue
-        spread = optional_float(book.get("yes_spread"))
-        if spread is None:
-            spread = yes_ask - yes_bid
-        p_hat = microprice(
-            yes_bid,
-            yes_ask,
-            optional_float(book.get("yes_bid_depth_top1")),
-            optional_float(book.get("yes_ask_depth_top1")),
-        )
-        if p_hat is None:
-            p_hat = (yes_bid + yes_ask) / 2.0
-        if not (
-            p_hat > float(spec["threshold"])
-            and spread <= float(spec["spread_max"])
-        ):
-            continue
-        event = str(book.get("event_ticker") or ticker.rsplit("-", 1)[0])
-        candidates.append(
-            {
-                "contract_ticker": ticker,
-                "event_ticker": event,
-                "clock_name": "T-60m",
-                "decision_ts": decision_ts,
-                "game_start_ts": game_start,
-                "slate_date": slate_date(game_start),
-                "book_observed_at_utc": book.get("observed_at_utc"),
-                "book_observed_ts": float(book["observed_ts"]),
-                "book_age_seconds": decision_ts - float(book["observed_ts"]),
-                "snapshot_id": book.get("snapshot_id"),
-                "raw_payload_hash": book.get("raw_payload_hash")
-                or snapshot_payload_hash(book),
-                "entry_source": book.get("entry_source"),
-                "public_orderbook_source_ok": public_orderbook_source_ok(book),
-                "best_yes_bid": yes_bid,
-                "best_yes_ask": yes_ask,
-                "yes_bid_depth_top1": optional_float(book.get("yes_bid_depth_top1")),
-                "yes_ask_depth_top1": optional_float(book.get("yes_ask_depth_top1")),
-                "p_hat": p_hat,
-                "yes_spread": spread,
-                "research_only": True,
-                "execution_enabled": False,
-            }
-        )
+        by_ticker: dict[str, list[dict[str, Any]]] = {}
+        for row in current_schedule_rows:
+            ticker = str(row.get("contract_ticker") or "")
+            by_ticker.setdefault(ticker, []).append(row)
+        for ticker in sorted(by_ticker):
+            eligible = [
+                row
+                for row in by_ticker[ticker]
+                if row.get("schedule_revision") is not True
+                and float(row["observed_ts"]) <= decision_ts
+                and decision_ts - float(row["observed_ts"]) <= CONFIRMATION_STALENESS_SECONDS
+            ]
+            if not eligible:
+                continue
+            book = max(
+                eligible,
+                key=lambda row: (float(row["observed_ts"]), str(row.get("snapshot_id"))),
+            )
+            yes_bid = optional_float(book.get("best_yes_bid"))
+            yes_ask = optional_float(book.get("best_yes_ask"))
+            if yes_bid is None or yes_ask is None or not (0 < yes_bid <= yes_ask < 1):
+                continue
+            spread = optional_float(book.get("yes_spread"))
+            if spread is None:
+                spread = yes_ask - yes_bid
+            p_hat = microprice(
+                yes_bid,
+                yes_ask,
+                optional_float(book.get("yes_bid_depth_top1")),
+                optional_float(book.get("yes_ask_depth_top1")),
+            )
+            if p_hat is None:
+                p_hat = (yes_bid + yes_ask) / 2.0
+            if not (p_hat > float(spec["threshold"]) and spread <= float(spec["spread_max"])):
+                continue
+            candidates.append(
+                {
+                    "contract_ticker": ticker,
+                    "event_ticker": event,
+                    "clock_name": "T-60m",
+                    "decision_ts": decision_ts,
+                    "game_start_ts": game_start,
+                    "game_start_resolution": "latest_observed_start_per_event",
+                    "slate_date": slate_date(game_start),
+                    "book_observed_at_utc": book.get("observed_at_utc"),
+                    "book_observed_ts": float(book["observed_ts"]),
+                    "book_age_seconds": decision_ts - float(book["observed_ts"]),
+                    "snapshot_id": book.get("snapshot_id"),
+                    "raw_payload_hash": book.get("raw_payload_hash") or snapshot_payload_hash(book),
+                    "entry_source": book.get("entry_source"),
+                    "public_orderbook_source_ok": public_orderbook_source_ok(book),
+                    "best_yes_bid": yes_bid,
+                    "best_yes_ask": yes_ask,
+                    "yes_bid_depth_top1": optional_float(book.get("yes_bid_depth_top1")),
+                    "yes_ask_depth_top1": optional_float(book.get("yes_ask_depth_top1")),
+                    "p_hat": p_hat,
+                    "yes_spread": spread,
+                    "research_only": True,
+                    "execution_enabled": False,
+                }
+            )
 
     # Match the discovery evaluator's event-level independence discipline.
-    by_event: dict[str, dict[str, Any]] = {}
+    selected_by_event: dict[str, dict[str, Any]] = {}
     for row in sorted(candidates, key=lambda item: (item["decision_ts"], item["contract_ticker"])):
-        by_event.setdefault(str(row["event_ticker"]), row)
-    return sorted(by_event.values(), key=lambda item: (item["decision_ts"], item["event_ticker"]))
+        selected_by_event.setdefault(str(row["event_ticker"]), row)
+    return sorted(
+        selected_by_event.values(),
+        key=lambda item: (item["decision_ts"], item["event_ticker"]),
+    )
 
 
 def confirmation_preflight(
@@ -440,7 +439,10 @@ def confirmation_preflight(
         "candidate_public_orderbook_share": source_share >= MIN_PUBLIC_ORDERBOOK_SOURCE_SHARE,
         "candidate_executable_depth_share": depth_share >= MIN_EXECUTABLE_DEPTH_SHARE,
         "candidate_strictly_post_registration": bool(candidates)
-        and all(float(row["decision_ts"]) > float(timestamp(registration_utc) or 0) for row in candidates),
+        and all(
+            float(row["decision_ts"]) > float(timestamp(registration_utc) or 0)
+            for row in candidates
+        ),
         "candidate_settlement_buffer_elapsed": buffer_elapsed,
     }
     start_ready = all(gates.values()) and not attempt_path.exists() and not final_path.exists()
@@ -559,7 +561,8 @@ def validate_attempt(attempt: Mapping[str, Any], *, contract_sha256: str) -> dic
 
 def resolve_frozen_attempt_fees(
     attempt: Mapping[str, Any],
-    *, fee_resolver: Callable[..., Mapping[str, Any]] = resolve_kxmlbgame_taker_fee,
+    *,
+    fee_resolver: Callable[..., Mapping[str, Any]] = resolve_kxmlbgame_taker_fee,
 ) -> tuple[dict[str, dict[str, Any]], bool]:
     fee_by_ticker: dict[str, dict[str, Any]] = {}
     for decision in attempt.get("candidate_rows") or []:
@@ -575,8 +578,7 @@ def resolve_frozen_attempt_fees(
             )
         )
     exact = bool(fee_by_ticker) and all(
-        str(row.get("fee_fallback_state") or "none") == "none"
-        for row in fee_by_ticker.values()
+        str(row.get("fee_fallback_state") or "none") == "none" for row in fee_by_ticker.values()
     )
     return fee_by_ticker, exact
 
@@ -731,8 +733,7 @@ def evaluate_frozen_attempt(
         "economic_inference": p_economic <= FDR_ALPHA,
         "calibration_inference": p_calibration <= FDR_ALPHA,
         "single_candidate_q_value": p_joint <= FDR_ALPHA,
-        "bootstrap_lower_bound_above_zero": optional_float(bootstrap.get("lower_bound"))
-        is not None
+        "bootstrap_lower_bound_above_zero": optional_float(bootstrap.get("lower_bound")) is not None
         and float(bootstrap["lower_bound"]) > 0,
         "temporal_survival": int(temporal.get("positive_buckets") or 0) >= 3
         and (recent is None or recent >= 0),
@@ -827,9 +828,7 @@ def run_single_shot_confirmation(
             "execution_enabled": False,
         }
 
-    fee_by_ticker, exact_fee = resolve_frozen_attempt_fees(
-        attempt, fee_resolver=fee_resolver
-    )
+    fee_by_ticker, exact_fee = resolve_frozen_attempt_fees(attempt, fee_resolver=fee_resolver)
     atomic_write_json(
         state_dir / "fee-evidence.json",
         {
