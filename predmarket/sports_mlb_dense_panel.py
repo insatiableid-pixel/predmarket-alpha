@@ -355,6 +355,23 @@ def percentile(values: Sequence[float], q: float) -> float | None:
     return ordered[low] * (1.0 - frac) + ordered[high] * frac
 
 
+def public_orderbook_source_ok(row: Mapping[str, Any]) -> bool:
+    explicit = row.get("orderbook_fetch_succeeded")
+    if explicit is not None:
+        return explicit is True
+    source = str(row.get("entry_source") or "").lower()
+    has_depth = any(
+        optional_float(row.get(key)) is not None
+        for key in (
+            "yes_bid_depth_top1",
+            "yes_ask_depth_top1",
+            "no_bid_depth_top1",
+            "no_ask_depth_top1",
+        )
+    )
+    return "orderbook" in source and has_depth
+
+
 def assess_panel_coverage(  # noqa: C901
     snapshots: Sequence[Mapping[str, Any]],
     *,
@@ -394,6 +411,7 @@ def assess_panel_coverage(  # noqa: C901
     primary_staleness: dict[str, list[float]] = {name: [] for name in PRIMARY_CLOCKS_SECONDS}
     executable_ok = 0
     depth_ok = 0
+    orderbook_ok = 0
     eligible_primary = 0
     for clock_name, offset in PRIMARY_CLOCKS_SECONDS.items():
         count = 0
@@ -436,15 +454,11 @@ def assess_panel_coverage(  # noqa: C901
             )
             if depth is not None and depth > 0:
                 depth_ok += 1
+            if public_orderbook_source_ok(book):
+                orderbook_ok += 1
         primary_event_counts[clock_name] = count
 
-    orderbook_n = sum(
-        1
-        for row in snapshots
-        if "orderbook" in str(row.get("entry_source") or "").lower()
-        or "dense" in str(row.get("entry_source") or "").lower()
-    )
-    source_share = (orderbook_n / len(snapshots)) if snapshots else 0.0
+    source_share = (orderbook_ok / eligible_primary) if eligible_primary else 0.0
     exec_share = (executable_ok / eligible_primary) if eligible_primary else 0.0
     depth_share = (depth_ok / eligible_primary) if eligible_primary else 0.0
     p90_t60 = percentile(primary_staleness["T-60m"], 0.90)
@@ -514,6 +528,7 @@ def health_status(
     raw_path: Path,
     coverage: Mapping[str, Any],
     last_capture_utc: str | None = None,
+    last_cycle_utc: str | None = None,
 ) -> dict[str, Any]:
     lock_pid = None
     lock_alive = False
@@ -529,7 +544,9 @@ def health_status(
             "lock_path": str(lock_path),
             "lock_pid": lock_pid,
             "lock_holder_alive": lock_alive,
-            "duplicate_collector_blocked": bool(lock_alive),
+            "lock_held_by_current_process": lock_pid == os.getpid(),
+            "collector_running_at_status_time": bool(lock_alive),
+            "duplicate_collector_blocked": bool(lock_alive and lock_pid != os.getpid()),
         },
         "infrastructure_ready": bool(coverage.get("capture_infrastructure_ready")),
         "panel_accumulation": {
@@ -544,6 +561,7 @@ def health_status(
         "evidence_ready": bool(coverage.get("evidence_panel_ready")),
         "status": coverage.get("status"),
         "last_capture_utc": last_capture_utc,
+        "last_cycle_utc": last_cycle_utc,
         "research_only": True,
         "execution_enabled": False,
     }

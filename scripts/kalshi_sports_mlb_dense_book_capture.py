@@ -139,13 +139,15 @@ def capture_rows(
     request_delay_seconds: float = 0.08,
     generated_utc: str | None = None,
 ) -> list[dict[str, Any]]:
-    generated = generated_utc or utc_now()
     rows: list[dict[str, Any]] = []
     for market in markets:
         ticker = str(market.get("ticker") or "").strip()
         if not ticker.startswith("KXMLBGAME"):
             continue
         quotes = market_top_of_book(market)
+        orderbook_fetch_succeeded = False
+        orderbook_fetch_status = "not_requested"
+        request_started_utc = generated_utc or utc_now()
         if fetch_orderbook:
             try:
                 payload = fetch_json(
@@ -159,8 +161,12 @@ def capture_rows(
                         quotes[key] = value
                     if key.endswith("depth_top1") and value is not None:
                         quotes[key] = value
-            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError):
-                pass
+                orderbook_fetch_succeeded = True
+                orderbook_fetch_status = "succeeded"
+            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError) as exc:
+                orderbook_fetch_status = f"failed_{type(exc).__name__}"
+        observed_utc = generated_utc or utc_now()
+        if fetch_orderbook:
             if request_delay_seconds > 0:
                 time.sleep(request_delay_seconds)
         yes_bid = quotes.get("best_yes_bid")
@@ -170,11 +176,12 @@ def capture_rows(
             mid = (float(yes_bid) + float(yes_ask)) / 2.0
         rows.append(
             {
-                "snapshot_id": f"dense|{ticker}|{generated}",
+                "snapshot_id": f"dense|{ticker}|{observed_utc}",
                 "contract_ticker": ticker,
                 "event_ticker": market.get("event_ticker"),
                 "series_ticker": "KXMLBGAME",
-                "observed_at_utc": generated,
+                "observed_at_utc": observed_utc,
+                "request_timestamp_utc": request_started_utc,
                 "best_yes_bid": yes_bid,
                 "best_yes_ask": yes_ask,
                 "best_no_bid": quotes.get("best_no_bid"),
@@ -191,7 +198,14 @@ def capture_rows(
                 "created_time": market.get("created_time"),
                 "occurrence_datetime": market.get("occurrence_datetime"),
                 "expected_expiration_time": market.get("expected_expiration_time"),
-                "entry_source": "dense_public_orderbook",
+                "capture_clock_windows": list(market.get("_eligible_capture_clocks") or []),
+                "orderbook_fetch_succeeded": orderbook_fetch_succeeded,
+                "orderbook_fetch_status": orderbook_fetch_status,
+                "entry_source": (
+                    "dense_public_orderbook"
+                    if orderbook_fetch_succeeded
+                    else "public_market_summary_orderbook_unavailable"
+                ),
                 "usable": False,
                 "research_only": True,
                 "execution_enabled": False,
@@ -235,7 +249,6 @@ def main(argv: Sequence[str] | None = None) -> int:
             markets,
             fetch_orderbook=bool(args.fetch_orderbook),
             request_delay_seconds=float(args.request_delay_seconds),
-            generated_utc=generated,
         )
     except (
         OSError,
