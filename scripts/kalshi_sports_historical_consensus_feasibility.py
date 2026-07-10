@@ -46,15 +46,27 @@ def build_feasibility(
 ) -> dict[str, Any]:
     generated = generated_utc or utc_now()
     nearest_strategy_skew = snapshot_interval_seconds / 2.0
-    skew_pass = nearest_strategy_skew <= max_allowed_skew_seconds
+    cadence_skew_pass = nearest_strategy_skew <= max_allowed_skew_seconds
     paid_probe_status = str((paid_probe or {}).get("status") or "")
     access_verified = (
         paid_access_verified or paid_probe_status == "historical_probe_access_verified"
     )
-    if not skew_pass:
+    paid_probe_skew: float | None = None
+    try:
+        if (paid_probe or {}).get("absolute_skew_seconds") is not None:
+            paid_probe_skew = float((paid_probe or {})["absolute_skew_seconds"])
+    except (TypeError, ValueError):
+        paid_probe_skew = None
+    paid_probe_skew_pass = (
+        paid_probe_skew <= max_allowed_skew_seconds if paid_probe_skew is not None else None
+    )
+    skew_pass = cadence_skew_pass and paid_probe_skew_pass is not False
+    if not cadence_skew_pass:
         status = "kalshi_sports_historical_consensus_feasibility_blocked_snapshot_skew"
     elif paid_probe and not access_verified:
         status = "kalshi_sports_historical_consensus_feasibility_blocked_paid_access_probe"
+    elif paid_probe and paid_probe_skew_pass is not True:
+        status = "kalshi_sports_historical_consensus_feasibility_blocked_snapshot_skew"
     elif not access_verified:
         status = "kalshi_sports_historical_consensus_feasibility_ready_paid_access_unverified"
     else:
@@ -110,6 +122,9 @@ def build_feasibility(
             "max_expected_absolute_skew_seconds": nearest_strategy_skew,
             "max_allowed_skew_seconds": max_allowed_skew_seconds,
             "skew_gate_pass": skew_pass,
+            "cadence_skew_gate_pass": cadence_skew_pass,
+            "paid_probe_absolute_skew_seconds": paid_probe_skew,
+            "paid_probe_skew_gate_pass": paid_probe_skew_pass,
             "paid_access_verified": access_verified,
             "historical_endpoint_cost_per_region_market": 10,
             "paid_probe_status": paid_probe_status or None,
@@ -134,6 +149,7 @@ def probe_historical_endpoint(
     markets: str,
     odds_format: str,
     date_utc: str,
+    snapshot_interval_seconds: int,
     timeout_seconds: float,
 ) -> dict[str, Any]:
     try:
@@ -142,6 +158,18 @@ def probe_historical_endpoint(
         return {"status": "historical_probe_blocked_missing_api_key", "error": str(exc)}
     if not api_key:
         return {"status": "historical_probe_blocked_missing_api_key", "error": "empty key file"}
+    target_ts = timestamp(date_utc)
+    if target_ts is None:
+        return {
+            "status": "historical_probe_blocked_invalid_target_date",
+            "error": "probe date must be an ISO-8601 timestamp",
+        }
+    requested_ts = target_ts + snapshot_interval_seconds / 2.0
+    requested_date_utc = (
+        datetime.fromtimestamp(requested_ts, UTC)
+        .isoformat(timespec="seconds")
+        .replace("+00:00", "Z")
+    )
     endpoint = THE_ODDS_API_ENDPOINT.format(sport_key=sport_key).replace(
         "/v4/sports/", "/v4/historical/sports/"
     )
@@ -152,7 +180,7 @@ def probe_historical_endpoint(
             "markets": markets,
             "oddsFormat": odds_format,
             "dateFormat": "iso",
-            "date": date_utc,
+            "date": requested_date_utc,
         }
     )
     url = f"{endpoint}?{params}"
@@ -169,21 +197,19 @@ def probe_historical_endpoint(
     except Exception as exc:
         return {"status": "historical_probe_failed_runtime_error", "error": str(exc)}
     snapshot_time = str(payload.get("timestamp") or "")
-    requested_ts = timestamp(date_utc)
     snapshot_ts = timestamp(snapshot_time)
-    skew = (
-        abs(requested_ts - snapshot_ts)
-        if requested_ts is not None and snapshot_ts is not None
-        else None
-    )
+    skew = abs(target_ts - snapshot_ts) if snapshot_ts is not None else None
+    request_to_snapshot_skew = abs(requested_ts - snapshot_ts) if snapshot_ts is not None else None
     return {
         "status": "historical_probe_access_verified",
         "sport_key": sport_key,
         "markets": markets,
         "regions": regions,
-        "requested_date_utc": date_utc,
+        "target_date_utc": date_utc,
+        "requested_date_utc": requested_date_utc,
         "snapshot_timestamp_utc": snapshot_time or None,
         "absolute_skew_seconds": skew,
+        "request_to_snapshot_skew_seconds": request_to_snapshot_skew,
         "quota_headers": {
             key: value for key, value in headers.items() if key.startswith("x-requests")
         },
@@ -236,6 +262,7 @@ def render_markdown(report: Mapping[str, Any]) -> str:
         f"- Status: `{report.get('status')}`",
         f"- Snapshot interval: `{summary.get('snapshot_interval_seconds')}` seconds",
         f"- Max expected skew: `{summary.get('max_expected_absolute_skew_seconds')}` seconds",
+        f"- Paid probe target skew: `{summary.get('paid_probe_absolute_skew_seconds')}` seconds",
         f"- Skew gate pass: `{summary.get('skew_gate_pass')}`",
         f"- Paid access verified: `{summary.get('paid_access_verified')}`",
         "",
@@ -272,6 +299,7 @@ def main(argv: Sequence[str] | None = None) -> int:
             markets=args.probe_markets,
             odds_format=args.probe_odds_format,
             date_utc=args.probe_date_utc,
+            snapshot_interval_seconds=int(args.snapshot_interval_seconds),
             timeout_seconds=float(args.timeout_seconds),
         )
         if args.probe_paid_endpoint

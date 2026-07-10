@@ -44,12 +44,49 @@ def test_paid_probe_success_promotes_to_backfill_ready() -> None:
         generated_utc="2026-07-06T00:00:00Z",
         snapshot_interval_seconds=300,
         max_allowed_skew_seconds=180,
-        paid_probe={"status": "historical_probe_access_verified"},
+        paid_probe={
+            "status": "historical_probe_access_verified",
+            "absolute_skew_seconds": 150,
+        },
     )
 
     assert report["status"] == "kalshi_sports_historical_consensus_feasibility_ready_for_backfill"
     assert report["summary"]["paid_access_verified"] is True
+    assert report["summary"]["paid_probe_skew_gate_pass"] is True
     assert report["paid_historical_calls"] is True
+
+
+def test_paid_probe_skew_over_limit_blocks_backfill() -> None:
+    report = build_feasibility(
+        generated_utc="2026-07-06T00:00:00Z",
+        snapshot_interval_seconds=300,
+        max_allowed_skew_seconds=180,
+        paid_probe={
+            "status": "historical_probe_access_verified",
+            "absolute_skew_seconds": 263,
+        },
+    )
+
+    assert (
+        report["status"] == "kalshi_sports_historical_consensus_feasibility_blocked_snapshot_skew"
+    )
+    assert report["summary"]["cadence_skew_gate_pass"] is True
+    assert report["summary"]["paid_probe_skew_gate_pass"] is False
+    assert report["summary"]["skew_gate_pass"] is False
+
+
+def test_paid_probe_without_measured_skew_blocks_backfill() -> None:
+    report = build_feasibility(
+        generated_utc="2026-07-06T00:00:00Z",
+        snapshot_interval_seconds=300,
+        max_allowed_skew_seconds=180,
+        paid_probe={"status": "historical_probe_access_verified"},
+    )
+
+    assert (
+        report["status"] == "kalshi_sports_historical_consensus_feasibility_blocked_snapshot_skew"
+    )
+    assert report["summary"]["paid_probe_skew_gate_pass"] is None
 
 
 def test_paid_probe_failure_blocks_paid_access_explicitly() -> None:
