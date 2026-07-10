@@ -1,0 +1,18 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "falsified",
+  "generated_utc": "2026-07-10T05:18:29Z",
+  "payload": {
+    "family_status": "falsified",
+    "fdr_survivor_count": 0,
+    "no_accounts_orders_live": true,
+    "no_paper_stake": true,
+    "no_sizing": true,
+    "powered_novel_count": 4,
+    "research_ready_count": 0,
+    "synthetic_tests_passed": true
+  },
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_family_falsified"
+}

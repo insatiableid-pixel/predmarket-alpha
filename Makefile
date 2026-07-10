@@ -73,6 +73,8 @@ help:
 	@echo "  make kalshi-sports-line-move-delta-logger — Record sharp sportsbook line-move deltas for stale-quote evidence"
 	@echo "  make kalshi-tick-recorder — Record read-only Kalshi sports ticker/orderbook_delta messages"
 	@echo "  make kalshi-sports-executable-horizon-research — Phase 0-3 executable short-horizon sports research"
+	@echo "  make kalshi-sports-mlb-settlement-miscalibration — Fixed-clock MLB settlement miscalibration factory"
+	@echo "  make kalshi-sports-mlb-dense-book-capture — Dense read-only MLB moneyline orderbook capture"
 	@echo "  make kalshi-sports-nondirectional-evidence-watch-once — Capture sports microstructure and run flow/liquidity gates"
 	@echo "  make kalshi-passive-liquidity-paper-fill-loop — Persist passive maker paper intents and label prior intents from later snapshots"
 	@echo "  make kalshi-passive-liquidity-paper-fill-falsification — Falsify passive maker paper fill labels"
@@ -472,6 +474,12 @@ KALSHI_SPORTS_EXECUTABLE_HORIZON_EXPORT_LABEL_DIR ?= $(PREDMARKET_MANUAL_DROPS_R
 KALSHI_SPORTS_EXECUTABLE_HORIZON_FDR_ALPHA ?= 0.05
 KALSHI_SPORTS_EXECUTABLE_HORIZON_MIN_OOS ?= 100
 KALSHI_SPORTS_EXECUTABLE_HORIZON_MIN_EVENTS ?= 20
+
+KALSHI_SPORTS_MLB_MISCALIBRATION_OUT_DIR ?= docs/codex/macro/kalshi-sports-mlb-settlement-miscalibration-latest
+KALSHI_SPORTS_MLB_MISCALIBRATION_RAW_DIR ?= $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_sports_mlb_settlement_miscalibration
+KALSHI_SPORTS_MLB_MISCALIBRATION_FDR_ALPHA ?= 0.05
+KALSHI_SPORTS_MLB_MISCALIBRATION_MIN_OOS ?= 20
+KALSHI_SPORTS_MLB_MISCALIBRATION_FETCH_PUBLIC ?= 1
 KALSHI_TICK_RECORDER_JSONL_DIR ?= $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_ticks
 KALSHI_TICK_RECORDER_UNIVERSE_PATH ?= docs/codex/macro/latest-kalshi-universe-scan.json
 KALSHI_TICK_RECORDER_TICKERS ?=
@@ -1316,6 +1324,20 @@ kalshi-sports-executable-horizon-research:
 		--fdr-alpha $(KALSHI_SPORTS_EXECUTABLE_HORIZON_FDR_ALPHA) \
 		--min-oos-labels $(KALSHI_SPORTS_EXECUTABLE_HORIZON_MIN_OOS) \
 		--min-events $(KALSHI_SPORTS_EXECUTABLE_HORIZON_MIN_EVENTS)
+
+
+kalshi-sports-mlb-dense-book-capture:
+	@python3 scripts/kalshi_sports_mlb_dense_book_capture.py \
+		--out-dir $(PREDMARKET_MANUAL_DROPS_ROOT)/kalshi_sports_mlb_fixed_clock_books \
+		--limit 200
+
+kalshi-sports-mlb-settlement-miscalibration:
+	@python3 scripts/kalshi_sports_mlb_settlement_miscalibration.py \
+		--out-dir $(KALSHI_SPORTS_MLB_MISCALIBRATION_OUT_DIR) \
+		--raw-dir $(KALSHI_SPORTS_MLB_MISCALIBRATION_RAW_DIR) \
+		--fdr-alpha $(KALSHI_SPORTS_MLB_MISCALIBRATION_FDR_ALPHA) \
+		--min-oos-events $(KALSHI_SPORTS_MLB_MISCALIBRATION_MIN_OOS) \
+		$(if $(filter 1 true TRUE yes YES,$(KALSHI_SPORTS_MLB_MISCALIBRATION_FETCH_PUBLIC)),--fetch-public-settlements,--no-fetch-public-settlements)
 
 kalshi-tick-recorder:
 	@python3 scripts/kalshi_tick_recorder.py \

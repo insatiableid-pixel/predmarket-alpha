@@ -1,0 +1,45 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "falsified",
+  "generated_utc": "2026-07-10T05:18:29Z",
+  "payload": [
+    {
+      "decision_value": "Fixed-clock MLB moneyline settlement miscalibration",
+      "events_by_clock": {
+        "T-15m": 100,
+        "T-24h": 169,
+        "T-60m": 168,
+        "T-6h": 169
+      },
+      "independent_labels_now": 175,
+      "lane": "sports_mlb_settlement_miscalibration_v1",
+      "next_action": "Retired: do not retune thresholds/buckets; require multi-week dense orderbook panel as a new pre-registered evidence surface before reopening",
+      "rank": 1,
+      "status": "falsified"
+    },
+    {
+      "decision_value": "Next distinct surface: multi-week dense orderbook fixed-clock panel with pre-registered slate-breadth power (not cosmetic retune of v1 thresholds)",
+      "lane": "mlb_multiweek_dense_fixed_clock_panel_v2",
+      "next_action": "Run scripts/kalshi_sports_mlb_dense_book_capture.py on a cadence covering T-24h/T-6h/T-60m/T-15m across >=4 chronological slates before re-registering",
+      "rank": 2,
+      "status": "discovery_pending"
+    },
+    {
+      "decision_value": "Distinct settlement-miscalibration mechanism only where market terms prove complementary moneyline identity within event",
+      "lane": "sports_exact_cross_contract_moneyline_coherence",
+      "next_action": "Park until multi-week dense panel exists; do not mix with retired v1",
+      "rank": 3,
+      "status": "parked"
+    },
+    {
+      "decision_value": "Do not resurrect short-horizon next-mid families",
+      "lane": "retired_short_horizon_microstructure",
+      "next_action": "Parked permanently under negative registry",
+      "rank": 4,
+      "status": "falsified"
+    }
+  ],
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_family_falsified"
+}

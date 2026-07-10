@@ -1,0 +1,109 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "falsified",
+  "generated_utc": "2026-07-10T05:18:29Z",
+  "payload": [
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "baseline_static_longshot_buy_yes_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "baseline_static_favorite_buy_yes_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "clock_x_price_fade_favorite_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "clock_x_price_buy_underdog_t6h",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "listing_age_cold_start_fade_extreme_t24h",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "path_slope_reversion_buy_no_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "path_slope_continuation_buy_yes_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "clock_geometry_drift_fade_t15m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "tight_spread_favorite_buy_yes_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "negctrl_trade_against_path_slope_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    },
+    {
+      "cutoff_utc": "2026-07-10T05:18:29Z",
+      "event_count": 0,
+      "mean_calibration_residual": null,
+      "mean_net_return": null,
+      "model_id": "negctrl_always_buy_yes_t60m",
+      "positive_rate": null,
+      "status": "confirmation_insufficient_sample"
+    }
+  ],
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_family_falsified"
+}

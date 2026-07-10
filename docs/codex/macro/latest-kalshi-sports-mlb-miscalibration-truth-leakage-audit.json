@@ -1,0 +1,325 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "falsified",
+  "generated_utc": "2026-07-10T05:18:29Z",
+  "payload": {
+    "book_orientation": {
+      "complementary_contracts": "same event_ticker collapsed for independence",
+      "no_ask": "executable entry for NO; never inferred from invalid complement for economics",
+      "yes_ask": "executable entry for YES"
+    },
+    "clocks_frozen_before_outcomes": [
+      "T-24h",
+      "T-6h",
+      "T-60m",
+      "T-15m"
+    ],
+    "crossed_yes_book_count": 0,
+    "family_id": "sports_mlb_settlement_miscalibration_v1",
+    "missing_yes_book_count": 135,
+    "novelty_map": {
+      "baseline_only": [
+        "static price buckets"
+      ],
+      "closed_families": [
+        "historical_mlb_multi_book_consensus_v1",
+        "near_resolution_simple_flow_forward_mid_v1",
+        "passive_liquidity_public_snapshot_paper_fill_v1",
+        "flow_depth_imbalance_settlement_directional_v1",
+        "sports_executable_horizon_microstructure_v1",
+        "sports_cross_contract_leadlag_v1",
+        "sports_thin_book_fade_v1",
+        "sports_consensus_price_bucket_bias"
+      ],
+      "distinct_mechanisms": [
+        "fixed pregame clocks vs short-horizon microstructure",
+        "hold-to-settlement economics vs next-mid / round-trip",
+        "calibration residual surface separate from executable EV",
+        "listing-age cold-start and clock-geometry path features"
+      ],
+      "this_family": "sports_mlb_settlement_miscalibration_v1"
+    },
+    "observation_row_count": 26219,
+    "observation_source_hashes_sample": {
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010108Z.json": "80ae9b1df9618bc0d2d447fb8b0f176c6ff224e7bcf50fd628ddce8635224be2",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T010256Z.json": "6dff1648b647437e99f5f71d372423e1cf4edf86bf95e0e7ba5a6e4ffb532b79",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T012826Z.json": "161bfcd9771d7168a1aeb1cc0aedaf3af5c2f2c8c04eca8abbf175cf0ecff6ab",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T013553Z.json": "21a628a023f7b3fd5a97ace38db72279b85858564df1b0e5c825902f5a4d2a5a",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T022031Z.json": "922e8c6c925a61183bca5f4f6f0a83b69e0833a40f69b27cb7bc4753c31379b2",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T031156Z.json": "7f5447e81ef39fdfe956098907b9cabcc47e6c8623b031de649de99855b8d803",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T033045Z.json": "a9d0046fc95b4aab9bc86593841073e4d619accff0464e556e81b076e175f391",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T035805Z.json": "a28ee44a4a10849cc37d67af0bc6d9e3af0e40a2a42619acf7b8c3c99c385f86",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T042626Z.json": "9725ef3607457ca00a524ccf6f1135756ad8832efa5a2649987c0a6704950d38",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T044026Z.json": "32c1afc0e3bf21705265e7e39b2559103b8970336c8ce2adfd757c7a9972c59f",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T052130Z.json": "857ea3c6728f9efc2c1d32e1bb3a8f94c2bc90fdf96d61fa0885b1f9c40f4cfe",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T052630Z.json": "6a11e9c5993de8087bf47c88cb3097223298a2d3af5ff78765d9a69586ea4469",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T052809Z.json": "f8da0c3127c05aaef1709ef2f4d9a46cb646c43f8e8d2532e9b4d4af924f086a",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T052947Z.json": "2836bcb08b97247baebeb38c2eb73c849b960f3914c9f61db934820531ed1cc0",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T055231Z.json": "1785598a51cb29c796434d6d45a3b6588433f9acf969d5d55f1d7db3743bca10",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T063500Z.json": "6851f87fee671dac199b07aa37e5dffefe0644a79596ed479a1703f1bb4ca8d5",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T071229Z.json": "a872a12d59d09efd4192413d4721c2b0e2e5df3e7abd9c92e6f5328d0e1c4920",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T071937Z.json": "a5d6410701b4f6ef08a25af9ee813ad26fd67ceeb6d4cddbe3a19a4a7882c7bd",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T072351Z.json": "0c52b037597d8818ad348eb60a62c13905df40d2116bd0dce1f291873007e9a3",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T072605Z.json": "d87cbf70d8f209978be445332925be399120ad3c99c897a85984522020d8049a",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T075610Z.json": "e5bbcfe8aa7e31d55425254ac024a4308b38e29e1d73540504b1f11013009cf4",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T160846Z.json": "76b7171e3b853b44c3b879b0ac04c87c3c78d58d49b717b3c2b8433e7acb2e49",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T170225Z.json": "3cd1f5589c326627bf55beb0677daf3acaf4461cbbcbd7da1648946b887ac5e8",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T181051Z.json": "43ccec280499628bbc02d74d79b471f79308a5124d9631cfe0006fde77560f1b",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T182120Z.json": "23223821346900a32b18f60b6110d3cc509fc9bef6e9b4551c0be1a27918b87e",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T183726Z.json": "77c70ca4fcaff079395a2b103ed3a16b0dda574dc75ea0c15eee81848fbf8f64",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T200457Z.json": "2c88e807a23c122c920f9e5da5245dd764bc362c40aa6afb7b09ba7571a2ca01",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T201049Z.json": "28842ef9c98cd59f0c2973fdc1c06a1081b3e694515396bc51fafdda9b3334b0",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T202645Z.json": "5bc63554c845e92bde47c1a56f18d872cc63f909f18770393056eb65a684d832",
+      "/home/mrwatson/manual_drops/kalshi_sports_microstructure_observations/sports_microstructure_observations_20260704T205502Z.json": "441168be6c085058acc1addb5c6258b544930614113b3d85462943b3e0ff1528",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051608.424933Z.json": "738cc8054a3c0c1f10d5fdfb48988025c7b33c4a1160686734163d701c7e02da",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_20260710T051811Z.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_fixed_clock_books/mlb_dense_books_latest.json": "f3912cad90ee686c30d8324569b15ec838762a281b0d6e5ede810490014cb593",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_20260710T051217Z.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candle_observations_latest.json": "b7b16259fb0c1a642f0439182fe80dcb8fc9fac97d03566a8fdb1d9b201411e5",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candlesticks_20260710T051217Z.json": "cf0bafd069d2ba311fe7f184c7f29db1ca1a27817274506f0a4538dd305cc2dc",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_candlesticks_latest.json": "cf0bafd069d2ba311fe7f184c7f29db1ca1a27817274506f0a4538dd305cc2dc",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_settled_markets_20260710T050936Z.json": "5676c208dd37131a91fab1c95ddfa3ec9cd84b78c9f43e3b6447d586ade6ba46",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_settled_markets_20260710T051217Z.json": "24ccf10c2020389b74b3380606e33de0db0a3840cc7f6d092af6997218a0d3e1",
+      "/home/mrwatson/manual_drops/kalshi_sports_mlb_settlement_miscalibration/kalshi_mlb_settled_markets_latest.json": "24ccf10c2020389b74b3380606e33de0db0a3840cc7f6d092af6997218a0d3e1",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260703T195913Z.json": "f2595a27cd3710a1067cafcbc9d334d335e9602ff9cb1589318befd852637395",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260703T214820Z.json": "07dbf6a90f9a35a51575060136b855f75a95161d5648ee24537f340a32b2a677",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T012720Z.json": "5f95731bb49dc21d33bd726725e73d326cd78ba08fb9b75e3fcc76c886916b09",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T013430Z.json": "5a211a4fb435a44d5c743ecc9039d07273fdf0c019eef79d68ca7ca9c40b5bdb",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T021919Z.json": "5060d91ffe7a6fa3602eb642b9bb84a49e3ceb08153e2d6ac39fefd60c059fd9",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T031049Z.json": "856a121825acb2244f05f4f194568a6731e53774274a7ca2edf35e63307542e5",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T032942Z.json": "48be41e59f58854c80975efea746264ac5bdc358671450e5a947635613284ac7",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T035657Z.json": "0f2ee1cc65782598d69609d7134cdf5847effda1bfeced7fbc52fededecc1421",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T042524Z.json": "cd245b96ba22d11c71ef43fef8bdf547f35be978e10f76382271a5b4039e1edd",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T043916Z.json": "e5c3378fb25c83623d58195ef2b766df7a3be162339027fb89f6a96b724932e9",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T160739Z.json": "316fd1fb7740eba8f099274dfce7a141aac160271dbbbb94014fdbdf61e076c8",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T170121Z.json": "fe277d96dfe704d63e9038669933c9d422d1395bc581b58b6089dcd95d147e48",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T180942Z.json": "cc1d916eac80882c2226a9d8811b8243ad0d37313bec14b3ee9dba854881e80e",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T182011Z.json": "5f457c2eeb07c0adb9e12cded17c99fb87a7d4e12668aa3b403fa05e52218fca",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T183621Z.json": "445e5c7243a76f719843eecbcdcc6e8b05874932743fb05e0b2e35a7209d21e3",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T200346Z.json": "ea9e48cd7f323f485bcf25289c89c850b6dc5743c3ce68ebca32fcafbdc6efcb",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T200943Z.json": "56608450a750feabb58cf813fe00a044ad4185c56ffb7767e84098f82707e681",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T202538Z.json": "7369637d19bee1e02350b4ff56e9d207264b7ce972ce3421c684dcfdfb587c35",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T205355Z.json": "c5a9f9f1db6451f3f493a3ab029eeb5586fc9e6dd86df772d2ab22876d995ef3",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260704T211643Z.json": "cf9d988dd7c30419b4cd4c35f26061caf1caafaf7e0ad42d15bc7265a3aee77e",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T143948Z.json": "4ed8de43b078a426f4f5018c5444b679dba0bf6f1097fed71a42ce970f23edc1",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T195718Z.json": "670bb3b282523de7487514c6e409a8e01147ef4b3b189b44e8274528feaa90a5",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T220117Z.json": "11f4ce0cc9450d4f513a9454c777fb3fa628a06e02ed7a9ee649c41479eaecda",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T220555Z.json": "cd0fdb999f86e784a1769cb5b29aea3be6d424963da654a2cb5b0f2460fd92cd",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T223155Z.json": "4b19a56449935573afc087bad4159e0bf387db68b534f20b0425749425aa4849",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T230150Z.json": "f56d5bc0b8ff882a68513ca0ee7b7286e73fcbf4da9297b28d47398b2867f613",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T233146Z.json": "4a29e93afd39b19f94a96884466cb24ff2f37fb06dc3fa6c6dbd6705e9874541",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T233658Z.json": "f8d7e17a8ec38fca5042d8f195d2862274c74e64ba2fd2941b43ec0bfb4d20e5",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260705T234812Z.json": "50b1d1bf5968753e8c790121609029aed96070bdd0f7a4acc96a84c1aec29753",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_observations/sports_proxy_observations_20260706T000037Z.json": "f776f08a02ffca7b4641cd5844cd1dae751e46d7858cd2c745cb621821249050"
+    },
+    "prior_negative_specs": [
+      {
+        "do_not_repeat": "Cosmetic threshold/bucket renames of the same consensus divergence specs",
+        "family": "sports_consensus_historical",
+        "spec_id": "historical_mlb_multi_book_consensus_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Same mid-direction forward labels with cosmetic momentum/imbalance renames",
+        "family": "near_resolution_informed_flow",
+        "spec_id": "near_resolution_simple_flow_forward_mid_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Same maker paper-fill specs on public snapshots without new fill truth",
+        "family": "passive_liquidity_provision",
+        "spec_id": "passive_liquidity_public_snapshot_paper_fill_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Resurrecting settlement-direction depth imbalance without new mechanism",
+        "family": "near_resolution_informed_flow",
+        "spec_id": "flow_depth_imbalance_settlement_directional_v1",
+        "status": "confirmation_failed"
+      },
+      {
+        "do_not_repeat": "Short-horizon next-mid / executable round-trip microstructure retunes",
+        "family": "sports_executable_horizon_microstructure_v1",
+        "spec_id": "sports_executable_horizon_microstructure_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Cross-contract short-horizon lead-lag retunes",
+        "family": "sports_cross_contract_leadlag_v1",
+        "spec_id": "sports_cross_contract_leadlag_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Thin-book short-horizon fade retunes",
+        "family": "sports_thin_book_fade_v1",
+        "spec_id": "sports_thin_book_fade_v1",
+        "status": "falsified"
+      },
+      {
+        "do_not_repeat": "Static favorite-longshot buckets may be retained only as baseline/negative control; cosmetic bucket renames are not novel candidates",
+        "family": "sports_consensus_price_bucket_bias",
+        "spec_id": "sports_consensus_price_bucket_bias",
+        "status": "baseline_only"
+      }
+    ],
+    "settlement_before_observation_count": 0,
+    "settlement_source_hashes": {
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260705T220117Z.json": "dad3e94298bedbbbbb5716d2a50556a12769d89708fef8e76af6404965190284",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260705T223155Z.json": "a7954ea7044f5f7a83c7ef539387fd62c7c77431c80452c7c45977aec2928017",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260705T230150Z.json": "82f9a816e874808637eaa64755a5cd8b7d8a822800bd6cf91c21723fe38e0a64",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260705T233146Z.json": "ae1645c565299021114385ad7a6ce855554a558c526b95b179ec851e81589a37",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260706T000037Z.json": "8d9253b6c734d3879be9cce17b31c75520fe786875b555613175a0e7fbf70e4f",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260706T002545Z.json": "f5a7122e2c15a6a09e577e5337861c47be3a35404560f905883b40aea89e640c",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260706T190915Z.json": "a03d1c659e846cd38bf0dfe21696608ee2ca1777706343d0f9d19b13713645a0",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260706T220151Z.json": "52b0b9f6518365a7e75c30e56c6fc6572cde0a14f41a448f2bfc4b415c7faa3c",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260707T033649Z.json": "b21fc46fd801f8428da56a286c0d9fd7894a295c24fe993b6dbf35d1cfe1a937",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260707T044521Z.json": "8d01a94d3d653b6e95488b1b223ad4f77a08e96cbcfd3145460c2c0a443c67b2",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260707T060033Z.json": "5eddb9af290d5c34335ef826570e157b4535e5054c427025c987a693f1ae7921",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T015023Z.json": "78f3547b26eef333ffed43e6f8f87bb3df632c42d48d66130da12dce5473f68d",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T021026Z.json": "f40d4225e53c642744af93719fd49641fe37f003ee74720bc837dc34f9339b42",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T024014Z.json": "34258680226a6b3f008157d435192f5b797e61d4d7c19928fe87a6715bd3e157",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T030514Z.json": "b2fdf8b672ecd5a8a0d0359ab86924251139f84b21fa6d2b75bfa7f201add002",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T044951Z.json": "f211e87b1abe98304f9e3a1a9769b14e8c4eb57aa405aafa458e50654ceeb0d3",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T160913Z.json": "73c8a292de22563aa5ba86e3faa1c63f74347ecd4809602bc6d510297a3188da",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260708T225036Z.json": "728dc5d1d2d0b5f621ca7b1abb4ea749642f2200d7be347983f4c84f78a92b64",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_20260710T003740Z.json": "8c3d7123b5af9680de2358fe9901b005ef6a982ac5f04e9809be645ce34d02ff",
+      "/home/mrwatson/manual_drops/kalshi_sports_proxy_labels/sports_proxy_labels_latest.json": "8c3d7123b5af9680de2358fe9901b005ef6a982ac5f04e9809be645ce34d02ff"
+    },
+    "settlement_ticker_count": 1774,
+    "staleness_frozen_before_outcomes": {
+      "T-15m": 1800,
+      "T-24h": 21600,
+      "T-60m": 2700,
+      "T-6h": 7200
+    },
+    "synthetic_tests": [
+      {
+        "detail": {
+          "abs_clock_delta_6h_to_60m": null,
+          "best_no_ask": 0.46,
+          "best_no_bid": 0.44,
+          "best_yes_ask": 0.56,
+          "best_yes_bid": 0.54,
+          "book_age_seconds": 120.0,
+          "book_observed_at_utc": "2026-07-08T22:03:00Z",
+          "book_observed_ts": 1783548180.0,
+          "brier": 0.2033190083,
+          "calibration_residual": 0.4509090909,
+          "clock_delta_24h_to_60m": null,
+          "clock_delta_60m_to_15m": null,
+          "clock_delta_6h_to_60m": null,
+          "clock_name": "T-60m",
+          "clock_offset_seconds": 3600,
+          "contract_ticker": "KXMLBGAME-26JUL081805BOSNYY-BOS",
+          "decision_ts": 1783548300.0,
+          "entry_source": "synthetic",
+          "event_ticker": "KXMLBGAME-26JUL081805BOSNYY",
+          "execution_enabled": false,
+          "feature_family": "sports_mlb_settlement_miscalibration_v1",
+          "game_start_source": "occurrence_datetime",
+          "game_start_ts": 1783551900.0,
+          "label_id": "KXMLBGAME-26JUL081805BOSNYY-BOS|T-60m|past",
+          "label_status": "labeled",
+          "listing_age_hours": 70.9666666667,
+          "microprice": 0.5490909091,
+          "no_ask_depth_top1": 9.0,
+          "no_ask_source": "observed_no_ask",
+          "no_blocker": null,
+          "no_capacity": 9.0,
+          "no_entry_ask": 0.46,
+          "no_entry_fee": 0.0174,
+          "no_gross_payoff": -0.46,
+          "no_net_payoff": -0.4774,
+          "no_settlement_payoff": 0.0,
+          "open_time": "2026-07-05T23:05:00Z",
+          "p_hat": 0.5490909091,
+          "path_mid_drawdown": null,
+          "path_mid_slope_per_hour": null,
+          "path_mid_vol": null,
+          "path_n_points": 0.0,
+          "raw_orderbook_sha256": null,
+          "research_only": true,
+          "series_ticker": "KXMLBGAME",
+          "settlement_result": "yes",
+          "settlement_source_path": null,
+          "settlement_source_sha256": null,
+          "snapshot_id": "past",
+          "source_path": "synthetic",
+          "source_sha256": "synthetic",
+          "total_depth_contracts": null,
+          "usable": false,
+          "yes_ask_depth_top1": 12.0,
+          "yes_blocker": null,
+          "yes_capacity": 12.0,
+          "yes_entry_ask": 0.56,
+          "yes_entry_fee": 0.0173,
+          "yes_gross_payoff": 0.44,
+          "yes_mid": 0.55,
+          "yes_net_payoff": 0.4227,
+          "yes_outcome": 1,
+          "yes_settlement_payoff": 1.0,
+          "yes_spread": 0.02
+        },
+        "name": "asof_never_selects_future_book",
+        "passed": true
+      },
+      {
+        "detail": {
+          "fee": 0.0173,
+          "gross": 0.44,
+          "net": 0.4227
+        },
+        "name": "hold_to_settlement_fee_is_entry_only",
+        "passed": true
+      },
+      {
+        "detail": 1.0,
+        "name": "positive_path_yes_settlement_payoff",
+        "passed": true
+      },
+      {
+        "detail": [
+          "censored_stale_book"
+        ],
+        "name": "stale_book_censored",
+        "passed": true
+      },
+      {
+        "detail": 0,
+        "name": "missing_book_no_phantom_labels",
+        "passed": true
+      },
+      {
+        "detail": {
+          "collapsed": 1,
+          "fired": 2
+        },
+        "name": "event_independence_collapses_complementary_contracts",
+        "passed": true
+      },
+      {
+        "detail": 1,
+        "name": "duplicate_books_do_not_double_count_clock_rows",
+        "passed": true
+      }
+    ],
+    "timestamp_semantics": {
+      "join_rule": "strict as-of: latest book with observed_ts <= clock_ts",
+      "market_close": "close_time from public market payload",
+      "market_observation_time": "observed_at_utc / quote_time of book snapshot",
+      "no_nearest_absolute_future_match": true,
+      "orderbook_receipt_time": "same as observation time for stored packets",
+      "scheduled_game_start": "occurrence_datetime preferred; ticker parse fallback",
+      "settlement_time": "public Kalshi settlement/result on contract ticker",
+      "staleness": {
+        "T-15m": 1800,
+        "T-24h": 21600,
+        "T-60m": 2700,
+        "T-6h": 7200
+      }
+    }
+  },
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_family_falsified"
+}

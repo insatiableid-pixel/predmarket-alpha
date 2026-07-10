@@ -1,0 +1,1496 @@
+{
+  "execution_enabled": false,
+  "family_id": "sports_mlb_settlement_miscalibration_v1",
+  "family_status": "falsified",
+  "generated_utc": "2026-07-10T05:18:29Z",
+  "payload": [
+    {
+      "baseline_only": true,
+      "bootstrap_mean_net_lower_95": -0.2942,
+      "clock_name": "T-60m",
+      "direction": "in_range",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 3,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.2942,
+          "oos_event_count": 1
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=1 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.2942",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.2760510605",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.2942",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=1",
+            "status": "fail"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 3,
+      "largest_series_cluster_share": 1.0,
+      "largest_slate_cluster_share": 1.0,
+      "mean_capacity_contracts": 21590.87,
+      "mechanism": "Static longshot buy baseline/control (not a novel claim).",
+      "model_id": "baseline_static_longshot_buy_yes_t60m",
+      "negative_control": false,
+      "oos_event_count": 1,
+      "oos_mean_calibration_residual": -0.2760510605,
+      "oos_mean_gross_return": -0.28,
+      "oos_mean_net_return": -0.2942,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 1,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "range": [
+        0.15,
+        0.3
+      ],
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 1
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-08": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.2942,
+        null,
+        null,
+        null
+      ],
+      "threshold": null,
+      "usable": false
+    },
+    {
+      "baseline_only": true,
+      "bootstrap_mean_net_lower_95": 0.1063,
+      "clock_name": "T-60m",
+      "direction": "in_range",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 8,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": 0.16046666666666667,
+          "oos_event_count": 3
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=3 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=0.1604666667",
+            "status": "pass"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=0.1789319121",
+            "status": "pass"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=0.1063",
+            "status": "pass"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=3 recent=None",
+            "status": "pass"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=3",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=True",
+            "status": "fail"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 8,
+      "largest_series_cluster_share": 1.0,
+      "largest_slate_cluster_share": 1.0,
+      "mean_capacity_contracts": 146452.6433333333,
+      "mechanism": "Static favorite buy baseline/control.",
+      "model_id": "baseline_static_favorite_buy_yes_t60m",
+      "negative_control": false,
+      "oos_event_count": 3,
+      "oos_mean_calibration_residual": 0.1789319121,
+      "oos_mean_gross_return": 0.17,
+      "oos_mean_net_return": 0.1604666667,
+      "oos_positive_event_count": 3,
+      "oos_positive_rate": 1.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 0.125,
+      "positive_capacity_event_count": 3,
+      "positive_temporal_buckets": 3,
+      "q_value": null,
+      "range": [
+        0.7,
+        0.9
+      ],
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 3
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-08": 3
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        0.2562,
+        0.1315,
+        0.0937,
+        null
+      ],
+      "threshold": null,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.1337684211,
+      "clock_name": "T-60m",
+      "direction": "gt",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 19,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": -0.061987781374999995,
+          "mean_net_return": -0.069125,
+          "oos_event_count": 4
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": -0.1425589586,
+          "mean_net_return": -0.156025,
+          "oos_event_count": 4
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": -0.1355522329,
+          "mean_net_return": -0.14535,
+          "oos_event_count": 4
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": -0.06919088957142858,
+          "mean_net_return": -0.07601428571428571,
+          "oos_event_count": 7
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=19 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1060052632",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.0970911641",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1337684211",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0760142857",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=17",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5263157895",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 19,
+      "largest_series_cluster_share": 0.5263157895,
+      "largest_slate_cluster_share": 0.5263157895,
+      "mean_capacity_contracts": 19022.5052941176,
+      "mechanism": "Fixed-clock interaction: near kickoff, high YES prices overstate win chance; buy NO at executable NO ask and hold to settlement.",
+      "model_id": "clock_x_price_fade_favorite_t60m",
+      "negative_control": false,
+      "oos_event_count": 19,
+      "oos_mean_calibration_residual": -0.0970911641,
+      "oos_mean_gross_return": -0.1,
+      "oos_mean_net_return": -0.1060052632,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 17,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "range": null,
+      "recent_bucket_mean_net": -0.0760142857,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 19
+      },
+      "side": "no",
+      "slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 3,
+        "2026-07-05": 2,
+        "2026-07-07": 1,
+        "2026-07-08": 10,
+        "2026-07-10": 2
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.069125,
+        -0.156025,
+        -0.14535,
+        -0.0760142857
+      ],
+      "threshold": 0.72,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.36585,
+      "clock_name": "T-6h",
+      "direction": "in_range",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 5,
+      "fold_stats": [
+        {
+          "fallback": "chronological_event_holdout_30pct",
+          "fold_index": 0,
+          "mean_net_return": -0.36585,
+          "oos_event_count": 2
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=2 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.36585",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.3453727588",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.36585",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=2",
+            "status": "fail"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 5,
+      "largest_series_cluster_share": 0.5,
+      "largest_slate_cluster_share": 0.5,
+      "mean_capacity_contracts": 521160.87,
+      "mechanism": "T-6h underdogs in a moderate band are underpriced relative to settlement frequency (clock x price, not static all-clock bucket).",
+      "model_id": "clock_x_price_buy_underdog_t6h",
+      "negative_control": false,
+      "oos_event_count": 2,
+      "oos_mean_calibration_residual": -0.3453727588,
+      "oos_mean_gross_return": -0.35,
+      "oos_mean_net_return": -0.36585,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 2,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "range": [
+        0.28,
+        0.42
+      ],
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 2
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-08": 1,
+        "2026-07-09": 1
+      },
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [
+        -0.4067,
+        -0.325,
+        null,
+        null
+      ],
+      "threshold": null,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": null,
+      "clock_name": "T-24h",
+      "direction": "lt_and_p_gt",
+      "execution_enabled": false,
+      "feature": "listing_age_hours",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 0,
+      "fold_stats": [],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=0 min=20",
+            "status": "fail"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=None",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=None",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=None",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=None",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=None",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "capacity_unavailable_or_zero; dense books required for research_ready",
+            "status": "fail"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=None (candlestick rows are discovery-only)",
+            "status": "fail"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.0",
+            "status": "pass"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 0,
+      "largest_series_cluster_share": 0.0,
+      "largest_slate_cluster_share": 0.0,
+      "mean_capacity_contracts": null,
+      "mechanism": "Cold-start / short listing age markets with extreme favorites are miscalibrated before informed flow arrives.",
+      "model_id": "listing_age_cold_start_fade_extreme_t24h",
+      "negative_control": false,
+      "oos_event_count": 0,
+      "oos_mean_calibration_residual": null,
+      "oos_mean_gross_return": null,
+      "oos_mean_net_return": null,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": null,
+      "orderbook_entry_share": null,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 0,
+      "positive_temporal_buckets": 0,
+      "q_value": null,
+      "range": null,
+      "recent_bucket_mean_net": null,
+      "research_only": true,
+      "series_cluster_counts": {},
+      "side": "no",
+      "slate_cluster_counts": {},
+      "status": "insufficient_sample",
+      "temporal_bucket_mean_net": [],
+      "threshold": 18.0,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.2193,
+      "clock_name": "T-60m",
+      "direction": "gt",
+      "execution_enabled": false,
+      "feature": "path_mid_slope_per_hour",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 23,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": -0.1471687103,
+          "mean_net_return": -0.15826,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": -0.3137207221,
+          "mean_net_return": -0.20379999999999998,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": -0.23346246746000002,
+          "mean_net_return": -0.2474,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": -0.0677008103375,
+          "mean_net_return": -0.0745125,
+          "oos_event_count": 8
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=23 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1584086957",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.1612345018",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.2193",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0745125",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=21",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5217391304",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 23,
+      "largest_series_cluster_share": 0.5217391304,
+      "largest_slate_cluster_share": 0.5217391304,
+      "mean_capacity_contracts": 38081.7557142857,
+      "mechanism": "Steep pregame YES mid run-up measured strictly before T-60m reverts by settlement.",
+      "model_id": "path_slope_reversion_buy_no_t60m",
+      "negative_control": false,
+      "oos_event_count": 23,
+      "oos_mean_calibration_residual": -0.1612345018,
+      "oos_mean_gross_return": -0.1508695652,
+      "oos_mean_net_return": -0.1584086957,
+      "oos_positive_event_count": 0,
+      "oos_positive_rate": 0.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 1.0,
+      "positive_capacity_event_count": 21,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "range": null,
+      "recent_bucket_mean_net": -0.0745125,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 23
+      },
+      "side": "no",
+      "slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 2,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        -0.15826,
+        -0.2038,
+        -0.2474,
+        -0.0745125
+      ],
+      "threshold": 0.015,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": 0.1017952381,
+      "clock_name": "T-60m",
+      "direction": "gt",
+      "execution_enabled": false,
+      "feature": "path_mid_slope_per_hour",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 21,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": 0.1471687103,
+          "mean_net_return": 0.13224,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": 0.2473483984,
+          "mean_net_return": 0.2314,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": 0.21546763688,
+          "mean_net_return": 0.19790000000000002,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": 0.05600013498333333,
+          "mean_net_return": 0.04513333333333333,
+          "oos_event_count": 6
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=21 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=0.1465952381",
+            "status": "pass"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=0.1612345018",
+            "status": "pass"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=2.8608e-06",
+            "status": "pass"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=0.1017952381",
+            "status": "pass"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=4 recent=0.0451333333",
+            "status": "pass"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=19",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5714285714",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 21,
+      "largest_series_cluster_share": 0.5714285714,
+      "largest_slate_cluster_share": 0.5714285714,
+      "mean_capacity_contracts": 94100.07,
+      "mechanism": "Steep pregame YES mid run-up continues into settlement (opposite of reversion).",
+      "model_id": "path_slope_continuation_buy_yes_t60m",
+      "negative_control": false,
+      "oos_event_count": 21,
+      "oos_mean_calibration_residual": 0.1612345018,
+      "oos_mean_gross_return": 0.1542857143,
+      "oos_mean_net_return": 0.1465952381,
+      "oos_positive_event_count": 21,
+      "oos_positive_rate": 1.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 4.768e-07,
+      "positive_capacity_event_count": 19,
+      "positive_temporal_buckets": 4,
+      "q_value": 2.8608e-06,
+      "range": null,
+      "recent_bucket_mean_net": 0.0451333333,
+      "research_only": true,
+      "retirement_reason": "fdr_pass_but_hard_gates_failed:cluster_share_le_0_35",
+      "series_cluster_counts": {
+        "KXMLBGAME": 21
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        0.13224,
+        0.2314,
+        0.1979,
+        0.0451333333
+      ],
+      "threshold": 0.015,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.1400391304,
+      "clock_name": "T-15m",
+      "direction": "gt",
+      "execution_enabled": false,
+      "feature": "clock_delta_6h_to_60m",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 23,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": 0.089304345175,
+          "mean_net_return": 0.058640000000000005,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": -0.085154962375,
+          "mean_net_return": -0.091,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": -0.06753286617499998,
+          "mean_net_return": -0.06676,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": -0.036510402799999994,
+          "mean_net_return": -0.032,
+          "oos_event_count": 8
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=23 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0326782609",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.0256521146",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1400391304",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=1 recent=-0.032",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=18",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.3913043478",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 23,
+      "largest_series_cluster_share": 0.3913043478,
+      "largest_slate_cluster_share": 0.3913043478,
+      "mean_capacity_contracts": 118938.895,
+      "mechanism": "Large T-6h\u2192T-60m probability lift that remains at T-15m is late overreaction; fade YES into settlement.",
+      "model_id": "clock_geometry_drift_fade_t15m",
+      "negative_control": false,
+      "oos_event_count": 23,
+      "oos_mean_calibration_residual": -0.0256521146,
+      "oos_mean_gross_return": -0.0273913043,
+      "oos_mean_net_return": -0.0326782609,
+      "oos_positive_event_count": 2,
+      "oos_positive_rate": 0.0869565217,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 0.999997139,
+      "positive_capacity_event_count": 18,
+      "positive_temporal_buckets": 1,
+      "q_value": 1.0,
+      "range": null,
+      "recent_bucket_mean_net": -0.032,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 23
+      },
+      "side": "no",
+      "slate_cluster_counts": {
+        "2026-07-04": 4,
+        "2026-07-05": 9,
+        "2026-07-07": 1,
+        "2026-07-08": 9
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        0.05864,
+        -0.091,
+        -0.06676,
+        -0.032
+      ],
+      "threshold": 0.04,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": 0.065185,
+      "clock_name": "T-60m",
+      "direction": "gt_and_spread_le",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 20,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": 0.11114214412000001,
+          "mean_net_return": 0.09826,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": 0.12975404112,
+          "mean_net_return": 0.11666000000000001,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": 0.13435672548000002,
+          "mean_net_return": 0.1187,
+          "oos_event_count": 5
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": 0.055245432,
+          "mean_net_return": 0.044840000000000005,
+          "oos_event_count": 5
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=20 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=0.094615",
+            "status": "pass"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=0.1076245857",
+            "status": "pass"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=2.8611e-06",
+            "status": "pass"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=0.065185",
+            "status": "pass"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=4 recent=0.04484",
+            "status": "pass"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=18",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=False",
+            "status": "pass"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 20,
+      "largest_series_cluster_share": 0.5,
+      "largest_slate_cluster_share": 0.5,
+      "mean_capacity_contracts": 97418.1194444444,
+      "mechanism": "Tight-spread favorites at T-60m are better calibrated / executable than wide-spread favorites; selective long favorite when friction is low.",
+      "model_id": "tight_spread_favorite_buy_yes_t60m",
+      "negative_control": false,
+      "oos_event_count": 20,
+      "oos_mean_calibration_residual": 0.1076245857,
+      "oos_mean_gross_return": 0.1005,
+      "oos_mean_net_return": 0.094615,
+      "oos_positive_event_count": 20,
+      "oos_positive_rate": 1.0,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 9.537e-07,
+      "positive_capacity_event_count": 18,
+      "positive_temporal_buckets": 4,
+      "q_value": 2.8611e-06,
+      "range": null,
+      "recent_bucket_mean_net": 0.04484,
+      "research_only": true,
+      "retirement_reason": "fdr_pass_but_hard_gates_failed:cluster_share_le_0_35",
+      "series_cluster_counts": {
+        "KXMLBGAME": 20
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 4,
+        "2026-07-05": 2,
+        "2026-07-07": 1,
+        "2026-07-08": 10,
+        "2026-07-10": 2
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        0.09826,
+        0.11666,
+        0.1187,
+        0.04484
+      ],
+      "threshold": 0.62,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.185075,
+      "clock_name": "T-60m",
+      "direction": "lt",
+      "execution_enabled": false,
+      "feature": "path_mid_slope_per_hour",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 24,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": -0.02971216835,
+          "mean_net_return": -0.04581666666666667,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": -0.29245808215,
+          "mean_net_return": -0.212,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": -0.18860735981666665,
+          "mean_net_return": -0.20288333333333333,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": -0.05566604716666667,
+          "mean_net_return": -0.0657,
+          "oos_event_count": 6
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=24 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.1316",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.1278975355",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.185075",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0657",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=22",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.5",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 24,
+      "largest_series_cluster_share": 0.5,
+      "largest_slate_cluster_share": 0.5,
+      "mean_capacity_contracts": 80210.2872727273,
+      "mechanism": "Negative control: buy YES after path selloff without theory support.",
+      "model_id": "negctrl_trade_against_path_slope_t60m",
+      "negative_control": true,
+      "oos_event_count": 24,
+      "oos_mean_calibration_residual": -0.1278975355,
+      "oos_mean_gross_return": -0.12375,
+      "oos_mean_net_return": -0.1316,
+      "oos_positive_event_count": 1,
+      "oos_positive_rate": 0.0416666667,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 0.9999999404,
+      "positive_capacity_event_count": 22,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "range": null,
+      "recent_bucket_mean_net": -0.0657,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 24
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-04": 5,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 2,
+        "2026-07-08": 12,
+        "2026-07-10": 2
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        -0.0458166667,
+        -0.212,
+        -0.2028833333,
+        -0.0657
+      ],
+      "threshold": -0.015,
+      "usable": false
+    },
+    {
+      "baseline_only": false,
+      "bootstrap_mean_net_lower_95": -0.1301814815,
+      "clock_name": "T-60m",
+      "direction": "gt",
+      "execution_enabled": false,
+      "feature": "p_hat",
+      "feature_family": "sports_mlb_settlement_miscalibration_v1",
+      "fired_row_count": 50,
+      "fold_stats": [
+        {
+          "fold_index": 0,
+          "mean_calibration_residual": -0.0535512916,
+          "mean_net_return": -0.06945,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 1,
+          "mean_calibration_residual": -0.008841087900000004,
+          "mean_net_return": -0.02351666666666666,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 2,
+          "mean_calibration_residual": -0.009014287316666661,
+          "mean_net_return": -0.027150000000000007,
+          "oos_event_count": 6
+        },
+        {
+          "fold_index": 3,
+          "mean_calibration_residual": -0.06745417276666667,
+          "mean_net_return": -0.0791,
+          "oos_event_count": 9
+        }
+      ],
+      "hard_gates": {
+        "discovery_gates_pass": false,
+        "gates": [
+          {
+            "name": "min_oos_events",
+            "reason": "oos_event_count=27 min=20",
+            "status": "pass"
+          },
+          {
+            "name": "positive_mean_net",
+            "reason": "mean_net=-0.0530592593",
+            "status": "fail"
+          },
+          {
+            "name": "calibration_direction",
+            "reason": "mean_selected_residual=-0.0383528724",
+            "status": "fail"
+          },
+          {
+            "name": "fdr_q_le_0_05",
+            "reason": "q=1.0",
+            "status": "fail"
+          },
+          {
+            "name": "bootstrap_lb_above_0",
+            "reason": "lb=-0.1301814815",
+            "status": "fail"
+          },
+          {
+            "name": "temporal_survival",
+            "reason": "positive_buckets=0 recent=-0.0791",
+            "status": "fail"
+          },
+          {
+            "name": "capacity_events",
+            "reason": "positive_capacity_events=22",
+            "status": "pass"
+          },
+          {
+            "name": "orderbook_entry_truth",
+            "reason": "orderbook_entry_share=1.0 (candlestick rows are discovery-only)",
+            "status": "pass"
+          },
+          {
+            "name": "cluster_share_le_0_35",
+            "reason": "largest_slate_share=0.4444444444",
+            "status": "fail"
+          },
+          {
+            "name": "not_negative_control",
+            "reason": "negative_control=True",
+            "status": "fail"
+          },
+          {
+            "name": "not_baseline_only",
+            "reason": "baseline_only=False",
+            "status": "pass"
+          },
+          {
+            "name": "untouched_confirmation",
+            "reason": "events=0 mean_net=None min_events=15",
+            "status": "fail"
+          }
+        ],
+        "research_ready": false
+      },
+      "independent_event_count": 27,
+      "largest_series_cluster_share": 0.4444444444,
+      "largest_slate_cluster_share": 0.4444444444,
+      "mean_capacity_contracts": 63146.4386363636,
+      "mechanism": "Negative control: almost always buy YES at T-60m.",
+      "model_id": "negctrl_always_buy_yes_t60m",
+      "negative_control": true,
+      "oos_event_count": 27,
+      "oos_mean_calibration_residual": -0.0383528724,
+      "oos_mean_gross_return": -0.0444444444,
+      "oos_mean_net_return": -0.0530592593,
+      "oos_positive_event_count": 12,
+      "oos_positive_rate": 0.4444444444,
+      "orderbook_entry_share": 1.0,
+      "p_value_mean_net_positive": 0.7789658308,
+      "positive_capacity_event_count": 22,
+      "positive_temporal_buckets": 0,
+      "q_value": 1.0,
+      "range": null,
+      "recent_bucket_mean_net": -0.0791,
+      "research_only": true,
+      "series_cluster_counts": {
+        "KXMLBGAME": 27
+      },
+      "side": "yes",
+      "slate_cluster_counts": {
+        "2026-07-03": 1,
+        "2026-07-04": 7,
+        "2026-07-05": 2,
+        "2026-07-06": 1,
+        "2026-07-07": 1,
+        "2026-07-08": 12,
+        "2026-07-10": 3
+      },
+      "status": "falsified",
+      "temporal_bucket_mean_net": [
+        -0.06945,
+        -0.0235166667,
+        -0.02715,
+        -0.0791
+      ],
+      "threshold": 0.01,
+      "usable": false
+    }
+  ],
+  "research_only": true,
+  "status": "mlb_settlement_miscalibration_family_falsified"
+}
