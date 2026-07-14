@@ -228,8 +228,12 @@ def execute_collector_cycle(
         "execution_enabled": False,
         "public_market_data_calls": not dry_run and bool(target_results),
         "authenticated_api_calls": False,
-        "provider_api_calls": False,
-        "paid_calls": False,
+        "provider_api_calls": any(bool(row.get("provider_api_calls")) for row in target_results),
+        "provider_api_call_count": sum(
+            int_value(row.get("provider_api_call_count")) for row in target_results
+        ),
+        "paid_calls": any(bool(row.get("paid_calls")) for row in target_results),
+        "paid_call_count": sum(int_value(row.get("paid_call_count")) for row in target_results),
         "database_writes": False,
         "market_execution": False,
         "account_or_order_paths": False,
@@ -244,7 +248,13 @@ def execute_collector_cycle(
         "cadence": cadence,
         "targets": target_results,
         "next_action": next_action(status, cadence),
-        "safety": safety_flags(public_market_data_calls=not dry_run and bool(target_results)),
+        "safety": {
+            **safety_flags(public_market_data_calls=not dry_run and bool(target_results)),
+            "provider_api_calls": any(
+                bool(row.get("provider_api_calls")) for row in target_results
+            ),
+            "paid_calls": any(bool(row.get("paid_calls")) for row in target_results),
+        },
     }
 
 
@@ -294,6 +304,22 @@ def target_result_row(
             "oldest_due_expected_expiration_utc",
         ],
     )
+    safety = artifact.get("safety") if isinstance(artifact.get("safety"), Mapping) else {}
+    provider_api_calls = bool(
+        artifact.get("provider_api_calls") or safety.get("provider_api_calls")
+    )
+    paid_calls = bool(
+        artifact.get("paid_calls")
+        or artifact.get("paid_historical_calls")
+        or safety.get("paid_calls")
+        or safety.get("paid_historical_calls")
+    )
+    provider_api_call_count = int_value(artifact.get("provider_api_call_count"))
+    paid_call_count = int_value(artifact.get("paid_call_count"))
+    if provider_api_calls and provider_api_call_count == 0:
+        provider_api_call_count = 1
+    if paid_calls and paid_call_count == 0:
+        paid_call_count = 1
     return {
         "target_id": target.target_id,
         "make_target": target.make_target,
@@ -306,6 +332,11 @@ def target_result_row(
         "artifact_sha256": sha256_or_none(target.artifact_path),
         "artifact_status": artifact.get("status"),
         "artifact_safe": artifact_is_safe(artifact),
+        "provider_api_calls": provider_api_calls,
+        "provider_api_call_count": provider_api_call_count,
+        "paid_calls": paid_calls,
+        "paid_call_count": paid_call_count,
+        "quota_headers": artifact.get("quota_headers") or summary.get("quota_headers") or {},
         "due_count": due_count,
         "label_count": label_count,
         "capture_count": capture_count,

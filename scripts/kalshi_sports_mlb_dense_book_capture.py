@@ -138,9 +138,13 @@ def capture_rows(
     fetch_orderbook: bool = True,
     request_delay_seconds: float = 0.08,
     generated_utc: str | None = None,
+    max_retries_per_market: int = 0,
+    deadline: float | None = None,
 ) -> list[dict[str, Any]]:
     rows: list[dict[str, Any]] = []
     for market in markets:
+        if deadline is not None and time.time() >= deadline:
+            break
         ticker = str(market.get("ticker") or "").strip()
         if not ticker.startswith("KXMLBGAME"):
             continue
@@ -149,26 +153,45 @@ def capture_rows(
         orderbook_fetch_status = "not_requested"
         request_started_utc = generated_utc or utc_now()
         if fetch_orderbook:
-            try:
-                payload = fetch_json(
-                    f"{KALSHI_PUBLIC_BASE_URL}/markets/"
-                    f"{urllib.parse.quote(ticker, safe='')}/orderbook"
-                )
-                ladder = parse_orderbook_fp(payload)
-                # Prefer explicit market top-of-book prices when present; fill depth from ladder.
-                for key, value in ladder.items():
-                    if quotes.get(key) is None and value is not None:
-                        quotes[key] = value
-                    if key.endswith("depth_top1") and value is not None:
-                        quotes[key] = value
-                orderbook_fetch_succeeded = True
-                orderbook_fetch_status = "succeeded"
-            except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError) as exc:
-                orderbook_fetch_status = f"failed_{type(exc).__name__}"
+            for attempt in range(1 + max(0, max_retries_per_market)):
+                try:
+                    if deadline is not None:
+                        remaining = deadline - time.time()
+                        if remaining <= 0.0:
+                            orderbook_fetch_status = "failed_TimeoutError"
+                            break
+                        timeout = min(30.0, remaining)
+                    else:
+                        timeout = 30.0
+                    payload = fetch_json(
+                        f"{KALSHI_PUBLIC_BASE_URL}/markets/"
+                        f"{urllib.parse.quote(ticker, safe='')}/orderbook",
+                        timeout=timeout
+                    )
+                    ladder = parse_orderbook_fp(payload)
+                    # Prefer explicit market top-of-book prices when present; fill depth from ladder.
+                    for key, value in ladder.items():
+                        if quotes.get(key) is None and value is not None:
+                            quotes[key] = value
+                        if key.endswith("depth_top1") and value is not None:
+                            quotes[key] = value
+                    orderbook_fetch_succeeded = True
+                    orderbook_fetch_status = "succeeded"
+                    break
+                except (urllib.error.HTTPError, urllib.error.URLError, TimeoutError, ValueError) as exc:
+                    orderbook_fetch_status = f"failed_{type(exc).__name__}"
+                    if attempt < max_retries_per_market:
+                        sleep_time = request_delay_seconds * 2
+                        if deadline is not None and time.time() + sleep_time >= deadline:
+                            break
+                        time.sleep(sleep_time)
         observed_utc = generated_utc or utc_now()
         if fetch_orderbook:
             if request_delay_seconds > 0:
-                time.sleep(request_delay_seconds)
+                if deadline is not None and time.time() + request_delay_seconds >= deadline:
+                    pass
+                else:
+                    time.sleep(request_delay_seconds)
         yes_bid = quotes.get("best_yes_bid")
         yes_ask = quotes.get("best_yes_ask")
         mid = None

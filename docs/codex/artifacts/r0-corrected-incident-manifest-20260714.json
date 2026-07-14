@@ -1,0 +1,264 @@
+{
+  "manifest_type": "R0_corrected_incident_preservation",
+  "generated_utc": "2026-07-14T23:45:00Z",
+  "directive": "NEXT_DIRECTIVE_20260714T222132Z_REMEDIATE_UNAUTHORIZED_MERGE_AND_REPROVE_REPO_CONTROL.md",
+  "prior_manifest": "docs/codex/artifacts/r0-evidence-manifest-20260714.json",
+
+  "discrepancies_from_prior_manifest": [
+    {
+      "field": "preflight_sha256",
+      "prior_value": "a80ac83caa755ae498d6287e541398f2da65c370b590674f45c11a3282cebadd",
+      "correct_value": "714a452a59fa733ca38cc9219c783794447c115197d27ac37bce8cde446f30c6",
+      "explanation": "Prior manifest recorded the embedded raw-integrity hash from inside preflight-latest.json, not the SHA-256 of the file itself."
+    },
+    {
+      "field": "preflight_generated_utc",
+      "prior_value": "2026-07-11T03:55:46Z (from embedded field)",
+      "correct_value": "2026-07-11T03:55:46Z (file mtime 2026-07-10T22:55:00Z)",
+      "explanation": "The embedded timestamp matches prior value. File mtime (2026-07-10) differs because the file was last written on Jul 10 with a generated_utc of Jul 11 03:55."
+    },
+    {
+      "field": "worktree_dirty_status",
+      "prior_value": "not included",
+      "correct_value": "included per-worktree below",
+      "explanation": "Prior manifest recorded only HEAD/tips per worktree, not dirty/untracked status."
+    },
+    {
+      "field": "untracked_file_inventory",
+      "prior_value": "269 total, aggregate category counts only",
+      "correct_value": "271 sorted entries with sha256, mtime, size",
+      "explanation": "Prior manifest used aggregate counts only. Actual count is 271 (not 269) due to the two new directive files. Full sorted inventory at canonical_untracked_inventory.csv."
+    },
+    {
+      "field": "commit_disposition",
+      "prior_value": "41 ported, 2 deferred_out_of_scope",
+      "correct_value": "all 43 are ancestors of 63fca31; 'deferred' commits are present in the merge tree",
+      "explanation": "Prior ledger claimed 2 formatting commits were 'deferred_out_of_scope' but both are ancestors of 63fca31. Corrected content-based ledger needed."
+    },
+    {
+      "field": "merge_commit_created",
+      "prior_value": "not disclosed in handoff (claimed no commit occurred)",
+      "correct_value": "merge commit 63fca31 created on codex/repo-control-mlb-sharp-lag-20260714",
+      "explanation": "Prior handoff claimed 'no commit, push, PR, or merge' occurred, but 63fca31 exists."
+    },
+    {
+      "field": "R2 implementation",
+      "prior_value": "Makefile key path fixed",
+      "correct_value": "only one-line Makefile edit; no permission checks, no provider accounting, no dense ops controls",
+      "explanation": "R2 was 1/6th implemented. Corrected manifest reflects actual state."
+    }
+  ],
+
+  "git_state": {
+    "observed_utc": "2026-07-14T22:25:00Z",
+    "canonical_checkout": "/home/mrwatson/projects/predmarket-alpha",
+    "remote_head": "c78eed90b5f22b989b4bd3c1eb3791a7b50f5ba9",
+    "remote_verified": "git ls-remote origin HEAD confirmed",
+    "local_main": {
+      "head": "e431ae263ecab4223b5d3ca403f75731eaf36f7c",
+      "ahead": 43,
+      "behind": 82,
+      "merge_base": "1b27f108ce7aea7d336b25d4aaed7b47cbfdafa2",
+      "dirty": "0 modified, 271 untracked",
+      "status": "canonical divergent branch"
+    },
+    "unsafe_merge": {
+      "commit": "63fca3101bdf38f17c9a1a50d3dca7214fe1831e",
+      "tree": "b313985ebbb23fa42e77be60cedda5211a4ba010",
+      "parent_1": "c78eed90b5f22b989b4bd3c1eb3791a7b50f5ba9 (origin/main)",
+      "parent_2": "e431ae263ecab4223b5d3ca403f75731eaf36f7c (local main)",
+      "parent_1_tree": "2246466692c83e31240d1ee5838fd43bd99d462a",
+      "parent_2_tree": "377a269b3bcc7a8f0ad5429d2ffcb173b4973fb3",
+      "author": "PredMarket Alpha Platform <mrwatson@predmarket-alpha.local>",
+      "timestamp": "2026-07-14T22:15:48-05:00",
+      "message": "Merge commit 'e431ae2' into codex/repo-control-mlb-sharp-lag-20260714",
+      "branch": "codex/repo-control-mlb-sharp-lag-20260714",
+      "branch_only": true,
+      "contained_in_branches": ["codex/repo-control-mlb-sharp-lag-20260714"],
+      "worktree": "/home/mrwatson/projects/predmarket-alpha-worktrees/repo-control-mlb-sharp-lag-20260714",
+      "worktree_status": "3 modified, 3 untracked, ahead 44",
+      "quarantine": "preserved as incident evidence, not deleted or rebased"
+    }
+  },
+
+  "worktrees": [
+    {"path": "/home/mrwatson/projects/predmarket-alpha", "branch": "main", "head": "e431ae263ecab4223b5d3ca403f75731eaf36f7c", "modified": 0, "untracked": 271, "dirty_note": "all untracked (user directives, generated macro artifacts)"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/fable-tick-recorder", "branch": "codex/fable-sports-evidence-2118", "head": "87a62d6c2de9ceac1f340df75081bce9950a17b3", "modified": 0, "untracked": 0, "dirty_note": "clean"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-max-leverage-20260710T043635Z", "branch": "codex/kalshi-sports-max-leverage-20260710T043635Z", "head": "9742ee5b479b1735caf39af0630fd4d4f2497582", "modified": 0, "untracked": 0, "dirty_note": "clean"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-dense-panel-20260710T054721Z", "branch": "codex/kalshi-sports-mlb-dense-panel-20260710T054721Z", "head": "e2042e2acc339f501dc1edf50a3c93bb596fd345", "modified": 0, "untracked": 1, "dirty_note": "untracked .venv"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-dense-panel-ops-origin-main-20260710T170600Z", "branch": "codex/kalshi-sports-mlb-dense-panel-ops-origin-main-20260710T170600Z", "head": "c78eed90b5f22b989b4bd3c1eb3791a7b50f5ba9", "modified": 0, "untracked": 1, "dirty_note": "ACTIVE CRON COLLECTOR at c78eed9, untracked handoff note"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-miscalibration-20260710T050210Z", "branch": "codex/kalshi-sports-mlb-miscalibration-20260710T050210Z", "head": "a1cdf2331c4bb26a26cf556a8bf90ed0d935c7ca", "modified": 0, "untracked": 1, "dirty_note": "untracked .venv"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-panel-ops-hardening-20260710T060259Z", "branch": "codex/kalshi-sports-mlb-panel-ops-hardening-20260710T060259Z", "head": "d4b441a893138ecaa7b75e51fe2a1b1f0033d5a4", "modified": 0, "untracked": 0, "dirty_note": "clean"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-reschedule-repair-20260710T065908Z", "branch": "codex/kalshi-sports-mlb-reschedule-repair-20260710T065908Z", "head": "1644a3bb6f4b9b1d77dfe9086c8b9a0723f182ba", "modified": 0, "untracked": 0, "dirty_note": "clean"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-single-shot-confirmation-20260710T062445Z", "branch": "codex/kalshi-sports-mlb-single-shot-confirmation-20260710T062445Z", "head": "18771a3e5cdcebaf0682e57c15b31f81769abff9", "modified": 0, "untracked": 0, "dirty_note": "clean"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/repo-control-mlb-sharp-lag-20260714", "branch": "codex/repo-control-mlb-sharp-lag-20260714", "head": "63fca3101bdf38f17c9a1a50d3dca7214fe1831e", "status": "QUARANTINED", "modified": 3, "untracked": 3, "dirty_note": "3 modified (Makefile, current-state.md, latest-decision.md), 3 untracked (ledger, manifest, handoff)"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/repo-control-mlb-sharp-lag-20260714-v2", "branch": "codex/repo-control-mlb-sharp-lag-20260714-v2", "head": "c78eed90b5f22b989b4bd3c1eb3791a7b50f5ba9", "modified": 0, "untracked": 4, "dirty_note": "LEGITIMATE INTEGRATION TREE, 4 untracked (corrected-ledger, corrected-manifest, R4-log, handoff)"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha/.kilo/worktrees/brash-salamander", "branch": "brash-salamander", "head": "1b27f108ce7aea7d336b25d4aaed7b47cbfdafa2", "dirty_note": "stale worktree at merge base between main and origin"}
+  ],
+  "worktree_count": 12,
+
+  "untracked_file_inventory": {
+    "canonical_count": 271,
+    "inventory_path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/artifacts/r0-untracked-inventory-20260714.csv",
+    "note": "Sorted file-level inventory with sha256, mtime, size. Credential files excluded from content hash.",
+    "category_breakdown": {
+      "root_directives_and_reports": 9,
+      "docs/codex/macro/": 258,
+      "docs/codex/artifacts/": 2,
+      "docs/architecture/": 1,
+      "docs/codex/artifacts/r0-*": 1
+    }
+  },
+
+  "scheduler": {
+    "observed_utc": "2026-07-14T22:25:00Z",
+    "type": "crontab",
+    "owner": "mrwatson",
+    "cron_block_start": "# PREDMARKET_KALSHI_MLB_DENSE_PANEL_START",
+    "cron_block_end": "# PREDMARKET_KALSHI_MLB_DENSE_PANEL_END",
+    "schedule": "* * * * *",
+    "command": "cd /home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-dense-panel-ops-origin-main-20260710T170600Z && mkdir -p /home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_logs && TMPDIR=/tmp /usr/bin/flock -n /tmp/predmarket-kalshi-mlb-dense-panel-cron.lock /home/mrwatson/projects/predmarket-alpha/.venv/bin/python scripts/kalshi_sports_mlb_dense_panel_ops.py capture --limit 200 --no-write-repo-latest >> /home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_logs/collector.log 2>&1",
+    "worktree_commit": "c78eed90b5f22b989b4bd3c1eb3791a7b50f5ba9",
+    "worktree_path": "/home/mrwatson/projects/predmarket-alpha-worktrees/kalshi-sports-mlb-dense-panel-ops-origin-main-20260710T170600Z",
+    "lock_file": "/tmp/predmarket-kalshi-mlb-dense-panel-cron.lock",
+    "lock_size": 0,
+    "lock_held": false,
+    "process_running": false,
+    "log_path": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_logs/collector.log",
+    "log_lines": 145174,
+    "log_size_bytes": 4995179,
+    "latest_log_entry_utc": "2026-07-14T22:25:00Z (approx)",
+    "status_file": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_status/mlb-dense-panel-status.json",
+    "status_observed_utc": "2026-07-14T22:25:00Z",
+    "status_value": "capture_infrastructure_ready_panel_accumulating"
+  },
+
+  "dense_panel_confirmation": {
+    "directory": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_confirmation",
+    "files": ["preflight-latest.json"],
+    "preflight_path": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_confirmation/preflight-latest.json",
+    "preflight_sha256_file": "714a452a59fa733ca38cc9219c783794447c115197d27ac37bce8cde446f30c6",
+    "preflight_sha256_embedded_raw": "a80ac83caa755ae498d6287e541398f2da65c370b590674f45c11a3282cebadd",
+    "preflight_generated_utc": "2026-07-11T03:55:46Z",
+    "preflight_file_mtime": "2026-07-10T22:55:00Z",
+    "preflight_file_size": 4904,
+    "preflight_status": "confirmation_pending",
+    "confirmation_start_ready": false,
+    "attempt_exists": false,
+    "final_exists": false,
+    "candidate_performance_revealed": false,
+    "execution_enabled": false,
+    "research_only": true,
+    "site_packages_or_pyc_md5": null,
+    "immutable_sentinel_preserved": true,
+    "note": "Container-file hash (714a452a) differs from embedded raw-integrity hash (a80ac83). Both recorded."
+  },
+
+  "credentials_security": {
+    "secure_key_path": "/home/mrwatson/.secrets/the-odds-api/key.txt",
+    "secure_key_mode": "600",
+    "secure_key_owner": "mrwatson",
+    "secure_key_size": 32,
+    "legacy_key_path": "/home/mrwatson/manual_drops/secrets/the_odds_api_key.txt",
+    "legacy_key_mode": "777",
+    "legacy_key_owner": "mrwatson",
+    "legacy_key_size": 64,
+    "secret_contents_never_read": true,
+    "secrets_unchanged": true
+  },
+
+  "manual_drop_path_regression": {
+    "regression_type": "function_missing_in_merge",
+    "function": "manual_drop_path",
+    "defined_in_origin": "predmarket/shared_helpers.py:389",
+    "defined_in_local": false,
+    "present_in_merge": false,
+    "broken_consumers": [
+      "predmarket/sports_consensus_reference_builder.py:24 (from predmarket.shared_helpers import manual_drop_path)",
+      "scripts/kalshi_sports_historical_consensus_archive.py:24-26 (from predmarket.shared_helpers import manual_drop_path)",
+      "predmarket/external_artifact_wrappers.py:12 (from predmarket.shared_helpers import manual_drop_path)"
+    ],
+    "test_collection_result": "ImportError: cannot import name 'manual_drop_path' from 'predmarket.shared_helpers'",
+    "affected_tests": [
+      "tests/test_kalshi_sports_consensus_reference_builder.py",
+      "tests/test_kalshi_sports_historical_consensus_archive.py"
+    ],
+    "root_cause": "git merge -X theirs chose local/main's shared_helpers.py (453 lines, no manual_drop_path) over origin/main's shared_helpers.py (482 lines, has manual_drop_path)"
+  },
+
+  "unsafe_merge_conflict_table": {
+    "total_changed_in_both": 21,
+    "total_added_in_both": 45,
+    "side_selection_summary": {
+      "origin_selected": 8,
+      "local_selected": 4,
+      "mixed_auto_merge": 9
+    },
+    "origin_selected_files": [
+      ".gitignore",
+      "predmarket/config.py",
+      "scripts/kalshi_crypto_proxy_capacity_correlation_decay.py",
+      "scripts/kalshi_crypto_proxy_feature_model_falsification.py",
+      "scripts/kalshi_crypto_proxy_research_candidate_replay.py",
+      "scripts/kalshi_probability_breadth_scout.py",
+      "tests/test_kalshi_manual_drop_capture.py",
+      "tests/test_kalshi_universe_scan.py"
+    ],
+    "local_selected_files": [
+      "docs/codex/current-state.md",
+      "predmarket/resilience.py",
+      "predmarket/type2_candidate_disposition.py",
+      "predmarket/type2_reference_builder.py"
+    ],
+    "mixed_auto_merge_files": [
+      "Makefile",
+      "README.md",
+      "predmarket/kalshi_manual_drop_capture.py",
+      "predmarket/kalshi_universe_scan.py",
+      "scripts/kalshi_contract_ev_ledger.py",
+      "scripts/kalshi_labeled_oos_backtest.py",
+      "tests/conftest.py",
+      "tests/test_codex_macro_blocker_audit.py",
+      "tests/test_dashboard.py"
+    ]
+  },
+
+  "six_missing_scripts": {
+    "status": "all_present_in_merge_tree",
+    "source": "from origin/main",
+    "scripts": [
+      "scripts/kalshi_always_on_collector.py",
+      "scripts/kalshi_sports_consensus_falsification.py",
+      "scripts/kalshi_sports_consensus_observation_loop.py",
+      "scripts/kalshi_sports_consensus_preflight.py",
+      "scripts/kalshi_sports_consensus_reference_build.py",
+      "scripts/kalshi_sports_paper_burn_in_cycle.py"
+    ]
+  },
+
+  "evidence_hashes": {
+    "dense_panel_raw_jsonl": {
+      "path": "/home/mrwatson/manual_drops/kalshi_sports_mlb_dense_panel_raw/mlb_dense_panel_snapshots.jsonl",
+      "sha256": "1bd0a2ab7b6cf5fd3f96d0e191a2957fea533a671c058a60be5482bdccfbdc01",
+      "note": "dynamic file, observed at 2026-07-14T22:25:00Z"
+    },
+    "historical_consensus": {
+      "path": "/home/mrwatson/manual_drops/kalshi_sports_historical_consensus",
+      "sha256s": "recorded in prior manifest (20 files)",
+      "note": "immutable archive, hashes from prior manifest are correct"
+    },
+    "line_moves": {
+      "path": "/home/mrwatson/manual_drops/kalshi_sports_line_moves",
+      "sha256s": "recorded in prior manifest (3 files)",
+      "note": "static archive, stopped logging Jul 7"
+    }
+  },
+
+  "phase_0_exit": "R0_evidence_captured_and_corrected",
+  "manifest_duplicates": [
+    {"path": "/home/mrwatson/projects/predmarket-alpha/docs/codex/artifacts/r0-evidence-manifest-20260714.json", "sha256": "c79da288a3a2dab2a53959cc7afa2a30c2964cdf84b71b00d574ae6933b4157a", "note": "identical copy in canonical checkout (dirty main)"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/repo-control-mlb-sharp-lag-20260714/docs/codex/artifacts/r0-evidence-manifest-20260714.json", "sha256": "c79da288a3a2dab2a53959cc7afa2a30c2964cdf84b71b00d574ae6933b4157a", "note": "identical copy in quarantined V1 worktree"},
+    {"path": "/home/mrwatson/projects/predmarket-alpha-worktrees/repo-control-mlb-sharp-lag-20260714-v2/docs/codex/artifacts/r0-corrected-incident-manifest-20260714.json", "sha256": "2303a5733fa074598db65ccfaa112108459cf3388313ce535933848ba0722828", "note": "this corrected file in V2 worktree"}
+  ],
+  "preservation_promise": "all branches, worktrees, untracked files, evidence, and 63fca31 left intact. None modified, deleted, or stashed."
+}
