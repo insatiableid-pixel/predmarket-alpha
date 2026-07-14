@@ -1,6 +1,9 @@
 # Codex Current State
 
-Last updated: 2026-07-10
+Last updated: 2026-07-14
+
+- 2026-07-14 repo-control-mlb-sharp-lag remediation: remediated unauthorized merge commit `63fca31` by building clean V2 integration tree from `origin/main=c78eed9` (which is the accepted code baseline). Merge `63fca31` is quarantined on a separate worktree. Static sharp-consensus evidence had zero FDR survivors; dynamic sharp-to-Kalshi latency is unproven; dense confirmation remains outcome-blind and pending; and paid, scheduler, and live work remains unauthorized. Verification of R2 controls completed with all unit/integration/Kalshi tests passing.
+
 
 ## Canonical Root
 

@@ -1,0 +1,59 @@
+R4 Durable Verification Log
+===========================
+Generated: 2026-07-14T23:15:00Z
+Worktree: codex/repo-control-mlb-sharp-lag-20260714-v2
+Baseline: origin/main=c78eed9
+
+Gate                          Result       Details
+----                          ------       -------
+1. git diff --check           PASS         No whitespace errors
+2. git status                 CLEAN        5 untracked, 10 modified (repaired R2 files)
+3. Focused R2 tests           32/32 pass   tests/test_sports_consensus_r2_controls.py
+4. Focused sports suite       54/54 pass   R2 + archive + always-on + soccer asian provider
+5. make test-unit             1524/1524 pass Full unit suite, 0 failures (15 deselected)
+6. make kalshi-verify         53/53 pass   Kalshi verification suite
+7. make lint-baseline-check   PASS         101 errors (within ratchet, 0 net regression)
+8. make tech-debt-check       PASS         22/22 total tech-debt markers
+9. make file-sizes-check      PASS         3 oversized files (no new)
+10. make modularize           PASS         Import boundaries kept (2 kept, 0 broken)
+
+Touched files:
+  predmarket/sports_consensus_reference_builder.py (M)
+    - _read_api_key(): permission rejection for group/world-accessible keys
+    - QuotaBudget class with per-run/day/tranche enforcement & response quota reconciliation
+    - capture_the_odds_api_current(): budget parameter and reconciliation before/after transport
+
+  predmarket/sports_consensus_sharp_provider_capture.py (M)
+    - paid_calls/provider_api_calls counts set truthfully from call metadata
+
+  scripts/kalshi_always_on_collector.py (M)
+    - provider_api_calls/paid_calls counts/bools propagated from target artifacts
+
+  scripts/kalshi_sports_mlb_dense_book_capture.py (M)
+    - capture_rows(): max_retries_per_market + deadline kwargs added; HTTP attempts and sleep bounded by remaining time to deadline
+
+  scripts/kalshi_sports_mlb_dense_panel_ops.py (M)
+    - _disk_usage_ok(): disk ceiling check
+    - _freshness_alarm(): stale capture warning
+    - _runtime_info(): version/cadence/deadline reporting
+    - cmd_capture(): outer deadline, bounded retries, collector.log retention, disk pre-check, controls in payload
+    - cmd_status(): --check mode (outcome-blind preflight), stale/disk alarms, runtime info
+
+  tests/test_sports_consensus_r2_controls.py (added)
+    - 32 tests covering key permission, quota budget, paid_calls, dense-panel controls, log rotation
+
+Artifacts:
+  - docs/codex/artifacts/r0-corrected-incident-manifest-20260714.json
+  - docs/codex/artifacts/commit-disposition-corrected-ledger-20260714.json
+  - docs/codex/artifacts/r4-verification-log-20260714.txt (this file)
+  - docs/codex/tranches/2026-07-14-repo-control-remediation.md
+
+Untouched (confirmed):
+  - No crontab/systemd timers modified
+  - No secrets read, printed, hashed, copied, chmod'd, deleted, rotated, or revoked
+  - No scheduler intervals or approval queues mutated
+  - No paid API calls made to production
+  - No destructive cleanup performed
+  - No live execution, accounts, or order paths touched
+  - Original merge commit 63fca31 preserved on quarantined worktree (not deleted/rebased)
+  - All other worktrees (10), cron c78eed9 ops collector, frozen confirmation state all untouched

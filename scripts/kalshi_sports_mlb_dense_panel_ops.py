@@ -14,10 +14,12 @@ from __future__ import annotations
 
 import argparse
 import json
+import shutil
 import sys
+import time
 from collections import Counter
 from collections.abc import Mapping, Sequence
-from datetime import UTC, datetime
+from datetime import UTC, datetime, timedelta
 from pathlib import Path
 from typing import Any
 
@@ -78,6 +80,59 @@ DEFAULT_BOOK_DIR = manual_drop_path(
     "kalshi_sports_mlb_fixed_clock_books",
     env_vars=("KALSHI_SPORTS_MLB_DENSE_BOOK_DIR",),
 )
+DEFAULT_LOG_DIR = manual_drop_path(
+    "kalshi_sports_mlb_dense_panel_logs",
+    env_vars=("KALSHI_SPORTS_MLB_DENSE_PANEL_LOG_DIR",),
+)
+
+# Dense-panel operational controls.
+MAX_CAPTURE_DEADLINE_SECONDS = 300  # outer deadline for one capture cycle
+MAX_BOUNDED_RETRIES_PER_MARKET = 2
+DISK_CEILING_BYTES = 500 * 1024 * 1024  # 500 MB max raw data before alarm
+FRESHNESS_ALARM_SECONDS = 600  # warn if last capture older than 10 minutes
+DENSE_PANEL_SCRIPT_VERSION = "mlb_dense_panel_ops_v2"
+
+
+def _rotate_collector_log(log_dir: Path) -> None:
+    """Rotate collector.log if it exists and is too large."""
+    import hashlib
+    log_path = log_dir / "collector.log"
+    if not log_path.is_file():
+        return
+    MAX_LOG_SIZE = 10 * 1024 * 1024
+    if log_path.stat().st_size <= MAX_LOG_SIZE:
+        return
+    MAX_BACKUPS = 5
+    for i in range(MAX_BACKUPS - 1, 0, -1):
+        src = log_dir / f"collector.log.{i}"
+        src_meta = log_dir / f"collector.log.{i}.meta.json"
+        dst = log_dir / f"collector.log.{i+1}"
+        dst_meta = log_dir / f"collector.log.{i+1}.meta.json"
+        if src.is_file():
+            if dst.is_file():
+                dst.unlink()
+            src.rename(dst)
+        if src_meta.is_file():
+            if dst_meta.is_file():
+                dst_meta.unlink()
+            src_meta.rename(dst_meta)
+
+    backup_path = log_dir / "collector.log.1"
+    backup_meta_path = log_dir / "collector.log.1.meta.json"
+    try:
+        content = log_path.read_bytes()
+        sha256 = hashlib.sha256(content).hexdigest()
+        backup_path.write_bytes(content)
+        meta = {
+            "rotated_at_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+            "original_size_bytes": len(content),
+            "sha256": sha256,
+        }
+        backup_meta_path.write_text(json.dumps(meta, indent=2) + "\n", encoding="utf-8")
+        log_path.write_bytes(b"")
+    except Exception as exc:
+        sys.stderr.write(f"Warning: collector log rotation failed: {exc}\n")
+
 
 
 def eligible_capture_clocks(market: Mapping[str, Any], *, observed_utc: str) -> tuple[str, ...]:
@@ -193,6 +248,44 @@ def enrich_capture_rows(
     return enriched
 
 
+def _disk_usage_ok(raw_dir: Path) -> tuple[bool, str]:
+    """Check disk usage for raw data directory."""
+    total = sum(
+        f.stat().st_size for f in raw_dir.rglob("*") if f.is_file()
+    ) if raw_dir.is_dir() else 0
+    ok = total <= DISK_CEILING_BYTES
+    msg = (
+        f"raw data disk usage {total} bytes / {DISK_CEILING_BYTES} ceiling OK"
+        if ok
+        else f"raw data disk usage {total} bytes exceeds {DISK_CEILING_BYTES} ceiling"
+    )
+    return ok, msg
+
+
+def _freshness_alarm(last_capture_utc: str | None) -> tuple[bool, str | None]:
+    """Return stale alarm if latest snapshot exceeds freshness threshold."""
+    if last_capture_utc is None:
+        return True, "no captures yet"
+    ts = timestamp(last_capture_utc)
+    if ts is None:
+        return True, "cannot parse last_capture_utc"
+    elapsed = time.time() - ts
+    if elapsed > FRESHNESS_ALARM_SECONDS:
+        return True, f"last capture {elapsed:.0f}s ago exceeds {FRESHNESS_ALARM_SECONDS}s threshold"
+    return False, None
+
+
+def _runtime_info() -> dict[str, Any]:
+    return {
+        "script_version": DENSE_PANEL_SCRIPT_VERSION,
+        "capture_cadence_seconds": CAPTURE_CADENCE_SECONDS,
+        "outer_deadline_seconds": MAX_CAPTURE_DEADLINE_SECONDS,
+        "bounded_retries_per_market": MAX_BOUNDED_RETRIES_PER_MARKET,
+        "disk_ceiling_bytes": DISK_CEILING_BYTES,
+        "freshness_alarm_seconds": FRESHNESS_ALARM_SECONDS,
+    }
+
+
 def build_schedule_revision_rows(
     markets: Sequence[Mapping[str, Any]],
     existing_rows: Sequence[Mapping[str, Any]],
@@ -259,7 +352,10 @@ def cmd_capture(
     fetch_orderbook: bool,
     request_delay: float,
     write_repo_latest: bool = False,
+    log_dir: Path | None = None,
 ) -> dict[str, Any]:
+    deadline = time.time() + MAX_CAPTURE_DEADLINE_SECONDS
+
     lock = CaptureLock(raw_dir / "collector.lock")
     ok, lock_msg = lock.acquire()
     if not ok:
@@ -271,9 +367,27 @@ def cmd_capture(
         }
     try:
         generated = utc_now()
-        markets = list_open_mlb(limit=limit)
+        raw_dir.mkdir(parents=True, exist_ok=True)
         raw_path = raw_dir / "mlb_dense_panel_snapshots.jsonl"
+
+        # Disk ceiling check before collection.
+        disk_ok, disk_msg = _disk_usage_ok(raw_dir)
+        if not disk_ok:
+            return {
+                "status": "capture_aborted_disk_ceiling_exceeded",
+                "detail": disk_msg,
+                "research_only": True,
+                "execution_enabled": False,
+            }
+
+        # Log retention for collector log.
+        if log_dir is not None:
+            _rotate_collector_log(log_dir)
+
+        markets = list_open_mlb(limit=limit)
         existing = load_raw_snapshots(raw_path)
+        stale, stale_msg = _freshness_alarm(latest_snapshot_utc(existing))
+
         schedule_revisions = build_schedule_revision_rows(
             markets,
             existing,
@@ -282,11 +396,16 @@ def cmd_capture(
         eligible_markets, window_diagnostics = select_capture_window_markets(
             markets, observed_utc=generated
         )
+
+        # Bounded retries with outer deadline.
         rows = capture_rows(
             eligible_markets,
             fetch_orderbook=fetch_orderbook,
             request_delay_seconds=request_delay,
+            max_retries_per_market=MAX_BOUNDED_RETRIES_PER_MARKET,
+            deadline=deadline,
         )
+
         enriched = enrich_capture_rows(rows, generated_utc=generated)
         # Load existing hashes for idempotent restart.
         seen = {str(row.get("raw_payload_hash") or snapshot_payload_hash(row)) for row in existing}
@@ -336,6 +455,8 @@ def cmd_capture(
                 "append_stats": append_stats,
                 "lock": lock_msg,
                 "packet_written": packet_written,
+                "max_bounded_retries": MAX_BOUNDED_RETRIES_PER_MARKET,
+                "deadline_seconds": MAX_CAPTURE_DEADLINE_SECONDS,
             },
             "coverage": coverage,
             "health": health,
@@ -343,6 +464,13 @@ def cmd_capture(
             "research_only": True,
             "execution_enabled": False,
             "candidate_performance_revealed": False,
+            "runtime": _runtime_info(),
+            "controls": {
+                "stale": stale,
+                "stale_detail": stale_msg,
+                "disk_ok": disk_ok,
+                "disk_detail": disk_msg,
+            },
         }
         status_dir.mkdir(parents=True, exist_ok=True)
         atomic_write_json(status_dir / "mlb-dense-panel-status.json", status_payload)
@@ -372,16 +500,19 @@ def cmd_capture(
 
 
 def cmd_status(
-    *, raw_dir: Path, status_dir: Path, write_repo_latest: bool = False
+    *, raw_dir: Path, status_dir: Path, write_repo_latest: bool = False, check: bool = False
 ) -> dict[str, Any]:
     raw_path = raw_dir / "mlb_dense_panel_snapshots.jsonl"
     rows = load_raw_snapshots(raw_path)
     coverage = assess_panel_coverage(rows)
+    last_cap_utc = latest_snapshot_utc(rows)
+    stale, stale_msg = _freshness_alarm(last_cap_utc)
+    disk_ok, disk_msg = _disk_usage_ok(raw_dir)
     health = health_status(
         lock_path=raw_dir / "collector.lock",
         raw_path=raw_path,
         coverage=coverage,
-        last_capture_utc=latest_snapshot_utc(rows),
+        last_capture_utc=last_cap_utc,
     )
     confirmation = frozen_candidate_confirmation_state(coverage)
     payload = {
@@ -398,13 +529,31 @@ def cmd_status(
             if confirmation.get("confirmation_power_met")
             else ("continue_dense_capture_accumulation; do not model or retune")
         ),
-        "capture_cadence_seconds": CAPTURE_CADENCE_SECONDS,
+        "runtime": _runtime_info(),
+        "controls": {
+            "stale": stale,
+            "stale_detail": stale_msg,
+            "disk_ok": disk_ok,
+            "disk_detail": disk_msg,
+        },
         "scheduling_note": (
             f"Recommended: systemd user timer or cron every {CAPTURE_CADENCE_SECONDS}s "
             "invoking `python scripts/kalshi_sports_mlb_dense_panel_ops.py capture`. "
             "PID lock prevents duplicate collectors."
         ),
     }
+    if check:
+        all_ok = (
+            bool(coverage.get("capture_infrastructure_ready"))
+            and not stale
+            and disk_ok
+        )
+        payload["preflight_check"] = {
+            "all_ok": all_ok,
+            "infrastructure_ready": bool(coverage.get("capture_infrastructure_ready")),
+            "freshness_ok": not stale,
+            "disk_ok": disk_ok,
+        }
     status_dir.mkdir(parents=True, exist_ok=True)
     atomic_write_json(status_dir / "mlb-dense-panel-status.json", payload)
     if write_repo_latest:
@@ -420,6 +569,7 @@ def cmd_status(
         "execution_enabled": False,
         "runtime_status_path": str(status_dir / "mlb-dense-panel-status.json"),
         "repo_latest_written": write_repo_latest,
+        "preflight_check": payload.get("preflight_check"),
     }
 
 
@@ -449,6 +599,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     cap.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
     cap.add_argument("--book-dir", type=Path, default=DEFAULT_BOOK_DIR)
     cap.add_argument("--status-dir", type=Path, default=DEFAULT_STATUS_DIR)
+    cap.add_argument("--log-dir", type=Path, default=DEFAULT_LOG_DIR)
     cap.add_argument("--limit", type=int, default=200)
     cap.add_argument("--fetch-orderbook", action=argparse.BooleanOptionalAction, default=True)
     cap.add_argument("--request-delay-seconds", type=float, default=0.08)
@@ -458,6 +609,7 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     st.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
     st.add_argument("--status-dir", type=Path, default=DEFAULT_STATUS_DIR)
     st.add_argument("--write-repo-latest", action=argparse.BooleanOptionalAction, default=False)
+    st.add_argument("--check", action="store_true", help="Outcome-blind preflight check (no capture)")
 
     rp = sub.add_parser("replay", help="Offline replay from raw JSONL")
     rp.add_argument("--raw-dir", type=Path, default=DEFAULT_RAW_DIR)
@@ -479,12 +631,14 @@ def main(argv: Sequence[str] | None = None) -> int:
                 fetch_orderbook=bool(args.fetch_orderbook),
                 request_delay=float(args.request_delay_seconds),
                 write_repo_latest=bool(args.write_repo_latest),
+                log_dir=args.log_dir,
             )
         elif args.command == "status":
             result = cmd_status(
                 raw_dir=args.raw_dir,
                 status_dir=args.status_dir,
                 write_repo_latest=bool(args.write_repo_latest),
+                check=bool(args.check),
             )
         elif args.command == "replay":
             result = cmd_replay(raw_dir=args.raw_dir)

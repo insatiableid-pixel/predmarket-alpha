@@ -183,7 +183,7 @@ def test_sports_consensus_key_file_default_follows_manual_drop_root(
         "_path_default_sports_consensus_builder",
     )
 
-    assert builder.DEFAULT_KEY_FILE == root / "secrets" / "the_odds_api_key.txt"
+    assert builder.DEFAULT_KEY_FILE == Path.home() / ".secrets" / "the-odds-api" / "key.txt"
 
     monkeypatch.setenv("KALSHI_SPORTS_CONSENSUS_KEY_FILE", str(override))
     overridden = load_script(

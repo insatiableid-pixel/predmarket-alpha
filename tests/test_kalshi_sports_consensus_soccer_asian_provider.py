@@ -2,6 +2,8 @@ from __future__ import annotations
 
 import importlib.util
 import json
+import os
+import stat
 from pathlib import Path
 
 from predmarket.sports_consensus_soccer_asian_provider import (
@@ -160,6 +162,7 @@ def test_script_auto_captures_when_target_books_were_not_requested(
         encoding="utf-8",
     )
     key_file.write_text("test-key", encoding="utf-8")
+    os.chmod(key_file, stat.S_IRUSR | stat.S_IWUSR)
     calls: list[tuple[str, ...]] = []
 
     def fake_capture(**kwargs):

@@ -10,18 +10,20 @@ from __future__ import annotations
 import hashlib
 import json
 import math
+import os
+import stat
 import time
 import urllib.error
 import urllib.parse
 import urllib.request
 from collections.abc import Callable, Mapping, Sequence
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any
 from zoneinfo import ZoneInfo
 
-from predmarket.shared_helpers import manual_drop_path
+from predmarket.shared_helpers import configured_path, manual_drop_path
 
 MLB_TEAM_TO_ABBR = {
     "Arizona Diamondbacks": "ARI",
@@ -75,13 +77,192 @@ THE_ODDS_API_ENDPOINT = "https://api.the-odds-api.com/v4/sports/{sport_key}/odds
 DEFAULT_REQUIRED_BOOKS = ("pinnacle", "betfair_ex_uk", "matchbook", "smarkets")
 DEFAULT_RAW_DIR = manual_drop_path("odds_api")
 DEFAULT_REFERENCE_JSON = manual_drop_path("predmarket", "sports-no-vig-consensus.json")
-DEFAULT_KEY_FILE = manual_drop_path(
-    "secrets",
-    "the_odds_api_key.txt",
-    env_vars=("KALSHI_SPORTS_CONSENSUS_KEY_FILE", "THE_ODDS_API_KEY_FILE"),
+DEFAULT_KEY_FILE = configured_path(
+    Path.home() / ".secrets" / "the-odds-api" / "key.txt",
+    "KALSHI_SPORTS_CONSENSUS_KEY_FILE",
+    "THE_ODDS_API_KEY_FILE",
+)
+DEFAULT_QUOTA_LEDGER = manual_drop_path(
+    "odds_api",
+    "quota-budget.json",
+    env_vars=("PREDMARKET_ODDS_API_QUOTA_LEDGER",),
 )
 
 Transport = Callable[[str, float], "HttpResponse"]
+
+
+DEFAULT_PER_RUN_BUDGET = 0
+DEFAULT_PER_DAY_BUDGET = 0
+DEFAULT_PER_TRANCHE_BUDGET = 0
+
+
+@dataclass
+class QuotaBudget:
+    used_per_run: int = 0
+    used_per_day: int = 0
+    used_per_tranche: int = 0
+    max_per_run: int = DEFAULT_PER_RUN_BUDGET
+    max_per_day: int = DEFAULT_PER_DAY_BUDGET
+    max_per_tranche: int = DEFAULT_PER_TRANCHE_BUDGET
+    ledger_path: Path | None = None
+    tranche_id: str = "unapproved"
+    run_id: str = field(default_factory=lambda: f"pid-{os.getpid()}")
+
+    @classmethod
+    def from_environment(cls) -> "QuotaBudget":
+        return cls(
+            max_per_run=_nonnegative_env_int(
+                "PREDMARKET_ODDS_API_MAX_PER_RUN", DEFAULT_PER_RUN_BUDGET
+            ),
+            max_per_day=_nonnegative_env_int(
+                "PREDMARKET_ODDS_API_MAX_PER_DAY", DEFAULT_PER_DAY_BUDGET
+            ),
+            max_per_tranche=_nonnegative_env_int(
+                "PREDMARKET_ODDS_API_MAX_PER_TRANCHE", DEFAULT_PER_TRANCHE_BUDGET
+            ),
+            ledger_path=DEFAULT_QUOTA_LEDGER,
+            tranche_id=os.getenv("PREDMARKET_ODDS_API_TRANCHE_ID", "unapproved").strip()
+            or "unapproved",
+            run_id=os.getenv("PREDMARKET_ODDS_API_RUN_ID", f"pid-{os.getpid()}").strip()
+            or f"pid-{os.getpid()}",
+        )
+
+    def check(self, requested: int = 1) -> bool:
+        return (
+            self.used_per_run + requested <= self.max_per_run
+            and self.used_per_day + requested <= self.max_per_day
+            and self.used_per_tranche + requested <= self.max_per_tranche
+        )
+
+    def consume(self, count: int = 1) -> None:
+        if count < 1:
+            return
+        if self.ledger_path is not None:
+            self._consume_persistent(count)
+            return
+        if not self.check(count):
+            raise RuntimeError(self._exceeded_message(count))
+        self.used_per_run += count
+        self.used_per_day += count
+        self.used_per_tranche += count
+
+    def reset_run(self) -> None:
+        self.used_per_run = 0
+
+    def snapshot(self) -> dict[str, Any]:
+        return {
+            "used_per_run": self.used_per_run,
+            "used_per_day": self.used_per_day,
+            "used_per_tranche": self.used_per_tranche,
+            "max_per_run": self.max_per_run,
+            "max_per_day": self.max_per_day,
+            "max_per_tranche": self.max_per_tranche,
+            "tranche_id": self.tranche_id,
+            "run_id": self.run_id,
+            "fail_closed": True,
+        }
+
+    def _exceeded_message(self, count: int) -> str:
+        return (
+            "QuotaBudget exceeded before transport: "
+            f"run={self.used_per_run}+{count}>{self.max_per_run}, "
+            f"day={self.used_per_day}+{count}>{self.max_per_day}, "
+            f"tranche={self.used_per_tranche}+{count}>{self.max_per_tranche}"
+        )
+
+    def _consume_persistent(self, count: int) -> None:
+        import fcntl
+
+        assert self.ledger_path is not None
+        path = self.ledger_path.expanduser()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        day_utc = datetime.now(UTC).date().isoformat()
+        with path.open("a+", encoding="utf-8") as handle:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            handle.seek(0)
+            try:
+                raw = json.load(handle)
+            except (json.JSONDecodeError, ValueError):
+                raw = {}
+            state = raw if isinstance(raw, dict) else {}
+            run_used = int(state.get("run_used") or 0) if state.get("run_id") == self.run_id else 0
+            day_used = int(state.get("day_used") or 0) if state.get("day_utc") == day_utc else 0
+            tranche_used = (
+                int(state.get("tranche_used") or 0)
+                if state.get("tranche_id") == self.tranche_id
+                else 0
+            )
+            self.used_per_run = run_used
+            self.used_per_day = day_used
+            self.used_per_tranche = tranche_used
+            if not self.check(count):
+                raise RuntimeError(self._exceeded_message(count))
+            self.used_per_run += count
+            self.used_per_day += count
+            self.used_per_tranche += count
+            persisted = {
+                "schema_version": 1,
+                "day_utc": day_utc,
+                "day_used": self.used_per_day,
+                "tranche_id": self.tranche_id,
+                "tranche_used": self.used_per_tranche,
+                "run_id": self.run_id,
+                "run_used": self.used_per_run,
+                "updated_utc": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+                "provider_quota": state.get("provider_quota") or {},
+            }
+            handle.seek(0)
+            handle.truncate()
+            json.dump(persisted, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+
+    def reconcile(self, headers: Mapping[str, str]) -> None:
+        if not headers or self.ledger_path is None:
+            return
+        quota_h = _quota_headers(headers)
+        remaining = quota_h.get("x-requests-remaining")
+        used = quota_h.get("x-requests-used")
+        if remaining is None and used is None:
+            return
+
+        import fcntl
+        path = self.ledger_path.expanduser()
+        path.parent.mkdir(parents=True, exist_ok=True)
+        with path.open("a+", encoding="utf-8") as handle:
+            fcntl.flock(handle.fileno(), fcntl.LOCK_EX)
+            handle.seek(0)
+            try:
+                raw = json.load(handle)
+            except (json.JSONDecodeError, ValueError):
+                raw = {}
+            state = raw if isinstance(raw, dict) else {}
+
+            provider_quota = state.setdefault("provider_quota", {})
+            if remaining is not None:
+                provider_quota["x_requests_remaining"] = str(remaining)
+            if used is not None:
+                provider_quota["x_requests_used"] = str(used)
+
+            state["updated_utc"] = datetime.now(UTC).isoformat().replace("+00:00", "Z")
+            handle.seek(0)
+            handle.truncate()
+            json.dump(state, handle, indent=2, sort_keys=True)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+
+
+
+def _nonnegative_env_int(name: str, default: int) -> int:
+    raw = os.getenv(name)
+    if raw is None or not raw.strip():
+        return default
+    value = int(raw)
+    if value < 0:
+        raise ValueError(f"{name} must be non-negative")
+    return value
 
 
 @dataclass(frozen=True)
@@ -228,6 +409,7 @@ def capture_the_odds_api_current(
     timeout_seconds: float = 20.0,
     created_at_utc: str | None = None,
     transport: Transport | None = None,
+    quota_budget: QuotaBudget | None = None,
 ) -> tuple[list[Mapping[str, Any]], dict[str, Any], Path]:
     if not api_key.strip():
         raise ValueError("api_key must be non-empty")
@@ -246,7 +428,14 @@ def capture_the_odds_api_current(
         markets=markets,
         odds_format=odds_format,
     )
+    budget = quota_budget
+    if budget is None and transport is None:
+        budget = QuotaBudget.from_environment()
+    if budget is not None:
+        budget.consume(1)
     response = (transport or _urlopen_fetch)(url, timeout_seconds)
+    if budget is not None:
+        budget.reconcile(response.headers)
     payload, json_ok = _decode_json(response.body)
     rows = payload if isinstance(payload, list) else []
     raw_path.write_text(json.dumps(payload, indent=2, sort_keys=True) + "\n", encoding="utf-8")
@@ -262,6 +451,9 @@ def capture_the_odds_api_current(
         "markets": list(markets),
         "odds_format": odds_format,
         "provider_api_calls": True,
+        "provider_api_call_count": 1,
+        "paid_calls": True,
+        "paid_call_count": 1,
         "paid_historical_calls": False,
         "database_writes": False,
         "account_or_order_paths": False,
@@ -269,6 +461,7 @@ def capture_the_odds_api_current(
         "api_key_printed": False,
         "status_code": response.status_code,
         "quota_headers": _quota_headers(response.headers),
+        "quota_budget": budget.snapshot() if budget is not None else None,
         "event_count": len(rows),
         "json_decode_ok": json_ok,
         "raw_path": str(raw_path),
@@ -287,6 +480,9 @@ def capture_the_odds_api_current(
         },
         "safety": {
             "provider_api_calls": True,
+            "provider_api_call_count": 1,
+            "paid_calls": True,
+            "paid_call_count": 1,
             "paid_historical_calls": False,
             "database_writes": False,
             "account_or_order_paths": False,
@@ -325,6 +521,7 @@ def run_sports_consensus_reference_build(
         captures.append((_read_json_list(raw_path), _read_json_object(meta_path), raw_path))
     if capture_current:
         api_key = _read_api_key(api_key_file)
+        quota_budget = QuotaBudget.from_environment()
         for sport_key in sport_keys:
             payload, meta, raw_path = capture_the_odds_api_current(
                 api_key=api_key,
@@ -335,6 +532,7 @@ def run_sports_consensus_reference_build(
                 markets=markets,
                 odds_format=odds_format,
                 timeout_seconds=timeout_seconds,
+                quota_budget=quota_budget,
             )
             captures.append((payload, meta, raw_path))
     reference, report = build_sports_consensus_reference(
@@ -695,9 +893,33 @@ def _event_has_required_books(
 
 
 def _read_api_key(path: Path) -> str:
-    key = path.expanduser().read_text(encoding="utf-8").strip()
+    expanded = path.expanduser()
+    flags = os.O_RDONLY | getattr(os, "O_NOFOLLOW", 0)
+    try:
+        descriptor = os.open(expanded, flags)
+    except FileNotFoundError:
+        raise FileNotFoundError(f"API key file not found: {expanded}") from None
+    except OSError as exc:
+        raise PermissionError(f"API key file must be a regular non-symlink file: {expanded}") from exc
+    try:
+        metadata = os.fstat(descriptor)
+        mode = metadata.st_mode
+        if not stat.S_ISREG(mode):
+            raise PermissionError(f"API key path is not a regular file: {expanded}")
+        if metadata.st_uid != os.getuid():
+            raise PermissionError(f"API key file is not owned by the current user: {expanded}")
+        if mode & 0o077:
+            raise PermissionError(
+                f"API key file is group/world-accessible (mode {oct(mode & 0o777)}): {expanded}"
+            )
+        with os.fdopen(descriptor, "r", encoding="utf-8") as handle:
+            descriptor = -1
+            key = handle.read().strip()
+    finally:
+        if descriptor >= 0:
+            os.close(descriptor)
     if not key:
-        raise ValueError(f"API key file is empty: {path}")
+        raise ValueError(f"API key file is empty: {expanded}")
     return key
 
 

@@ -66,6 +66,9 @@ def capture_sharp_provider_sources(
                         "status": "sharp_provider_capture_error",
                         "error": str(exc),
                         "provider_api_calls": True,
+                        "provider_api_call_count": 1,
+                        "paid_calls": True,
+                        "paid_call_count": 1,
                     },
                     "raw_path": None,
                     "error": str(exc),
@@ -173,6 +176,14 @@ def build_sharp_provider_capture_report(
         )
 
     error_count = sum(1 for row in source_rows if row.get("error"))
+    provider_api_call_count = sum(
+        _call_count(capture.get("meta"), "provider_api_call_count", "provider_api_calls")
+        for capture in captures
+    )
+    paid_call_count = sum(
+        _call_count(capture.get("meta"), "paid_call_count", "paid_calls")
+        for capture in captures
+    )
     provider_ids = sorted(provider_counter)
     status = _status(
         capture_count=len(captures),
@@ -215,13 +226,17 @@ def build_sharp_provider_capture_report(
         "execution_enabled": False,
         "market_execution": False,
         "account_or_order_paths": False,
-        "provider_api_calls": bool(captures),
-        "paid_calls": False,
+        "provider_api_calls": provider_api_call_count > 0,
+        "provider_api_call_count": provider_api_call_count,
+        "paid_calls": paid_call_count > 0,
+        "paid_call_count": paid_call_count,
         "database_writes": False,
         "raw_provider_payload_copied": False,
         "safety": {
-            "provider_api_calls": bool(captures),
-            "paid_calls": False,
+            "provider_api_calls": provider_api_call_count > 0,
+            "provider_api_call_count": provider_api_call_count,
+            "paid_calls": paid_call_count > 0,
+            "paid_call_count": paid_call_count,
             "database_writes": False,
             "account_or_order_paths": False,
             "market_execution": False,
@@ -244,6 +259,14 @@ def build_sharp_provider_capture_report(
         "source_rows": source_rows,
         "providers": [_provider_row(provider_id, provider_counter[provider_id]) for provider_id in provider_ids],
     }
+
+
+def _call_count(meta_value: Any, count_key: str, bool_key: str) -> int:
+    meta = meta_value if isinstance(meta_value, Mapping) else {}
+    raw_count = meta.get(count_key)
+    if isinstance(raw_count, int) and raw_count >= 0:
+        return raw_count
+    return 1 if meta.get(bool_key) is True else 0
 
 
 def render_sharp_provider_capture_markdown(report: Mapping[str, Any]) -> str:
